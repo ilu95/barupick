@@ -8023,8 +8023,8 @@
                         if (r.colors) Object.entries(r.colors).forEach(([p,k]) => { if (k && COLORS_60[k]) outfitHex[p] = COLORS_60[k].hex; });
                         const hasPhoto = r.photos && r.photos.length > 0;
                         const thumbImg = hasPhoto
-                            ? `<img src="${r.photos[0]}" class="w-10 h-10 rounded-xl object-cover border border-warm-300">`
-                            : (Object.keys(outfitHex).length > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'width:32px;height:44px;object-fit:contain') : '');
+                            ? `<img src="${r.photos[0]}" class="w-20 h-20 rounded-xl object-cover border border-warm-300">`
+                            : (Object.keys(outfitHex).length > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'width:50px;height:70px;object-fit:contain') : '');
                         return `<div onclick="app.openOotdDetail('${r.date}')" class="flex items-center gap-3 bg-white border border-warm-400 rounded-2xl px-4 py-2.5 mb-2 cursor-pointer shadow-warm-sm active:scale-[0.98] transition-all">
                             <div class="flex-shrink-0 text-center" style="min-width:32px">
                                 <div class="font-display text-base font-bold text-warm-900">${rd.getDate()}</div>
@@ -12755,11 +12755,13 @@
                                 if (e[1]) { var c = COLORS_60[e[1]]; if (c) outfitHex[e[0]] = c.hex; }
                             });
                         }
-                        var mnImg = Object.keys(outfitHex).length > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'width:30px;height:42px;object-fit:contain') : '';
+                        var thumbImg = hasPhoto
+                            ? '<img src="' + r.photos[0] + '" class="w-20 h-20 rounded-xl object-cover border border-warm-300">'
+                            : (Object.keys(outfitHex).length > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'width:50px;height:70px;object-fit:contain') : '');
                         h += '<button onclick="app.openOotdDetail(\'' + r.date + '\')" class="w-full bg-white border border-warm-400 rounded-2xl px-4 py-2.5 flex items-center gap-3 text-left shadow-warm-sm active:scale-[0.99] transition-all">';
                         h += '<span class="font-display text-xs font-semibold text-warm-500 w-10 flex-shrink-0">' + (r.date || '').slice(5).replace('-', '/') + '</span>';
-                        h += '<div class="flex-shrink-0">' + mnImg + '</div>';
-                        h += '<span class="flex-1 text-xs text-warm-600 truncate">' + (hasPhoto ? '📷 ' : '') + (r.situation || '') + (r.mood ? ' ' + r.mood : '') + '</span>';
+                        h += '<div class="flex-shrink-0">' + thumbImg + '</div>';
+                        h += '<span class="flex-1 text-xs text-warm-600 truncate">' + (r.situation || '') + (r.mood ? ' ' + r.mood : '') + '</span>';
                         h += '<i data-lucide="chevron-right" style="width:14px;height:14px;color:#D6D3D1" class="flex-shrink-0"></i>';
                         h += '</button>';
                     });
@@ -13806,13 +13808,15 @@
                     const hasPhoto = post.photo_url || (post.photos && post.photos.length > 0);
                     const photoUrl = post.photo_url || (post.photos && post.photos[0]);
                     const isFollowing = this.comm.myFollows.has(post.user_id);
+                    const memo = escapeHtml(post.caption || '');
+                    const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
 
                     h += '<div class="bg-white rounded-[14px] border border-warm-400 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm" onclick="app.openCommDetail(' + realIdx + ')">';
 
                     // 사진 + 마네킹 동시 표시
                     if (hasPhoto) {
-                        h += '<div class="relative bg-warm-200 min-h-[110px]">';
-                        h += '<img src="' + photoUrl + '" class="w-full h-[110px] object-cover" onerror="this.style.display=\'none\'">';
+                        h += '<div class="relative bg-warm-200" style="aspect-ratio:4/5">';
+                        h += '<img src="' + photoUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
                         h += '<div class="absolute bottom-1 right-1 bg-white/90 rounded-lg p-0.5 shadow-sm">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:32px') + '</div>';
                         h += '</div>';
                     } else {
@@ -13820,9 +13824,9 @@
                     }
 
                     h += '<div class="px-2.5 pt-2 pb-2.5">';
-                    h += '<div class="flex justify-between items-center"><span class="text-lg font-bold text-terra-500">' + (post.score||0) + '점</span><span class="text-[11px] text-warm-600">♡ ' + (post.likes_count||0) + '</span></div>';
-                    if (style) h += '<div class="text-[11px] text-warm-600 mt-0.5">' + style + '</div>';
-                    h += '<div class="text-[11px] text-warm-600 mt-0.5 flex items-center gap-1.5">' + (postAvatar ? '<img src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span><span>' + ago + '</span></div>';
+                    h += '<div class="flex justify-between items-center"><span class="text-xs font-medium text-warm-600">' + dateStr + '</span><span class="text-[11px] text-warm-500">♡ ' + (post.likes_count||0) + '</span></div>';
+                    if (memo) h += '<div class="text-[11px] text-warm-800 mt-1 line-clamp-2 leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + memo + '</div>';
+                    h += '<div class="text-[11px] text-warm-600 mt-1 flex items-center gap-1.5">' + (postAvatar ? '<img src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span></div>';
                     h += '</div></div>';
                 });
                 grid.innerHTML = h;
@@ -13914,13 +13918,13 @@
                         followBtn +
                     '</div>' +
 
-                    // 사진 (있으면)
-                    (hasPhoto ? '<div class="rounded-[14px] overflow-hidden mb-3"><img src="' + photoUrl + '" class="w-full max-h-[280px] object-cover" onerror="this.parentElement.style.display=\'none\'"></div>' : '') +
+                    // 사진 (있으면 크게)
+                    (hasPhoto ? '<div class="rounded-[14px] overflow-hidden mb-3"><img src="' + photoUrl + '" class="w-full object-contain" style="max-height:400px" onerror="this.parentElement.style.display=\'none\'"></div>' : '') +
 
                     // 마네킹
                     '<div class="flex justify-center py-5 bg-warm-200 rounded-[14px] mb-4">' + mn + '</div>' +
 
-                    // 점수 + 스타일
+                    // 날짜 + 점수 + 스타일
                     '<div class="flex items-center gap-3 mb-3">' +
                         '<span class="font-display text-3xl font-bold text-terra-600">' + (post.score||0) + '점</span>' +
                         (style ? '<span class="text-[11px] text-warm-600 border border-warm-400 rounded-full px-2.5 py-0.5">' + style + '</span>' : '') +
