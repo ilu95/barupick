@@ -9063,7 +9063,7 @@
                 const p = auth.profile;
 
                 const nickname = escapeHtml(p?.nickname) || '스타일 입문자';
-                const avatarUrl = p?.avatar_url || '';
+                const avatarUrl = escapeHtml(p?.avatar_url) || '';
                 const bio = escapeHtml(p?.bio) || '';
 
                 // 기록 통계 (gamification 엔진 활용)
@@ -13677,7 +13677,7 @@
                     Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
                     const mn = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:70px');
                     const nick = escapeHtml(post.profiles?.nickname) || '유저';
-                    const postAvatar = post.profiles?.avatar_url;
+                    const postAvatar = escapeHtml(post.profiles?.avatar_url);
                     const style = post.style ? (STYLE_GUIDE[post.style]?.name || post.style) : '';
                     const ago = this._timeAgo(post.created_at);
                     const hasPhoto = post.photo_url || (post.photos && post.photos.length > 0);
@@ -13745,7 +13745,7 @@
                 Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
                 const mn = mannequinToImg(createMannequinSVG(outfitHex, { outerType: post.layer_type==='basic'?'':'coat' }), 'height:200px');
                 const nick = escapeHtml(post.profiles?.nickname) || '유저';
-                const detailAvatar = post.profiles?.avatar_url;
+                const detailAvatar = escapeHtml(post.profiles?.avatar_url);
                 const initial = nick.charAt(0).toUpperCase();
                 const style = post.style ? (STYLE_GUIDE[post.style]?.name || post.style) : '';
                 const ago = this._timeAgo(post.created_at);
@@ -14046,7 +14046,7 @@
                 // 해당 유저의 포스트 수집
                 const userPosts = this.comm.posts.filter(p => p.user_id === userId);
                 const nick = escapeHtml(userPosts[0]?.profiles?.nickname) || '유저';
-                const userAvatar = userPosts[0]?.profiles?.avatar_url;
+                const userAvatar = escapeHtml(userPosts[0]?.profiles?.avatar_url);
                 const initial = nick.charAt(0).toUpperCase();
 
                 // 팔로우 버튼
@@ -14365,6 +14365,7 @@
                         const area = document.getElementById('cropArea');
                         const guide = document.getElementById('cropGuide');
                         const zoom = document.getElementById('cropZoom');
+                        const dpr = window.devicePixelRatio || 1;
 
                         // 가이드 원 크기 (화면 너비의 70%, 최대 300px)
                         const guideSize = Math.min(area.clientWidth * 0.7, area.clientHeight * 0.7, 300);
@@ -14373,9 +14374,17 @@
                         guide.style.left = (area.clientWidth - guideSize) / 2 + 'px';
                         guide.style.top = (area.clientHeight - guideSize) / 2 + 'px';
 
-                        // 캔버스 크기 = 표시 영역
-                        canvas.width = area.clientWidth;
-                        canvas.height = area.clientHeight;
+                        // 캔버스: CSS 크기는 유지, 내부 해상도만 DPR 배수
+                        const cssW = area.clientWidth;
+                        const cssH = area.clientHeight;
+                        canvas.width = cssW * dpr;
+                        canvas.height = cssH * dpr;
+                        canvas.style.width = cssW + 'px';
+                        canvas.style.height = cssH + 'px';
+                        ctx.scale(dpr, dpr);
+                        // 고화질 렌더링
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
 
                         let scale = 1;
                         let offsetX = 0, offsetY = 0;
@@ -14389,11 +14398,11 @@
                         zoom.value = Math.floor(fitScale * 100);
 
                         function draw() {
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.clearRect(0, 0, cssW, cssH);
                             const w = img.width * scale;
                             const h = img.height * scale;
-                            const x = (canvas.width - w) / 2 + offsetX;
-                            const y = (canvas.height - h) / 2 + offsetY;
+                            const x = (cssW - w) / 2 + offsetX;
+                            const y = (cssH - h) / 2 + offsetY;
                             ctx.drawImage(img, x, y, w, h);
                         }
                         draw();
@@ -14427,21 +14436,23 @@
 
                         // 완료 → 크롭 → 업로드
                         document.getElementById('cropDone').onclick = async () => {
-                            // 가이드 원 영역을 기준으로 크롭
-                            const outSize = 400; // 출력 크기 400x400
+                            // 가이드 원 영역을 기준으로 크롭 (CSS 좌표 기준)
+                            const outSize = 600; // 고해상도 출력
                             const outCanvas = document.createElement('canvas');
                             outCanvas.width = outSize;
                             outCanvas.height = outSize;
                             const outCtx = outCanvas.getContext('2d');
+                            outCtx.imageSmoothingEnabled = true;
+                            outCtx.imageSmoothingQuality = 'high';
 
-                            // 원본 이미지에서 크롭할 영역 계산
+                            // 원본 이미지에서 크롭할 영역 계산 (CSS 좌표 기준)
                             const w = img.width * scale;
                             const h = img.height * scale;
-                            const imgX = (canvas.width - w) / 2 + offsetX;
-                            const imgY = (canvas.height - h) / 2 + offsetY;
+                            const imgX = (cssW - w) / 2 + offsetX;
+                            const imgY = (cssH - h) / 2 + offsetY;
 
-                            const guideLeft = (canvas.width - guideSize) / 2;
-                            const guideTop = (canvas.height - guideSize) / 2;
+                            const guideLeft = (cssW - guideSize) / 2;
+                            const guideTop = (cssH - guideSize) / 2;
 
                             // 가이드 영역 → 원본 이미지 좌표 변환
                             const srcX = (guideLeft - imgX) / scale;
