@@ -6603,7 +6603,7 @@
 
             // OOTD 기록 상태
             ootd: {
-                colors: { top: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null },
+                colors: { top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null },
                 openPicker: null,   // 현재 열린 파트 피커
                 photos: [],         // base64 이미지 배열 (최대 4장, 크롭된 썸네일)
                 photos_orig: [],    // 원본 이미지 (상세보기용)
@@ -7109,8 +7109,8 @@
             // ============================================================
             renderOotdRecord() {
                 const oc = this.ootd.colors;
-                const parts = ['top','bottom','outer','shoes','scarf','hat'];
-                const partLabels = { top:'상의', bottom:'하의', outer:'아우터', shoes:'신발', scarf:'목도리', hat:'모자' };
+                const parts = ['top','middleware','bottom','outer','shoes','scarf','hat'];
+                const partLabels = { top:'상의(이너)', middleware:'미들웨어', bottom:'하의', outer:'아우터', shoes:'신발', scarf:'목도리', hat:'모자' };
 
                 // 마네킹 미리보기 (작게)
                 const outfitHex = {};
@@ -7818,7 +7818,7 @@
             },
             ootdLoadRecord(record) {
                 // 기존 기록을 편집 모드로 불러오기
-                this.ootd.colors = record.colors ? JSON.parse(JSON.stringify(record.colors)) : { top:null, bottom:null, outer:null, shoes:null };
+                this.ootd.colors = record.colors ? JSON.parse(JSON.stringify(record.colors)) : { top:null, middleware:null, bottom:null, outer:null, shoes:null };
                 this.ootd.photos = record.photos ? [...record.photos] : [];
                 this.ootd.photos_orig = record.photos_orig ? [...record.photos_orig] : [];
                 this.ootd.situation = record.situation || null;
@@ -7835,7 +7835,7 @@
             async saveOotdRecord() {
                 const oc = this.ootd.colors;
                 const outfit = {};
-                ['top','bottom','outer','shoes'].forEach(p => { if (oc[p]) outfit[p] = oc[p]; });
+                ['top','middleware','bottom','outer','shoes','scarf','hat'].forEach(p => { if (oc[p]) outfit[p] = oc[p]; });
                 if (Object.keys(outfit).length < 2) { spToast('2가지 이상 색상을 선택해주세요'); return; }
 
                 // 수정 모드면 기존 날짜, 아니면 오늘
@@ -7889,7 +7889,7 @@
                 gamification.invalidate();
 
                 // 상태 초기화
-                this.ootd = { colors: { top:null, bottom:null, outer:null, shoes:null, scarf:null, hat:null }, openPicker:null, photos:[], photos_orig:[], situation:null, mood:null, memo:'', visibility:'private' };
+                this.ootd = { colors: { top:null, middleware:null, bottom:null, outer:null, shoes:null, scarf:null, hat:null }, openPicker:null, photos:[], photos_orig:[], situation:null, mood:null, memo:'', visibility:'private' };
                 this._ootdEditDate = null;
 
                 spToast(isEdit ? '✅ 코디 기록이 수정되었어요!' : '✅ 오늘의 코디가 기록되었어요!');
@@ -14348,7 +14348,7 @@
             // 커뮤니티 전용 새 게시
             openNewCommunityPost() {
                 if (!auth.user) { this.goTo('auth-login'); return; }
-                this.comm.newPost = { title: '', photos: [], photos_orig: [], colors: { top: null, bottom: null, outer: null, shoes: null }, caption: '', showInstagram: false };
+                this.comm.newPost = { title: '', photos: [], photos_orig: [], colors: { top: null, middleware: null, bottom: null, outer: null, shoes: null }, caption: '', showInstagram: false };
                 this.comm.postOutfit = null; // 기존 빌드/추천 게시와 구분
                 this.goTo('community-new-post');
             },
@@ -14358,8 +14358,8 @@
                 const hasInsta = auth.profile?.instagram_id;
 
                 // 색상 선택 UI
-                const parts = [['top','상의'],['bottom','하의'],['outer','아우터'],['shoes','신발']];
-                let colorHtml = '<div class="grid grid-cols-4 gap-2 mb-4">';
+                const parts = [['top','상의(이너)'],['middleware','미들웨어'],['bottom','하의'],['outer','아우터'],['shoes','신발']];
+                let colorHtml = '<div class="grid grid-cols-5 gap-2 mb-4">';
                 parts.forEach(([k,label]) => {
                     const sel = np.colors[k];
                     const c = sel ? COLORS_60[sel] : null;
