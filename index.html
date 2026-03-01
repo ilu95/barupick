@@ -6722,7 +6722,7 @@
                 else if (screen === 'closet' || screen.startsWith('closet-') || screen === 'ootd-calendar' || screen === 'ootd-detail' || screen === 'best-coord') activeTab = 'nav-closet';
                 else if (screen === 'ootd-record') activeTab = 'nav-ootd';
                 else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'community-new-post' || screen === 'user-profile') activeTab = 'nav-community';
-                else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
+                else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'my-posts' || screen === 'block-list' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
                 else if (screen === 'shop') activeTab = 'nav-shop';
                 else activeTab = '';
 
@@ -7080,6 +7080,16 @@
                         content.innerHTML = this.renderTitleExamResult();
                         break;
 
+                    case 'my-posts':
+                        headerTitle.textContent = '내 게시물';
+                        content.innerHTML = this.renderMyPosts();
+                        this._loadMyPosts();
+                        break;
+                    case 'block-list':
+                        headerTitle.textContent = '차단 목록';
+                        content.innerHTML = this.renderBlockList();
+                        this._loadBlockList();
+                        break;
                     case 'my-settings':
                         headerTitle.textContent = '설정';
                         content.innerHTML = this.renderMySettings();
@@ -9320,6 +9330,17 @@
                     <div class="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3 pb-2 border-b border-warm-400">
                         ${svg("settings", 14)} 설정
                     </div>
+                    ${u ? `<button onclick="app.goTo('my-posts')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
+                        ${svg("file-text", 18, "#A8A29E")}
+                        <span class="text-[15px] text-warm-900 flex-1">내 게시물</span>
+                        ${svg("chevron-right", 16, "#D6D3D1")}
+                    </button>` : ''}
+                    ${u ? `<button onclick="app.goTo('block-list')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
+                        ${svg("shield-off", 18, "#A8A29E")}
+                        <span class="text-[15px] text-warm-900 flex-1">차단 목록</span>
+                        <span class="text-xs font-medium text-warm-600 bg-warm-200 px-2.5 py-1 rounded-full">${app._blockedUsers.size}</span>
+                        ${svg("chevron-right", 16, "#D6D3D1")}
+                    </button>` : ''}
                     <button onclick="app.goTo('my-settings')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
                         ${svg("sliders-horizontal", 18, "#A8A29E")}
                         <span class="text-[15px] text-warm-900 flex-1">설정</span>
@@ -13996,8 +14017,11 @@
                 const status = document.getElementById('comm-status');
                 if (!grid) return;
 
-                // 콘텐츠 필터 적용
+                // 차단 유저 필터 + 콘텐츠 필터 적용
                 let filtered = this.comm.posts;
+                if (this._blockedUsers.size > 0) {
+                    filtered = filtered.filter(p => !this._blockedUsers.has(p.user_id));
+                }
                 if (this.comm.contentFilter === 'photo') {
                     filtered = filtered.filter(p => p.photo_url || (p.photo_urls && p.photo_urls.length > 0) || (p.photos && p.photos.length > 0));
                 } else if (this.comm.contentFilter === 'mannequin') {
@@ -14756,11 +14780,134 @@
                 }
 
                 h += '</div>';
+
+                // 차단 버튼 (본인 아닐 때)
+                if (!isMe && auth.user) {
+                    const isBlocked = this._blockedUsers.has(userId);
+                    h += '<div class="border-t border-warm-300 pt-3 mt-2">';
+                    h += '<button onclick="app.commToggleBlock(\'' + userId + '\')" class="w-full py-2.5 text-xs text-center ' + (isBlocked ? 'text-warm-600' : 'text-red-400') + ' active:opacity-60 transition-all">' + (isBlocked ? '🚫 차단 해제' : '🚫 이 유저 차단하기') + '</button>';
+                    h += '</div>';
+                }
+
+                h += '</div>';
                 return h;
             },
 
-            // ============================================================
-            // 인앱 알림 시스템 (#19)
+            // ── 차단 시스템 ──
+            _blockedUsers: new Set(),
+            async _initBlocks() {
+                if (!sb || !auth.user) return;
+                try {
+                    const { data } = await sb.from('blocks').select('blocked_id').eq('blocker_id', auth.user.id);
+                    this._blockedUsers = new Set((data||[]).map(b => b.blocked_id));
+                } catch(e) { console.warn('Blocks init error:', e); }
+            },
+
+            async commToggleBlock(userId) {
+                if (!sb || !auth.user) return;
+                const isBlocked = this._blockedUsers.has(userId);
+                if (!isBlocked) {
+                    if (!confirm('이 유저를 차단하시겠어요?\n차단하면 해당 유저의 게시물이 피드에 표시되지 않습니다.')) return;
+                }
+                try {
+                    if (isBlocked) {
+                        await sb.from('blocks').delete().eq('blocker_id', auth.user.id).eq('blocked_id', userId);
+                        this._blockedUsers.delete(userId);
+                        spToast('차단을 해제했어요');
+                    } else {
+                        await sb.from('blocks').insert({ blocker_id: auth.user.id, blocked_id: userId });
+                        this._blockedUsers.add(userId);
+                        spToast('유저를 차단했어요 🚫');
+                    }
+                    this.render();
+                } catch(e) {
+                    console.error('Block error:', e);
+                    spToast('처리 실패: ' + (e.message || ''));
+                }
+            },
+
+            // ── 내 게시물 ──
+            _myPosts: [],
+            renderMyPosts() {
+                return '<div class="screen active"><div id="my-posts-content"><div class="text-center py-10 text-warm-600 text-sm">불러오는 중...</div></div></div>';
+            },
+
+            async _loadMyPosts() {
+                if (!sb || !auth.user) return;
+                const el = document.getElementById('my-posts-content');
+                if (!el) return;
+                try {
+                    const { data, error } = await sb.from('posts').select('*').eq('user_id', auth.user.id).order('created_at', { ascending: false });
+                    if (error) throw error;
+                    this._myPosts = data || [];
+
+                    if (this._myPosts.length === 0) {
+                        el.innerHTML = '<div class="text-center py-16"><div class="text-4xl mb-3">📝</div><div class="text-sm text-warm-600">아직 게시한 코디가 없어요</div></div>';
+                        return;
+                    }
+
+                    const statusLabels = { pending: '⏳ 대기중', approved: '✅ 승인됨', rejected: '❌ 거절됨' };
+                    const statusColors = { pending: 'bg-yellow-50 text-yellow-700 border-yellow-200', approved: 'bg-green-50 text-green-700 border-green-200', rejected: 'bg-red-50 text-red-700 border-red-200' };
+
+                    let h = '<div class="text-xs text-warm-500 mb-3">총 ' + this._myPosts.length + '개</div>';
+                    this._myPosts.forEach(post => {
+                        const title = escapeHtml(post.title) || '(제목 없음)';
+                        const status = post.status || 'pending';
+                        const ago = this._timeAgo(post.created_at);
+                        const photoUrl = (post.photo_urls && post.photo_urls[0]) || post.photo_url || '';
+
+                        h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 mb-2.5 flex gap-3">';
+                        if (photoUrl) h += '<img src="' + photoUrl + '" class="w-16 h-20 rounded-xl object-cover flex-shrink-0" onerror="this.style.display=\'none\'">';
+                        h += '<div class="flex-1 min-w-0">';
+                        h += '<div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border ' + (statusColors[status]||'') + '">' + (statusLabels[status]||status) + '</span><span class="text-[10px] text-warm-400">' + ago + '</span></div>';
+                        h += '<div class="text-sm font-semibold text-warm-900 truncate">' + title + '</div>';
+                        h += '<div class="text-[10px] text-warm-500">♡ ' + (post.likes_count||0) + '</div>';
+                        if (status === 'rejected' && post.rejected_reason) {
+                            h += '<div class="text-[10px] text-red-500 mt-1">사유: ' + escapeHtml(post.rejected_reason) + '</div>';
+                        }
+                        h += '</div></div>';
+                    });
+                    el.innerHTML = h;
+                } catch(e) {
+                    el.innerHTML = '<div class="text-center py-10 text-red-500 text-sm">로딩 실패: ' + (e.message||'') + '</div>';
+                }
+            },
+
+            // ── 차단 목록 ──
+            _blockListData: [],
+            renderBlockList() {
+                return '<div class="screen active"><div id="block-list-content"><div class="text-center py-10 text-warm-600 text-sm">불러오는 중...</div></div></div>';
+            },
+
+            async _loadBlockList() {
+                if (!sb || !auth.user) return;
+                const el = document.getElementById('block-list-content');
+                if (!el) return;
+                try {
+                    const { data, error } = await sb.from('blocks').select('blocked_id, blocked:blocked_id(nickname, avatar_url)').eq('blocker_id', auth.user.id);
+                    if (error) throw error;
+                    this._blockListData = data || [];
+
+                    if (this._blockListData.length === 0) {
+                        el.innerHTML = '<div class="text-center py-16"><div class="text-4xl mb-3">🛡️</div><div class="text-sm text-warm-600">차단한 유저가 없어요</div></div>';
+                        return;
+                    }
+
+                    let h = '<div class="text-xs text-warm-500 mb-3">' + this._blockListData.length + '명 차단중</div>';
+                    this._blockListData.forEach(b => {
+                        const nick = escapeHtml(b.blocked?.nickname) || '유저';
+                        const avatar = escapeHtml(b.blocked?.avatar_url);
+                        h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 mb-2 flex items-center gap-3">';
+                        h += (avatar ? '<img src="' + avatar + '" class="w-10 h-10 rounded-full object-cover flex-shrink-0">' : '<div class="w-10 h-10 rounded-full bg-warm-200 flex items-center justify-center text-warm-500 font-bold text-sm flex-shrink-0">' + nick.charAt(0) + '</div>');
+                        h += '<div class="flex-1"><div class="text-sm font-semibold text-warm-900">@' + nick + '</div></div>';
+                        h += '<button onclick="app.commToggleBlock(\'' + b.blocked_id + '\')" class="px-3 py-1.5 rounded-full text-[11px] font-medium bg-warm-200 text-warm-700 border border-warm-400 active:scale-95 transition-all">해제</button>';
+                        h += '</div>';
+                    });
+                    el.innerHTML = h;
+                } catch(e) {
+                    el.innerHTML = '<div class="text-center py-10 text-red-500 text-sm">로딩 실패: ' + (e.message||'') + '</div>';
+                }
+            },
             // ============================================================
             _initNotifications() {
                 try { this.notifications = JSON.parse(localStorage.getItem('sp_notifications') || '[]'); } catch(e) { this.notifications = []; }
@@ -15810,6 +15957,7 @@
             await auth.init();
             app._initFollows();
             app._initNotifications();
+            app._initBlocks();
 
             // 온보딩 체크 (#5)
             if (!localStorage.getItem('sp_onboarded')) {
