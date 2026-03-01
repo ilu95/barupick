@@ -9063,6 +9063,8 @@
                 const p = auth.profile;
 
                 const nickname = escapeHtml(p?.nickname) || '스타일 입문자';
+                const avatarUrl = p?.avatar_url || '';
+                const bio = escapeHtml(p?.bio) || '';
 
                 // 기록 통계 (gamification 엔진 활용)
                 const gd = gamification._getData();
@@ -9077,12 +9079,19 @@
             <div class="screen active">
 
                 <!-- 프로필 헤더 -->
-                <div class="flex items-center gap-4 pb-6">
-                    <div class="w-16 h-16 rounded-full bg-terra-100 border-[2.5px] border-terra-200 flex items-center justify-center flex-shrink-0">
-                        ${svg("user", 26, "#A8613F")}
+                <div class="flex items-center gap-4 pb-3">
+                    <div class="relative flex-shrink-0" onclick="${u ? 'app.changeAvatar()' : ''}">
+                        ${avatarUrl
+                            ? `<img src="${avatarUrl}" class="w-16 h-16 rounded-full object-cover border-[2.5px] border-terra-200" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                            + `<div class="w-16 h-16 rounded-full bg-terra-100 border-[2.5px] border-terra-200 items-center justify-center flex-shrink-0" style="display:none">${svg("user", 26, "#A8613F")}</div>`
+                            : `<div class="w-16 h-16 rounded-full bg-terra-100 border-[2.5px] border-terra-200 flex items-center justify-center">${svg("user", 26, "#A8613F")}</div>`}
+                        ${u ? `<div class="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-white border border-warm-400 rounded-full flex items-center justify-center shadow-sm">${svg("camera", 11, "#A8A29E")}</div>` : ''}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-lg font-bold text-warm-900 tracking-tight">${nickname}</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-lg font-bold text-warm-900 tracking-tight">${nickname}</div>
+                            ${u ? `<button onclick="app.editNickname()" class="text-warm-500 active:scale-90 transition-all">${svg("pencil", 13, "#A8A29E")}</button>` : ''}
+                        </div>
                         <div class="text-sm text-warm-600 mt-0.5">Lv.${lv.level} · ${lv.name}</div>
                         <div class="h-1.5 bg-warm-300 rounded-full overflow-hidden mt-1.5 max-w-[140px]">
                             <div class="h-full bg-terra-400 rounded-full" style="width:${lv.progress}%"></div>
@@ -9091,6 +9100,12 @@
                     ${u ? `<button onclick="app.authLogout()" class="px-4 py-2 rounded-full border border-warm-400 bg-white text-xs font-medium text-warm-700 active:scale-95 transition-all">로그아웃</button>`
                         : `<button onclick="app.goTo('auth-login')" class="px-4 py-2 rounded-full bg-terra-500 text-white text-xs font-medium active:scale-95 transition-all shadow-terra">로그인</button>`}
                 </div>
+                <!-- 소개글 -->
+                ${u ? `<div class="mb-6 cursor-pointer" onclick="app.editBio()">
+                    ${bio
+                        ? `<div class="text-sm text-warm-700 leading-relaxed">${bio}</div>`
+                        : `<div class="text-sm text-warm-500 italic">탭하여 소개글을 작성해보세요</div>`}
+                </div>` : '<div class="mb-3"></div>'}
 
                 <!-- 통계 카드 -->
                 <div class="grid grid-cols-4 gap-2 mb-6">
@@ -13602,7 +13617,7 @@
 
                 try {
                     const PAGE_SIZE = 20;
-                    let query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname)');
+                    let query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url)');
                     if (this.comm.styleFilter) query = query.eq('style', this.comm.styleFilter);
                     if (this.comm.sort === 'popular') query = query.order('likes_count', {ascending:false});
                     else query = query.order('created_at', {ascending:false});
@@ -13662,6 +13677,7 @@
                     Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
                     const mn = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:70px');
                     const nick = escapeHtml(post.profiles?.nickname) || '유저';
+                    const postAvatar = post.profiles?.avatar_url;
                     const style = post.style ? (STYLE_GUIDE[post.style]?.name || post.style) : '';
                     const ago = this._timeAgo(post.created_at);
                     const hasPhoto = post.photo_url || (post.photos && post.photos.length > 0);
@@ -13683,7 +13699,7 @@
                     h += '<div class="px-2.5 pt-2 pb-2.5">';
                     h += '<div class="flex justify-between items-center"><span class="text-lg font-bold text-terra-500">' + (post.score||0) + '점</span><span class="text-[11px] text-warm-600">♡ ' + (post.likes_count||0) + '</span></div>';
                     if (style) h += '<div class="text-[11px] text-warm-600 mt-0.5">' + style + '</div>';
-                    h += '<div class="text-[11px] text-warm-600 mt-0.5 flex items-center gap-1.5"><span>@' + nick + (isFollowing ? ' ✓' : '') + '</span><span>' + ago + '</span></div>';
+                    h += '<div class="text-[11px] text-warm-600 mt-0.5 flex items-center gap-1.5">' + (postAvatar ? '<img src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span><span>' + ago + '</span></div>';
                     h += '</div></div>';
                 });
                 grid.innerHTML = h;
@@ -13729,6 +13745,7 @@
                 Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
                 const mn = mannequinToImg(createMannequinSVG(outfitHex, { outerType: post.layer_type==='basic'?'':'coat' }), 'height:200px');
                 const nick = escapeHtml(post.profiles?.nickname) || '유저';
+                const detailAvatar = post.profiles?.avatar_url;
                 const initial = nick.charAt(0).toUpperCase();
                 const style = post.style ? (STYLE_GUIDE[post.style]?.name || post.style) : '';
                 const ago = this._timeAgo(post.created_at);
@@ -13764,7 +13781,9 @@
                 return '<div class="screen active">' +
                     // 유저 바 + 팔로우
                     '<div class="flex items-center gap-2.5 mb-4">' +
-                        '<div class="w-10 h-10 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-sm cursor-pointer" onclick="app.openUserProfile(\'' + post.user_id + '\')">' + initial + '</div>' +
+                        (detailAvatar
+                            ? '<img src="' + detailAvatar + '" class="w-10 h-10 rounded-full object-cover cursor-pointer" onclick="app.openUserProfile(\'' + post.user_id + '\')" onerror="this.outerHTML=\'<div class=\\\'w-10 h-10 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-sm\\\'>' + initial + '</div>\'">'
+                            : '<div class="w-10 h-10 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-sm cursor-pointer" onclick="app.openUserProfile(\'' + post.user_id + '\')">' + initial + '</div>') +
                         '<div class="flex-1 cursor-pointer" onclick="app.openUserProfile(\'' + post.user_id + '\')">' +
                             '<div class="text-sm font-bold text-warm-900">@' + nick + (isMutual ? ' <span class="text-green-600 text-[10px]">👫</span>' : '') + '</div>' +
                             '<div class="text-xs text-warm-500">' + ago + '</div>' +
@@ -14027,6 +14046,7 @@
                 // 해당 유저의 포스트 수집
                 const userPosts = this.comm.posts.filter(p => p.user_id === userId);
                 const nick = escapeHtml(userPosts[0]?.profiles?.nickname) || '유저';
+                const userAvatar = userPosts[0]?.profiles?.avatar_url;
                 const initial = nick.charAt(0).toUpperCase();
 
                 // 팔로우 버튼
@@ -14045,7 +14065,9 @@
                 let h = '<div class="screen active">';
                 // 프로필 카드
                 h += '<div class="text-center py-6">';
-                h += '<div class="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xl mx-auto mb-3">' + initial + '</div>';
+                h += (userAvatar
+                    ? '<img src="' + userAvatar + '" class="w-16 h-16 rounded-full object-cover mx-auto mb-3" onerror="this.outerHTML=\'<div class=\\\'w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xl mx-auto mb-3\\\'>' + initial + '</div>\'">'
+                    : '<div class="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xl mx-auto mb-3">' + initial + '</div>');
                 h += '<div class="text-lg font-bold text-warm-900 mb-1">@' + nick + '</div>';
                 if (isMutual) h += '<div class="text-xs text-green-600 font-medium mb-2">👫 서로 친구</div>';
                 h += '<div class="flex justify-center gap-6 mb-4 text-center">';
@@ -14284,6 +14306,84 @@
                 } catch(e) {
                     if(errEl){errEl.style.display='block';errEl.textContent=e.message||'가입 실패';}
                     if(btn){btn.disabled=false;btn.textContent='가입하기';}
+                }
+            },
+
+            // 프로필 편집 (#2.5)
+            async changeAvatar() {
+                if (!sb || !auth.user) return;
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 2 * 1024 * 1024) { spToast('이미지는 2MB 이하만 가능해요'); return; }
+
+                    try {
+                        spToast('업로드 중...');
+                        const ext = file.name.split('.').pop() || 'jpg';
+                        const path = 'avatars/' + auth.user.id + '.' + ext;
+
+                        // Storage에 업로드
+                        const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+                        if (upErr) throw upErr;
+
+                        // Public URL 가져오기
+                        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+                        const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
+
+                        // profiles 테이블 업데이트
+                        const { error: dbErr } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', auth.user.id);
+                        if (dbErr) throw dbErr;
+
+                        auth.profile.avatar_url = avatarUrl;
+                        spToast('프로필 사진이 변경되었어요 📸');
+                        this.render();
+                    } catch(e) {
+                        console.error('Avatar upload error:', e);
+                        spToast('업로드 실패: ' + (e.message || ''));
+                    }
+                };
+                input.click();
+            },
+
+            async editNickname() {
+                if (!sb || !auth.user) return;
+                const current = auth.profile?.nickname || '';
+                const newNick = prompt('닉네임을 입력해주세요 (2~12자)', current);
+                if (!newNick || newNick.trim() === current) return;
+                const clean = sanitizeNickname(newNick);
+                if (clean.length < 2) { spToast('닉네임은 2자 이상이어야 해요'); return; }
+
+                try {
+                    const { error } = await sb.from('profiles').update({ nickname: clean }).eq('id', auth.user.id);
+                    if (error) throw error;
+                    auth.profile.nickname = clean;
+                    spToast('닉네임이 변경되었어요 ✏️');
+                    this.render();
+                } catch(e) {
+                    console.error('Nickname update error:', e);
+                    spToast('변경 실패: ' + (e.message || ''));
+                }
+            },
+
+            async editBio() {
+                if (!sb || !auth.user) return;
+                const current = auth.profile?.bio || '';
+                const newBio = prompt('소개글을 입력해주세요 (최대 60자)', current);
+                if (newBio === null) return;
+                const clean = newBio.trim().slice(0, 60);
+
+                try {
+                    const { error } = await sb.from('profiles').update({ bio: clean || null }).eq('id', auth.user.id);
+                    if (error) throw error;
+                    auth.profile.bio = clean;
+                    spToast(clean ? '소개글이 저장되었어요 ✨' : '소개글이 삭제되었어요');
+                    this.render();
+                } catch(e) {
+                    console.error('Bio update error:', e);
+                    spToast('변경 실패: ' + (e.message || ''));
                 }
             },
 
