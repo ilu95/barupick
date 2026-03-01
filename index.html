@@ -6577,7 +6577,7 @@
         const app = {
             screenHistory: [],
             currentScreen: 'home',
-            comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'all', page: 0, hasMore: true, loading: false, detail: null, myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit' },
+            comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'all', page: 0, hasMore: true, loading: false, detail: null, myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit', tab: 'all', friendsMode: 'mutual', rankingMode: 'weekly', newPost: { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false } },
             notifications: [],
 
             // 코디 만들기(①) 상태
@@ -6721,7 +6721,7 @@
                 if (screen === 'home' || screen.startsWith('rec-') || screen.startsWith('build-') || screen === 'weather' || screen === 'fabric' || screen.startsWith('fabric-') || screen === 'saved' || screen === 'quiz' || screen === 'quiz-result' || screen.startsWith('eval-') || screen === 'body-guide' || screen === 'body-result') activeTab = 'nav-coord';
                 else if (screen === 'closet' || screen.startsWith('closet-') || screen === 'ootd-calendar' || screen === 'ootd-detail' || screen === 'best-coord') activeTab = 'nav-closet';
                 else if (screen === 'ootd-record') activeTab = 'nav-ootd';
-                else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'user-profile') activeTab = 'nav-community';
+                else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'community-new-post' || screen === 'user-profile') activeTab = 'nav-community';
                 else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
                 else if (screen === 'shop') activeTab = 'nav-shop';
                 else activeTab = '';
@@ -6950,7 +6950,7 @@
                     case 'community':
                         headerTitle.textContent = '커뮤니티';
                         content.innerHTML = this.renderCommunity();
-                        this.communityLoad();
+                        this.communityLoad(this.comm.posts.length === 0);
                         break;
                     case 'community-detail':
                         headerTitle.textContent = '코디 상세';
@@ -6959,6 +6959,10 @@
                     case 'community-post':
                         headerTitle.textContent = '코디 공유하기';
                         content.innerHTML = this.renderCommunityPost();
+                        break;
+                    case 'community-new-post':
+                        headerTitle.textContent = '새 코디 공유';
+                        content.innerHTML = this.renderCommunityNewPost();
                         break;
                     case 'user-profile':
                         headerTitle.textContent = '프로필';
@@ -7889,27 +7893,6 @@
                 this._ootdEditDate = null;
 
                 spToast(isEdit ? '✅ 코디 기록이 수정되었어요!' : '✅ 오늘의 코디가 기록되었어요!');
-
-                // 전체공개면 커뮤니티에 자동 게시
-                if (record.visibility === 'public' && sb && auth.user) {
-                    try {
-                        const postData = {
-                            user_id: auth.user.id,
-                            outfit: outfit,
-                            score: ev.total,
-                            style: null,
-                            layer_type: 'basic',
-                            caption: record.memo || null,
-                            tags: []
-                        };
-                        const { error } = await sb.from('posts').insert(postData);
-                        if (!error) {
-                            spToast('커뮤니티에도 공유되었어요! 🌐');
-                        }
-                    } catch(e) {
-                        console.warn('Community auto-post failed:', e);
-                    }
-                }
 
                 this.goTo('ootd-calendar');
             },
@@ -9236,6 +9219,17 @@
                         ? `<div class="text-sm text-warm-700 leading-relaxed">${bio}</div>`
                         : `<div class="text-sm text-warm-500 italic">탭하여 소개글을 작성해보세요</div>`}
                 </div>` : '<div class="mb-3"></div>'}
+
+                <!-- 인스타그램 -->
+                ${u ? `<div class="flex items-center gap-2.5 mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl px-4 py-3 cursor-pointer active:scale-[0.99] transition-all" onclick="app.editInstagram()">
+                    <span class="text-lg">📸</span>
+                    <div class="flex-1">
+                        ${auth.profile?.instagram_id
+                            ? `<div class="text-sm font-medium text-warm-900">@${escapeHtml(auth.profile.instagram_id)}</div><div class="text-[10px] text-warm-500">탭하여 수정</div>`
+                            : `<div class="text-sm text-warm-500">인스타그램 ID를 등록해보세요</div>`}
+                    </div>
+                    ${svg("chevron-right", 16, "#D6D3D1")}
+                </div>` : ''}
 
                 <!-- 통계 카드 -->
                 <div class="grid grid-cols-4 gap-2 mb-6">
@@ -13710,26 +13704,73 @@
             renderCommunity() {
                 const u = auth.user;
                 const p = auth.profile;
+                const tab = this.comm.tab || 'all';
 
-                // 정렬 + 스타일 필터
-                const sorts = [['latest','최신순'],['popular','인기순']];
-                let sortHtml = sorts.map(s => '<button class="px-4 py-2 rounded-full text-xs font-medium transition-all ' + (this.comm.sort===s[0]?'bg-warm-900 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetSort(\'' + s[0] + '\')">' + s[1] + '</button>').join('');
+                // 3탭 버튼
+                const tabs = [['all','전체'],['friends','친구'],['ranking','랭킹']];
+                let tabHtml = '<div class="flex gap-1.5 mb-3">';
+                tabs.forEach(t => {
+                    tabHtml += '<button class="flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all ' + (tab===t[0]?'bg-warm-900 text-white shadow-md':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSwitchTab(\'' + t[0] + '\')">' + t[1] + '</button>';
+                });
+                tabHtml += '</div>';
 
-                const styles = [['all','전체'],['casual','캐주얼'],['preppy','프레피'],['minimal','미니멀'],['amekaji','아메카지'],['british','브리티시'],['street','스트릿']];
-                let filterHtml = '<select class="px-3 py-[7px] rounded-full text-xs border border-warm-400 bg-white text-warm-700 cursor-pointer ml-auto appearance-none pr-6" style="background-image:url(\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2378716C%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>\');background-repeat:no-repeat;background-position:right 8px center" onchange="app.commSetStyle(this.value)">';
-                styles.forEach(s => { filterHtml += '<option value="' + s[0] + '"' + (this.comm.styleFilter===(s[0]==='all'?null:s[0])?' selected':'') + '>' + s[1] + '</option>'; });
-                filterHtml += '</select>';
+                let body = '';
+                if (tab === 'all') {
+                    // 정렬 + 필터
+                    const sorts = [['latest','최신순'],['popular','인기순']];
+                    let sortHtml = sorts.map(s => '<button class="px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (this.comm.sort===s[0]?'bg-warm-900 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetSort(\'' + s[0] + '\')">' + s[1] + '</button>').join('');
 
-                // 콘텐츠 필터 (#14)
-                const cFilters = [['all','전부'],['photo','📷 사진'],['mannequin','👤 마네킹']];
-                let cFilterHtml = cFilters.map(f => '<button class="px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (this.comm.contentFilter===f[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetContentFilter(\'' + f[0] + '\')">' + f[1] + '</button>').join('');
+                    const cFilters = [['all','전부'],['photo','📷 사진'],['mannequin','👤 마네킹']];
+                    let cFilterHtml = cFilters.map(f => '<button class="px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (this.comm.contentFilter===f[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetContentFilter(\'' + f[0] + '\')">' + f[1] + '</button>').join('');
 
-                return '<div class="screen active">' +
-                    '<div class="flex items-center gap-2 mb-3">' + sortHtml + '<div class="ml-auto">' + filterHtml + '</div></div>' +
-                    '<div class="flex gap-1.5 mb-4">' + cFilterHtml + '</div>' +
+                    body = '<div class="flex items-center gap-1.5 mb-2.5">' + sortHtml + '</div>' +
+                        '<div class="flex gap-1.5 mb-4">' + cFilterHtml + '</div>';
+                } else if (tab === 'friends') {
+                    if (!u) {
+                        body = '<div class="text-center py-16"><div class="text-4xl mb-3">👫</div><div class="text-sm text-warm-600 mb-4">로그인하면 친구 코디를 볼 수 있어요</div><button onclick="app.goTo(\'auth-login\')" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">로그인하기</button></div>';
+                        return '<div class="screen active">' + tabHtml + body + '</div>';
+                    }
+                    const modes = [['mutual','서로 팔로우'],['following','팔로잉']];
+                    body = '<div class="flex gap-1.5 mb-4">' + modes.map(m => '<button class="px-4 py-2 rounded-full text-[11px] font-medium transition-all ' + (this.comm.friendsMode===m[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetFriendsMode(\'' + m[0] + '\')">' + m[1] + '</button>').join('') + '</div>';
+                } else if (tab === 'ranking') {
+                    const modes = [['weekly','주간'],['monthly','월간'],['user','유저'],['event','이벤트']];
+                    body = '<div class="flex gap-1.5 mb-4">' + modes.map(m => '<button class="px-3.5 py-2 rounded-full text-[11px] font-medium transition-all ' + (this.comm.rankingMode===m[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetRankingMode(\'' + m[0] + '\')">' + m[1] + '</button>').join('') + '</div>';
+                }
+
+                // 플로팅 게시 버튼
+                const fab = u ? '<div style="position:fixed;bottom:80px;right:16px;z-index:90"><button onclick="app.openNewCommunityPost()" class="w-14 h-14 bg-terra-500 text-white rounded-full shadow-lg flex items-center justify-center text-2xl font-light active:scale-90 transition-all hover:bg-terra-600">+</button></div>' : '';
+
+                return '<div class="screen active">' + tabHtml + body +
                     '<div id="comm-grid" class="grid grid-cols-2 gap-2.5"></div>' +
                     '<div id="comm-status"></div>' +
+                    fab +
                 '</div>';
+            },
+
+            commSwitchTab(tab) {
+                this.comm.tab = tab;
+                this.comm.posts = [];
+                this.comm.page = 0;
+                this.comm.hasMore = true;
+                this.render();
+            },
+
+            commSetFriendsMode(mode) {
+                this.comm.friendsMode = mode;
+                this.comm.posts = [];
+                this.comm.page = 0;
+                this.comm.hasMore = true;
+                this.communityLoad(true);
+                this.render();
+            },
+
+            commSetRankingMode(mode) {
+                this.comm.rankingMode = mode;
+                this.comm.posts = [];
+                this.comm.page = 0;
+                this.comm.hasMore = true;
+                this.communityLoad(true);
+                this.render();
             },
 
             async communityLoad(reset) {
@@ -13740,12 +13781,52 @@
                 const status = document.getElementById('comm-status');
                 if (status) status.innerHTML = '<div class="text-center py-8 text-warm-600 text-sm">불러오는 중...</div>';
 
+                const tab = this.comm.tab || 'all';
+
                 try {
                     const PAGE_SIZE = 20;
-                    let query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url)');
-                    if (this.comm.styleFilter) query = query.eq('style', this.comm.styleFilter);
-                    if (this.comm.sort === 'popular') query = query.order('likes_count', {ascending:false});
-                    else query = query.order('created_at', {ascending:false});
+
+                    if (tab === 'ranking') {
+                        await this._loadRanking();
+                        this.comm.loading = false;
+                        return;
+                    }
+
+                    let query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)');
+                    query = query.eq('status', 'approved');
+
+                    if (tab === 'friends' && auth.user) {
+                        // 친구 탭: 팔로우 목록 기반
+                        const followIds = Array.from(this.comm.myFollows);
+                        if (followIds.length === 0) {
+                            this.comm.posts = [];
+                            this.comm.hasMore = false;
+                            this.renderCommunityGrid();
+                            this.comm.loading = false;
+                            return;
+                        }
+                        if (this.comm.friendsMode === 'mutual') {
+                            // 서로 팔로우만
+                            const friends = JSON.parse(localStorage.getItem('sp_friends') || '[]');
+                            if (friends.length === 0) {
+                                this.comm.posts = [];
+                                this.comm.hasMore = false;
+                                this.renderCommunityGrid();
+                                this.comm.loading = false;
+                                return;
+                            }
+                            query = query.in('user_id', friends);
+                        } else {
+                            query = query.in('user_id', followIds);
+                        }
+                        query = query.order('created_at', {ascending:false});
+                    } else {
+                        // 전체 탭
+                        if (this.comm.styleFilter) query = query.eq('style', this.comm.styleFilter);
+                        if (this.comm.sort === 'popular') query = query.order('likes_count', {ascending:false});
+                        else query = query.order('created_at', {ascending:false});
+                    }
+
                     query = query.range(this.comm.page * PAGE_SIZE, (this.comm.page+1) * PAGE_SIZE - 1);
 
                     const { data, error } = await query;
@@ -13775,6 +13856,141 @@
                 this.comm.loading = false;
             },
 
+            async _loadRanking() {
+                const mode = this.comm.rankingMode;
+                const grid = document.getElementById('comm-grid');
+                const status = document.getElementById('comm-status');
+                if (!grid) return;
+
+                try {
+                    if (mode === 'event') {
+                        // 이벤트 랭킹: 진행 중인 이벤트 표시
+                        const now = new Date().toISOString();
+                        const { data: events } = await sb.from('events').select('*').lte('start_date', now).gte('end_date', now).order('created_at', {ascending:false});
+                        if (!events || events.length === 0) {
+                            grid.innerHTML = '';
+                            if (status) status.innerHTML = '<div class="text-center py-16"><div class="text-4xl mb-3">🎉</div><div class="text-sm text-warm-600">현재 진행 중인 이벤트가 없어요</div></div>';
+                            return;
+                        }
+                        let h = '<div class="col-span-2 space-y-3">';
+                        events.forEach(ev => {
+                            const end = new Date(ev.end_date).toLocaleDateString('ko-KR', {month:'short',day:'numeric'});
+                            h += '<div class="bg-white border border-warm-400 rounded-2xl p-4"><div class="font-semibold text-warm-900 mb-1">🎉 ' + escapeHtml(ev.title) + '</div><div class="text-xs text-warm-600 mb-1">' + (ev.description ? escapeHtml(ev.description) : '') + '</div><div class="text-[10px] text-warm-500">~ ' + end + ' 까지 · #' + escapeHtml(ev.tag) + '</div></div>';
+                        });
+                        h += '</div>';
+                        grid.innerHTML = h;
+                        if (status) status.innerHTML = '';
+                        return;
+                    }
+
+                    if (mode === 'user') {
+                        // 유저 랭킹: 누적 좋아요 합산
+                        const { data } = await sb.from('posts').select('user_id, profiles!posts_user_id_fkey(nickname, avatar_url)').eq('status','approved');
+                        if (!data) { grid.innerHTML = ''; return; }
+                        // 유저별 좋아요 합산
+                        const userMap = {};
+                        data.forEach(p => {
+                            if (!userMap[p.user_id]) userMap[p.user_id] = { nick: escapeHtml(p.profiles?.nickname)||'유저', avatar: escapeHtml(p.profiles?.avatar_url), likes: 0, posts: 0 };
+                            userMap[p.user_id].likes += (p.likes_count||0);
+                            userMap[p.user_id].posts++;
+                        });
+                        // likes_count가 없을 수 있으므로 서버에서 직접 가져오기
+                        const { data: likeCounts } = await sb.rpc('get_user_like_rankings', { lim: 20 }).catch(() => ({ data: null }));
+                        let ranked = Object.entries(userMap).map(([id,u]) => ({id,...u})).sort((a,b)=>b.likes-a.likes).slice(0,20);
+
+                        let h = '<div class="col-span-2 space-y-2">';
+                        ranked.forEach((u,i) => {
+                            const medal = i < 3 ? ['🥇','🥈','🥉'][i] : '<span class="text-xs text-warm-500 font-mono w-5 text-center">' + (i+1) + '</span>';
+                            h += '<div class="flex items-center gap-3 bg-white border border-warm-400 rounded-xl px-3.5 py-2.5 cursor-pointer active:scale-[0.98] transition-all" onclick="app.openUserProfile(\'' + u.id + '\')">';
+                            h += '<span class="text-lg flex-shrink-0 w-7 text-center">' + medal + '</span>';
+                            h += (u.avatar ? '<img src="' + u.avatar + '" class="w-9 h-9 rounded-full object-cover flex-shrink-0">' : '<div class="w-9 h-9 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xs flex-shrink-0">' + u.nick.charAt(0) + '</div>');
+                            h += '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-warm-900 truncate">@' + u.nick + '</div><div class="text-[10px] text-warm-500">코디 ' + u.posts + '개</div></div>';
+                            h += '<div class="text-right flex-shrink-0"><div class="text-sm font-bold text-terra-600">♡ ' + u.likes + '</div></div>';
+                            h += '</div>';
+                        });
+                        h += '</div>';
+                        grid.innerHTML = h;
+                        if (status) status.innerHTML = ranked.length === 0 ? '<div class="text-center py-10 text-warm-600 text-sm">아직 랭킹 데이터가 없어요</div>' : '';
+                        return;
+                    }
+
+                    // 주간/월간 랭킹
+                    const now = new Date();
+                    let startDate;
+                    if (mode === 'weekly') {
+                        const day = now.getDay();
+                        const diff = day === 0 ? 6 : day - 1; // 월요일 기준
+                        startDate = new Date(now);
+                        startDate.setDate(now.getDate() - diff);
+                        startDate.setHours(0,0,0,0);
+                    } else {
+                        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    }
+
+                    const { data } = await sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url)')
+                        .eq('status', 'approved')
+                        .gte('created_at', startDate.toISOString())
+                        .order('likes_count', {ascending:false})
+                        .limit(20);
+
+                    this.comm.posts = data || [];
+                    this.comm.hasMore = false;
+
+                    // 내 좋아요 로드
+                    if (auth.user && data && data.length > 0) {
+                        const pids = data.map(p => p.id);
+                        const likesRes = await sb.from('likes').select('post_id').eq('user_id', auth.user.id).in('post_id', pids);
+                        (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
+                    }
+
+                    // 랭킹 번호 달아서 그리드에 표시
+                    this._renderRankingGrid(data || []);
+                    if (status) status.innerHTML = (data||[]).length === 0 ? '<div class="text-center py-10 text-warm-600 text-sm">' + (mode==='weekly'?'이번 주':'이번 달') + ' 랭킹 데이터가 없어요</div>' : '';
+
+                } catch(e) {
+                    console.error('Ranking load error:', e);
+                    if (status) status.innerHTML = '<div class="text-center py-10 text-warm-600">랭킹 로딩 실패</div>';
+                }
+            },
+
+            _renderRankingGrid(posts) {
+                const grid = document.getElementById('comm-grid');
+                if (!grid) return;
+                if (posts.length === 0) { grid.innerHTML = ''; return; }
+
+                let h = '';
+                posts.forEach((post, idx) => {
+                    const outfit = post.outfit || {};
+                    const outfitHex = {};
+                    Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
+                    const mn = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:70px');
+                    const nick = escapeHtml(post.profiles?.nickname) || '유저';
+                    const postAvatar = escapeHtml(post.profiles?.avatar_url);
+                    const hasPhoto = post.photo_url || (post.photo_urls && post.photo_urls.length > 0) || (post.photos && post.photos.length > 0);
+                    const photoUrl = post.photo_url || (post.photo_urls && post.photo_urls[0]) || (post.photos && post.photos[0]);
+                    const title = escapeHtml(post.title) || '';
+                    const medal = idx < 3 ? ['🥇','🥈','🥉'][idx] : (idx+1);
+
+                    h += '<div class="bg-white rounded-[14px] border border-warm-400 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm relative" onclick="app.openCommDetail(' + this.comm.posts.indexOf(post) + ')">';
+                    h += '<div class="absolute top-1.5 left-1.5 z-10 bg-white/90 rounded-lg px-1.5 py-0.5 text-xs font-bold shadow-sm">' + medal + '</div>';
+
+                    if (hasPhoto) {
+                        h += '<div class="relative bg-warm-200" style="aspect-ratio:4/5">';
+                        h += '<img src="' + photoUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+                        h += '<div class="absolute bottom-1 right-1 bg-white/90 rounded-lg p-0.5 shadow-sm">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:32px') + '</div>';
+                        h += '</div>';
+                    } else {
+                        h += '<div class="flex justify-center items-center px-2 pt-3 pb-1 bg-warm-200 min-h-[90px]">' + mn + '</div>';
+                    }
+
+                    h += '<div class="px-2.5 pt-2 pb-2.5">';
+                    if (title) h += '<div class="text-xs font-semibold text-warm-900 truncate mb-0.5">' + title + '</div>';
+                    h += '<div class="flex justify-between items-center"><span class="text-[10px] text-warm-500">@' + nick + '</span><span class="text-[11px] text-terra-600 font-bold">♡ ' + (post.likes_count||0) + '</span></div>';
+                    h += '</div></div>';
+                });
+                grid.innerHTML = h;
+            },
+
             renderCommunityGrid() {
                 const grid = document.getElementById('comm-grid');
                 const status = document.getElementById('comm-status');
@@ -13783,14 +13999,19 @@
                 // 콘텐츠 필터 적용
                 let filtered = this.comm.posts;
                 if (this.comm.contentFilter === 'photo') {
-                    filtered = filtered.filter(p => p.photo_url || (p.photos && p.photos.length > 0));
+                    filtered = filtered.filter(p => p.photo_url || (p.photo_urls && p.photo_urls.length > 0) || (p.photos && p.photos.length > 0));
                 } else if (this.comm.contentFilter === 'mannequin') {
-                    filtered = filtered.filter(p => !p.photo_url && (!p.photos || p.photos.length === 0));
+                    filtered = filtered.filter(p => !p.photo_url && (!p.photo_urls || p.photo_urls.length === 0) && (!p.photos || p.photos.length === 0));
                 }
+
+                const tab = this.comm.tab || 'all';
+                const emptyMsg = tab === 'friends'
+                    ? (this.comm.friendsMode === 'mutual' ? '서로 팔로우한 친구의 코디가 없어요' : '팔로잉한 유저의 코디가 없어요')
+                    : (this.comm.contentFilter !== 'all' ? '이 필터에 맞는 코디가 없어요' : '아직 공유된 코디가 없어요<br>첫 번째로 공유해보세요!');
 
                 if (filtered.length === 0) {
                     grid.innerHTML = '';
-                    if (status) status.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-2">🎨</div><div class="text-sm text-warm-600">' + (this.comm.contentFilter !== 'all' ? '이 필터에 맞는 코디가 없어요' : '아직 공유된 코디가 없어요<br>첫 번째로 공유해보세요!') + '</div></div>';
+                    if (status) status.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-2">' + (tab==='friends'?'👫':'🎨') + '</div><div class="text-sm text-warm-600">' + emptyMsg + '</div></div>';
                     return;
                 }
 
@@ -13805,10 +14026,10 @@
                     const postAvatar = escapeHtml(post.profiles?.avatar_url);
                     const style = post.style ? (STYLE_GUIDE[post.style]?.name || post.style) : '';
                     const ago = this._timeAgo(post.created_at);
-                    const hasPhoto = post.photo_url || (post.photos && post.photos.length > 0);
-                    const photoUrl = post.photo_url || (post.photos && post.photos[0]);
+                    const hasPhoto = post.photo_url || (post.photo_urls && post.photo_urls.length > 0) || (post.photos && post.photos.length > 0);
+                    const photoUrl = post.photo_url || (post.photo_urls && post.photo_urls[0]) || (post.photos && post.photos[0]);
                     const isFollowing = this.comm.myFollows.has(post.user_id);
-                    const memo = escapeHtml(post.caption || '');
+                    const title = escapeHtml(post.title) || '';
                     const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
 
                     h += '<div class="bg-white rounded-[14px] border border-warm-400 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm" onclick="app.openCommDetail(' + realIdx + ')">';
@@ -13824,8 +14045,8 @@
                     }
 
                     h += '<div class="px-2.5 pt-2 pb-2.5">';
-                    h += '<div class="flex justify-between items-center"><span class="text-xs font-medium text-warm-600">' + dateStr + '</span><span class="text-[11px] text-warm-500">♡ ' + (post.likes_count||0) + '</span></div>';
-                    if (memo) h += '<div class="text-[11px] text-warm-800 mt-1 line-clamp-2 leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + memo + '</div>';
+                    if (title) h += '<div class="text-xs font-semibold text-warm-900 truncate mb-0.5">' + title + '</div>';
+                    h += '<div class="flex justify-between items-center"><span class="text-[10px] text-warm-600">' + dateStr + '</span><span class="text-[11px] text-warm-500">♡ ' + (post.likes_count||0) + '</span></div>';
                     h += '<div class="text-[11px] text-warm-600 mt-1 flex items-center gap-1.5">' + (postAvatar ? '<img src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span></div>';
                     h += '</div></div>';
                 });
@@ -13880,9 +14101,15 @@
                 const bookmarked = this.comm.myBookmarks.has(post.id);
                 const isFollowing = this.comm.myFollows.has(post.user_id);
                 const isMutual = this._isFriend(post.user_id);
-                const hasPhoto = post.photo_url || (post.photos && post.photos.length > 0);
-                const photoUrl = post.photo_url || (post.photos && post.photos[0]);
                 const isMe = auth.user && auth.user.id === post.user_id;
+
+                // 사진 URL 목록 (photo_urls 우선, 기존 photo_url/photos 호환)
+                let photoUrls = [];
+                if (post.photo_urls && post.photo_urls.length > 0) photoUrls = post.photo_urls;
+                else if (post.photo_url) photoUrls = [post.photo_url];
+                else if (post.photos && post.photos.length > 0) photoUrls = post.photos;
+                const hasPhoto = photoUrls.length > 0;
+                const title = escapeHtml(post.title) || '';
 
                 // 색상 스와치
                 let swatches = '';
@@ -13905,6 +14132,37 @@
                     }
                 }
 
+                // 인스타그램 링크
+                let instaHtml = '';
+                if (post.show_instagram && post.profiles?.instagram_id) {
+                    const instaId = escapeHtml(post.profiles.instagram_id);
+                    instaHtml = '<div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-3.5 mb-3 cursor-pointer active:scale-[0.98] transition-all" onclick="window.open(\'https://instagram.com/' + instaId + '\',\'_blank\')">' +
+                        '<div class="flex items-center gap-2">' +
+                        '<span class="text-lg">📸</span>' +
+                        '<div class="flex-1"><div class="text-sm font-semibold text-warm-900">@' + instaId + '</div><div class="text-[10px] text-warm-500">인스타 구경하러가기 →</div></div>' +
+                        '</div></div>';
+                }
+
+                // 다중 사진 갤러리
+                let photoHtml = '';
+                if (hasPhoto) {
+                    if (photoUrls.length === 1) {
+                        photoHtml = '<div class="rounded-[14px] overflow-hidden mb-3"><img src="' + photoUrls[0] + '" class="w-full object-contain" style="max-height:500px" onerror="this.parentElement.style.display=\'none\'"></div>';
+                    } else {
+                        // 스와이프 갤러리
+                        photoHtml = '<div id="commPhotoSlider" class="rounded-[14px] overflow-hidden mb-3 relative" style="touch-action:pan-y">';
+                        photoHtml += '<div id="commPhotoTrack" class="flex transition-transform duration-300" style="will-change:transform">';
+                        photoUrls.forEach((url, i) => {
+                            photoHtml += '<div class="w-full flex-shrink-0"><img src="' + url + '" class="w-full object-contain" style="max-height:500px"' + (i===0 ? ' onload="app._initCommPhotoSlider(' + photoUrls.length + ')"' : '') + '></div>';
+                        });
+                        photoHtml += '</div>';
+                        // dots 인디케이터
+                        photoHtml += '<div class="flex justify-center gap-1.5 py-2">';
+                        photoUrls.forEach((_, i) => { photoHtml += '<div class="w-1.5 h-1.5 rounded-full ' + (i===0?'bg-terra-500':'bg-warm-400') + '" id="commDot' + i + '"></div>'; });
+                        photoHtml += '</div></div>';
+                    }
+                }
+
                 return '<div class="screen active">' +
                     // 유저 바 + 팔로우
                     '<div class="flex items-center gap-2.5 mb-4">' +
@@ -13918,13 +14176,16 @@
                         followBtn +
                     '</div>' +
 
-                    // 사진 (있으면 크게)
-                    (hasPhoto ? '<div class="rounded-[14px] overflow-hidden mb-3"><img src="' + photoUrl + '" class="w-full object-contain" style="max-height:400px" onerror="this.parentElement.style.display=\'none\'"></div>' : '') +
+                    // 사진 갤러리
+                    photoHtml +
 
-                    // 마네킹
+                    // 마네킹 + 색상 스와치
                     '<div class="flex justify-center py-5 bg-warm-200 rounded-[14px] mb-4">' + mn + '</div>' +
 
-                    // 날짜 + 점수 + 스타일
+                    // 제목
+                    (title ? '<div class="text-lg font-bold text-warm-900 mb-2">' + title + '</div>' : '') +
+
+                    // 점수 + 스타일
                     '<div class="flex items-center gap-3 mb-3">' +
                         '<span class="font-display text-3xl font-bold text-terra-600">' + (post.score||0) + '점</span>' +
                         (style ? '<span class="text-[11px] text-warm-600 border border-warm-400 rounded-full px-2.5 py-0.5">' + style + '</span>' : '') +
@@ -13933,6 +14194,9 @@
                     // 캡션
                     (post.caption ? '<div class="bg-warm-200 rounded-2xl p-3.5 text-sm text-warm-800 mb-3">' + escapeHtml(post.caption) + '</div>' : '') +
 
+                    // 인스타그램 링크
+                    instaHtml +
+
                     // 색상 스와치
                     '<div class="mb-3">' + swatches + '</div>' +
 
@@ -13940,8 +14204,64 @@
                     '<div class="flex gap-2">' +
                         '<button class="flex-1 py-2.5 rounded-xl border border-warm-400 bg-white text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1' + (liked?' text-red-500 border-red-300':'') + '" onclick="app.commToggleLike(\'' + post.id + '\')">' + (liked?'❤️':'🤍') + ' ' + (post.likes_count||0) + '</button>' +
                         '<button class="flex-1 py-2.5 rounded-xl border border-warm-400 bg-white text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1' + (bookmarked?' text-terra-600 border-terra-300':'') + '" onclick="app.commToggleBookmark(\'' + post.id + '\')">' + (bookmarked?'🔖':'📄') + ' 저장</button>' +
+                        (!isMe ? '<button class="py-2.5 px-3 rounded-xl border border-warm-400 bg-white text-xs text-warm-500 active:scale-[0.97] transition-all" onclick="app.commReport(\'' + post.id + '\')">⚠️</button>' : '') +
                     '</div>' +
                 '</div>';
+            },
+
+            _commPhotoIdx: 0,
+            _initCommPhotoSlider(total) {
+                const slider = document.getElementById('commPhotoSlider');
+                const track = document.getElementById('commPhotoTrack');
+                if (!slider || !track) return;
+                this._commPhotoIdx = 0;
+                let startX = 0, diffX = 0, isDragging = false;
+
+                slider.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    diffX = 0;
+                    isDragging = true;
+                    track.style.transition = 'none';
+                }, { passive: true });
+
+                slider.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    diffX = e.touches[0].clientX - startX;
+                    const offset = -this._commPhotoIdx * slider.offsetWidth + diffX;
+                    track.style.transform = 'translateX(' + offset + 'px)';
+                }, { passive: true });
+
+                slider.addEventListener('touchend', () => {
+                    isDragging = false;
+                    track.style.transition = 'transform 0.3s ease';
+                    if (Math.abs(diffX) > 40) {
+                        if (diffX < 0 && this._commPhotoIdx < total - 1) this._commPhotoIdx++;
+                        else if (diffX > 0 && this._commPhotoIdx > 0) this._commPhotoIdx--;
+                    }
+                    track.style.transform = 'translateX(' + (-this._commPhotoIdx * slider.offsetWidth) + 'px)';
+                    // dots 업데이트
+                    for (let i = 0; i < total; i++) {
+                        const dot = document.getElementById('commDot' + i);
+                        if (dot) dot.className = 'w-1.5 h-1.5 rounded-full ' + (i === this._commPhotoIdx ? 'bg-terra-500' : 'bg-warm-400');
+                    }
+                });
+            },
+
+            commReport(postId) {
+                if (!auth.user) { this.goTo('auth-login'); return; }
+                const reasons = ['스팸','부적절한 콘텐츠','혐오 표현','기타'];
+                const reason = prompt('신고 사유를 선택해주세요:\\n1. 스팸\\n2. 부적절한 콘텐츠\\n3. 혐오 표현\\n4. 기타\\n\\n번호를 입력하세요:');
+                if (!reason) return;
+                const idx = parseInt(reason) - 1;
+                if (idx < 0 || idx > 3) { spToast('올바른 번호를 입력해주세요'); return; }
+                if (sb) {
+                    sb.from('reports').insert({ reporter_id: auth.user.id, post_id: postId, reason: reasons[idx] })
+                        .then(({error}) => {
+                            if (error && error.code === '23505') spToast('이미 신고한 게시물이에요');
+                            else if (error) spToast('신고 실패: ' + error.message);
+                            else spToast('신고가 접수되었어요 📋');
+                        });
+                }
             },
 
             async commToggleLike(postId) {
@@ -14025,6 +14345,206 @@
                 this.goTo('community-post');
             },
 
+            // 커뮤니티 전용 새 게시
+            openNewCommunityPost() {
+                if (!auth.user) { this.goTo('auth-login'); return; }
+                this.comm.newPost = { title: '', photos: [], photos_orig: [], colors: { top: null, bottom: null, outer: null, shoes: null }, caption: '', showInstagram: false };
+                this.comm.postOutfit = null; // 기존 빌드/추천 게시와 구분
+                this.goTo('community-new-post');
+            },
+
+            renderCommunityNewPost() {
+                const np = this.comm.newPost;
+                const hasInsta = auth.profile?.instagram_id;
+
+                // 색상 선택 UI
+                const parts = [['top','상의'],['bottom','하의'],['outer','아우터'],['shoes','신발']];
+                let colorHtml = '<div class="grid grid-cols-4 gap-2 mb-4">';
+                parts.forEach(([k,label]) => {
+                    const sel = np.colors[k];
+                    const c = sel ? COLORS_60[sel] : null;
+                    colorHtml += '<div class="text-center">';
+                    colorHtml += '<div class="w-10 h-10 rounded-xl border-2 mx-auto mb-1 cursor-pointer active:scale-90 transition-all ' + (c ? 'border-terra-400' : 'border-dashed border-warm-400') + '" style="' + (c ? 'background:' + c.hex : '') + '" onclick="app._commPickColor(\'' + k + '\')"></div>';
+                    colorHtml += '<span class="text-[10px] text-warm-600">' + label + '</span></div>';
+                });
+                colorHtml += '</div>';
+
+                // 사진 미리보기
+                let photoHtml = '<div class="flex gap-2 mb-4 overflow-x-auto pb-1">';
+                np.photos.forEach((p, i) => {
+                    photoHtml += '<div class="relative flex-shrink-0"><img src="' + p + '" class="w-20 h-24 rounded-xl object-cover border border-warm-400"><button onclick="app._commRemovePhoto(' + i + ')" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">×</button></div>';
+                });
+                if (np.photos.length < 4) {
+                    photoHtml += '<label class="flex-shrink-0 w-20 h-24 rounded-xl border-2 border-dashed border-warm-400 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-all bg-warm-100"><span class="text-xl text-warm-500">📷</span><span class="text-[9px] text-warm-500 mt-0.5">' + np.photos.length + '/4</span><input type="file" accept="image/*" class="hidden" onchange="app._commAddPhoto(this)"></label>';
+                }
+                photoHtml += '</div>';
+
+                // 색상 피커 오버레이 (열려있으면)
+                let pickerHtml = '';
+                if (this._commPickerPart) {
+                    const part = this._commPickerPart;
+                    pickerHtml = '<div class="fixed inset-0 bg-black/50 z-50 flex items-end" onclick="app._commPickerPart=null;app.render()">';
+                    pickerHtml += '<div class="w-full bg-white rounded-t-3xl p-5 pb-8 max-h-[60vh] overflow-y-auto" onclick="event.stopPropagation()">';
+                    pickerHtml += '<div class="text-sm font-semibold text-warm-900 mb-3">' + (CATEGORY_NAMES[part]||part) + ' 색상 선택</div>';
+                    pickerHtml += '<div class="grid grid-cols-6 gap-2">';
+                    Object.entries(COLORS_60).forEach(([key, c]) => {
+                        pickerHtml += '<div class="w-full aspect-square rounded-lg border cursor-pointer active:scale-90 transition-all' + (np.colors[part]===key?' ring-2 ring-terra-500 ring-offset-1':'') + '" style="background:' + c.hex + '" onclick="app._commSelectColor(\'' + part + '\',\'' + key + '\')"></div>';
+                    });
+                    pickerHtml += '</div></div></div>';
+                }
+
+                // 마네킹 미리보기
+                const outfit = {};
+                Object.entries(np.colors).forEach(([k,v]) => { if(v) outfit[k] = v; });
+                const outfitHex = {};
+                Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
+                const colorCount = Object.values(np.colors).filter(v => v).length;
+                const mn = colorCount > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:120px') : '';
+
+                return '<div class="screen active">' +
+                    '<p class="text-sm text-warm-600 mb-4">코디를 커뮤니티에 공유해보세요</p>' +
+
+                    // 제목
+                    '<div class="text-[13px] font-medium text-warm-800 mb-1.5">제목 <span class="text-terra-500">*</span></div>' +
+                    '<input type="text" class="w-full px-3.5 py-2.5 bg-white border border-warm-400 rounded-xl text-sm focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all outline-none mb-4" id="comm-new-title" placeholder="코디 제목을 입력하세요" maxlength="30" value="' + escapeHtml(np.title) + '" oninput="app.comm.newPost.title=this.value">' +
+
+                    // 사진
+                    '<div class="text-[13px] font-medium text-warm-800 mb-1.5">사진 <span class="text-[10px] text-warm-500">(선택, 최대 4장)</span></div>' +
+                    photoHtml +
+
+                    // 코디 색상
+                    '<div class="text-[13px] font-medium text-warm-800 mb-1.5">코디 색상 <span class="text-terra-500">*</span> <span class="text-[10px] text-warm-500">(2색 이상)</span></div>' +
+                    colorHtml +
+
+                    // 마네킹 미리보기
+                    (mn ? '<div class="flex justify-center py-4 bg-warm-200 rounded-[14px] mb-4">' + mn + '</div>' : '') +
+
+                    // 캡션
+                    '<div class="text-[13px] font-medium text-warm-800 mb-1.5">캡션 <span class="text-[10px] text-warm-500">(선택)</span></div>' +
+                    '<textarea class="w-full px-3.5 py-3 bg-white border border-warm-400 rounded-xl text-sm focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all outline-none resize-none mb-4" rows="3" id="comm-new-caption" placeholder="이 코디에 대해 한마디..." maxlength="200" oninput="app.comm.newPost.caption=this.value">' + escapeHtml(np.caption) + '</textarea>' +
+
+                    // 인스타 홍보 토글
+                    (hasInsta ? '<div class="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl px-4 py-3 mb-5"><div><div class="text-sm font-medium text-warm-900">📸 나의 인스타그램 홍보하기</div><div class="text-[10px] text-warm-500">@' + escapeHtml(auth.profile.instagram_id) + '</div></div><button class="w-11 h-6 rounded-full transition-all ' + (np.showInstagram ? 'bg-terra-500' : 'bg-warm-400') + '" onclick="app.comm.newPost.showInstagram=!app.comm.newPost.showInstagram;app.render()"><div class="w-5 h-5 bg-white rounded-full shadow transition-transform ' + (np.showInstagram ? 'translate-x-5' : 'translate-x-0.5') + '"></div></button></div>' : '') +
+
+                    // 공유 버튼
+                    '<button class="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm shadow-terra active:scale-[0.98] transition-all flex items-center justify-center gap-1.5" id="comm-new-submit-btn" onclick="app.commSubmitNewPost()">공유하기</button>' +
+                    '<p class="text-center text-[10px] text-warm-500 mt-2">관리자 승인 후 커뮤니티에 공개됩니다</p>' +
+
+                    pickerHtml +
+                '</div>';
+            },
+
+            _commPickerPart: null,
+            _commPickColor(part) {
+                this._commPickerPart = part;
+                this.render();
+            },
+            _commSelectColor(part, colorKey) {
+                this.comm.newPost.colors[part] = colorKey;
+                this._commPickerPart = null;
+                this.render();
+            },
+
+            _commAddPhoto(input) {
+                if (!input.files || !input.files[0]) return;
+                const file = input.files[0];
+                if (file.size > 10 * 1024 * 1024) { spToast('10MB 이하 이미지만 가능해요'); return; }
+                const self = this;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        self._showCropUI(img, 'rect', 4/5, function(croppedDataUrl) {
+                            self.comm.newPost.photos.push(croppedDataUrl);
+                            // 원본 리사이즈 (1200px)
+                            const oC = document.createElement('canvas');
+                            const maxW = 1200;
+                            let w = img.width, h = img.height;
+                            if (w > maxW) { h = h * maxW / w; w = maxW; }
+                            oC.width = w; oC.height = h;
+                            oC.getContext('2d').drawImage(img, 0, 0, w, h);
+                            self.comm.newPost.photos_orig.push(oC.toDataURL('image/webp', 0.85));
+                            self.render();
+                        }, 'dataurl');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                input.value = '';
+            },
+
+            _commRemovePhoto(idx) {
+                this.comm.newPost.photos.splice(idx, 1);
+                this.comm.newPost.photos_orig.splice(idx, 1);
+                this.render();
+            },
+
+            async commSubmitNewPost() {
+                if (!sb || !auth.user) return;
+                if (!this._throttle('post', 3000)) { spToast('잠시 후 다시 시도해주세요'); return; }
+
+                const np = this.comm.newPost;
+                const title = (np.title || '').trim();
+                if (!title) { spToast('제목을 입력해주세요'); return; }
+                if (title.length > 30) { spToast('제목은 30자 이내로 입력해주세요'); return; }
+
+                const colorCount = Object.values(np.colors).filter(v => v).length;
+                if (colorCount < 2) { spToast('코디 색상을 2가지 이상 선택해주세요'); return; }
+
+                const btn = document.getElementById('comm-new-submit-btn');
+                if (btn) { btn.disabled = true; btn.textContent = '업로드 중...'; }
+
+                try {
+                    // 사진 업로드 (Supabase Storage)
+                    let photoUrls = [];
+                    for (let i = 0; i < np.photos_orig.length; i++) {
+                        const dataUrl = np.photos_orig[i] || np.photos[i];
+                        const blob = await (await fetch(dataUrl)).blob();
+                        const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
+                        const path = auth.user.id + '/' + uuid + '.webp';
+                        const { data, error } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp', upsert: false });
+                        if (error) throw new Error('사진 업로드 실패: ' + error.message);
+                        const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
+                        photoUrls.push(urlData.publicUrl);
+                    }
+
+                    const outfit = {};
+                    Object.entries(np.colors).forEach(([k,v]) => { if(v) outfit[k] = v; });
+
+                    // 점수 산출
+                    const pc = profile.getPersonalColor();
+                    const ev = evaluationSystem.evaluate(outfit, pc);
+
+                    const rawCaption = (np.caption || '').trim().slice(0, 200);
+                    const caption = rawCaption || null;
+
+                    const { error } = await sb.from('posts').insert({
+                        user_id: auth.user.id,
+                        title: title,
+                        outfit: outfit,
+                        score: ev.total || 0,
+                        style: null,
+                        layer_type: 'basic',
+                        caption: caption,
+                        photo_urls: photoUrls.length > 0 ? photoUrls : null,
+                        status: 'pending',
+                        show_instagram: np.showInstagram && !!auth.profile?.instagram_id,
+                        tags: []
+                    });
+                    if (error) throw error;
+
+                    spToast('관리자 승인 후 커뮤니티에 공개됩니다 📋');
+                    this.comm.newPost = { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false };
+                    this.comm.posts = [];
+                    this.comm.page = 0;
+                    this.goTo('community');
+                } catch(e) {
+                    console.error('Post error:', e);
+                    alert('공유 실패: ' + (e.message||'알 수 없는 오류'));
+                    if (btn) { btn.disabled = false; btn.textContent = '공유하기'; }
+                }
+            },
+
             renderCommunityPost() {
                 const outfit = this.comm.postOutfit || {};
                 const outfitHex = {};
@@ -14039,9 +14559,12 @@
                         '<span class="font-display text-xl font-bold text-terra-600">' + (this.comm.postScore||0) + '점</span>' +
                         (style ? '<span class="text-[11px] text-warm-600 border border-warm-400 rounded-full px-2.5 py-0.5">' + style + '</span>' : '') +
                     '</div>' +
+                    '<div class="text-[13px] font-medium text-warm-800 mb-1.5">제목 <span class="text-terra-500">*</span></div>' +
+                    '<input type="text" class="w-full px-3.5 py-2.5 bg-white border border-warm-400 rounded-xl text-sm focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all outline-none mb-4" id="comm-title" placeholder="코디 제목" maxlength="30">' +
                     '<div class="text-[13px] font-medium text-warm-800 mb-1.5">한마디 (선택)</div>' +
                     '<textarea class="w-full px-3.5 py-3 bg-white border border-warm-400 rounded-xl text-sm focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all outline-none resize-none mb-4" rows="3" id="comm-caption" placeholder="이 코디에 대해 한마디..." maxlength="200"></textarea>' +
                     '<button class="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm shadow-terra active:scale-[0.98] transition-all flex items-center justify-center gap-1.5" id="comm-submit-btn" onclick="app.commSubmitPost()">' + svg('globe', 16, '#fff') + ' 공유하기</button>' +
+                    '<p class="text-center text-[10px] text-warm-500 mt-2">관리자 승인 후 커뮤니티에 공개됩니다</p>' +
                 '</div>';
             },
 
@@ -14061,19 +14584,23 @@
                 if (btn) { btn.disabled = true; btn.textContent = '공유 중...'; }
 
                 try {
+                    const title = (document.getElementById('comm-title')?.value || '').trim();
+                    if (!title) { spToast('제목을 입력해주세요'); if (btn) { btn.disabled = false; btn.textContent = '🌐 공유하기'; } return; }
                     const rawCaption = (document.getElementById('comm-caption')?.value || '').trim();
-                    const caption = sanitizeNickname(rawCaption) ? rawCaption.slice(0, 200) : null;
+                    const caption = rawCaption ? rawCaption.slice(0, 200) : null;
                     const { error } = await sb.from('posts').insert({
                         user_id: auth.user.id,
+                        title: title.slice(0, 30),
                         outfit: this.comm.postOutfit,
                         score: this.comm.postScore || 0,
                         style: this.comm.postStyle || null,
                         layer_type: this.comm.postLayerType || 'basic',
                         caption: caption || null,
+                        status: 'pending',
                         tags: this.comm.postStyle ? [this.comm.postStyle] : []
                     });
                     if (error) throw error;
-                    alert('커뮤니티에 공유되었어요! 🎉');
+                    spToast('관리자 승인 후 커뮤니티에 공개됩니다 📋');
                     this.comm.posts = [];
                     this.comm.page = 0;
                     this.goTo('community');
@@ -14174,6 +14701,7 @@
                 const userPosts = this.comm.posts.filter(p => p.user_id === userId);
                 const nick = escapeHtml(userPosts[0]?.profiles?.nickname) || '유저';
                 const userAvatar = escapeHtml(userPosts[0]?.profiles?.avatar_url);
+                const userInsta = escapeHtml(userPosts[0]?.profiles?.instagram_id || '');
                 const initial = nick.charAt(0).toUpperCase();
 
                 // 팔로우 버튼
@@ -14197,6 +14725,12 @@
                     : '<div class="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xl mx-auto mb-3">' + initial + '</div>');
                 h += '<div class="text-lg font-bold text-warm-900 mb-1">@' + nick + '</div>';
                 if (isMutual) h += '<div class="text-xs text-green-600 font-medium mb-2">👫 서로 친구</div>';
+
+                // 인스타그램 링크
+                if (userInsta) {
+                    h += '<button onclick="window.open(\'https://instagram.com/' + userInsta + '\',\'_blank\')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-xs font-medium text-warm-700 mb-2 active:scale-95 transition-all">📸 인스타그램</button>';
+                }
+
                 h += '<div class="flex justify-center gap-6 mb-4 text-center">';
                 h += '<div><div class="font-display text-lg font-bold text-warm-900">' + userPosts.length + '</div><div class="text-[10px] text-warm-500">코디</div></div>';
                 h += '</div>';
@@ -14667,6 +15201,30 @@
                     this.render();
                 } catch(e) {
                     console.error('Bio update error:', e);
+                    spToast('변경 실패: ' + (e.message || ''));
+                }
+            },
+
+            async editInstagram() {
+                if (!sb || !auth.user) return;
+                const current = auth.profile?.instagram_id || '';
+                const newId = prompt('인스타그램 ID를 입력해주세요\n(@없이, 예: barusa_vintage)\n삭제하려면 비워두세요', current);
+                if (newId === null) return;
+                const clean = newId.trim().replace(/^@/, '');
+
+                if (clean && !/^[a-zA-Z0-9_.]{1,30}$/.test(clean)) {
+                    spToast('영문, 숫자, 밑줄, 마침표만 사용할 수 있어요');
+                    return;
+                }
+
+                try {
+                    const { error } = await sb.from('profiles').update({ instagram_id: clean || null }).eq('id', auth.user.id);
+                    if (error) throw error;
+                    auth.profile.instagram_id = clean || null;
+                    spToast(clean ? '인스타그램이 연결되었어요 📸' : '인스타그램이 해제되었어요');
+                    this.render();
+                } catch(e) {
+                    console.error('Instagram update error:', e);
                     spToast('변경 실패: ' + (e.message || ''));
                 }
             },
