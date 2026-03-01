@@ -7828,7 +7828,7 @@
             getOotdRecords() {
                 try { return JSON.parse(localStorage.getItem('sp_ootd_records') || '[]'); } catch(e) { return []; }
             },
-            saveOotdRecord() {
+            async saveOotdRecord() {
                 const oc = this.ootd.colors;
                 const outfit = {};
                 ['top','bottom','outer','shoes'].forEach(p => { if (oc[p]) outfit[p] = oc[p]; });
@@ -7889,6 +7889,28 @@
                 this._ootdEditDate = null;
 
                 spToast(isEdit ? '✅ 코디 기록이 수정되었어요!' : '✅ 오늘의 코디가 기록되었어요!');
+
+                // 전체공개면 커뮤니티에 자동 게시
+                if (record.visibility === 'public' && sb && auth.user) {
+                    try {
+                        const postData = {
+                            user_id: auth.user.id,
+                            outfit: outfit,
+                            score: ev.total,
+                            style: null,
+                            layer_type: 'basic',
+                            caption: record.memo || null,
+                            tags: []
+                        };
+                        const { error } = await sb.from('posts').insert(postData);
+                        if (!error) {
+                            spToast('커뮤니티에도 공유되었어요! 🌐');
+                        }
+                    } catch(e) {
+                        console.warn('Community auto-post failed:', e);
+                    }
+                }
+
                 this.goTo('ootd-calendar');
             },
 
@@ -7999,16 +8021,18 @@
                         const rd = new Date(r.date + 'T00:00:00');
                         const outfitHex = {};
                         if (r.colors) Object.entries(r.colors).forEach(([p,k]) => { if (k && COLORS_60[k]) outfitHex[p] = COLORS_60[k].hex; });
-                        const mnImg = Object.keys(outfitHex).length > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'width:32px;height:44px;object-fit:contain') : '';
                         const hasPhoto = r.photos && r.photos.length > 0;
+                        const thumbImg = hasPhoto
+                            ? `<img src="${r.photos[0]}" class="w-10 h-10 rounded-xl object-cover border border-warm-300">`
+                            : (Object.keys(outfitHex).length > 0 ? mannequinToImg(createMannequinSVG(outfitHex, {}), 'width:32px;height:44px;object-fit:contain') : '');
                         return `<div onclick="app.openOotdDetail('${r.date}')" class="flex items-center gap-3 bg-white border border-warm-400 rounded-2xl px-4 py-2.5 mb-2 cursor-pointer shadow-warm-sm active:scale-[0.98] transition-all">
                             <div class="flex-shrink-0 text-center" style="min-width:32px">
                                 <div class="font-display text-base font-bold text-warm-900">${rd.getDate()}</div>
                                 <div class="text-[10px] text-warm-600">${['일','월','화','수','목','금','토'][rd.getDay()]}</div>
                             </div>
-                            <div class="flex-shrink-0">${mnImg}</div>
+                            <div class="flex-shrink-0">${thumbImg}</div>
                             <div class="flex-1 text-right text-xs text-warm-600 truncate">
-                                ${hasPhoto ? '📷 ' : ''}${r.situation || ''}${r.mood ? ' ' + r.mood : ''}
+                                ${r.situation || ''}${r.mood ? ' ' + r.mood : ''}
                             </div>
                             <i data-lucide="chevron-right" style="width:14px;height:14px;color:#D6D3D1"></i>
                         </div>`;
@@ -13684,12 +13708,6 @@
             renderCommunity() {
                 const u = auth.user;
                 const p = auth.profile;
-                let userBar = '';
-                if (u && p) {
-                    userBar = '<div class="flex items-center gap-2.5 bg-white border border-warm-400 rounded-2xl px-4 py-3 mb-4 shadow-warm-sm">' + svg("user", 18, "#A8A29E") + '<span class="flex-1 text-sm font-medium text-warm-900">' + (escapeHtml(p.nickname) || '유저') + '</span><button onclick="app.authLogout()" class="text-xs text-warm-600 font-medium px-3 py-1.5 border border-warm-400 rounded-full active:scale-95 transition-all">로그아웃</button></div>';
-                } else {
-                    userBar = '<div class="flex items-center gap-2.5 bg-white border border-warm-400 rounded-2xl px-4 py-3 mb-4 shadow-warm-sm">' + svg("user", 18, "#D6D3D1") + '<span class="flex-1 text-sm text-warm-500">로그인하면 공유·좋아요 가능</span><button onclick="app.goTo(\'auth-login\')" class="text-xs text-white font-medium px-3 py-1.5 bg-terra-500 rounded-full active:scale-95 transition-all shadow-terra">로그인</button></div>';
-                }
 
                 // 정렬 + 스타일 필터
                 const sorts = [['latest','최신순'],['popular','인기순']];
@@ -13705,7 +13723,6 @@
                 let cFilterHtml = cFilters.map(f => '<button class="px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (this.comm.contentFilter===f[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetContentFilter(\'' + f[0] + '\')">' + f[1] + '</button>').join('');
 
                 return '<div class="screen active">' +
-                    userBar +
                     '<div class="flex items-center gap-2 mb-3">' + sortHtml + '<div class="ml-auto">' + filterHtml + '</div></div>' +
                     '<div class="flex gap-1.5 mb-4">' + cFilterHtml + '</div>' +
                     '<div id="comm-grid" class="grid grid-cols-2 gap-2.5"></div>' +
