@@ -14315,37 +14315,178 @@
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = async (e) => {
+                input.onchange = (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
-                    if (file.size > 2 * 1024 * 1024) { spToast('이미지는 2MB 이하만 가능해요'); return; }
-
-                    try {
-                        spToast('업로드 중...');
-                        const ext = file.name.split('.').pop() || 'jpg';
-                        const path = 'avatars/' + auth.user.id + '.' + ext;
-
-                        // Storage에 업로드
-                        const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
-                        if (upErr) throw upErr;
-
-                        // Public URL 가져오기
-                        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
-                        const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
-
-                        // profiles 테이블 업데이트
-                        const { error: dbErr } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', auth.user.id);
-                        if (dbErr) throw dbErr;
-
-                        auth.profile.avatar_url = avatarUrl;
-                        spToast('프로필 사진이 변경되었어요 📸');
-                        this.render();
-                    } catch(e) {
-                        console.error('Avatar upload error:', e);
-                        spToast('업로드 실패: ' + (e.message || ''));
-                    }
+                    if (file.size > 10 * 1024 * 1024) { spToast('이미지는 10MB 이하만 가능해요'); return; }
+                    this._openCropModal(file);
                 };
                 input.click();
+            },
+
+            _openCropModal(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imgSrc = e.target.result;
+
+                    // 크롭 오버레이 생성
+                    const ov = document.createElement('div');
+                    ov.id = 'cropOverlay';
+                    ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
+
+                    // 상단 바
+                    const topBar = '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;flex-shrink:0">'
+                        + '<button id="cropCancel" style="color:#fff;font-size:15px;padding:8px 16px;background:rgba(255,255,255,0.15);border:none;border-radius:20px">취소</button>'
+                        + '<span style="color:#fff;font-size:15px;font-weight:600">프로필 사진</span>'
+                        + '<button id="cropDone" style="color:#fff;font-size:15px;padding:8px 16px;background:#A8613F;border:none;border-radius:20px;font-weight:600">완료</button>'
+                        + '</div>';
+
+                    // 캔버스 영역
+                    const canvasArea = '<div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;touch-action:none" id="cropArea">'
+                        + '<canvas id="cropCanvas" style="max-width:100%;max-height:100%"></canvas>'
+                        + '<div id="cropGuide" style="position:absolute;pointer-events:none;border:2px solid rgba(255,255,255,0.8);border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,0.5)"></div>'
+                        + '</div>';
+
+                    // 줌 슬라이더
+                    const zoomBar = '<div style="padding:16px 32px;flex-shrink:0;display:flex;align-items:center;gap:12px">'
+                        + '<span style="color:#aaa;font-size:12px">−</span>'
+                        + '<input type="range" id="cropZoom" min="100" max="300" value="100" style="flex:1;accent-color:#A8613F">'
+                        + '<span style="color:#aaa;font-size:12px">+</span>'
+                        + '</div>';
+
+                    ov.innerHTML = topBar + canvasArea + zoomBar;
+                    document.body.appendChild(ov);
+
+                    // 이미지 로드 → 캔버스 초기화
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.getElementById('cropCanvas');
+                        const ctx = canvas.getContext('2d');
+                        const area = document.getElementById('cropArea');
+                        const guide = document.getElementById('cropGuide');
+                        const zoom = document.getElementById('cropZoom');
+
+                        // 가이드 원 크기 (화면 너비의 70%, 최대 300px)
+                        const guideSize = Math.min(area.clientWidth * 0.7, area.clientHeight * 0.7, 300);
+                        guide.style.width = guideSize + 'px';
+                        guide.style.height = guideSize + 'px';
+                        guide.style.left = (area.clientWidth - guideSize) / 2 + 'px';
+                        guide.style.top = (area.clientHeight - guideSize) / 2 + 'px';
+
+                        // 캔버스 크기 = 표시 영역
+                        canvas.width = area.clientWidth;
+                        canvas.height = area.clientHeight;
+
+                        let scale = 1;
+                        let offsetX = 0, offsetY = 0;
+                        let dragging = false, lastX = 0, lastY = 0;
+
+                        // 이미지가 가이드 원을 꽉 채우도록 초기 스케일 계산
+                        const fitScale = guideSize / Math.min(img.width, img.height);
+                        scale = fitScale;
+                        zoom.min = Math.floor(fitScale * 100);
+                        zoom.max = Math.floor(fitScale * 300);
+                        zoom.value = Math.floor(fitScale * 100);
+
+                        function draw() {
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            const w = img.width * scale;
+                            const h = img.height * scale;
+                            const x = (canvas.width - w) / 2 + offsetX;
+                            const y = (canvas.height - h) / 2 + offsetY;
+                            ctx.drawImage(img, x, y, w, h);
+                        }
+                        draw();
+
+                        // 줌
+                        zoom.oninput = () => {
+                            scale = parseInt(zoom.value) / 100;
+                            draw();
+                        };
+
+                        // 드래그 (마우스 + 터치)
+                        function onStart(cx, cy) { dragging = true; lastX = cx; lastY = cy; }
+                        function onMove(cx, cy) {
+                            if (!dragging) return;
+                            offsetX += cx - lastX;
+                            offsetY += cy - lastY;
+                            lastX = cx; lastY = cy;
+                            draw();
+                        }
+                        function onEnd() { dragging = false; }
+
+                        canvas.addEventListener('mousedown', (e) => onStart(e.clientX, e.clientY));
+                        canvas.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+                        canvas.addEventListener('mouseup', onEnd);
+                        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); const t = e.touches[0]; onStart(t.clientX, t.clientY); }, { passive: false });
+                        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: false });
+                        canvas.addEventListener('touchend', onEnd);
+
+                        // 취소
+                        document.getElementById('cropCancel').onclick = () => ov.remove();
+
+                        // 완료 → 크롭 → 업로드
+                        document.getElementById('cropDone').onclick = async () => {
+                            // 가이드 원 영역을 기준으로 크롭
+                            const outSize = 400; // 출력 크기 400x400
+                            const outCanvas = document.createElement('canvas');
+                            outCanvas.width = outSize;
+                            outCanvas.height = outSize;
+                            const outCtx = outCanvas.getContext('2d');
+
+                            // 원본 이미지에서 크롭할 영역 계산
+                            const w = img.width * scale;
+                            const h = img.height * scale;
+                            const imgX = (canvas.width - w) / 2 + offsetX;
+                            const imgY = (canvas.height - h) / 2 + offsetY;
+
+                            const guideLeft = (canvas.width - guideSize) / 2;
+                            const guideTop = (canvas.height - guideSize) / 2;
+
+                            // 가이드 영역 → 원본 이미지 좌표 변환
+                            const srcX = (guideLeft - imgX) / scale;
+                            const srcY = (guideTop - imgY) / scale;
+                            const srcSize = guideSize / scale;
+
+                            // 원형 클리핑
+                            outCtx.beginPath();
+                            outCtx.arc(outSize / 2, outSize / 2, outSize / 2, 0, Math.PI * 2);
+                            outCtx.closePath();
+                            outCtx.clip();
+
+                            outCtx.drawImage(img, srcX, srcY, srcSize, srcSize, 0, 0, outSize, outSize);
+
+                            // Blob으로 변환
+                            outCanvas.toBlob(async (blob) => {
+                                if (!blob) { spToast('이미지 처리 실패'); ov.remove(); return; }
+
+                                try {
+                                    spToast('업로드 중...');
+                                    const path = auth.user.id + '/avatar.webp';
+
+                                    const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/webp' });
+                                    if (upErr) throw upErr;
+
+                                    const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+                                    const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
+
+                                    const { error: dbErr } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', auth.user.id);
+                                    if (dbErr) throw dbErr;
+
+                                    auth.profile.avatar_url = avatarUrl;
+                                    spToast('프로필 사진이 변경되었어요 📸');
+                                    ov.remove();
+                                    app.render();
+                                } catch(e) {
+                                    console.error('Avatar upload error:', e);
+                                    spToast('업로드 실패: ' + (e.message || ''));
+                                }
+                            }, 'image/webp', 0.85);
+                        };
+                    };
+                    img.src = imgSrc;
+                };
+                reader.readAsDataURL(file);
             },
 
             async editNickname() {
