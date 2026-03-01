@@ -6605,7 +6605,8 @@
             ootd: {
                 colors: { top: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null },
                 openPicker: null,   // 현재 열린 파트 피커
-                photos: [],         // base64 이미지 배열 (최대 4장)
+                photos: [],         // base64 이미지 배열 (최대 4장, 크롭된 썸네일)
+                photos_orig: [],    // 원본 이미지 (상세보기용)
                 situation: null,
                 mood: null,
                 memo: '',
@@ -7330,26 +7331,31 @@
                 if (!input.files || !input.files[0]) return;
                 if (this.ootd.photos.length >= 4) { spToast('최대 4장까지 추가할 수 있어요'); return; }
                 const file = input.files[0];
-                if (file.size > 5 * 1024 * 1024) { spToast('5MB 이하 이미지만 가능해요'); return; }
+                if (file.size > 10 * 1024 * 1024) { spToast('10MB 이하 이미지만 가능해요'); return; }
                 const reader = new FileReader();
                 const self = this;
                 reader.onload = function(e) {
-                    // 리사이즈 (최대 800px)
                     const img = new Image();
                     img.onload = function() {
-                        const maxW = 800, maxH = 800;
-                        let w = img.width, h = img.height;
-                        if (w > maxW || h > maxH) {
-                            const ratio = Math.min(maxW / w, maxH / h);
-                            w = Math.round(w * ratio);
-                            h = Math.round(h * ratio);
-                        }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                        self.ootd.photos.push(dataUrl);
-                        self.render();
+                        // 4:5 크롭 UI 오픈
+                        self._showCropUI(img, 'rect', 4/5, (croppedDataUrl) => {
+                            // 원본도 리사이즈해서 보관
+                            const maxW = 1200, maxH = 1200;
+                            let w = img.width, h = img.height;
+                            if (w > maxW || h > maxH) {
+                                const r = Math.min(maxW / w, maxH / h);
+                                w = Math.round(w * r); h = Math.round(h * r);
+                            }
+                            const origCanvas = document.createElement('canvas');
+                            origCanvas.width = w; origCanvas.height = h;
+                            origCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            const origDataUrl = origCanvas.toDataURL('image/jpeg', 0.8);
+
+                            if (!self.ootd.photos_orig) self.ootd.photos_orig = [];
+                            self.ootd.photos.push(croppedDataUrl);
+                            self.ootd.photos_orig.push(origDataUrl);
+                            self.render();
+                        }, 'dataurl');
                     };
                     img.src = e.target.result;
                 };
@@ -7358,6 +7364,7 @@
             },
             ootdRemovePhoto(idx) {
                 this.ootd.photos.splice(idx, 1);
+                if (this.ootd.photos_orig) this.ootd.photos_orig.splice(idx, 1);
                 this.render();
             },
 
@@ -7370,14 +7377,12 @@
             openPhotoEditor(idx) {
                 const src = this.ootd.photos[idx];
                 if (!src) return;
-                this._photoEd = { idx, items: [], tool: 'sticker', activeItem: -1, dragOffset: null, stickerType: '😎' };
+                this._photoEd = { idx, items: [], tool: 'sticker', activeItem: -1, dragOffset: null, stickerType: '😎', _mosaicColor: '#000000' };
 
-                // 오버레이 생성
                 const ov = document.createElement('div');
                 ov.id = 'photoEdOverlay';
                 ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;';
 
-                // 상단 바
                 ov.innerHTML = `
                     <div style="display:flex;align-items:center;padding:12px 16px;gap:10px;flex-shrink:0">
                         <button onclick="app.closePhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:transparent">취소</button>
@@ -7391,14 +7396,12 @@
                 `;
                 document.body.appendChild(ov);
 
-                // 이미지 로드 → 캔버스
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.getElementById('peCanvas');
                     const wrap = document.getElementById('peCanvasWrap');
                     if (!canvas || !wrap) return;
 
-                    // 캔버스 크기 = 이미지 비율 유지, wrap에 맞춤
                     const maxW = wrap.clientWidth, maxH = wrap.clientHeight;
                     let w = img.width, h = img.height;
                     const ratio = Math.min(maxW / w, maxH / h, 1);
@@ -7423,60 +7426,54 @@
             },
 
             savePhotoEditor() {
-                // 편집 결과를 사진에 반영 (모든 아이템 포함해서 flat render)
                 const pe = this._photoEd;
                 const canvas = document.createElement('canvas');
                 const img = pe._img;
                 if (!img) { this.closePhotoEditor(); return; }
 
-                // 원본 해상도로 저장
                 canvas.width = img.width; canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 const scaleX = img.width / pe._cw;
                 const scaleY = img.height / pe._ch;
-
                 ctx.drawImage(img, 0, 0);
 
                 pe.items.forEach(item => {
                     const x = item.x * scaleX, y = item.y * scaleY, sz = item.size * scaleX;
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate((item.rotation || 0) * Math.PI / 180);
                     if (item.type === 'sticker') {
                         ctx.font = sz + 'px serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(item.emoji, x, y);
+                        ctx.fillText(item.emoji, 0, 0);
                     } else if (item.type === 'blur') {
-                        // 가우시안 블러 시뮬레이션 (pixelate)
                         const r = sz / 2;
-                        const sx = Math.max(0, Math.round(x - r));
-                        const sy = Math.max(0, Math.round(y - r));
-                        const sw = Math.min(canvas.width - sx, Math.round(sz));
-                        const sh = Math.min(canvas.height - sy, Math.round(sz));
+                        const origX = Math.round(x - r), origY = Math.round(y - r);
+                        const sw = Math.min(canvas.width - Math.max(0, origX), Math.round(sz));
+                        const sh = Math.min(canvas.height - Math.max(0, origY), Math.round(sz));
                         if (sw > 0 && sh > 0) {
-                            const pixelSize = Math.max(4, Math.round(sz / 8));
-                            ctx.save();
+                            ctx.restore(); ctx.save();
                             ctx.beginPath();
                             ctx.arc(x, y, r, 0, Math.PI * 2);
                             ctx.clip();
-                            // 축소 후 확대 = 픽셀화
-                            const tmpC = document.createElement('canvas');
-                            tmpC.width = Math.max(1, Math.round(sw / pixelSize));
-                            tmpC.height = Math.max(1, Math.round(sh / pixelSize));
-                            tmpC.getContext('2d').drawImage(canvas, sx, sy, sw, sh, 0, 0, tmpC.width, tmpC.height);
+                            const ps = Math.max(4, Math.round(sz / 8));
+                            const tc = document.createElement('canvas');
+                            tc.width = Math.max(1, Math.round(sw / ps));
+                            tc.height = Math.max(1, Math.round(sh / ps));
+                            tc.getContext('2d').drawImage(canvas, Math.max(0, origX), Math.max(0, origY), sw, sh, 0, 0, tc.width, tc.height);
                             ctx.imageSmoothingEnabled = false;
-                            ctx.drawImage(tmpC, 0, 0, tmpC.width, tmpC.height, sx, sy, sw, sh);
+                            ctx.drawImage(tc, 0, 0, tc.width, tc.height, Math.max(0, origX), Math.max(0, origY), sw, sh);
                             ctx.imageSmoothingEnabled = true;
-                            ctx.restore();
                         }
-                    } else if (item.type === 'mosaic') {
+                    } else if (item.type === 'fill') {
                         const r = sz / 2;
-                        ctx.save();
                         ctx.beginPath();
-                        ctx.arc(x, y, r, 0, Math.PI * 2);
-                        ctx.clip();
-                        ctx.fillStyle = item.color || 'rgba(0,0,0,0.85)';
+                        ctx.arc(0, 0, r, 0, Math.PI * 2);
+                        ctx.fillStyle = item.color || '#000000';
                         ctx.fill();
-                        ctx.restore();
                     }
+                    ctx.restore();
                 });
 
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
@@ -7498,45 +7495,45 @@
 
                 pe.items.forEach((item, idx) => {
                     const x = item.x, y = item.y, sz = item.size;
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate((item.rotation || 0) * Math.PI / 180);
+
                     if (item.type === 'sticker') {
                         ctx.font = sz + 'px serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(item.emoji, x, y);
+                        ctx.fillText(item.emoji, 0, 0);
                     } else if (item.type === 'blur') {
-                        // 미리보기용 반투명 원
                         const r = sz / 2;
-                        ctx.save();
+                        ctx.restore(); ctx.save();
                         ctx.beginPath();
                         ctx.arc(x, y, r, 0, Math.PI * 2);
                         ctx.clip();
-                        // 픽셀화 미리보기
-                        const sx = Math.max(0, Math.round(x-r)), sy = Math.max(0, Math.round(y-r));
-                        const sw = Math.min(w-sx, Math.round(sz)), sh = Math.min(h-sy, Math.round(sz));
+                        const sx = Math.max(0, Math.round(x - r)), sy = Math.max(0, Math.round(y - r));
+                        const sw = Math.min(w - sx, Math.round(sz)), sh = Math.min(h - sy, Math.round(sz));
                         if (sw > 0 && sh > 0) {
-                            const ps = Math.max(3, Math.round(sz/6));
-                            const tc = document.createElement('canvas');
-                            tc.width = Math.max(1, Math.round(sw/ps)); tc.height = Math.max(1, Math.round(sh/ps));
-                            // 원본 이미지에서만 샘플링
+                            const ps = Math.max(3, Math.round(sz / 6));
                             const origC = document.createElement('canvas');
                             origC.width = w; origC.height = h;
                             origC.getContext('2d').drawImage(pe._img, 0, 0, w, h);
+                            const tc = document.createElement('canvas');
+                            tc.width = Math.max(1, Math.round(sw / ps));
+                            tc.height = Math.max(1, Math.round(sh / ps));
                             tc.getContext('2d').drawImage(origC, sx, sy, sw, sh, 0, 0, tc.width, tc.height);
                             ctx.imageSmoothingEnabled = false;
                             ctx.drawImage(tc, 0, 0, tc.width, tc.height, sx, sy, sw, sh);
                             ctx.imageSmoothingEnabled = true;
                         }
-                        ctx.restore();
-                    } else if (item.type === 'mosaic') {
+                    } else if (item.type === 'fill') {
                         const r = sz / 2;
-                        ctx.save();
                         ctx.beginPath();
-                        ctx.arc(x, y, r, 0, Math.PI * 2);
-                        ctx.clip();
-                        ctx.fillStyle = item.color || 'rgba(0,0,0,0.85)';
+                        ctx.arc(0, 0, r, 0, Math.PI * 2);
+                        ctx.fillStyle = item.color || '#000000';
                         ctx.fill();
-                        ctx.restore();
                     }
+
+                    ctx.restore();
 
                     // 선택 표시
                     if (idx === pe.activeItem) {
@@ -7544,14 +7541,25 @@
                         ctx.strokeStyle = '#C2785C';
                         ctx.lineWidth = 2;
                         ctx.setLineDash([4, 3]);
-                        if (item.type === 'sticker') {
-                            ctx.strokeRect(x - sz/2, y - sz/2, sz, sz);
-                        } else {
-                            ctx.beginPath();
-                            ctx.arc(x, y, sz/2, 0, Math.PI * 2);
-                            ctx.stroke();
-                        }
+                        const r = sz / 2 + 4;
+                        ctx.beginPath();
+                        ctx.arc(x, y, r, 0, Math.PI * 2);
+                        ctx.stroke();
+                        // 삭제 버튼
                         ctx.setLineDash([]);
+                        const dx = x + r * 0.7, dy = y - r * 0.7;
+                        ctx.beginPath();
+                        ctx.arc(dx, dy, 10, 0, Math.PI * 2);
+                        ctx.fillStyle = '#E53E3E';
+                        ctx.fill();
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(dx - 4, dy - 4);
+                        ctx.lineTo(dx + 4, dy + 4);
+                        ctx.moveTo(dx + 4, dy - 4);
+                        ctx.lineTo(dx - 4, dy + 4);
+                        ctx.stroke();
                         ctx.restore();
                     }
                 });
@@ -7562,9 +7570,9 @@
                 if (!tb) return;
                 const pe = this._photoEd;
                 const tools = [
-                    { id: 'sticker', label: '😎 스티커', icon: '😎' },
-                    { id: 'blur', label: '🔲 블러', icon: '🔲' },
-                    { id: 'mosaic', label: '⬛ 채우기', icon: '⬛' }
+                    { id: 'sticker', label: '😎 스티커' },
+                    { id: 'blur', label: '🔲 블러' },
+                    { id: 'fill', label: '⬛ 채우기' }
                 ];
 
                 let h = '';
@@ -7577,37 +7585,34 @@
                 });
                 h += '</div>';
 
-                // 스티커 선택
+                // 스티커 선택 + 추가 버튼
                 if (pe.tool === 'sticker') {
-                    h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+                    h += '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">';
                     this._photoEdStickers.forEach(s => {
                         const active = pe.stickerType === s;
                         h += '<button onclick="app._photoEd.stickerType=\'' + s + '\';app._peRenderToolbar()" style="width:36px;height:36px;border-radius:8px;font-size:20px;border:1.5px solid ' + (active ? '#C2785C' : 'rgba(255,255,255,0.1)') + ';background:' + (active ? 'rgba(194,120,92,0.2)' : 'transparent') + '">' + s + '</button>';
                     });
                     h += '</div>';
+                    h += '<button onclick="app._peAddItem()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;background:#C2785C;color:#fff;font-weight:600;font-size:13px;border:none">+ 스티커 추가</button>';
                 }
 
-                // 채우기 색상
-                if (pe.tool === 'mosaic') {
-                    const colors = ['rgba(0,0,0,0.85)', 'rgba(255,255,255,0.9)', '#C2785C', '#6B9E76', '#5B8DB8', '#D4915E'];
-                    h += '<div style="display:flex;gap:6px;align-items:center"><span style="color:#888;font-size:11px;margin-right:4px">색상:</span>';
+                // 블러/채우기 추가 버튼
+                if (pe.tool === 'blur') {
+                    h += '<button onclick="app._peAddItem()" style="width:100%;padding:10px;border-radius:10px;background:#C2785C;color:#fff;font-weight:600;font-size:13px;border:none">+ 블러 추가</button>';
+                }
+
+                if (pe.tool === 'fill') {
+                    const colors = ['#000000', '#FFFFFF', '#C2785C', '#6B9E76', '#5B8DB8', '#D4915E', '#8B5CF6', '#EC4899'];
+                    h += '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><span style="color:#888;font-size:11px;margin-right:4px">색상:</span>';
                     colors.forEach(c => {
-                        h += '<button onclick="app._photoEd._mosaicColor=\'' + c + '\';app._peRenderToolbar()" style="width:28px;height:28px;border-radius:50%;background:' + c + ';border:2px solid ' + ((pe._mosaicColor||'rgba(0,0,0,0.85)') === c ? '#C2785C' : 'rgba(255,255,255,0.2)') + '"></button>';
+                        h += '<button onclick="app._photoEd._mosaicColor=\'' + c + '\';app._peRenderToolbar()" style="width:28px;height:28px;border-radius:50%;background:' + c + ';border:2px solid ' + ((pe._mosaicColor || '#000000') === c ? '#C2785C' : 'rgba(255,255,255,0.2)') + '"></button>';
                     });
                     h += '</div>';
-                }
-
-                // 선택된 아이템 액션
-                if (pe.activeItem >= 0 && pe.items[pe.activeItem]) {
-                    h += '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">';
-                    h += '<button onclick="app._peResizeItem(-10)" style="flex:1;padding:7px;border-radius:8px;background:rgba(255,255,255,0.1);color:#ccc;font-size:12px;font-weight:600">➖ 축소</button>';
-                    h += '<button onclick="app._peResizeItem(10)" style="flex:1;padding:7px;border-radius:8px;background:rgba(255,255,255,0.1);color:#ccc;font-size:12px;font-weight:600">➕ 확대</button>';
-                    h += '<button onclick="app._peDeleteItem()" style="flex:1;padding:7px;border-radius:8px;background:rgba(200,50,50,0.3);color:#f88;font-size:12px;font-weight:600">🗑 삭제</button>';
-                    h += '</div>';
+                    h += '<button onclick="app._peAddItem()" style="width:100%;padding:10px;border-radius:10px;background:#C2785C;color:#fff;font-weight:600;font-size:13px;border:none">+ 채우기 추가</button>';
                 }
 
                 // 안내
-                h += '<div style="text-align:center;margin-top:8px;font-size:11px;color:#666">터치하여 배치 · 드래그하여 이동</div>';
+                h += '<div style="text-align:center;margin-top:8px;font-size:11px;color:#666">터치: 선택 · 드래그: 이동 · 두 손가락: 크기/회전</div>';
 
                 tb.innerHTML = h;
             },
@@ -7619,12 +7624,25 @@
                 this._peRenderToolbar();
             },
 
-            _peResizeItem(delta) {
+            _peAddItem() {
                 const pe = this._photoEd;
-                if (pe.activeItem < 0) return;
-                const item = pe.items[pe.activeItem];
-                item.size = Math.max(20, Math.min(300, item.size + delta));
+                const cx = pe._cw / 2, cy = pe._ch / 2;
+                const newItem = { x: cx, y: cy, size: 60, rotation: 0 };
+                if (pe.tool === 'sticker') {
+                    newItem.type = 'sticker';
+                    newItem.emoji = pe.stickerType;
+                } else if (pe.tool === 'blur') {
+                    newItem.type = 'blur';
+                    newItem.size = 80;
+                } else if (pe.tool === 'fill') {
+                    newItem.type = 'fill';
+                    newItem.size = 80;
+                    newItem.color = pe._mosaicColor || '#000000';
+                }
+                pe.items.push(newItem);
+                pe.activeItem = pe.items.length - 1;
                 this._peRedraw();
+                this._peRenderToolbar();
             },
 
             _peDeleteItem() {
@@ -7640,85 +7658,165 @@
                 const canvas = document.getElementById('peCanvas');
                 if (!canvas) return;
                 const pe = this._photoEd;
+                const self = this;
 
-                const getPos = (e) => {
+                const getPos = (touch) => {
                     const rect = canvas.getBoundingClientRect();
-                    const t = e.touches ? e.touches[0] : e;
-                    return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+                    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
                 };
 
                 const hitTest = (pos) => {
-                    // 역순으로 검사 (위에 있는 아이템 우선)
                     for (let i = pe.items.length - 1; i >= 0; i--) {
                         const item = pe.items[i];
-                        const r = item.size / 2;
+                        const r = item.size / 2 + 8; // 약간 넉넉한 히트 영역
                         const dx = pos.x - item.x, dy = pos.y - item.y;
                         if (dx * dx + dy * dy < r * r) return i;
                     }
                     return -1;
                 };
 
-                let isDragging = false;
-
-                const onStart = (e) => {
-                    e.preventDefault();
-                    const pos = getPos(e);
-                    const hit = hitTest(pos);
-
-                    if (hit >= 0) {
-                        // 기존 아이템 선택 + 드래그 시작
-                        pe.activeItem = hit;
-                        pe.dragOffset = { x: pos.x - pe.items[hit].x, y: pos.y - pe.items[hit].y };
-                        isDragging = true;
-                    } else {
-                        // 새 아이템 추가
-                        const newItem = { x: pos.x, y: pos.y, size: 50 };
-                        if (pe.tool === 'sticker') {
-                            newItem.type = 'sticker';
-                            newItem.emoji = pe.stickerType;
-                        } else if (pe.tool === 'blur') {
-                            newItem.type = 'blur';
-                            newItem.size = 70;
-                        } else if (pe.tool === 'mosaic') {
-                            newItem.type = 'mosaic';
-                            newItem.size = 70;
-                            newItem.color = pe._mosaicColor || 'rgba(0,0,0,0.85)';
-                        }
-                        pe.items.push(newItem);
-                        pe.activeItem = pe.items.length - 1;
-                        pe.dragOffset = { x: 0, y: 0 };
-                        isDragging = true;
-                    }
-                    this._peRedraw();
-                    this._peRenderToolbar();
-                };
-
-                const onMove = (e) => {
-                    if (!isDragging || pe.activeItem < 0) return;
-                    e.preventDefault();
-                    const pos = getPos(e);
+                const hitDelete = (pos) => {
+                    if (pe.activeItem < 0) return false;
                     const item = pe.items[pe.activeItem];
-                    item.x = pos.x - pe.dragOffset.x;
-                    item.y = pos.y - pe.dragOffset.y;
-                    this._peRedraw();
+                    const r = item.size / 2 + 4;
+                    const dx = item.x + r * 0.7, dy = item.y - r * 0.7;
+                    return Math.hypot(pos.x - dx, pos.y - dy) < 14;
                 };
 
-                const onEnd = () => {
+                let isDragging = false, startPos = null, moved = false;
+                let pinchStart = { dist: 0, angle: 0, size: 0, rotation: 0 };
+
+                const onTouchStart = (e) => {
+                    e.preventDefault();
+
+                    if (e.touches.length === 2 && pe.activeItem >= 0) {
+                        // 핀치 시작 (선택된 아이템 크기/회전 조절)
+                        const t0 = e.touches[0], t1 = e.touches[1];
+                        pinchStart.dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+                        pinchStart.angle = Math.atan2(t1.clientY - t0.clientY, t1.clientX - t0.clientX);
+                        pinchStart.size = pe.items[pe.activeItem].size;
+                        pinchStart.rotation = pe.items[pe.activeItem].rotation || 0;
+                        isDragging = false;
+                        return;
+                    }
+
+                    if (e.touches.length === 1) {
+                        const pos = getPos(e.touches[0]);
+                        startPos = pos;
+                        moved = false;
+
+                        // 삭제 버튼 히트
+                        if (hitDelete(pos)) {
+                            self._peDeleteItem();
+                            return;
+                        }
+
+                        const hit = hitTest(pos);
+                        if (hit >= 0) {
+                            pe.activeItem = hit;
+                            pe.dragOffset = { x: pos.x - pe.items[hit].x, y: pos.y - pe.items[hit].y };
+                            isDragging = true;
+                        } else {
+                            // 빈 공간 터치 → 선택 해제
+                            pe.activeItem = -1;
+                            isDragging = false;
+                        }
+                        self._peRedraw();
+                        self._peRenderToolbar();
+                    }
+                };
+
+                const onTouchMove = (e) => {
+                    e.preventDefault();
+
+                    if (e.touches.length === 2 && pe.activeItem >= 0) {
+                        // 핀치 중 → 크기 + 회전
+                        const t0 = e.touches[0], t1 = e.touches[1];
+                        const dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+                        const angle = Math.atan2(t1.clientY - t0.clientY, t1.clientX - t0.clientX);
+                        const item = pe.items[pe.activeItem];
+                        item.size = Math.max(20, Math.min(300, pinchStart.size * (dist / pinchStart.dist)));
+                        item.rotation = pinchStart.rotation + (angle - pinchStart.angle) * 180 / Math.PI;
+                        self._peRedraw();
+                        return;
+                    }
+
+                    if (e.touches.length === 1 && isDragging && pe.activeItem >= 0) {
+                        const pos = getPos(e.touches[0]);
+                        moved = true;
+                        const item = pe.items[pe.activeItem];
+                        item.x = pos.x - pe.dragOffset.x;
+                        item.y = pos.y - pe.dragOffset.y;
+                        self._peRedraw();
+                    }
+                };
+
+                const onTouchEnd = (e) => {
                     isDragging = false;
                     pe.dragOffset = null;
                 };
 
-                canvas.addEventListener('mousedown', onStart);
-                canvas.addEventListener('mousemove', onMove);
-                canvas.addEventListener('mouseup', onEnd);
-                canvas.addEventListener('touchstart', onStart, { passive: false });
-                canvas.addEventListener('touchmove', onMove, { passive: false });
-                canvas.addEventListener('touchend', onEnd);
+                // 마우스 이벤트 (PC 테스트)
+                let mouseDown = false;
+                const onMouseDown = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const pos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+
+                    if (hitDelete(pos)) { self._peDeleteItem(); return; }
+
+                    const hit = hitTest(pos);
+                    if (hit >= 0) {
+                        pe.activeItem = hit;
+                        pe.dragOffset = { x: pos.x - pe.items[hit].x, y: pos.y - pe.items[hit].y };
+                        mouseDown = true;
+                    } else {
+                        pe.activeItem = -1;
+                        mouseDown = false;
+                    }
+                    self._peRedraw();
+                    self._peRenderToolbar();
+                };
+
+                const onMouseMove = (e) => {
+                    if (!mouseDown || pe.activeItem < 0) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const item = pe.items[pe.activeItem];
+                    item.x = e.clientX - rect.left - pe.dragOffset.x;
+                    item.y = e.clientY - rect.top - pe.dragOffset.y;
+                    self._peRedraw();
+                };
+
+                canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+                canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+                canvas.addEventListener('touchend', onTouchEnd);
+                canvas.addEventListener('mousedown', onMouseDown);
+                canvas.addEventListener('mousemove', onMouseMove);
+                canvas.addEventListener('mouseup', () => { mouseDown = false; });
+            },
+            _initPhotoSlider(total) {
+                const slider = document.getElementById('ootdPhotoSlider');
+                const track = document.getElementById('ootdPhotoTrack');
+                const dots = document.getElementById('ootdPhotoDots');
+                if (!slider || !track) return;
+                let cur = 0, startX = 0, diffX = 0, dragging = false;
+                function goTo(i) {
+                    cur = Math.max(0, Math.min(total - 1, i));
+                    track.style.transform = 'translateX(-' + (cur * 100 / total) + '%)';
+                    if (dots) {
+                        [...dots.children].forEach((d, j) => {
+                            d.className = 'w-1.5 h-1.5 rounded-full transition-colors ' + (j === cur ? 'bg-terra-500' : 'bg-warm-400');
+                        });
+                    }
+                }
+                slider.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; diffX = 0; dragging = true; track.style.transition = 'none'; }, { passive: true });
+                slider.addEventListener('touchmove', (e) => { if (!dragging) return; diffX = e.touches[0].clientX - startX; const pct = (-cur * 100 / total) + (diffX / slider.clientWidth * 100 / total); track.style.transform = 'translateX(' + pct + '%)'; }, { passive: true });
+                slider.addEventListener('touchend', () => { if (!dragging) return; dragging = false; track.style.transition = 'transform 0.3s'; if (Math.abs(diffX) > 40) { goTo(cur + (diffX < 0 ? 1 : -1)); } else { goTo(cur); } });
             },
             ootdLoadRecord(record) {
                 // 기존 기록을 편집 모드로 불러오기
                 this.ootd.colors = record.colors ? JSON.parse(JSON.stringify(record.colors)) : { top:null, bottom:null, outer:null, shoes:null };
                 this.ootd.photos = record.photos ? [...record.photos] : [];
+                this.ootd.photos_orig = record.photos_orig ? [...record.photos_orig] : [];
                 this.ootd.situation = record.situation || null;
                 this.ootd.mood = record.mood || null;
                 this.ootd.memo = record.memo || '';
@@ -7759,6 +7857,7 @@
                     date: dateStr,
                     colors: JSON.parse(JSON.stringify(oc)),
                     photos: this.ootd.photos.slice(0),
+                    photos_orig: (this.ootd.photos_orig || []).slice(0),
                     score: ev.total,
                     weather: weatherStr,
                     weatherData: weatherData,
@@ -7786,7 +7885,7 @@
                 gamification.invalidate();
 
                 // 상태 초기화
-                this.ootd = { colors: { top:null, bottom:null, outer:null, shoes:null, scarf:null, hat:null }, openPicker:null, photos:[], situation:null, mood:null, memo:'', visibility:'private' };
+                this.ootd = { colors: { top:null, bottom:null, outer:null, shoes:null, scarf:null, hat:null }, openPicker:null, photos:[], photos_orig:[], situation:null, mood:null, memo:'', visibility:'private' };
                 this._ootdEditDate = null;
 
                 spToast(isEdit ? '✅ 코디 기록이 수정되었어요!' : '✅ 오늘의 코디가 기록되었어요!');
@@ -7976,15 +8075,22 @@
                     </div>
                 </div>
 
-                <!-- 사진 갤러리 -->
+                <!-- 사진 갤러리 (스와이프) -->
                 ${record.photos && record.photos.length > 0 ? `
-                <div class="mb-5">
-                    <div class="${record.photos.length === 1 ? '' : 'flex gap-2 overflow-x-auto pb-2'}">
-                        ${record.photos.map((p, i) => `
-                            <div class="${record.photos.length === 1 ? 'w-full' : 'w-56 flex-shrink-0'} rounded-2xl overflow-hidden border border-warm-300 shadow-warm-sm">
-                                <img src="${p}" class="w-full ${record.photos.length === 1 ? 'max-h-80' : 'h-56'} object-cover" onclick="app._viewPhoto('${record.date}',${i})">
-                            </div>`).join('')}
+                <div class="mb-5 relative">
+                    <div id="ootdPhotoSlider" class="overflow-hidden rounded-2xl border border-warm-300 shadow-warm-sm" style="touch-action:pan-y">
+                        <div id="ootdPhotoTrack" class="flex transition-transform duration-300" style="width:${record.photos.length * 100}%">
+                            ${(record.photos_orig && record.photos_orig.length > 0 ? record.photos_orig : record.photos).map((p, i) => `
+                                <div style="width:${100 / record.photos.length}%;flex-shrink:0" class="bg-warm-200">
+                                    <img src="${p}" class="w-full object-contain" style="max-height:420px;min-height:200px" onclick="app._viewPhoto('${record.date}',${i})">
+                                </div>`).join('')}
+                        </div>
                     </div>
+                    ${record.photos.length > 1 ? `
+                    <div class="flex justify-center gap-1.5 mt-2.5" id="ootdPhotoDots">
+                        ${record.photos.map((_, i) => `<div class="w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-terra-500' : 'bg-warm-400'} transition-colors"></div>`).join('')}
+                    </div>
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="app._initPhotoSlider(${record.photos.length})" style="display:none">` : ''}
                 </div>` : ''}
 
                 <div class="mb-5">
@@ -14326,178 +14432,183 @@
 
             _openCropModal(file) {
                 const reader = new FileReader();
+                reader.onerror = () => spToast('이미지를 읽을 수 없어요');
                 reader.onload = (e) => {
                     const imgSrc = e.target.result;
-
-                    // 크롭 오버레이 생성
-                    const ov = document.createElement('div');
-                    ov.id = 'cropOverlay';
-                    ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
-
-                    // 상단 바
-                    const topBar = '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;flex-shrink:0">'
-                        + '<button id="cropCancel" style="color:#fff;font-size:15px;padding:8px 16px;background:rgba(255,255,255,0.15);border:none;border-radius:20px">취소</button>'
-                        + '<span style="color:#fff;font-size:15px;font-weight:600">프로필 사진</span>'
-                        + '<button id="cropDone" style="color:#fff;font-size:15px;padding:8px 16px;background:#A8613F;border:none;border-radius:20px;font-weight:600">완료</button>'
-                        + '</div>';
-
-                    // 캔버스 영역
-                    const canvasArea = '<div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;touch-action:none" id="cropArea">'
-                        + '<canvas id="cropCanvas" style="max-width:100%;max-height:100%"></canvas>'
-                        + '<div id="cropGuide" style="position:absolute;pointer-events:none;border:2px solid rgba(255,255,255,0.8);border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,0.5)"></div>'
-                        + '</div>';
-
-                    // 줌 슬라이더
-                    const zoomBar = '<div style="padding:16px 32px;flex-shrink:0;display:flex;align-items:center;gap:12px">'
-                        + '<span style="color:#aaa;font-size:12px">−</span>'
-                        + '<input type="range" id="cropZoom" min="100" max="300" value="100" style="flex:1;accent-color:#A8613F">'
-                        + '<span style="color:#aaa;font-size:12px">+</span>'
-                        + '</div>';
-
-                    ov.innerHTML = topBar + canvasArea + zoomBar;
-                    document.body.appendChild(ov);
-
-                    // 이미지 로드 → 캔버스 초기화
                     const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.getElementById('cropCanvas');
-                        const ctx = canvas.getContext('2d');
-                        const area = document.getElementById('cropArea');
-                        const guide = document.getElementById('cropGuide');
-                        const zoom = document.getElementById('cropZoom');
-                        const dpr = window.devicePixelRatio || 1;
-
-                        // 가이드 원 크기 (화면 너비의 70%, 최대 300px)
-                        const guideSize = Math.min(area.clientWidth * 0.7, area.clientHeight * 0.7, 300);
-                        guide.style.width = guideSize + 'px';
-                        guide.style.height = guideSize + 'px';
-                        guide.style.left = (area.clientWidth - guideSize) / 2 + 'px';
-                        guide.style.top = (area.clientHeight - guideSize) / 2 + 'px';
-
-                        // 캔버스: CSS 크기는 유지, 내부 해상도만 DPR 배수
-                        const cssW = area.clientWidth;
-                        const cssH = area.clientHeight;
-                        canvas.width = cssW * dpr;
-                        canvas.height = cssH * dpr;
-                        canvas.style.width = cssW + 'px';
-                        canvas.style.height = cssH + 'px';
-                        ctx.scale(dpr, dpr);
-                        // 고화질 렌더링
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-
-                        let scale = 1;
-                        let offsetX = 0, offsetY = 0;
-                        let dragging = false, lastX = 0, lastY = 0;
-
-                        // 이미지가 가이드 원을 꽉 채우도록 초기 스케일 계산
-                        const fitScale = guideSize / Math.min(img.width, img.height);
-                        scale = fitScale;
-                        zoom.min = Math.floor(fitScale * 100);
-                        zoom.max = Math.floor(fitScale * 300);
-                        zoom.value = Math.floor(fitScale * 100);
-
-                        function draw() {
-                            ctx.clearRect(0, 0, cssW, cssH);
-                            const w = img.width * scale;
-                            const h = img.height * scale;
-                            const x = (cssW - w) / 2 + offsetX;
-                            const y = (cssH - h) / 2 + offsetY;
-                            ctx.drawImage(img, x, y, w, h);
+                    img.onerror = () => spToast('이미지 형식을 지원하지 않아요');
+                    img.onload = () => this._showCropUI(img, 'circle', 1, async (blob) => {
+                        if (!blob) return;
+                        try {
+                            spToast('업로드 중...');
+                            const path = auth.user.id + '/avatar.webp';
+                            const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/webp' });
+                            if (upErr) throw upErr;
+                            const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+                            const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
+                            const { error: dbErr } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', auth.user.id);
+                            if (dbErr) throw dbErr;
+                            auth.profile.avatar_url = avatarUrl;
+                            spToast('프로필 사진이 변경되었어요 📸');
+                            app.render();
+                        } catch(e) {
+                            console.error('Avatar upload error:', e);
+                            spToast('업로드 실패: ' + (e.message || ''));
                         }
-                        draw();
-
-                        // 줌
-                        zoom.oninput = () => {
-                            scale = parseInt(zoom.value) / 100;
-                            draw();
-                        };
-
-                        // 드래그 (마우스 + 터치)
-                        function onStart(cx, cy) { dragging = true; lastX = cx; lastY = cy; }
-                        function onMove(cx, cy) {
-                            if (!dragging) return;
-                            offsetX += cx - lastX;
-                            offsetY += cy - lastY;
-                            lastX = cx; lastY = cy;
-                            draw();
-                        }
-                        function onEnd() { dragging = false; }
-
-                        canvas.addEventListener('mousedown', (e) => onStart(e.clientX, e.clientY));
-                        canvas.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
-                        canvas.addEventListener('mouseup', onEnd);
-                        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); const t = e.touches[0]; onStart(t.clientX, t.clientY); }, { passive: false });
-                        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: false });
-                        canvas.addEventListener('touchend', onEnd);
-
-                        // 취소
-                        document.getElementById('cropCancel').onclick = () => ov.remove();
-
-                        // 완료 → 크롭 → 업로드
-                        document.getElementById('cropDone').onclick = async () => {
-                            // 가이드 원 영역을 기준으로 크롭 (CSS 좌표 기준)
-                            const outSize = 600; // 고해상도 출력
-                            const outCanvas = document.createElement('canvas');
-                            outCanvas.width = outSize;
-                            outCanvas.height = outSize;
-                            const outCtx = outCanvas.getContext('2d');
-                            outCtx.imageSmoothingEnabled = true;
-                            outCtx.imageSmoothingQuality = 'high';
-
-                            // 원본 이미지에서 크롭할 영역 계산 (CSS 좌표 기준)
-                            const w = img.width * scale;
-                            const h = img.height * scale;
-                            const imgX = (cssW - w) / 2 + offsetX;
-                            const imgY = (cssH - h) / 2 + offsetY;
-
-                            const guideLeft = (cssW - guideSize) / 2;
-                            const guideTop = (cssH - guideSize) / 2;
-
-                            // 가이드 영역 → 원본 이미지 좌표 변환
-                            const srcX = (guideLeft - imgX) / scale;
-                            const srcY = (guideTop - imgY) / scale;
-                            const srcSize = guideSize / scale;
-
-                            // 원형 클리핑
-                            outCtx.beginPath();
-                            outCtx.arc(outSize / 2, outSize / 2, outSize / 2, 0, Math.PI * 2);
-                            outCtx.closePath();
-                            outCtx.clip();
-
-                            outCtx.drawImage(img, srcX, srcY, srcSize, srcSize, 0, 0, outSize, outSize);
-
-                            // Blob으로 변환
-                            outCanvas.toBlob(async (blob) => {
-                                if (!blob) { spToast('이미지 처리 실패'); ov.remove(); return; }
-
-                                try {
-                                    spToast('업로드 중...');
-                                    const path = auth.user.id + '/avatar.webp';
-
-                                    const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/webp' });
-                                    if (upErr) throw upErr;
-
-                                    const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
-                                    const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
-
-                                    const { error: dbErr } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', auth.user.id);
-                                    if (dbErr) throw dbErr;
-
-                                    auth.profile.avatar_url = avatarUrl;
-                                    spToast('프로필 사진이 변경되었어요 📸');
-                                    ov.remove();
-                                    app.render();
-                                } catch(e) {
-                                    console.error('Avatar upload error:', e);
-                                    spToast('업로드 실패: ' + (e.message || ''));
-                                }
-                            }, 'image/webp', 0.85);
-                        };
-                    };
+                    });
                     img.src = imgSrc;
                 };
                 reader.readAsDataURL(file);
+            },
+
+            // 공용 크롭 UI (shape: 'circle'|'rect', ratio: w/h, callback(blob|dataUrl))
+            _showCropUI(img, shape, ratio, callback, outputType) {
+                const ov = document.createElement('div');
+                ov.id = 'cropOverlay';
+                ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
+
+                ov.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;flex-shrink:0">'
+                    + '<button id="cropCancel" style="color:#fff;font-size:15px;padding:8px 16px;background:rgba(255,255,255,0.15);border:none;border-radius:20px">취소</button>'
+                    + '<span style="color:#fff;font-size:15px;font-weight:600">' + (shape === 'circle' ? '프로필 사진' : '사진 크롭') + '</span>'
+                    + '<button id="cropDone" style="color:#fff;font-size:15px;padding:8px 16px;background:#A8613F;border:none;border-radius:20px;font-weight:600">완료</button>'
+                    + '</div>'
+                    + '<div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;touch-action:none" id="cropArea">'
+                    + '<canvas id="cropCanvas"></canvas>'
+                    + '<div id="cropGuide" style="position:absolute;pointer-events:none;border:2px solid rgba(255,255,255,0.8);' + (shape === 'circle' ? 'border-radius:50%;' : 'border-radius:12px;') + 'box-shadow:0 0 0 9999px rgba(0,0,0,0.55)"></div>'
+                    + '</div>'
+                    + '<div style="padding:16px;text-align:center;color:#888;font-size:12px;flex-shrink:0">두 손가락으로 확대/축소</div>';
+
+                document.body.appendChild(ov);
+
+                const canvas = document.getElementById('cropCanvas');
+                const ctx = canvas.getContext('2d');
+                const area = document.getElementById('cropArea');
+                const guide = document.getElementById('cropGuide');
+                const dpr = window.devicePixelRatio || 1;
+
+                // 가이드 크기
+                const maxGuideW = area.clientWidth * 0.75;
+                const maxGuideH = area.clientHeight * 0.65;
+                let guideW, guideH;
+                if (ratio >= 1) {
+                    guideW = Math.min(maxGuideW, maxGuideH * ratio);
+                    guideH = guideW / ratio;
+                } else {
+                    guideH = Math.min(maxGuideH, maxGuideW / ratio);
+                    guideW = guideH * ratio;
+                }
+                if (shape === 'circle') { guideW = guideH = Math.min(guideW, guideH); }
+
+                guide.style.width = guideW + 'px';
+                guide.style.height = guideH + 'px';
+                guide.style.left = (area.clientWidth - guideW) / 2 + 'px';
+                guide.style.top = (area.clientHeight - guideH) / 2 + 'px';
+
+                const cssW = area.clientWidth, cssH = area.clientHeight;
+                canvas.width = cssW * dpr;
+                canvas.height = cssH * dpr;
+                canvas.style.width = cssW + 'px';
+                canvas.style.height = cssH + 'px';
+                ctx.scale(dpr, dpr);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // 이미지가 가이드를 꽉 채우도록
+                const fitScale = Math.max(guideW / img.width, guideH / img.height);
+                let scale = fitScale;
+                let minScale = fitScale * 0.5;
+                let offsetX = 0, offsetY = 0;
+
+                function draw() {
+                    ctx.clearRect(0, 0, cssW, cssH);
+                    const w = img.width * scale, h = img.height * scale;
+                    ctx.drawImage(img, (cssW - w) / 2 + offsetX, (cssH - h) / 2 + offsetY, w, h);
+                }
+                draw();
+
+                // 터치 이벤트 (핀치줌 + 드래그)
+                let touches = [], lastDist = 0, lastScale = scale, lastCenter = null;
+                let isDragging = false, lastX = 0, lastY = 0;
+
+                area.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    touches = [...e.touches];
+                    if (touches.length === 2) {
+                        lastDist = Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+                        lastScale = scale;
+                        lastCenter = { x: (touches[0].clientX + touches[1].clientX) / 2, y: (touches[0].clientY + touches[1].clientY) / 2 };
+                    } else if (touches.length === 1) {
+                        isDragging = true;
+                        lastX = touches[0].clientX;
+                        lastY = touches[0].clientY;
+                    }
+                }, { passive: false });
+
+                area.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    if (e.touches.length === 2) {
+                        const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                        scale = Math.max(minScale, Math.min(lastScale * 5, lastScale * (dist / lastDist)));
+                        draw();
+                    } else if (e.touches.length === 1 && isDragging) {
+                        offsetX += e.touches[0].clientX - lastX;
+                        offsetY += e.touches[0].clientY - lastY;
+                        lastX = e.touches[0].clientX;
+                        lastY = e.touches[0].clientY;
+                        draw();
+                    }
+                }, { passive: false });
+
+                area.addEventListener('touchend', (e) => {
+                    if (e.touches.length < 2) { isDragging = false; }
+                    if (e.touches.length === 1) {
+                        isDragging = true;
+                        lastX = e.touches[0].clientX;
+                        lastY = e.touches[0].clientY;
+                    }
+                });
+
+                // 마우스 (PC 테스트용)
+                let mouseDown = false;
+                area.addEventListener('mousedown', (e) => { mouseDown = true; lastX = e.clientX; lastY = e.clientY; });
+                area.addEventListener('mousemove', (e) => { if (!mouseDown) return; offsetX += e.clientX - lastX; offsetY += e.clientY - lastY; lastX = e.clientX; lastY = e.clientY; draw(); });
+                area.addEventListener('mouseup', () => mouseDown = false);
+                area.addEventListener('wheel', (e) => { e.preventDefault(); scale = Math.max(minScale, Math.min(lastScale * 5, scale * (e.deltaY > 0 ? 0.95 : 1.05))); draw(); }, { passive: false });
+
+                document.getElementById('cropCancel').onclick = () => ov.remove();
+                document.getElementById('cropDone').onclick = () => {
+                    const outW = shape === 'circle' ? 600 : Math.round(guideW * 2);
+                    const outH = shape === 'circle' ? 600 : Math.round(guideH * 2);
+                    const outCanvas = document.createElement('canvas');
+                    outCanvas.width = outW; outCanvas.height = outH;
+                    const outCtx = outCanvas.getContext('2d');
+                    outCtx.imageSmoothingEnabled = true;
+                    outCtx.imageSmoothingQuality = 'high';
+
+                    const w = img.width * scale, h = img.height * scale;
+                    const imgX = (cssW - w) / 2 + offsetX;
+                    const imgY = (cssH - h) / 2 + offsetY;
+                    const guideLeft = (cssW - guideW) / 2;
+                    const guideTop = (cssH - guideH) / 2;
+                    const srcX = (guideLeft - imgX) / scale;
+                    const srcY = (guideTop - imgY) / scale;
+                    const srcW = guideW / scale;
+                    const srcH = guideH / scale;
+
+                    if (shape === 'circle') {
+                        outCtx.beginPath();
+                        outCtx.arc(outW / 2, outH / 2, outW / 2, 0, Math.PI * 2);
+                        outCtx.clip();
+                    }
+                    outCtx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, outW, outH);
+
+                    ov.remove();
+                    if (outputType === 'dataurl') {
+                        callback(outCanvas.toDataURL('image/jpeg', 0.85));
+                    } else {
+                        outCanvas.toBlob((blob) => callback(blob), 'image/webp', 0.85);
+                    }
+                };
             },
 
             async editNickname() {
