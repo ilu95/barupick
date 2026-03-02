@@ -7855,6 +7855,7 @@
                 this.ootd.showInstagram = record.showInstagram || false;
                 this.ootd.openPicker = null;
                 this._ootdEditId = record.id || null;
+                this._ootdEditPostId = record.postId || null;
                 this.goTo('ootd-record');
             },
             getOotdRecords() {
@@ -7913,6 +7914,7 @@
                     memo: this.ootd.memo || '',
                     visibility: this.ootd.visibility || 'private',
                     showInstagram: this.ootd.showInstagram || false,
+                    postId: this._ootdEditPostId || null,
                     createdAt: Date.now()
                 };
 
@@ -7928,45 +7930,73 @@
                 records.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
                 localStorage.setItem('sp_ootd_records', JSON.stringify(records));
 
-                // 전체 공개 → 커뮤니티 자동 등록
-                if (record.visibility === 'public' && sb && auth.user) {
+                // 커뮤니티 연동: visibility 변경에 따라 생성/수정/삭제
+                if (sb && auth.user) {
+                    const existingPostId = record.postId || null;
                     try {
-                        // 사진 업로드
-                        let photoUrls = [];
-                        const origPhotos = this.ootd.photos_orig || [];
-                        const thumbPhotos = this.ootd.photos || [];
-                        for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
-                            const dataUrl = origPhotos[i] || thumbPhotos[i];
-                            if (!dataUrl) continue;
-                            const blob = await (await fetch(dataUrl)).blob();
-                            const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
-                            const path = auth.user.id + '/' + uuid + '.webp';
-                            const { data: upData, error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp', upsert: false });
-                            if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
-                            const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
-                            photoUrls.push(urlData.publicUrl);
+                        if (record.visibility === 'public') {
+                            // 사진 업로드
+                            let photoUrls = [];
+                            const origPhotos = this.ootd.photos_orig || [];
+                            const thumbPhotos = this.ootd.photos || [];
+                            for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
+                                const dataUrl = origPhotos[i] || thumbPhotos[i];
+                                if (!dataUrl) continue;
+                                const blob = await (await fetch(dataUrl)).blob();
+                                const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
+                                const path = auth.user.id + '/' + uuid + '.webp';
+                                const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp', upsert: false });
+                                if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
+                                const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
+                                photoUrls.push(urlData.publicUrl);
+                            }
+
+                            const outfit = {};
+                            Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v; });
+                            const postData = {
+                                user_id: auth.user.id,
+                                title: (record.memo || '').slice(0, 100),
+                                outfit: outfit,
+                                score: record.score || 0,
+                                style: null,
+                                layer_type: 'basic',
+                                caption: (record.memo || '').slice(0, 200) || null,
+                                photo_urls: photoUrls.length > 0 ? photoUrls : null,
+                                status: 'approved',
+                                show_instagram: this.ootd.showInstagram && !!auth.profile?.instagram_id,
+                                tags: record.situation ? [record.situation] : []
+                            };
+
+                            if (existingPostId) {
+                                // 이미 커뮤니티에 올린 기록 → 수정
+                                const { title: _t, ...updateData } = postData;
+                                delete updateData.user_id;
+                                updateData.title = postData.title;
+                                await sb.from('posts').update(updateData).eq('id', existingPostId);
+                                spToast('🌐 커뮤니티 게시물이 수정되었어요!');
+                            } else {
+                                // 새로 커뮤니티에 등록
+                                const { data: inserted } = await sb.from('posts').insert(postData).select('id').single();
+                                if (inserted) {
+                                    record.postId = inserted.id;
+                                    // localStorage에도 반영
+                                    let recs = this.getOotdRecords();
+                                    const idx = recs.findIndex(r => r.id === record.id);
+                                    if (idx >= 0) { recs[idx].postId = inserted.id; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)); }
+                                }
+                                spToast('🌐 커뮤니티에 공개되었어요!');
+                            }
+                        } else if (existingPostId) {
+                            // 전체 공개 → 비공개/친구로 변경 → 커뮤니티에서 삭제
+                            await sb.from('posts').delete().eq('id', existingPostId);
+                            record.postId = null;
+                            let recs = this.getOotdRecords();
+                            const idx = recs.findIndex(r => r.id === record.id);
+                            if (idx >= 0) { recs[idx].postId = null; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)); }
+                            spToast('커뮤니티 게시물이 비공개로 전환되었어요');
                         }
-
-                        const outfit = {};
-                        Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v; });
-
-                        await sb.from('posts').insert({
-                            user_id: auth.user.id,
-                            title: (record.memo || '').slice(0, 100),
-                            outfit: outfit,
-                            score: record.score || 0,
-                            style: null,
-                            layer_type: 'basic',
-                            caption: (record.memo || '').slice(0, 200) || null,
-                            photo_urls: photoUrls.length > 0 ? photoUrls : null,
-                            status: 'approved',
-                            show_instagram: this.ootd.showInstagram && !!auth.profile?.instagram_id,
-                            tags: record.situation ? [record.situation] : []
-                        });
-                        spToast('🌐 커뮤니티에 공개되었어요!');
                     } catch(e) {
-                        console.error('Community post failed:', e);
-                        spToast('코디는 저장되었지만 커뮤니티 등록에 실패했어요');
+                        console.error('Community sync failed:', e);
                     }
                 }
 
@@ -7976,6 +8006,7 @@
                 // 상태 초기화
                 this.ootd = { colors: { top:null, middleware:null, bottom:null, outer:null, shoes:null, scarf:null, hat:null }, openPicker:null, photos:[], photos_orig:[], situation:null, mood:null, memo:'', visibility:'private', showInstagram:false };
                 this._ootdEditId = null;
+                this._ootdEditPostId = null;
 
                 const wasPublic = record.visibility === 'public' && sb && auth.user;
                 if (!wasPublic) {
