@@ -6965,6 +6965,7 @@
                     case 'community-detail':
                         headerTitle.textContent = '코디 상세';
                         content.innerHTML = this.renderCommunityDetail();
+                        if (this.comm.detail) this._loadComments(this.comm.detail.id);
                         break;
                     case 'community-post':
                         headerTitle.textContent = '코디 공유하기';
@@ -14324,7 +14325,7 @@
                     h += '<div class="px-2.5 pt-2 pb-2.5">';
                     if (title) h += '<div class="text-xs font-semibold text-warm-900 truncate mb-0.5">' + title + '</div>';
                     if (style) h += '<span class="inline-block text-[9px] font-medium text-warm-500 bg-warm-100 border border-warm-300 rounded px-1.5 py-0.5 mb-1">' + style + '</span>';
-                    h += '<div class="flex justify-between items-center"><span class="text-[10px] text-warm-600">' + dateStr + '</span><span class="text-[11px] text-warm-500">♡ ' + (post.likes_count||0) + '</span></div>';
+                    h += '<div class="flex justify-between items-center"><span class="text-[10px] text-warm-600">' + dateStr + '</span><span class="text-[11px] text-warm-500">♡ ' + (post.likes_count||0) + '  💬 ' + (post.comments_count||0) + '</span></div>';
                     h += '<div class="text-[11px] text-warm-600 mt-1 flex items-center gap-1.5">' + (postAvatar ? '<img src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span></div>';
                     h += '</div></div>';
                 });
@@ -14480,6 +14481,19 @@
                         '<button data-like-btn class="flex-1 py-2.5 rounded-xl border border-warm-400 bg-white text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1' + (liked?' text-red-500 border-red-300':'') + '" onclick="app.commToggleLike(\'' + post.id + '\')">' + (liked?'❤️':'🤍') + ' ' + (post.likes_count||0) + '</button>' +
                         '<button data-bookmark-btn class="flex-1 py-2.5 rounded-xl border border-warm-400 bg-white text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1' + (bookmarked?' text-terra-600 border-terra-300':'') + '" onclick="app.commToggleBookmark(\'' + post.id + '\')">' + (bookmarked?'🔖':'📄') + ' 저장</button>' +
                         (!isMe ? '<button class="py-2.5 px-3 rounded-xl border border-warm-400 bg-white text-xs text-warm-500 active:scale-[0.97] transition-all" onclick="app.commReport(\'' + post.id + '\')">⚠️</button>' : '') +
+                    '</div>' +
+
+                    // 댓글 섹션
+                    '<div class="mt-5">' +
+                        '<div class="flex items-center gap-1.5 mb-3"><span class="text-sm font-bold text-warm-900">💬 댓글</span><span id="comm-comment-count" class="text-xs text-warm-500">' + (post.comments_count||0) + '</span></div>' +
+                        '<div id="comm-comments" class="space-y-3 mb-3"><div class="text-center py-4 text-warm-500 text-xs">댓글을 불러오는 중...</div></div>' +
+                        (auth.user
+                            ? '<div class="flex gap-2 items-end">' +
+                                '<textarea id="comm-comment-input" class="flex-1 bg-white border border-warm-400 rounded-xl px-3 py-2.5 text-xs text-warm-900 placeholder-warm-500 outline-none focus:border-terra-400 transition-all resize-none" rows="1" maxlength="500" placeholder="댓글을 남겨보세요..." oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\'"></textarea>' +
+                                '<button onclick="app._submitComment(\'' + post.id + '\')" class="px-4 py-2.5 bg-terra-500 text-white rounded-xl text-xs font-semibold active:scale-[0.95] transition-all shadow-terra flex-shrink-0">등록</button>' +
+                              '</div>'
+                            : '<div class="text-center py-3 text-xs text-warm-500 bg-warm-100 rounded-xl cursor-pointer active:bg-warm-200 transition-colors" onclick="app.goTo(\'auth-login\')">로그인하고 댓글을 남겨보세요 →</div>'
+                        ) +
                     '</div>' +
                 '</div>';
             },
@@ -14692,6 +14706,143 @@
                     });
                 } else {
                     this.render();
+                }
+            },
+
+            // ── 댓글 시스템 ──
+            async _loadComments(postId) {
+                const container = document.getElementById('comm-comments');
+                if (!container || !sb) return;
+                try {
+                    const { data, error } = await sb.from('comments')
+                        .select('*, profiles!comments_user_id_profiles_fkey(nickname, avatar_url)')
+                        .eq('post_id', postId)
+                        .order('created_at', { ascending: true });
+                    if (error) throw error;
+                    this._renderComments(data || [], postId);
+                    const countEl = document.getElementById('comm-comment-count');
+                    if (countEl) countEl.textContent = (data || []).length;
+                } catch(e) {
+                    console.error('Comments load error:', e);
+                    container.innerHTML = '<div class="text-center py-3 text-warm-500 text-xs">댓글을 불러오지 못했어요</div>';
+                }
+            },
+
+            _renderComments(comments, postId) {
+                const container = document.getElementById('comm-comments');
+                if (!container) return;
+
+                if (comments.length === 0) {
+                    container.innerHTML = '<div class="text-center py-4 text-warm-500 text-xs">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</div>';
+                    return;
+                }
+
+                let h = '';
+                comments.forEach(c => {
+                    const nick = escapeHtml(c.profiles?.nickname) || '유저';
+                    const avatar = escapeHtml(c.profiles?.avatar_url);
+                    const initial = nick.charAt(0).toUpperCase();
+                    const ago = this._timeAgo(c.created_at);
+                    const isMyComment = auth.user && auth.user.id === c.user_id;
+                    const content = escapeHtml(c.content);
+
+                    h += '<div class="flex gap-2.5" id="comment-' + c.id + '">';
+                    // 아바타
+                    h += (avatar
+                        ? '<img src="' + avatar + '" class="w-7 h-7 rounded-full object-cover flex-shrink-0 cursor-pointer mt-0.5" onclick="app.openUserProfile(\'' + c.user_id + '\')" onerror="this.outerHTML=\'<div class=\\\'w-7 h-7 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-[10px] flex-shrink-0 mt-0.5\\\'>' + initial + '</div>\'">'
+                        : '<div class="w-7 h-7 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-[10px] flex-shrink-0 cursor-pointer mt-0.5" onclick="app.openUserProfile(\'' + c.user_id + '\')">' + initial + '</div>');
+                    // 내용
+                    h += '<div class="flex-1 min-w-0">';
+                    h += '<div class="flex items-baseline gap-1.5"><span class="text-xs font-semibold text-warm-900 cursor-pointer" onclick="app.openUserProfile(\'' + c.user_id + '\')">@' + nick + '</span><span class="text-[10px] text-warm-500">' + ago + '</span></div>';
+                    h += '<div class="text-xs text-warm-700 mt-0.5 break-words whitespace-pre-wrap">' + content + '</div>';
+                    // 삭제 (본인만)
+                    if (isMyComment) {
+                        h += '<button class="text-[10px] text-warm-400 mt-1 active:text-red-400 transition-colors" onclick="app._deleteComment(\'' + c.id + '\',\'' + postId + '\')">삭제</button>';
+                    }
+                    h += '</div></div>';
+                });
+                container.innerHTML = h;
+            },
+
+            async _submitComment(postId) {
+                if (!auth.user) { this.goTo('auth-login'); return; }
+                if (!sb) return;
+                if (!this._throttle('comment_' + postId, 2000)) { spToast('잠시 후 다시 시도해주세요'); return; }
+
+                const input = document.getElementById('comm-comment-input');
+                if (!input) return;
+                const content = input.value.trim();
+                if (!content) { spToast('댓글을 입력해주세요'); return; }
+                if (content.length > 500) { spToast('500자 이내로 작성해주세요'); return; }
+
+                try {
+                    const { error } = await sb.from('comments').insert({
+                        post_id: postId,
+                        user_id: auth.user.id,
+                        content: content
+                    });
+                    if (error) throw error;
+
+                    input.value = '';
+                    input.style.height = 'auto';
+
+                    // 댓글 수 로컬 업데이트
+                    const p = this.comm.posts.find(x => x.id === postId);
+                    if (p) p.comments_count = (p.comments_count || 0) + 1;
+                    if (this.comm.detail && this.comm.detail.id === postId) this.comm.detail.comments_count = (this.comm.detail.comments_count || 0) + 1;
+
+                    // 부분 DOM 갱신 (댓글 목록만 다시 로드)
+                    await this._loadComments(postId);
+                    spToast('댓글이 등록되었어요 💬');
+
+                    // 댓글 목록 맨 아래로 스크롤
+                    const container = document.getElementById('comm-comments');
+                    if (container && container.lastElementChild) {
+                        container.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                } catch(e) {
+                    console.error('Comment submit error:', e);
+                    spToast('댓글 등록 실패: ' + (e.message || ''));
+                }
+            },
+
+            async _deleteComment(commentId, postId) {
+                if (!auth.user || !sb) return;
+                if (!confirm('이 댓글을 삭제할까요?')) return;
+
+                try {
+                    const { error } = await sb.from('comments').delete().eq('id', commentId).eq('user_id', auth.user.id);
+                    if (error) throw error;
+
+                    // 댓글 수 로컬 업데이트
+                    const p = this.comm.posts.find(x => x.id === postId);
+                    if (p) p.comments_count = Math.max(0, (p.comments_count || 1) - 1);
+                    if (this.comm.detail && this.comm.detail.id === postId) this.comm.detail.comments_count = Math.max(0, (this.comm.detail.comments_count || 1) - 1);
+
+                    // 삭제 애니메이션
+                    const el = document.getElementById('comment-' + commentId);
+                    if (el) {
+                        el.style.transition = 'opacity 0.3s, transform 0.3s';
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateX(-20px)';
+                        setTimeout(() => {
+                            el.remove();
+                            // 댓글 수 갱신
+                            const countEl = document.getElementById('comm-comment-count');
+                            const remaining = document.getElementById('comm-comments')?.children.length || 0;
+                            if (countEl) countEl.textContent = remaining;
+                            if (remaining === 0) {
+                                const container = document.getElementById('comm-comments');
+                                if (container) container.innerHTML = '<div class="text-center py-4 text-warm-500 text-xs">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</div>';
+                            }
+                        }, 300);
+                    } else {
+                        await this._loadComments(postId);
+                    }
+                    spToast('댓글이 삭제되었어요');
+                } catch(e) {
+                    console.error('Comment delete error:', e);
+                    spToast('삭제 실패: ' + (e.message || ''));
                 }
             },
 
