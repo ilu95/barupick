@@ -6581,7 +6581,7 @@
         const app = {
             screenHistory: [],
             currentScreen: 'home',
-            comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'all', page: 0, hasMore: true, loading: false, detail: null, myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit', tab: 'all', friendsMode: 'mutual', rankingMode: 'weekly', newPost: { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false } },
+            comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'all', page: 0, hasMore: true, loading: false, detail: null, myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit', tab: 'all', friendsMode: 'mutual', rankingMode: 'weekly', postPhotos: [], postPhotos_orig: [], newPost: { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false } },
             notifications: [],
 
             // 코디 만들기(①) 상태
@@ -14572,6 +14572,8 @@
                     this.comm.postOuterType = this.recommend.outerType || 'coat';
                     this.comm.postMidType = this.recommend.midType || 'knit';
                 }
+                this.comm.postPhotos = [];
+                this.comm.postPhotos_orig = [];
                 this.goTo('community-post');
             },
 
@@ -14581,6 +14583,21 @@
                 Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || null; });
                 const mn = mannequinToImg(createMannequinSVG(outfitHex, { outerType: this.comm.postOuterType, midType: this.comm.postMidType }), 'height:160px');
                 const style = this.comm.postStyle ? (STYLE_GUIDE[this.comm.postStyle]?.name || this.comm.postStyle) : '';
+                const photos = this.comm.postPhotos || [];
+
+                let photosHtml = '<div class="mb-4">';
+                photosHtml += '<div class="text-[13px] font-medium text-warm-800 mb-1.5">📷 착용 사진 <span class="text-[10px] text-warm-500">(선택, 최대 4장)</span></div>';
+                photosHtml += '<div class="flex gap-2 flex-wrap">';
+                photos.forEach((p, i) => {
+                    photosHtml += '<div class="relative"><img src="' + p + '" class="w-20 h-20 rounded-xl object-cover border border-warm-300">' +
+                        '<button onclick="app._commRemovePostPhoto(' + i + ')" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center shadow">✕</button></div>';
+                });
+                if (photos.length < 4) {
+                    photosHtml += '<label class="w-20 h-20 rounded-xl border-2 border-dashed border-warm-400 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-all bg-warm-100">' +
+                        '<input type="file" accept="image/*" class="hidden" onchange="app._commAddPostPhoto(event)">' +
+                        svg('camera', 20, '#A8A29E') + '<span class="text-[9px] text-warm-500 mt-0.5">추가</span></label>';
+                }
+                photosHtml += '</div></div>';
 
                 return '<div class="screen active">' +
                     '<p class="text-sm text-warm-600 mb-4">이 코디를 커뮤니티에 공유해요</p>' +
@@ -14589,11 +14606,53 @@
                         '<span class="font-display text-xl font-bold text-terra-600">' + (this.comm.postScore||0) + '점</span>' +
                         (style ? '<span class="text-[11px] text-warm-600 border border-warm-400 rounded-full px-2.5 py-0.5">' + style + '</span>' : '') +
                     '</div>' +
+                    photosHtml +
                     '<div class="text-[13px] font-medium text-warm-800 mb-1.5">💬 한줄 메모 <span class="text-[10px] text-warm-500">(선택)</span></div>' +
                     '<input type="text" class="w-full px-3.5 py-2.5 bg-white border border-warm-400 rounded-xl text-sm focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all outline-none mb-4" id="comm-caption" placeholder="이 코디에 대해 한마디..." maxlength="100">' +
                     '<button class="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm shadow-terra active:scale-[0.98] transition-all flex items-center justify-center gap-1.5" id="comm-submit-btn" onclick="app.commSubmitPost()">' + svg('globe', 16, '#fff') + ' 공유하기</button>' +
-                    '<p class="text-center text-[10px] text-warm-500 mt-2">커뮤니티에 공개되었어요</p>' +
+                    '<p class="text-center text-[10px] text-warm-500 mt-2">커뮤니티에 바로 공개돼요</p>' +
                 '</div>';
+            },
+
+            _commAddPostPhoto(e) {
+                const file = e.target.files && e.target.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+                if ((this.comm.postPhotos || []).length >= 4) { spToast('사진은 최대 4장까지 가능해요'); return; }
+                const self = this;
+                // 원본 보존
+                const origReader = new FileReader();
+                origReader.onload = function() {
+                    if (!self.comm.postPhotos_orig) self.comm.postPhotos_orig = [];
+                    self.comm.postPhotos_orig.push(origReader.result);
+                };
+                origReader.readAsDataURL(file);
+                // 썸네일
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX = 800;
+                        let w = img.width, h = img.height;
+                        if (w > MAX || h > MAX) {
+                            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                            else { w = Math.round(w * MAX / h); h = MAX; }
+                        }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        if (!self.comm.postPhotos) self.comm.postPhotos = [];
+                        self.comm.postPhotos.push(canvas.toDataURL('image/webp', 0.85));
+                        self.render();
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            },
+
+            _commRemovePostPhoto(idx) {
+                if (this.comm.postPhotos) this.comm.postPhotos.splice(idx, 1);
+                if (this.comm.postPhotos_orig) this.comm.postPhotos_orig.splice(idx, 1);
+                this.render();
             },
 
             // 🔒 보안: Rate limiter (연타 방지)
@@ -14612,6 +14671,22 @@
                 if (btn) { btn.disabled = true; btn.textContent = '공유 중...'; }
 
                 try {
+                    // 사진 업로드
+                    let photoUrls = [];
+                    const origPhotos = this.comm.postPhotos_orig || [];
+                    const thumbPhotos = this.comm.postPhotos || [];
+                    for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
+                        const dataUrl = origPhotos[i] || thumbPhotos[i];
+                        if (!dataUrl) continue;
+                        const blob = await (await fetch(dataUrl)).blob();
+                        const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
+                        const path = auth.user.id + '/' + uuid + '.webp';
+                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp', upsert: false });
+                        if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
+                        const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
+                        photoUrls.push(urlData.publicUrl);
+                    }
+
                     const caption = (document.getElementById('comm-caption')?.value || '').trim().slice(0, 200) || null;
                     const { error } = await sb.from('posts').insert({
                         user_id: auth.user.id,
@@ -14621,11 +14696,15 @@
                         style: this.comm.postStyle || null,
                         layer_type: this.comm.postLayerType || 'basic',
                         caption: caption,
+                        photo_urls: photoUrls.length > 0 ? photoUrls : null,
                         status: 'approved',
                         tags: this.comm.postStyle ? [this.comm.postStyle] : []
                     });
                     if (error) throw error;
                     spToast('🌐 커뮤니티에 공개되었어요!');
+                    // 상태 초기화
+                    this.comm.postPhotos = [];
+                    this.comm.postPhotos_orig = [];
                     this.comm.posts = [];
                     this.comm.page = 0;
                     this.goTo('community');
