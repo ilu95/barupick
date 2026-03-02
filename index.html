@@ -174,6 +174,10 @@
 
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        /* Lazy loading */
+        .lazy-placeholder { background: #e7e5e4; min-height: 60px; }
+        .lazy-loaded { animation: lazyFadeIn 0.3s ease-out; }
+        @keyframes lazyFadeIn { from { opacity: 0.3; } to { opacity: 1; } }
 
         :root {
             /* 뉴트럴 웜 팔레트 (Gentler Streak 영감) */
@@ -6731,7 +6735,7 @@
                 else if (screen === 'closet' || screen.startsWith('closet-') || screen === 'ootd-calendar' || screen === 'ootd-detail' || screen === 'ootd-day-list' || screen === 'best-coord') activeTab = 'nav-closet';
                 else if (screen === 'ootd-record') activeTab = 'nav-ootd';
                 else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'user-profile' || screen === 'follow-list') activeTab = 'nav-community';
-                else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'my-posts' || screen === 'block-list' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
+                else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'my-posts' || screen === 'my-insights' || screen === 'post-insight' || screen === 'block-list' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
                 else if (screen === 'shop') activeTab = 'nav-shop';
                 else activeTab = '';
 
@@ -6973,6 +6977,7 @@
                     case 'user-profile':
                         headerTitle.textContent = '프로필';
                         content.innerHTML = this.renderUserProfile();
+                        this._observeLazyImages(content);
                         break;
                     case 'follow-list':
                         headerTitle.textContent = this._followListTab === 'followers' ? '팔로워' : '팔로잉';
@@ -7099,6 +7104,16 @@
                         headerTitle.textContent = '내 게시물';
                         content.innerHTML = this.renderMyPosts();
                         this._loadMyPosts();
+                        break;
+                    case 'my-insights':
+                        headerTitle.textContent = '인사이트';
+                        content.innerHTML = this.renderInsights();
+                        this._loadInsights();
+                        break;
+                    case 'post-insight':
+                        headerTitle.textContent = '게시물 인사이트';
+                        content.innerHTML = this.renderPostInsight();
+                        this._loadPostInsight();
                         break;
                     case 'block-list':
                         headerTitle.textContent = '차단 목록';
@@ -9121,7 +9136,7 @@
                         <span class="text-[15px] text-warm-900 flex-1">개인정보처리방침</span>
                         ${svg("chevron-right", 16, "#D6D3D1")}
                     </button>
-                    <div class="flex items-center justify-between py-3 text-sm border-b border-warm-300"><span class="text-warm-600">버전</span><span class="font-display text-warm-800 font-medium">0.22 (beta)</span></div>
+                    <div class="flex items-center justify-between py-3 text-sm border-b border-warm-300"><span class="text-warm-600">버전</span><span class="font-display text-warm-800 font-medium">0.24 (beta)</span></div>
                     <div class="flex items-center justify-between py-3 text-sm"><span class="text-warm-600">개발</span><span class="text-warm-800 font-medium">바루픽</span></div>
                 </div>
 
@@ -9600,6 +9615,12 @@
                     ${u ? `<button onclick="app.goTo('my-posts')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
                         ${svg("file-text", 18, "#A8A29E")}
                         <span class="text-[15px] text-warm-900 flex-1">내 게시물</span>
+                        ${svg("chevron-right", 16, "#D6D3D1")}
+                    </button>` : ''}
+                    ${u ? `<button onclick="app.goTo('my-insights')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
+                        ${svg("bar-chart-3", 18, "#A8A29E")}
+                        <span class="text-[15px] text-warm-900 flex-1">인사이트</span>
+                        <span class="text-xs font-medium text-terra-600 bg-terra-100 px-2.5 py-1 rounded-full">📊 NEW</span>
                         ${svg("chevron-right", 16, "#D6D3D1")}
                     </button>` : ''}
                     ${u ? `<button onclick="app.goTo('block-list')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
@@ -13995,6 +14016,32 @@
             // ============================================================
             // 🌐 커뮤니티 갤러리
             // ============================================================
+            // ── 이미지 Lazy Loading ──
+            _lazyObserver: null,
+            _initLazyObserver() {
+                if (this._lazyObserver) return;
+                this._lazyObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            if (src) {
+                                img.src = src;
+                                img.removeAttribute('data-src');
+                                img.classList.remove('lazy-placeholder');
+                                img.classList.add('lazy-loaded');
+                            }
+                            this._lazyObserver.unobserve(img);
+                        }
+                    });
+                }, { rootMargin: '200px 0px', threshold: 0.01 });
+            },
+            _observeLazyImages(container) {
+                if (!this._lazyObserver) this._initLazyObserver();
+                const imgs = (container || document).querySelectorAll('img[data-src]');
+                imgs.forEach(img => this._lazyObserver.observe(img));
+            },
+
             renderCommunity() {
                 const u = auth.user;
                 const p = auth.profile;
@@ -14037,6 +14084,25 @@
                     }
                     const modes = [['mutual','서로 팔로우'],['following','팔로잉']];
                     body = '<div class="flex gap-1.5 mb-4">' + modes.map(m => '<button class="px-4 py-2 rounded-full text-[11px] font-medium transition-all ' + (this.comm.friendsMode===m[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetFriendsMode(\'' + m[0] + '\')">' + m[1] + '</button>').join('') + '</div>';
+
+                    // 바이럴 CTA: 팔로우 수에 따라 안내
+                    const myFollowCount = this.comm.myFollows.size;
+                    if (myFollowCount === 0) {
+                        body += '<div class="bg-gradient-to-b from-terra-50 to-warm-100 border border-terra-200 rounded-2xl p-6 text-center mb-4">' +
+                            '<div class="text-3xl mb-3">🔍</div>' +
+                            '<div class="text-sm font-bold text-warm-900 mb-1.5">친구를 찾아보세요!</div>' +
+                            '<div class="text-xs text-warm-600 mb-4 leading-relaxed">다른 유저를 팔로우하면<br>이 탭에서 친구들의 코디를 볼 수 있어요</div>' +
+                            '<div class="flex flex-col gap-2">' +
+                                '<button onclick="app.goTo(\'user-search\')" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">👤 유저 검색하기</button>' +
+                                '<button onclick="app.commSwitchTab(\'ranking\')" class="px-6 py-2 bg-white text-warm-700 border border-warm-400 rounded-full text-xs font-medium active:scale-95 transition-all">🏆 랭킹에서 인기 유저 찾기</button>' +
+                            '</div></div>';
+                    } else if (myFollowCount <= 3) {
+                        body += '<div class="bg-terra-50 border border-terra-200 rounded-2xl p-4 mb-4 flex items-center gap-3">' +
+                            '<div class="text-2xl flex-shrink-0">💡</div>' +
+                            '<div class="flex-1"><div class="text-xs font-semibold text-warm-800 mb-0.5">더 많은 코디를 발견하세요</div><div class="text-[11px] text-warm-600">더 많은 유저를 팔로우하면 다양한 스타일을 볼 수 있어요</div></div>' +
+                            '<button onclick="app.goTo(\'user-search\')" class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0">탐색</button>' +
+                        '</div>';
+                    }
                 } else if (tab === 'ranking') {
                     const modes = [['weekly','주간'],['monthly','월간'],['user','유저'],['event','이벤트']];
                     body = '<div class="flex gap-1.5 mb-4">' + modes.map(m => '<button class="px-3.5 py-2 rounded-full text-[11px] font-medium transition-all ' + (this.comm.rankingMode===m[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetRankingMode(\'' + m[0] + '\')">' + m[1] + '</button>').join('') + '</div>';
@@ -14278,7 +14344,7 @@
 
                     if (hasPhoto) {
                         h += '<div class="relative bg-warm-200" style="aspect-ratio:4/5">';
-                        h += '<img src="' + photoUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-cover lazy-placeholder" onerror="this.style.display=\'none\'">';
                         h += '<div class="absolute bottom-1 right-1 bg-white/90 rounded-lg p-0.5 shadow-sm">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:32px') + '</div>';
                         h += '</div>';
                     } else {
@@ -14291,6 +14357,7 @@
                     h += '</div></div>';
                 });
                 grid.innerHTML = h;
+                this._observeLazyImages(grid);
             },
 
             renderCommunityGrid() {
@@ -14311,12 +14378,19 @@
 
                 const tab = this.comm.tab || 'all';
                 const emptyMsg = tab === 'friends'
-                    ? (this.comm.friendsMode === 'mutual' ? '서로 팔로우한 친구의 코디가 없어요' : '팔로잉한 유저의 코디가 없어요')
+                    ? (this.comm.friendsMode === 'mutual'
+                        ? '서로 팔로우한 친구의 코디가 없어요<br><span class=\'text-[11px] text-warm-400 block mt-2\'>팔로잉 탭에서 더 많은 코디를 확인해보세요</span>'
+                        : '팔로잉한 유저의 코디가 없어요<br><span class=\'text-[11px] text-warm-400 block mt-2\'>유저 검색에서 새로운 스타일을 발견해보세요</span>')
                     : (this.comm.styleFilter ? '"' + (STYLE_GUIDE[this.comm.styleFilter]?.name || this.comm.styleFilter) + '" 스타일의 코디가 없어요' : (this.comm.contentFilter !== 'all' ? '이 필터에 맞는 코디가 없어요' : '아직 공유된 코디가 없어요<br>첫 번째로 공유해보세요!'));
 
                 if (filtered.length === 0) {
                     grid.innerHTML = '';
-                    if (status) status.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-2">' + (tab==='friends'?'👫':'🎨') + '</div><div class="text-sm text-warm-600">' + emptyMsg + '</div></div>';
+                    let emptyH = '<div class="text-center py-10"><div class="text-4xl mb-2">' + (tab==='friends'?'👫':'🎨') + '</div><div class="text-sm text-warm-600">' + emptyMsg + '</div>';
+                    if (tab === 'friends') {
+                        emptyH += '<button onclick="app.goTo(\'user-search\')" class="mt-4 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all shadow-terra">유저 검색하기</button>';
+                    }
+                    emptyH += '</div>';
+                    if (status) status.innerHTML = emptyH;
                     return;
                 }
 
@@ -14342,7 +14416,7 @@
                     // 사진 + 마네킹 동시 표시
                     if (hasPhoto) {
                         h += '<div class="relative bg-warm-200" style="aspect-ratio:4/5">';
-                        h += '<img src="' + photoUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-cover lazy-placeholder" onerror="this.style.display=\'none\'">';
                         h += '<div class="absolute bottom-1 right-1 bg-white/90 rounded-lg p-0.5 shadow-sm">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:32px') + '</div>';
                         h += '</div>';
                     } else {
@@ -14353,10 +14427,11 @@
                     if (title) h += '<div class="text-xs font-semibold text-warm-900 truncate mb-0.5">' + title + '</div>';
                     if (style) h += '<span class="inline-block text-[9px] font-medium text-warm-500 bg-warm-100 border border-warm-300 rounded px-1.5 py-0.5 mb-1">' + style + '</span>';
                     h += '<div class="flex justify-between items-center"><span class="text-[10px] text-warm-600">' + dateStr + '</span><span class="text-[11px] text-warm-500">' + (post.hide_counts ? '♡' : '♡ ' + (post.likes_count||0)) + (tab === 'friends' && post.comments_count ? ' · 💬 ' + post.comments_count : '') + '</span></div>';
-                    h += '<div class="text-[11px] text-warm-600 mt-1 flex items-center gap-1.5">' + (postAvatar ? '<img src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span></div>';
+                    h += '<div class="text-[11px] text-warm-600 mt-1 flex items-center gap-1.5">' + (postAvatar ? '<img data-src="' + postAvatar + '" class="w-4 h-4 rounded-full object-cover lazy-placeholder">' : '') + '<span>@' + nick + (isFollowing ? ' ✓' : '') + '</span></div>';
                     h += '</div></div>';
                 });
                 grid.innerHTML = h;
+                this._observeLazyImages(grid);
 
                 if (status) {
                     if (this.comm.hasMore) {
@@ -14519,8 +14594,32 @@
                         (!isMe ? '<button class="py-2.5 px-3 rounded-xl border border-warm-400 bg-white text-xs text-warm-500 active:scale-[0.97] transition-all" onclick="app.commReport(\'' + post.id + '\')">⚠️</button>' : '') +
                     '</div>' +
 
+                    // ── 바이럴 CTA (미팔로우 유저 게시물) ──
+                    (!isMe && !isFollowing && auth.user ? '<div class="mt-3 bg-gradient-to-r from-terra-50 to-warm-50 border border-terra-200 rounded-2xl p-3.5 flex items-center gap-2.5 cursor-pointer active:scale-[0.98] transition-all" onclick="app.commToggleFollow(\'' + post.user_id + '\')"><div class="text-lg flex-shrink-0">✨</div><div class="flex-1"><div class="text-xs font-semibold text-warm-800">@' + nick + '님의 코디 더 보기</div><div class="text-[10px] text-warm-500">팔로우하면 새 코디 알림을 받을 수 있어요</div></div><span class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold flex-shrink-0">팔로우</span></div>' : '') +
+                    (!isMe && isFollowing && !isMutual ? '<div class="mt-3 bg-warm-100 border border-warm-300 rounded-xl p-3 text-center text-[11px] text-warm-600">@' + nick + '님도 나를 팔로우하면 <span class="font-semibold text-green-700">👫 친구</span>가 되어 댓글로 소통할 수 있어요</div>' : '') +
+
                     // ── 인사이트 (본인 게시물만) ──
-                    (isMe ? '<div class="mt-4 bg-warm-100 border border-warm-300 rounded-2xl p-4"><div class="text-xs font-semibold text-warm-700 mb-2.5 flex items-center gap-1.5"><i data-lucide="bar-chart-3" style="width:13px;height:13px"></i> 인사이트</div><div class="grid grid-cols-3 gap-2.5"><div class="text-center bg-white rounded-xl py-2.5 border border-warm-300"><div class="text-lg font-bold text-warm-900">' + (post.view_count||0) + '</div><div class="text-[10px] text-warm-500">조회수</div></div><div class="text-center bg-white rounded-xl py-2.5 border border-warm-300"><div class="text-lg font-bold text-warm-900">' + (post.likes_count||0) + '</div><div class="text-[10px] text-warm-500">좋아요</div></div><div class="text-center bg-white rounded-xl py-2.5 border border-warm-300"><div class="text-lg font-bold text-warm-900">' + (post.save_count||0) + '</div><div class="text-[10px] text-warm-500">저장</div></div></div></div>' : '') +
+                    (isMe ? (() => {
+                        const views = post.view_count||0;
+                        const likes = post.likes_count||0;
+                        const saves = post.save_count||0;
+                        const comments = post.comments_count||0;
+                        const likeRate = views > 0 ? (likes/views*100).toFixed(1) : '—';
+                        const saveRate = views > 0 ? (saves/views*100).toFixed(1) : '—';
+                        return '<div class="mt-4 bg-warm-100 border border-warm-300 rounded-2xl p-4">' +
+                            '<div class="flex items-center justify-between mb-3"><div class="text-xs font-semibold text-warm-700 flex items-center gap-1.5"><i data-lucide="bar-chart-3" style="width:13px;height:13px"></i> 인사이트</div><button onclick="app._insightPostId=\'' + post.id + '\';app.goTo(\'post-insight\')" class="text-[10px] text-terra-600 font-medium">자세히 보기 →</button></div>' +
+                            '<div class="grid grid-cols-4 gap-2 mb-3">' +
+                                '<div class="text-center bg-white rounded-xl py-2 border border-warm-300"><div class="text-base font-bold text-warm-900">' + views + '</div><div class="text-[9px] text-warm-500">조회</div></div>' +
+                                '<div class="text-center bg-white rounded-xl py-2 border border-warm-300"><div class="text-base font-bold text-warm-900">' + likes + '</div><div class="text-[9px] text-warm-500">좋아요</div></div>' +
+                                '<div class="text-center bg-white rounded-xl py-2 border border-warm-300"><div class="text-base font-bold text-warm-900">' + saves + '</div><div class="text-[9px] text-warm-500">저장</div></div>' +
+                                '<div class="text-center bg-white rounded-xl py-2 border border-warm-300"><div class="text-base font-bold text-warm-900">' + comments + '</div><div class="text-[9px] text-warm-500">댓글</div></div>' +
+                            '</div>' +
+                            '<div class="grid grid-cols-2 gap-2">' +
+                                '<div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-warm-300"><span class="text-[10px] text-warm-500">좋아요율</span><span class="ml-auto text-xs font-bold ' + (likeRate !== '—' && parseFloat(likeRate) >= 10 ? 'text-green-600' : 'text-warm-700') + '">' + likeRate + (likeRate !== '—' ? '%' : '') + '</span></div>' +
+                                '<div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-warm-300"><span class="text-[10px] text-warm-500">저장률</span><span class="ml-auto text-xs font-bold ' + (saveRate !== '—' && parseFloat(saveRate) >= 5 ? 'text-green-600' : 'text-warm-700') + '">' + saveRate + (saveRate !== '—' ? '%' : '') + '</span></div>' +
+                            '</div>' +
+                        '</div>';
+                    })() : '') +
 
                     // ── 댓글 섹션 (친구 피드에서 열었을 때만) ──
                     (this.comm._detailSource === 'friends' && post.visibility === 'friends' ? (
@@ -15245,6 +15344,20 @@
                     return h;
                 }
 
+                // 바이럴 CTA: 미팔로우 유저 프로필 방문 시
+                if (!isMe && !isFollowing && pd.loaded) {
+                    h += '<div class="bg-gradient-to-r from-terra-50 to-warm-100 border border-terra-200 rounded-2xl p-4 mb-3 flex items-center gap-3">';
+                    h += '<div class="text-2xl flex-shrink-0">🔓</div>';
+                    h += '<div class="flex-1"><div class="text-xs font-semibold text-warm-800 mb-0.5">팔로우하면 더 볼 수 있어요</div><div class="text-[11px] text-warm-500">친구 전용 코디와 댓글을 확인할 수 있어요</div></div>';
+                    h += '<button onclick="app.commToggleFollow(\'' + userId + '\')" class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0 shadow-terra">팔로우</button>';
+                    h += '</div>';
+                } else if (!isMe && isFollowing && !isMutual && pd.loaded) {
+                    h += '<div class="bg-warm-100 border border-warm-300 rounded-2xl p-3.5 mb-3 flex items-center gap-2.5">';
+                    h += '<div class="text-lg flex-shrink-0">👋</div>';
+                    h += '<div class="flex-1 text-[11px] text-warm-600">상대방도 팔로우하면 <span class="font-semibold text-green-700">👫 친구</span>가 되어 댓글과 친구 전용 코디를 볼 수 있어요</div>';
+                    h += '</div>';
+                }
+
                 // 유저의 공개 코디 그리드
                 if (pd.posts.length > 0) {
                     h += '<div class="border-t border-warm-300 pt-4 mt-2">';
@@ -15257,7 +15370,7 @@
                         const hasPhoto = post.photo_urls && post.photo_urls.length > 0;
                         let thumb;
                         if (hasPhoto) {
-                            thumb = '<img src="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl" onerror="this.style.display=\'none\'">';
+                            thumb = '<img data-src="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl lazy-placeholder" onerror="this.style.display=\'none\'">';
                         } else {
                             thumb = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:55px');
                         }
@@ -15554,7 +15667,10 @@
                         h += '<div class="flex-1 min-w-0">';
                         h += '<div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border ' + (statusColors[status]||'') + '">' + (statusLabels[status]||status) + '</span><span class="text-[10px] text-warm-400">' + ago + '</span></div>';
                         h += '<div class="text-sm font-semibold text-warm-900 truncate">' + title + '</div>';
-                        h += '<div class="text-[10px] text-warm-500">♡ ' + (post.likes_count||0) + '</div>';
+                        h += '<div class="text-[10px] text-warm-500">♡ ' + (post.likes_count||0) + ' · 👁 ' + (post.view_count||0) + ' · 💾 ' + (post.save_count||0) + '</div>';
+                        if (status === 'approved') {
+                            h += '<button onclick="event.stopPropagation();app._insightPostId=\'' + post.id + '\';app.goTo(\'post-insight\')" class="text-[10px] text-terra-600 font-medium mt-1">📊 인사이트 →</button>';
+                        }
                         if (status === 'rejected' && post.rejected_reason) {
                             h += '<div class="text-[10px] text-red-500 mt-1">사유: ' + escapeHtml(post.rejected_reason) + '</div>';
                         }
@@ -15563,6 +15679,294 @@
                     el.innerHTML = h;
                 } catch(e) {
                     el.innerHTML = '<div class="text-center py-10 text-red-500 text-sm">로딩 실패: ' + (e.message||'') + '</div>';
+                }
+            },
+
+            // ── 인사이트 시스템 ──
+            _insightData: null,
+            _insightPostId: null,
+            _insightPostData: null,
+
+            renderInsights() {
+                return '<div class="screen active"><div id="insights-content"><div class="text-center py-10 text-warm-600 text-sm">📊 인사이트 불러오는 중...</div></div></div>';
+            },
+
+            async _loadInsights() {
+                if (!sb || !auth.user) return;
+                const el = document.getElementById('insights-content');
+                if (!el) return;
+                try {
+                    // 내 전체 게시물 로드
+                    const { data: posts, error } = await sb.from('posts').select('id, created_at, likes_count, view_count, save_count, comments_count, hide_counts, visibility, outfit, style, caption, photo_urls, score').eq('user_id', auth.user.id).eq('status', 'approved').order('created_at', { ascending: false });
+                    if (error) throw error;
+                    if (!posts || posts.length === 0) {
+                        el.innerHTML = '<div class="text-center py-16"><div class="text-4xl mb-3">📊</div><div class="text-sm text-warm-600 mb-2">아직 공개된 게시물이 없어요</div><div class="text-xs text-warm-500">OOTD를 공개하면 인사이트를 볼 수 있어요</div></div>';
+                        return;
+                    }
+
+                    // 최근 14일 좋아요 추이
+                    const postIds = posts.map(p => p.id);
+                    const since14 = new Date(Date.now() - 14 * 86400000).toISOString();
+                    let likesTimeline = [];
+                    try {
+                        const { data: lk } = await sb.from('likes').select('created_at').in('post_id', postIds).gte('created_at', since14);
+                        likesTimeline = lk || [];
+                    } catch(e) {}
+
+                    // 집계
+                    const totalViews = posts.reduce((s, p) => s + (p.view_count||0), 0);
+                    const totalLikes = posts.reduce((s, p) => s + (p.likes_count||0), 0);
+                    const totalSaves = posts.reduce((s, p) => s + (p.save_count||0), 0);
+                    const totalComments = posts.reduce((s, p) => s + (p.comments_count||0), 0);
+                    const avgLikeRate = totalViews > 0 ? (totalLikes / totalViews * 100).toFixed(1) : '—';
+                    const avgSaveRate = totalViews > 0 ? (totalSaves / totalViews * 100).toFixed(1) : '—';
+
+                    // TOP 게시물 (좋아요 기준)
+                    const topPosts = [...posts].sort((a, b) => (b.likes_count||0) - (a.likes_count||0)).slice(0, 5);
+
+                    // 14일 바 차트 데이터
+                    const dayMap = {};
+                    for (let i = 13; i >= 0; i--) {
+                        const d = new Date(Date.now() - i * 86400000);
+                        const key = d.toISOString().slice(0, 10);
+                        dayMap[key] = { likes: 0, label: (d.getMonth()+1) + '/' + d.getDate() };
+                    }
+                    likesTimeline.forEach(l => {
+                        const key = (l.created_at||'').slice(0, 10);
+                        if (dayMap[key]) dayMap[key].likes++;
+                    });
+                    const dayArr = Object.values(dayMap);
+                    const maxLikes = Math.max(1, ...dayArr.map(d => d.likes));
+
+                    // 스타일 분포
+                    const styleCounts = {};
+                    posts.forEach(p => {
+                        const s = p.style || '미지정';
+                        const name = STYLE_GUIDE[s]?.name || s;
+                        styleCounts[name] = (styleCounts[name]||0) + 1;
+                    });
+                    const styleArr = Object.entries(styleCounts).sort((a,b) => b[1]-a[1]).slice(0, 5);
+                    const maxStyleCount = Math.max(1, ...styleArr.map(s => s[1]));
+
+                    // ── 렌더링 ──
+                    let h = '';
+
+                    // 요약 카드
+                    h += '<div class="grid grid-cols-2 gap-2.5 mb-4">';
+                    h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 text-center shadow-warm-sm"><div class="text-2xl font-bold text-warm-900">' + totalViews.toLocaleString() + '</div><div class="text-[10px] text-warm-500 mt-0.5">총 조회수</div></div>';
+                    h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 text-center shadow-warm-sm"><div class="text-2xl font-bold text-warm-900">' + totalLikes.toLocaleString() + '</div><div class="text-[10px] text-warm-500 mt-0.5">총 좋아요</div></div>';
+                    h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 text-center shadow-warm-sm"><div class="text-2xl font-bold text-warm-900">' + totalSaves.toLocaleString() + '</div><div class="text-[10px] text-warm-500 mt-0.5">총 저장</div></div>';
+                    h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 text-center shadow-warm-sm"><div class="text-2xl font-bold text-warm-900">' + totalComments.toLocaleString() + '</div><div class="text-[10px] text-warm-500 mt-0.5">총 댓글</div></div>';
+                    h += '</div>';
+
+                    // 참여율 카드
+                    h += '<div class="grid grid-cols-3 gap-2 mb-5">';
+                    h += '<div class="bg-terra-50 border border-terra-200 rounded-xl py-2.5 text-center"><div class="text-sm font-bold text-terra-700">' + posts.length + '</div><div class="text-[9px] text-terra-500">게시물</div></div>';
+                    h += '<div class="bg-terra-50 border border-terra-200 rounded-xl py-2.5 text-center"><div class="text-sm font-bold ' + (avgLikeRate !== '—' && parseFloat(avgLikeRate) >= 10 ? 'text-green-600' : 'text-terra-700') + '">' + avgLikeRate + (avgLikeRate !== '—' ? '%' : '') + '</div><div class="text-[9px] text-terra-500">좋아요율</div></div>';
+                    h += '<div class="bg-terra-50 border border-terra-200 rounded-xl py-2.5 text-center"><div class="text-sm font-bold ' + (avgSaveRate !== '—' && parseFloat(avgSaveRate) >= 5 ? 'text-green-600' : 'text-terra-700') + '">' + avgSaveRate + (avgSaveRate !== '—' ? '%' : '') + '</div><div class="text-[9px] text-terra-500">저장률</div></div>';
+                    h += '</div>';
+
+                    // 14일 좋아요 추이
+                    h += '<div class="mb-5">';
+                    h += '<div class="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3"><i data-lucide="trending-up" style="width:13px;height:13px"></i> 14일 좋아요 추이</div>';
+                    h += '<div class="bg-white border border-warm-300 rounded-2xl p-3.5">';
+                    h += '<div class="flex items-end gap-1" style="height:100px">';
+                    dayArr.forEach(d => {
+                        const pct = d.likes > 0 ? Math.max(8, d.likes / maxLikes * 100) : 4;
+                        h += '<div class="flex-1 flex flex-col items-center justify-end gap-0.5">';
+                        if (d.likes > 0) h += '<div class="text-[8px] text-terra-600 font-bold">' + d.likes + '</div>';
+                        h += '<div class="w-full rounded-t-sm ' + (d.likes > 0 ? 'bg-terra-400' : 'bg-warm-300') + '" style="height:' + pct + '%"></div>';
+                        h += '</div>';
+                    });
+                    h += '</div>';
+                    h += '<div class="flex justify-between mt-1.5"><span class="text-[8px] text-warm-400">' + dayArr[0].label + '</span><span class="text-[8px] text-warm-400">' + dayArr[dayArr.length-1].label + '</span></div>';
+                    h += '</div></div>';
+
+                    // 스타일 분포
+                    if (styleArr.length > 0) {
+                        h += '<div class="mb-5">';
+                        h += '<div class="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3"><i data-lucide="pie-chart" style="width:13px;height:13px"></i> 스타일 분포</div>';
+                        h += '<div class="bg-white border border-warm-300 rounded-2xl p-3.5 space-y-2.5">';
+                        styleArr.forEach(([name, count]) => {
+                            const pct = Math.round(count / posts.length * 100);
+                            const barW = Math.max(8, count / maxStyleCount * 100);
+                            h += '<div><div class="flex justify-between items-center mb-1"><span class="text-xs font-medium text-warm-800">' + name + '</span><span class="text-[10px] text-warm-500">' + count + '개 (' + pct + '%)</span></div><div class="h-2 bg-warm-200 rounded-full overflow-hidden"><div class="h-full bg-terra-400 rounded-full" style="width:' + barW + '%"></div></div></div>';
+                        });
+                        h += '</div></div>';
+                    }
+
+                    // TOP 5 게시물
+                    h += '<div class="mb-4">';
+                    h += '<div class="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3"><i data-lucide="trophy" style="width:13px;height:13px"></i> 인기 게시물 TOP 5</div>';
+                    topPosts.forEach((post, idx) => {
+                        const medal = idx < 3 ? ['🥇','🥈','🥉'][idx] : (idx+1);
+                        const title = escapeHtml(post.caption || '') || '코디 #' + (idx+1);
+                        const photoUrl = post.photo_urls && post.photo_urls[0];
+                        const views = post.view_count||0;
+                        const likes = post.likes_count||0;
+                        const saves = post.save_count||0;
+                        const lr = views > 0 ? (likes/views*100).toFixed(1) + '%' : '—';
+                        h += '<div class="bg-white border border-warm-400 rounded-2xl p-3 mb-2 flex gap-3 cursor-pointer active:scale-[0.98] transition-all" onclick="app._insightPostId=\'' + post.id + '\';app.goTo(\'post-insight\')">';
+                        h += '<div class="flex-shrink-0 flex items-start"><span class="text-base">' + medal + '</span></div>';
+                        if (photoUrl) h += '<img src="' + photoUrl + '" class="w-12 h-15 rounded-lg object-cover flex-shrink-0" onerror="this.style.display=\'none\'">';
+                        h += '<div class="flex-1 min-w-0">';
+                        h += '<div class="text-xs font-semibold text-warm-900 truncate mb-1">' + title + '</div>';
+                        h += '<div class="flex gap-3 text-[10px] text-warm-500"><span>👁 ' + views + '</span><span>♡ ' + likes + '</span><span>💾 ' + saves + '</span><span class="text-terra-600 font-medium">' + lr + '</span></div>';
+                        h += '</div><div class="flex-shrink-0 text-warm-400"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></div>';
+                        h += '</div>';
+                    });
+                    h += '</div>';
+
+                    el.innerHTML = h;
+                    refreshIcons();
+                } catch(e) {
+                    el.innerHTML = '<div class="text-center py-10 text-red-500 text-sm">로딩 실패: ' + (e.message||'') + '</div>';
+                }
+            },
+
+            // ── 개별 게시물 인사이트 ──
+            renderPostInsight() {
+                return '<div class="screen active"><div id="post-insight-content"><div class="text-center py-10 text-warm-600 text-sm">📊 분석 중...</div></div></div>';
+            },
+
+            async _loadPostInsight() {
+                if (!sb || !auth.user || !this._insightPostId) return;
+                const el = document.getElementById('post-insight-content');
+                if (!el) return;
+                const postId = this._insightPostId;
+                try {
+                    // 게시물 로드
+                    const { data: post, error } = await sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname)').eq('id', postId).single();
+                    if (error || !post) { el.innerHTML = '<div class="text-center py-10 text-warm-600 text-sm">게시물을 찾을 수 없어요</div>'; return; }
+
+                    // 14일 좋아요 타임라인
+                    const since14 = new Date(Date.now() - 14 * 86400000).toISOString();
+                    const { data: likes14 } = await sb.from('likes').select('created_at').eq('post_id', postId).gte('created_at', since14);
+
+                    // 14일 댓글 타임라인
+                    let comments14 = [];
+                    try {
+                        const { data: c14 } = await sb.from('comments').select('created_at').eq('post_id', postId).gte('created_at', since14);
+                        comments14 = c14 || [];
+                    } catch(e) {}
+
+                    // 내 다른 게시물 평균 (비교용)
+                    const { data: myPosts } = await sb.from('posts').select('likes_count, view_count, save_count').eq('user_id', auth.user.id).eq('status', 'approved');
+                    const myAvg = { views: 0, likes: 0, saves: 0 };
+                    if (myPosts && myPosts.length > 0) {
+                        myAvg.views = Math.round(myPosts.reduce((s,p) => s + (p.view_count||0), 0) / myPosts.length);
+                        myAvg.likes = Math.round(myPosts.reduce((s,p) => s + (p.likes_count||0), 0) / myPosts.length);
+                        myAvg.saves = Math.round(myPosts.reduce((s,p) => s + (p.save_count||0), 0) / myPosts.length);
+                    }
+
+                    // 수치
+                    const views = post.view_count||0;
+                    const lk = post.likes_count||0;
+                    const sv = post.save_count||0;
+                    const cm = post.comments_count||0;
+                    const likeRate = views > 0 ? (lk/views*100).toFixed(1) : '—';
+                    const saveRate = views > 0 ? (sv/views*100).toFixed(1) : '—';
+
+                    // 14일 일별 맵
+                    const dayMap = {};
+                    for (let i = 13; i >= 0; i--) {
+                        const d = new Date(Date.now() - i * 86400000);
+                        const key = d.toISOString().slice(0, 10);
+                        dayMap[key] = { likes: 0, comments: 0, label: (d.getMonth()+1) + '/' + d.getDate() };
+                    }
+                    (likes14||[]).forEach(l => { const k = (l.created_at||'').slice(0, 10); if (dayMap[k]) dayMap[k].likes++; });
+                    comments14.forEach(c => { const k = (c.created_at||'').slice(0, 10); if (dayMap[k]) dayMap[k].comments++; });
+                    const dayArr = Object.values(dayMap);
+                    const maxDay = Math.max(1, ...dayArr.map(d => d.likes + d.comments));
+
+                    // 게시 후 경과일
+                    const daysOld = Math.max(1, Math.floor((Date.now() - new Date(post.created_at).getTime()) / 86400000));
+                    const avgViewsPerDay = (views / daysOld).toFixed(1);
+
+                    // ── 렌더링 ──
+                    let h = '';
+
+                    // 게시물 미리보기
+                    const photoUrl = post.photo_urls && post.photo_urls[0];
+                    const title = escapeHtml(post.caption || '') || '코디';
+                    const ago = this._timeAgo(post.created_at);
+                    h += '<div class="bg-white border border-warm-400 rounded-2xl p-3.5 mb-4 flex gap-3">';
+                    if (photoUrl) h += '<img src="' + photoUrl + '" class="w-14 h-18 rounded-xl object-cover flex-shrink-0" onerror="this.style.display=\'none\'">';
+                    h += '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-warm-900 truncate">' + title + '</div><div class="text-[10px] text-warm-500 mt-0.5">' + ago + ' · ' + daysOld + '일째</div><div class="text-[10px] text-warm-500 mt-0.5">하루 평균 ' + avgViewsPerDay + '회 조회</div></div></div>';
+
+                    // 핵심 지표
+                    h += '<div class="grid grid-cols-4 gap-2 mb-4">';
+                    h += '<div class="text-center bg-white border border-warm-400 rounded-xl py-2.5 shadow-warm-sm"><div class="text-lg font-bold text-warm-900">' + views + '</div><div class="text-[9px] text-warm-500">조회</div></div>';
+                    h += '<div class="text-center bg-white border border-warm-400 rounded-xl py-2.5 shadow-warm-sm"><div class="text-lg font-bold text-warm-900">' + lk + '</div><div class="text-[9px] text-warm-500">좋아요</div></div>';
+                    h += '<div class="text-center bg-white border border-warm-400 rounded-xl py-2.5 shadow-warm-sm"><div class="text-lg font-bold text-warm-900">' + sv + '</div><div class="text-[9px] text-warm-500">저장</div></div>';
+                    h += '<div class="text-center bg-white border border-warm-400 rounded-xl py-2.5 shadow-warm-sm"><div class="text-lg font-bold text-warm-900">' + cm + '</div><div class="text-[9px] text-warm-500">댓글</div></div>';
+                    h += '</div>';
+
+                    // 참여율 + 내 평균 비교
+                    h += '<div class="bg-white border border-warm-300 rounded-2xl p-4 mb-4">';
+                    h += '<div class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><i data-lucide="target" style="width:13px;height:13px"></i> 참여율 분석</div>';
+                    h += '<div class="grid grid-cols-2 gap-3 mb-3">';
+                    h += '<div class="bg-warm-50 rounded-xl p-3"><div class="text-[10px] text-warm-500 mb-1">좋아요율</div><div class="text-xl font-bold ' + (likeRate !== '—' && parseFloat(likeRate) >= 10 ? 'text-green-600' : 'text-warm-900') + '">' + likeRate + (likeRate !== '—' ? '%' : '') + '</div></div>';
+                    h += '<div class="bg-warm-50 rounded-xl p-3"><div class="text-[10px] text-warm-500 mb-1">저장률</div><div class="text-xl font-bold ' + (saveRate !== '—' && parseFloat(saveRate) >= 5 ? 'text-green-600' : 'text-warm-900') + '">' + saveRate + (saveRate !== '—' ? '%' : '') + '</div></div>';
+                    h += '</div>';
+
+                    // 내 평균 비교
+                    h += '<div class="text-[10px] text-warm-500 mb-2">내 게시물 평균과 비교</div>';
+                    const comparisons = [
+                        { label: '조회', val: views, avg: myAvg.views },
+                        { label: '좋아요', val: lk, avg: myAvg.likes },
+                        { label: '저장', val: sv, avg: myAvg.saves }
+                    ];
+                    comparisons.forEach(c => {
+                        const diff = c.avg > 0 ? Math.round((c.val - c.avg) / c.avg * 100) : 0;
+                        const diffStr = diff > 0 ? '+' + diff + '%' : (diff < 0 ? diff + '%' : '동일');
+                        const diffColor = diff > 0 ? 'text-green-600' : (diff < 0 ? 'text-red-500' : 'text-warm-500');
+                        h += '<div class="flex items-center justify-between py-1.5 border-b border-warm-200 last:border-0"><span class="text-xs text-warm-700">' + c.label + '</span><div class="flex items-center gap-2"><span class="text-xs font-medium text-warm-800">' + c.val + '</span><span class="text-[10px] text-warm-400">vs 평균 ' + c.avg + '</span><span class="text-[10px] font-semibold ' + diffColor + '">' + diffStr + '</span></div></div>';
+                    });
+                    h += '</div>';
+
+                    // 14일 반응 추이
+                    h += '<div class="mb-4">';
+                    h += '<div class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><i data-lucide="trending-up" style="width:13px;height:13px"></i> 14일 반응 추이</div>';
+                    h += '<div class="bg-white border border-warm-300 rounded-2xl p-3.5">';
+                    h += '<div class="flex items-center gap-3 mb-2"><span class="flex items-center gap-1 text-[10px] text-warm-500"><span class="inline-block w-2 h-2 rounded-full bg-terra-400"></span> 좋아요</span><span class="flex items-center gap-1 text-[10px] text-warm-500"><span class="inline-block w-2 h-2 rounded-full bg-blue-400"></span> 댓글</span></div>';
+                    h += '<div class="flex items-end gap-0.5" style="height:80px">';
+                    dayArr.forEach(d => {
+                        const total = d.likes + d.comments;
+                        const pctL = total > 0 ? Math.max(6, d.likes / maxDay * 100) : 0;
+                        const pctC = total > 0 ? Math.max(6, d.comments / maxDay * 100) : 0;
+                        const empty = total === 0;
+                        h += '<div class="flex-1 flex flex-col items-center justify-end gap-0">';
+                        if (total > 0) h += '<div class="text-[7px] text-warm-500 font-medium">' + total + '</div>';
+                        if (d.comments > 0) h += '<div class="w-full rounded-t-sm bg-blue-400" style="height:' + pctC + '%"></div>';
+                        if (d.likes > 0) h += '<div class="w-full ' + (d.comments > 0 ? '' : 'rounded-t-sm ') + 'bg-terra-400" style="height:' + pctL + '%"></div>';
+                        if (empty) h += '<div class="w-full bg-warm-200 rounded-t-sm" style="height:3%"></div>';
+                        h += '</div>';
+                    });
+                    h += '</div>';
+                    h += '<div class="flex justify-between mt-1.5"><span class="text-[8px] text-warm-400">' + dayArr[0].label + '</span><span class="text-[8px] text-warm-400">' + dayArr[dayArr.length-1].label + '</span></div>';
+                    h += '</div></div>';
+
+                    // 팁
+                    h += '<div class="bg-terra-50 border border-terra-200 rounded-2xl p-4">';
+                    h += '<div class="text-xs font-semibold text-terra-700 mb-2">💡 인사이트 팁</div>';
+                    const tips = [];
+                    if (likeRate !== '—' && parseFloat(likeRate) >= 15) tips.push('좋아요율이 높아요! 이 스타일의 코디를 더 공유해보세요');
+                    else if (likeRate !== '—' && parseFloat(likeRate) < 5 && views > 10) tips.push('착용샷을 추가하면 좋아요가 늘어날 수 있어요');
+                    if (saveRate !== '—' && parseFloat(saveRate) >= 8) tips.push('저장률이 높아요! 실용적인 코디로 인정받고 있어요');
+                    if (cm > lk) tips.push('댓글이 좋아요보다 많아요 — 대화가 활발한 게시물이에요');
+                    if (views > 0 && views < 5) tips.push('아직 노출이 적어요. 인기 스타일 태그를 활용해보세요');
+                    if (tips.length === 0) tips.push('꾸준히 코디를 공유하면 팔로워가 늘어나요');
+                    tips.forEach(t => {
+                        h += '<div class="text-[11px] text-terra-600 mb-1">· ' + t + '</div>';
+                    });
+                    h += '</div>';
+
+                    el.innerHTML = h;
+                    refreshIcons();
+                } catch(e) {
+                    el.innerHTML = '<div class="text-center py-10 text-red-500 text-sm">로딩 실패: ' + (e.message||'') + '</div>';
+                    console.error(e);
                 }
             },
 
