@@ -6726,7 +6726,7 @@
                 if (screen === 'home' || screen.startsWith('rec-') || screen.startsWith('build-') || screen === 'weather' || screen === 'fabric' || screen.startsWith('fabric-') || screen === 'saved' || screen === 'quiz' || screen === 'quiz-result' || screen.startsWith('eval-') || screen === 'body-guide' || screen === 'body-result') activeTab = 'nav-coord';
                 else if (screen === 'closet' || screen.startsWith('closet-') || screen === 'ootd-calendar' || screen === 'ootd-detail' || screen === 'ootd-day-list' || screen === 'best-coord') activeTab = 'nav-closet';
                 else if (screen === 'ootd-record') activeTab = 'nav-ootd';
-                else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'user-profile') activeTab = 'nav-community';
+                else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'user-profile' || screen === 'follow-list') activeTab = 'nav-community';
                 else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'my-posts' || screen === 'block-list' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
                 else if (screen === 'shop') activeTab = 'nav-shop';
                 else activeTab = '';
@@ -6968,6 +6968,10 @@
                     case 'user-profile':
                         headerTitle.textContent = '프로필';
                         content.innerHTML = this.renderUserProfile();
+                        break;
+                    case 'follow-list':
+                        headerTitle.textContent = this._followListTab === 'followers' ? '팔로워' : '팔로잉';
+                        content.innerHTML = this.renderFollowList();
                         break;
                     case 'notifications':
                         headerTitle.textContent = '알림';
@@ -9533,6 +9537,11 @@
                     <div class="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3 pb-2 border-b border-warm-400">
                         ${svg("settings", 14)} 설정
                     </div>
+                    ${u ? `<button onclick="app.openUserProfile('${auth.user.id}')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
+                        ${svg("user", 18, "#A8A29E")}
+                        <span class="text-[15px] text-warm-900 flex-1">내 프로필</span>
+                        ${svg("chevron-right", 16, "#D6D3D1")}
+                    </button>` : ''}
                     ${u ? `<button onclick="app.goTo('my-posts')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
                         ${svg("file-text", 18, "#A8A29E")}
                         <span class="text-[15px] text-warm-900 flex-1">내 게시물</span>
@@ -14716,6 +14725,9 @@
                         }
                     } catch(e) { console.error('Follow sync error:', e); }
                 }
+                // 캐시 무효화
+                this._followListData = null;
+                this._userProfileData = null;
                 this.render();
             },
 
@@ -14730,30 +14742,41 @@
                 const userId = this._viewingUser;
                 if (!userId) return '<div class="screen active"><div class="text-center py-10 text-warm-600">유저를 찾을 수 없습니다</div></div>';
 
+                const isMe = auth.user && auth.user.id === userId;
                 const isFollowing = this.comm.myFollows.has(userId);
                 const isMutual = this._isFriend(userId);
 
-                // 해당 유저의 포스트 수집
-                const userPosts = this.comm.posts.filter(p => p.user_id === userId);
-                const nick = escapeHtml(userPosts[0]?.profiles?.nickname) || '유저';
-                const userAvatar = escapeHtml(userPosts[0]?.profiles?.avatar_url);
-                const userInsta = escapeHtml(userPosts[0]?.profiles?.instagram_id || '');
-                const initial = nick.charAt(0).toUpperCase();
-
-                // 팔로우 수 비동기 로드
-                if (!this._profileCounts || this._profileCounts.userId !== userId) {
-                    this._profileCounts = { userId, followers: '-', following: '-' };
+                // 프로필 + 게시물 + 팔로우 수 비동기 로드
+                if (!this._userProfileData || this._userProfileData.userId !== userId) {
+                    this._userProfileData = { userId, profile: null, posts: [], followers: 0, following: 0, loaded: false };
                     if (sb) {
-                        sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', userId)
-                            .then(({ count }) => { this._profileCounts.followers = count || 0; this.render(); });
-                        sb.from('follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId)
-                            .then(({ count }) => { this._profileCounts.following = count || 0; this.render(); });
+                        (async () => {
+                            try {
+                                const [profileRes, postsRes, followersRes, followingRes] = await Promise.all([
+                                    sb.from('profiles').select('*').eq('id', userId).single(),
+                                    sb.from('posts').select('*').eq('user_id', userId).eq('status', 'approved').or('visibility.eq.public,visibility.is.null').order('created_at', {ascending:false}).limit(30),
+                                    sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', userId),
+                                    sb.from('follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId)
+                                ]);
+                                this._userProfileData.profile = profileRes.data;
+                                this._userProfileData.posts = postsRes.data || [];
+                                this._userProfileData.followers = followersRes.count || 0;
+                                this._userProfileData.following = followingRes.count || 0;
+                                this._userProfileData.loaded = true;
+                                this.render();
+                            } catch(e) { console.error('Profile load error:', e); }
+                        })();
                     }
                 }
-                const fc = this._profileCounts;
+                const pd = this._userProfileData;
+                const prof = pd.profile || {};
+                const nick = escapeHtml(prof.nickname || '유저');
+                const userAvatar = escapeHtml(prof.avatar_url || '');
+                const userInsta = escapeHtml(prof.instagram_id || '');
+                const userBio = escapeHtml(prof.bio || '');
+                const initial = nick.charAt(0).toUpperCase();
 
                 // 팔로우 버튼
-                const isMe = auth.user && auth.user.id === userId;
                 let followBtn = '';
                 if (!isMe) {
                     if (isMutual) {
@@ -14766,51 +14789,69 @@
                 }
 
                 let h = '<div class="screen active">';
+
                 // 프로필 카드
-                h += '<div class="text-center py-6">';
+                h += '<div class="text-center py-5">';
                 h += (userAvatar
-                    ? '<img src="' + userAvatar + '" class="w-16 h-16 rounded-full object-cover mx-auto mb-3" onerror="this.outerHTML=\'<div class=\\\'w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xl mx-auto mb-3\\\'>' + initial + '</div>\'">'
-                    : '<div class="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xl mx-auto mb-3">' + initial + '</div>');
-                h += '<div class="text-lg font-bold text-warm-900 mb-1">@' + nick + '</div>';
-                if (isMutual) h += '<div class="text-xs text-green-600 font-medium mb-2">👫 서로 친구</div>';
+                    ? '<img src="' + userAvatar + '" class="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-warm-300" onerror="this.outerHTML=\'<div class=\\\'w-20 h-20 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-2xl mx-auto mb-3 border-2 border-warm-300\\\'>' + initial + '</div>\'">'
+                    : '<div class="w-20 h-20 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-2xl mx-auto mb-3 border-2 border-warm-300">' + initial + '</div>');
+                h += '<div class="text-lg font-bold text-warm-900">@' + nick + '</div>';
+                if (userBio) h += '<div class="text-xs text-warm-500 mt-1 px-8">' + userBio + '</div>';
+                if (isMutual && !isMe) h += '<div class="text-[11px] text-green-600 font-medium mt-1">👫 서로 친구</div>';
 
                 // 인스타그램 링크
                 if (userInsta) {
-                    h += '<button onclick="window.open(\'https://instagram.com/' + userInsta + '\',\'_blank\')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-xs font-medium text-warm-700 mb-2 active:scale-95 transition-all">📸 인스타그램</button>';
+                    h += '<button onclick="window.open(\'https://instagram.com/' + userInsta + '\',\'_blank\')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-xs font-medium text-warm-700 mt-2 active:scale-95 transition-all">📸 @' + userInsta + '</button>';
                 }
 
-                h += '<div class="flex justify-center gap-6 mb-4 text-center">';
-                h += '<div><div class="font-display text-lg font-bold text-warm-900">' + userPosts.length + '</div><div class="text-[10px] text-warm-500">코디</div></div>';
-                h += '<div><div class="font-display text-lg font-bold text-warm-900">' + fc.followers + '</div><div class="text-[10px] text-warm-500">팔로워</div></div>';
-                h += '<div><div class="font-display text-lg font-bold text-warm-900">' + fc.following + '</div><div class="text-[10px] text-warm-500">팔로잉</div></div>';
+                // 통계 (클릭 가능)
+                h += '<div class="flex justify-center gap-5 mt-4 mb-3">';
+                h += '<div class="text-center"><div class="font-display text-lg font-bold text-warm-900">' + pd.posts.length + '</div><div class="text-[10px] text-warm-500">코디</div></div>';
+                h += '<div class="text-center cursor-pointer" onclick="app.openFollowList(\'' + userId + '\',\'followers\')"><div class="font-display text-lg font-bold text-warm-900">' + pd.followers + '</div><div class="text-[10px] text-warm-500">팔로워</div></div>';
+                h += '<div class="text-center cursor-pointer" onclick="app.openFollowList(\'' + userId + '\',\'following\')"><div class="font-display text-lg font-bold text-warm-900">' + pd.following + '</div><div class="text-[10px] text-warm-500">팔로잉</div></div>';
                 h += '</div>';
-                h += followBtn;
+                if (isMe) {
+                    h += '<button onclick="app.goTo(\'profile\')" class="px-5 py-2 rounded-full text-xs font-semibold bg-white text-warm-700 border border-warm-400 active:scale-95 transition-all">프로필 편집</button>';
+                } else {
+                    h += followBtn;
+                }
                 h += '</div>';
 
-                // 유저의 코디 그리드
-                if (userPosts.length > 0) {
+                // 로딩 중
+                if (!pd.loaded) {
+                    h += '<div class="text-center py-10 text-warm-400 text-sm">불러오는 중...</div>';
+                    h += '</div>';
+                    return h;
+                }
+
+                // 유저의 공개 코디 그리드
+                if (pd.posts.length > 0) {
                     h += '<div class="border-t border-warm-300 pt-4 mt-2">';
-                    h += '<div class="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">코디 목록</div>';
+                    h += '<div class="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">공개 코디</div>';
                     h += '<div class="grid grid-cols-3 gap-1.5">';
-                    userPosts.forEach((post, idx) => {
-                        const realIdx = this.comm.posts.indexOf(post);
+                    pd.posts.forEach((post, idx) => {
                         const outfit = post.outfit || {};
                         const outfitHex = {};
                         Object.entries(outfit).forEach(([k,v]) => { if(v) outfitHex[k] = COLORS_60[v]?.hex || v; });
-                        const mn = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:50px');
-                        h += '<div class="bg-warm-200 rounded-xl p-2 flex justify-center items-center min-h-[70px] cursor-pointer active:scale-95 transition-transform" onclick="app.openCommDetail(' + realIdx + ')">' + mn + '</div>';
+                        const hasPhoto = post.photo_urls && post.photo_urls.length > 0;
+                        let thumb;
+                        if (hasPhoto) {
+                            thumb = '<img src="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl" onerror="this.style.display=\'none\'">';
+                        } else {
+                            thumb = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:55px');
+                        }
+                        // 클릭 시 상세로 이동 — comm.posts에 넣고 열기
+                        h += '<div class="bg-warm-200 rounded-xl overflow-hidden flex justify-center items-center cursor-pointer active:scale-95 transition-transform" style="min-height:80px;aspect-ratio:1" onclick="app._openProfilePost(\'' + post.id + '\')">' + thumb + '</div>';
                     });
                     h += '</div></div>';
                 } else {
-                    h += '<div class="text-center py-8 text-warm-500 text-sm">이 유저의 공유된 코디가 피드에 없어요</div>';
+                    h += '<div class="text-center py-10 text-warm-400 text-sm">공개된 코디가 없어요</div>';
                 }
-
-                h += '</div>';
 
                 // 차단 버튼 (본인 아닐 때)
                 if (!isMe && auth.user) {
                     const isBlocked = this._blockedUsers.has(userId);
-                    h += '<div class="border-t border-warm-300 pt-3 mt-2">';
+                    h += '<div class="border-t border-warm-300 pt-3 mt-4">';
                     h += '<button onclick="app.commToggleBlock(\'' + userId + '\')" class="w-full py-2.5 text-xs text-center ' + (isBlocked ? 'text-warm-600' : 'text-red-400') + ' active:opacity-60 transition-all">' + (isBlocked ? '🚫 차단 해제' : '🚫 이 유저 차단하기') + '</button>';
                     h += '</div>';
                 }
@@ -14819,7 +14860,175 @@
                 return h;
             },
 
-            // ── 차단 시스템 ──
+            async _openProfilePost(postId) {
+                // 프로필에서 게시물 클릭 시 상세 보기
+                const pd = this._userProfileData;
+                if (!pd) return;
+                const post = pd.posts.find(p => p.id === postId);
+                if (!post) return;
+                // profiles 정보 첨부
+                if (!post.profiles && pd.profile) {
+                    post.profiles = { nickname: pd.profile.nickname, avatar_url: pd.profile.avatar_url, instagram_id: pd.profile.instagram_id };
+                }
+                // comm.posts에 없으면 추가
+                const existIdx = this.comm.posts.findIndex(p => p.id === postId);
+                if (existIdx >= 0) {
+                    this.openCommDetail(existIdx);
+                } else {
+                    this.comm.posts.push(post);
+                    this.openCommDetail(this.comm.posts.length - 1);
+                }
+            },
+
+            // ============================================================
+            // 팔로워/팔로잉 리스트 + 유저 검색
+            // ============================================================
+            _followListUserId: null,
+            _followListTab: 'followers',
+            _followListData: null,
+            _userSearchQuery: '',
+            _userSearchResults: null,
+
+            openFollowList(userId, tab) {
+                this._followListUserId = userId;
+                this._followListTab = tab || 'followers';
+                this._followListData = null;
+                this._userSearchQuery = '';
+                this._userSearchResults = null;
+                this.goTo('follow-list');
+            },
+
+            renderFollowList() {
+                const userId = this._followListUserId;
+                const tab = this._followListTab;
+                if (!userId) return '<div class="screen active"><div class="text-center py-10 text-warm-500">잘못된 접근이에요</div></div>';
+
+                // 비동기 데이터 로드
+                if (!this._followListData || this._followListData.userId !== userId || this._followListData.tab !== tab) {
+                    this._followListData = { userId, tab, users: [], loaded: false };
+                    if (sb) {
+                        (async () => {
+                            try {
+                                let userIds = [];
+                                if (tab === 'followers') {
+                                    const { data } = await sb.from('follows').select('follower_id').eq('following_id', userId);
+                                    userIds = (data || []).map(f => f.follower_id);
+                                } else {
+                                    const { data } = await sb.from('follows').select('following_id').eq('follower_id', userId);
+                                    userIds = (data || []).map(f => f.following_id);
+                                }
+                                if (userIds.length > 0) {
+                                    const { data: profiles } = await sb.from('profiles').select('id, nickname, avatar_url, instagram_id').in('id', userIds);
+                                    this._followListData.users = profiles || [];
+                                }
+                                this._followListData.loaded = true;
+                                this.render();
+                            } catch(e) { console.error('Follow list error:', e); }
+                        })();
+                    }
+                }
+                const fd = this._followListData;
+
+                // 탭 버튼
+                const tabs = [['followers','팔로워'],['following','팔로잉']];
+                let tabHtml = '<div class="flex gap-1.5 mb-4">';
+                tabs.forEach(t => {
+                    tabHtml += '<button class="flex-1 py-2.5 rounded-full text-xs font-semibold transition-all ' +
+                        (tab === t[0] ? 'bg-terra-500 text-white' : 'bg-white border border-warm-400 text-warm-700 active:scale-95') +
+                        '" onclick="app._followListTab=\'' + t[0] + '\';app._followListData=null;app.render()">' + t[1] +
+                        (fd.loaded ? ' ' + fd.users.length : '') + '</button>';
+                });
+                tabHtml += '</div>';
+
+                // 유저 검색
+                let searchHtml = '<div class="relative mb-4">';
+                searchHtml += '<input type="text" placeholder="닉네임 또는 인스타 ID로 검색" value="' + escapeHtml(this._userSearchQuery) + '" oninput="app._userSearchQuery=this.value" onkeydown="if(event.key===\'Enter\')app._doUserSearch()" class="w-full pl-10 pr-16 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-colors">';
+                searchHtml += '<i data-lucide="search" style="width:16px;height:16px;color:#A8A29E" class="absolute left-3.5 top-1/2 -translate-y-1/2"></i>';
+                searchHtml += '<button onclick="app._doUserSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-terra-500 text-white text-[11px] font-semibold rounded-xl active:scale-95 transition-all">검색</button>';
+                searchHtml += '</div>';
+
+                // 검색 결과
+                let searchResultHtml = '';
+                if (this._userSearchResults !== null) {
+                    if (this._userSearchResults.length === 0) {
+                        searchResultHtml = '<div class="text-center py-4 text-warm-400 text-xs mb-4">검색 결과가 없어요</div>';
+                    } else {
+                        searchResultHtml = '<div class="mb-4 bg-terra-50 border border-terra-200 rounded-2xl px-3 py-2">';
+                        searchResultHtml += '<div class="text-[10px] text-terra-600 uppercase tracking-wider font-semibold mb-2 px-1">검색 결과</div>';
+                        this._userSearchResults.forEach(u => {
+                            searchResultHtml += this._renderFollowUserRow(u, true);
+                        });
+                        searchResultHtml += '</div>';
+                    }
+                }
+
+                // 메인 리스트
+                let listHtml = '';
+                if (!fd.loaded) {
+                    listHtml = '<div class="text-center py-10 text-warm-400 text-sm">불러오는 중...</div>';
+                } else if (fd.users.length === 0) {
+                    listHtml = '<div class="text-center py-10"><div class="text-3xl mb-2">' + (tab === 'followers' ? '👥' : '📭') + '</div><div class="text-sm text-warm-500">' + (tab === 'followers' ? '아직 팔로워가 없어요' : '아직 팔로잉하는 유저가 없어요') + '</div></div>';
+                } else {
+                    fd.users.forEach(u => {
+                        listHtml += this._renderFollowUserRow(u, false);
+                    });
+                }
+
+                return '<div class="screen active">' + tabHtml + searchHtml + searchResultHtml + listHtml + '</div>';
+            },
+
+            _renderFollowUserRow(u, isSearch) {
+                const uid = u.id;
+                const nick = escapeHtml(u.nickname || '유저');
+                const avatar = escapeHtml(u.avatar_url || '');
+                const insta = escapeHtml(u.instagram_id || '');
+                const initial = nick.charAt(0).toUpperCase();
+                const isMe = auth.user && auth.user.id === uid;
+                const iFollow = this.comm.myFollows.has(uid);
+                const isMut = this._isFriend(uid);
+
+                let badge = '';
+                let btn = '';
+                if (isMe) {
+                    badge = '<span class="text-[9px] bg-warm-200 text-warm-600 px-2 py-0.5 rounded-full">나</span>';
+                } else if (isMut) {
+                    badge = '<span class="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">👫 친구</span>';
+                    btn = '<button onclick="event.stopPropagation();app.commToggleFollow(\'' + uid + '\')" class="flex-shrink-0 px-3 py-1.5 text-[11px] font-semibold bg-warm-100 text-warm-600 border border-warm-300 rounded-xl active:scale-95 transition-all">팔로잉</button>';
+                } else if (iFollow) {
+                    btn = '<button onclick="event.stopPropagation();app.commToggleFollow(\'' + uid + '\')" class="flex-shrink-0 px-3 py-1.5 text-[11px] font-semibold bg-warm-100 text-warm-600 border border-warm-300 rounded-xl active:scale-95 transition-all">팔로잉</button>';
+                } else {
+                    const highlight = (this._followListTab === 'followers' && !isSearch) ? ' ring-1 ring-terra-300' : '';
+                    btn = '<button onclick="event.stopPropagation();app.commToggleFollow(\'' + uid + '\')" class="flex-shrink-0 px-3 py-1.5 text-[11px] font-semibold bg-terra-500 text-white rounded-xl active:scale-95 transition-all shadow-sm' + highlight + '">팔로우</button>';
+                }
+
+                let row = '<div class="flex items-center gap-3 py-3 border-b border-warm-200 last:border-b-0 cursor-pointer active:bg-warm-100/50 transition-colors" onclick="app.openUserProfile(\'' + uid + '\')">';
+                row += avatar
+                    ? '<img src="' + avatar + '" class="w-11 h-11 rounded-full object-cover border border-warm-300 flex-shrink-0" onerror="this.outerHTML=\'<div class=\\\'w-11 h-11 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-sm flex-shrink-0\\\'>' + initial + '</div>\'">'
+                    : '<div class="w-11 h-11 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-sm flex-shrink-0">' + initial + '</div>';
+                row += '<div class="flex-1 min-w-0">';
+                row += '<div class="flex items-center gap-1.5"><span class="text-sm font-semibold text-warm-900 truncate">' + nick + '</span>' + badge + '</div>';
+                if (insta) row += '<div class="text-[11px] text-warm-400 truncate">@' + insta + '</div>';
+                row += '</div>';
+                row += btn;
+                row += '</div>';
+                return row;
+            },
+
+            async _doUserSearch() {
+                const q = (this._userSearchQuery || '').trim();
+                if (q.length < 2) { spToast('2글자 이상 입력해주세요'); return; }
+                if (!sb) return;
+                try {
+                    const { data } = await sb.from('profiles').select('id, nickname, avatar_url, instagram_id')
+                        .or('nickname.ilike.%' + q + '%,instagram_id.ilike.%' + q + '%')
+                        .limit(20);
+                    this._userSearchResults = data || [];
+                    this.render();
+                } catch(e) {
+                    console.error('User search error:', e);
+                    spToast('검색 중 오류가 발생했어요');
+                }
+            },
             _blockedUsers: new Set(),
             async _initBlocks() {
                 if (!sb || !auth.user) return;
