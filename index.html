@@ -13,6 +13,7 @@
         connect-src 'self' https://*.supabase.co https://api.open-meteo.com;
     ">
     <title>바루픽</title>
+    <link rel="icon" type="image/png" href="favicon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -9581,6 +9582,12 @@
                         <span class="text-[15px] text-warm-900 flex-1">설정</span>
                         ${svg("chevron-right", 16, "#D6D3D1")}
                     </button>
+                    <button id="pwa-install-btn" onclick="app.installPWA()" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors" style="display:none">
+                        ${svg("download", 18, "#A8A29E")}
+                        <span class="text-[15px] text-warm-900 flex-1">홈 화면에 추가</span>
+                        <span class="text-xs font-medium text-terra-600 bg-terra-100 px-2.5 py-1 rounded-full">앱처럼 사용</span>
+                        ${svg("chevron-right", 16, "#D6D3D1")}
+                    </button>
                     <button onclick="app.shareApp()" class="w-full flex items-center gap-3 py-3.5 text-left active:bg-warm-200/50 rounded-lg transition-colors">
                         ${svg("share", 18, "#A8A29E")}
                         <span class="text-[15px] text-warm-900 flex-1">앱 공유하기</span>
@@ -14502,18 +14509,97 @@
 
             commReport(postId) {
                 if (!auth.user) { this.goTo('auth-login'); return; }
-                const reasons = ['스팸','부적절한 콘텐츠','혐오 표현','기타'];
-                const reason = prompt('신고 사유를 선택해주세요:\\n1. 스팸\\n2. 부적절한 콘텐츠\\n3. 혐오 표현\\n4. 기타\\n\\n번호를 입력하세요:');
-                if (!reason) return;
-                const idx = parseInt(reason) - 1;
-                if (idx < 0 || idx > 3) { spToast('올바른 번호를 입력해주세요'); return; }
-                if (sb) {
-                    sb.from('reports').insert({ reporter_id: auth.user.id, post_id: postId, reason: reasons[idx] })
-                        .then(({error}) => {
-                            if (error && error.code === '23505') spToast('이미 신고한 게시물이에요');
-                            else if (error) spToast('신고 실패: ' + error.message);
-                            else spToast('신고가 접수되었어요 📋');
-                        });
+                this._showReportSheet(postId);
+            },
+
+            _showReportSheet(postId) {
+                // 기존 시트 제거
+                const old = document.getElementById('report-sheet');
+                if (old) old.remove();
+
+                const reasons = [
+                    { icon: '🚫', label: '스팸', desc: '광고, 반복 게시물' },
+                    { icon: '⚠️', label: '부적절한 콘텐츠', desc: '선정적이거나 불쾌한 내용' },
+                    { icon: '🚨', label: '혐오 표현', desc: '차별, 비하, 폭력적 표현' },
+                    { icon: '📝', label: '기타', desc: '직접 입력' }
+                ];
+
+                const sheet = document.createElement('div');
+                sheet.id = 'report-sheet';
+                sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+
+                // 배경
+                const bg = document.createElement('div');
+                bg.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.4);transition:opacity 0.2s';
+                bg.onclick = () => this._closeReportSheet();
+                sheet.appendChild(bg);
+
+                // 패널
+                const panel = document.createElement('div');
+                panel.style.cssText = 'position:relative;width:100%;max-width:500px;background:#FAFAF9;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1)';
+                panel.id = 'report-panel';
+
+                let h = '<div class="w-10 h-1 bg-warm-300 rounded-full mx-auto mb-4"></div>';
+                h += '<div class="text-[15px] font-bold text-warm-900 mb-1">신고 사유 선택</div>';
+                h += '<div class="text-xs text-warm-500 mb-4">해당하는 사유를 선택해주세요</div>';
+
+                reasons.forEach((r, i) => {
+                    h += '<button onclick="app._submitReport(\'' + postId + '\',' + i + ')" class="w-full flex items-center gap-3 py-3.5 border-b border-warm-200 text-left active:bg-warm-200/50 rounded-lg transition-colors">';
+                    h += '<span class="text-xl w-8 text-center">' + r.icon + '</span>';
+                    h += '<div class="flex-1"><div class="text-sm font-medium text-warm-900">' + r.label + '</div><div class="text-[11px] text-warm-500">' + r.desc + '</div></div>';
+                    h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D6D3D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+                    h += '</button>';
+                });
+
+                h += '<button onclick="app._closeReportSheet()" class="w-full py-3 mt-2 text-sm text-warm-500 text-center active:text-warm-700 transition-colors">취소</button>';
+
+                panel.innerHTML = h;
+                sheet.appendChild(panel);
+                document.body.appendChild(sheet);
+
+                // 애니메이션
+                requestAnimationFrame(() => {
+                    bg.style.opacity = '1';
+                    panel.style.transform = 'translateY(0)';
+                });
+            },
+
+            _closeReportSheet() {
+                const sheet = document.getElementById('report-sheet');
+                if (!sheet) return;
+                const panel = document.getElementById('report-panel');
+                const bg = sheet.querySelector('div');
+                if (panel) panel.style.transform = 'translateY(100%)';
+                if (bg) bg.style.opacity = '0';
+                setTimeout(() => sheet.remove(), 300);
+            },
+
+            async _submitReport(postId, idx) {
+                const reasons = ['스팸', '부적절한 콘텐츠', '혐오 표현', '기타'];
+                let reason = reasons[idx];
+
+                if (idx === 3) {
+                    // 기타: 직접 입력
+                    this._closeReportSheet();
+                    const custom = prompt('신고 사유를 입력해주세요:');
+                    if (!custom || !custom.trim()) return;
+                    reason = '기타: ' + custom.trim();
+                } else {
+                    this._closeReportSheet();
+                }
+
+                if (!sb) return;
+                try {
+                    const { error } = await sb.from('reports').insert({
+                        reporter_id: auth.user.id,
+                        post_id: postId,
+                        reason: reason
+                    });
+                    if (error && error.code === '23505') spToast('이미 신고한 게시물이에요');
+                    else if (error) spToast('신고 실패: ' + error.message);
+                    else spToast('신고가 접수되었어요 📋');
+                } catch(e) {
+                    spToast('신고 실패: ' + (e.message || ''));
                 }
             },
 
@@ -16400,6 +16486,61 @@
             app._initFollows();
             app._initNotifications();
             app._initBlocks();
+
+            // 서비스 워커 등록
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    reg.addEventListener('updatefound', () => {
+                        const nw = reg.installing;
+                        if (nw) nw.addEventListener('statechange', () => {
+                            if (nw.state === 'activated' && navigator.serviceWorker.controller) {
+                                console.log('바루픽 업데이트됨');
+                            }
+                        });
+                    });
+                }).catch(err => console.warn('SW 등록 실패:', err));
+            }
+
+            // PWA 설치 프롬프트
+            let _deferredInstall = null;
+            window.addEventListener('beforeinstallprompt', e => {
+                e.preventDefault();
+                _deferredInstall = e;
+                // 설치 버튼 표시
+                const btn = document.getElementById('pwa-install-btn');
+                if (btn) btn.style.display = '';
+            });
+            window.addEventListener('appinstalled', () => {
+                _deferredInstall = null;
+                const btn = document.getElementById('pwa-install-btn');
+                if (btn) btn.style.display = 'none';
+                spToast('홈 화면에 추가했어요! 🎉');
+            });
+            app.installPWA = async function() {
+                if (!_deferredInstall) {
+                    // iOS Safari 안내
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                    if (isIOS) {
+                        alert('Safari 하단의 공유 버튼(□↑)을 누른 후\n"홈 화면에 추가"를 선택해주세요.');
+                    } else {
+                        spToast('브라우저 메뉴에서 "홈 화면에 추가"를 선택해주세요');
+                    }
+                    return;
+                }
+                _deferredInstall.prompt();
+                const { outcome } = await _deferredInstall.userChoice;
+                if (outcome === 'accepted') {
+                    spToast('설치 완료! 🎉');
+                }
+                _deferredInstall = null;
+            };
+            // iOS에서도 설치 버튼 보이게
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.navigator.standalone) {
+                setTimeout(() => {
+                    const btn = document.getElementById('pwa-install-btn');
+                    if (btn) btn.style.display = '';
+                }, 1000);
+            }
 
             // 온보딩 체크 (#5)
             if (!localStorage.getItem('sp_onboarded')) {
