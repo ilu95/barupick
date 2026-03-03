@@ -8067,7 +8067,7 @@
                     const isShared = record.visibility === 'public' || record.visibility === 'friends';
                     try {
                         if (isShared) {
-                            // 사진 업로드
+                            // 사진 업로드 (최적화: 원본 1200px + 썸네일 400px)
                             let photoUrls = [];
                             const origPhotos = this.ootd.photos_orig || [];
                             const thumbPhotos = this.ootd.photos || [];
@@ -8075,28 +8075,10 @@
                                 const dataUrl = origPhotos[i] || thumbPhotos[i];
                                 if (!dataUrl) continue;
                                 try {
-                                    // data URL → Blob 직접 변환 (CSP connect-src 우회)
-                                    let blob;
-                                    if (dataUrl.startsWith('data:')) {
-                                        const [header, b64] = dataUrl.split(',');
-                                        const mime = header.match(/:(.*?);/)?.[1] || 'image/webp';
-                                        const binary = atob(b64);
-                                        const arr = new Uint8Array(binary.length);
-                                        for (let j = 0; j < binary.length; j++) arr[j] = binary.charCodeAt(j);
-                                        blob = new Blob([arr], { type: mime });
-                                    } else {
-                                        blob = await (await fetch(dataUrl)).blob();
-                                    }
-                                    // 5MB 초과 시 건너뛰기
-                                    if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large:', (blob.size/1024/1024).toFixed(1) + 'MB, skipping'); continue; }
-                                    const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
-                                    const ext = blob.type === 'image/png' ? '.png' : blob.type === 'image/jpeg' ? '.jpg' : '.webp';
-                                    const path = auth.user.id + '/' + uuid + ext;
-                                    const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: blob.type || 'image/webp', upsert: false });
-                                    if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
-                                    const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
-                                    photoUrls.push(urlData.publicUrl);
+                                    const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
+                                    if (result) photoUrls.push(result.url);
                                 } catch(photoErr) { console.warn('Photo processing error:', photoErr); }
+                            }
                             }
 
                             const outfit = {};
@@ -14691,7 +14673,7 @@
 
                     if (hasPhoto) {
                         h += '<div class="bg-warm-100 flex items-center justify-center" style="aspect-ratio:4/5">';
-                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.parentElement.innerHTML=\'<div class=\\\'w-full h-full flex items-center justify-center text-warm-400 text-3xl\\\'>🎨</div>\'">';
+                        h += '<img data-src="' + this._getThumbUrl(photoUrl) + '" data-full="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.src=this.dataset.full||this.src">';
                         h += '</div>';
                     } else {
                         h += '<div class="flex justify-center items-center bg-warm-100 py-4" style="aspect-ratio:4/5">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:120px') + '</div>';
@@ -14762,7 +14744,7 @@
                     // 사진 모드: 이미지만 표시 (크롭 비율 유지, 잘림 방지)
                     if (hasPhoto) {
                         h += '<div class="bg-warm-100 flex items-center justify-center" style="aspect-ratio:4/5">';
-                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.parentElement.innerHTML=\'<div class=\\\'w-full h-full flex items-center justify-center text-warm-400 text-3xl\\\'>🎨</div>\'">';
+                        h += '<img data-src="' + this._getThumbUrl(photoUrl) + '" data-full="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.src=this.dataset.full||this.src">';
                         h += '</div>';
                     } else {
                         // 마네킹 모드: 마네킹만 크게 표시
@@ -15440,31 +15422,15 @@
                 if (btn) { btn.disabled = true; btn.textContent = '공유 중...'; }
 
                 try {
-                    // 사진 업로드
+                    // 사진 업로드 (최적화: 원본 1200px + 썸네일 400px)
                     let photoUrls = [];
                     const origPhotos = this.comm.postPhotos_orig || [];
                     const thumbPhotos = this.comm.postPhotos || [];
                     for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
                         const dataUrl = origPhotos[i] || thumbPhotos[i];
                         if (!dataUrl) continue;
-                        let blob;
-                        if (dataUrl.startsWith('data:')) {
-                            const [header, b64] = dataUrl.split(',');
-                            const mime = header.match(/:(.*?);/)?.[1] || 'image/webp';
-                            const binary = atob(b64);
-                            const arr = new Uint8Array(binary.length);
-                            for (let j = 0; j < binary.length; j++) arr[j] = binary.charCodeAt(j);
-                            blob = new Blob([arr], { type: mime });
-                        } else {
-                            blob = await (await fetch(dataUrl)).blob();
-                        }
-                        if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large, skipping'); continue; }
-                        const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
-                        const path = auth.user.id + '/' + uuid + '.webp';
-                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: blob.type || 'image/webp', upsert: false });
-                        if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
-                        const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
-                        photoUrls.push(urlData.publicUrl);
+                        const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
+                        if (result) photoUrls.push(result.url);
                     }
 
                     const caption = (document.getElementById('comm-caption')?.value || '').trim().slice(0, 200) || null;
@@ -15807,7 +15773,7 @@
                         const hasPhoto = post.photo_urls && post.photo_urls.length > 0;
                         let thumb;
                         if (hasPhoto) {
-                            thumb = '<img data-src="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl lazy-placeholder" onerror="this.style.display=\'none\'">';
+                            thumb = '<img data-src="' + escapeHtml(this._getThumbUrl(post.photo_urls[0])) + '" data-full="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl lazy-placeholder" onerror="this.src=this.dataset.full||this.src">';
                         } else {
                             thumb = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:55px');
                         }
@@ -16764,18 +16730,9 @@
                 if (this._eventSubmitPhotos && this._eventSubmitPhotos.length > 0) {
                     for (let i = 0; i < this._eventSubmitPhotos.length; i++) {
                         const dataUrl = this._eventSubmitPhotos[i];
-                        const path = auth.user.id + '/event_' + ev.id + '_' + Date.now() + '_' + i + '.webp';
-                        // dataURL → Blob (CSP-safe, no fetch)
-                        const parts = dataUrl.split(',');
-                        const mime = parts[0].match(/:(.*?);/)[1];
-                        const raw = atob(parts[1]);
-                        const arr = new Uint8Array(raw.length);
-                        for (let j = 0; j < raw.length; j++) arr[j] = raw.charCodeAt(j);
-                        const blob = new Blob([arr], { type: mime });
-                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: mime });
-                        if (upErr) { spToast('사진 업로드 실패'); console.error(upErr); return; }
-                        const { data: pub } = sb.storage.from('community').getPublicUrl(path);
-                        photoUrls.push(pub.publicUrl);
+                        const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
+                        if (result) photoUrls.push(result.url);
+                        else { spToast('사진 업로드 실패'); return; }
                     }
                 }
 
@@ -17731,6 +17688,80 @@
             },
 
             _urlBase64ToUint8Array(base64String) {
+
+            // ── 이미지 최적화 유틸 ──
+            _compressImage(src, maxPx, quality) {
+                // src: Image 객체 또는 data URL → Promise<Blob> (WebP)
+                return new Promise((resolve) => {
+                    const process = (img) => {
+                        let w = img.width, h = img.height;
+                        if (w > maxPx || h > maxPx) {
+                            const r = Math.min(maxPx / w, maxPx / h);
+                            w = Math.round(w * r); h = Math.round(h * r);
+                        }
+                        const c = document.createElement('canvas');
+                        c.width = w; c.height = h;
+                        c.getContext('2d').drawImage(img, 0, 0, w, h);
+                        c.toBlob((blob) => resolve(blob), 'image/webp', quality || 0.82);
+                    };
+                    if (src instanceof HTMLImageElement) { process(src); return; }
+                    // data URL
+                    const img = new Image();
+                    img.onload = () => process(img);
+                    img.onerror = () => resolve(null);
+                    img.src = src;
+                });
+            },
+
+            async _uploadOptimized(bucket, dataUrl, userId) {
+                // 원본(max 1200px) + 썸네일(max 400px) 업로드
+                // returns { url, thumbUrl } or null
+                if (!sb || !dataUrl) return null;
+                try {
+                    const img = await new Promise((res, rej) => {
+                        const i = new Image();
+                        i.onload = () => res(i);
+                        i.onerror = rej;
+                        i.src = dataUrl;
+                    });
+
+                    const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+                    const basePath = userId + '/' + uuid;
+
+                    // 원본 (max 1200px, WebP 0.82)
+                    const mainBlob = await this._compressImage(img, 1200, 0.82);
+                    if (!mainBlob) return null;
+                    const mainPath = basePath + '.webp';
+                    const { error: e1 } = await sb.storage.from(bucket).upload(mainPath, mainBlob, { contentType: 'image/webp', upsert: false });
+                    if (e1) { console.warn('Upload main error:', e1.message); return null; }
+                    const { data: d1 } = sb.storage.from(bucket).getPublicUrl(mainPath);
+
+                    // 썸네일 (max 400px, WebP 0.72)
+                    const thumbBlob = await this._compressImage(img, 400, 0.72);
+                    const thumbPath = basePath + '_thumb.webp';
+                    if (thumbBlob) {
+                        await sb.storage.from(bucket).upload(thumbPath, thumbBlob, { contentType: 'image/webp', upsert: false }).catch(() => {});
+                    }
+                    const { data: d2 } = sb.storage.from(bucket).getPublicUrl(thumbPath);
+
+                    return { url: d1.publicUrl, thumbUrl: d2.publicUrl };
+                } catch(e) {
+                    console.warn('_uploadOptimized error:', e);
+                    return null;
+                }
+            },
+
+            _getThumbUrl(photoUrl) {
+                // photo URL → 썸네일 URL 변환
+                if (!photoUrl) return '';
+                // 이미 _thumb이면 그대로
+                if (photoUrl.includes('_thumb.')) return photoUrl;
+                // .webp → _thumb.webp
+                return photoUrl.replace(/\.webp(\?.*)?$/, '_thumb.webp$1')
+                               .replace(/\.jpg(\?.*)?$/, '_thumb.webp$1')
+                               .replace(/\.jpeg(\?.*)?$/, '_thumb.webp$1')
+                               .replace(/\.png(\?.*)?$/, '_thumb.webp$1');
+            },
                 const padding = '='.repeat((4 - base64String.length % 4) % 4);
                 const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
                 const rawData = window.atob(base64);
