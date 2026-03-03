@@ -6653,7 +6653,7 @@
         const app = {
             screenHistory: [],
             currentScreen: 'home',
-            comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'all', page: 0, hasMore: true, loading: false, detail: null, _detailSource: 'all', myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit', tab: 'all', friendsMode: 'mutual', rankingMode: 'weekly', postPhotos: [], postPhotos_orig: [], newPost: { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false } },
+            comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'photo', page: 0, hasMore: true, loading: false, detail: null, _detailSource: 'all', myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit', tab: 'all', friendsMode: 'mutual', rankingMode: 'weekly', postPhotos: [], postPhotos_orig: [], newPost: { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false } },
             // 이벤트 시스템
             _eventData: null, _eventSubs: null, _eventVotes: null, _eventMyVote: null, _eventViewMode: 'grid', _eventShuffle: null,
             _vizCollapsed: false,
@@ -14258,7 +14258,7 @@
                     const sorts = [['latest','최신순'],['popular','인기순']];
                     let sortHtml = sorts.map(s => '<button class="px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (this.comm.sort===s[0]?'bg-warm-900 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetSort(\'' + s[0] + '\')">' + s[1] + '</button>').join('');
 
-                    const cFilters = [['all','전부'],['photo','📷 사진'],['mannequin','👤 마네킹']];
+                    const cFilters = [['photo','📷 사진'],['mannequin','👤 마네킹']];
                     let cFilterHtml = cFilters.map(f => '<button class="px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (this.comm.contentFilter===f[0]?'bg-terra-500 text-white':'bg-white border border-warm-400 text-warm-700 active:scale-95') + '" onclick="app.commSetContentFilter(\'' + f[0] + '\')">' + f[1] + '</button>').join('');
 
                     // 스타일 필터 (가로 스크롤)
@@ -14663,12 +14663,11 @@
                     h += '<div class="absolute top-1.5 left-1.5 z-10 bg-white/90 rounded-lg px-1.5 py-0.5 text-xs font-bold shadow-sm">' + medal + '</div>';
 
                     if (hasPhoto) {
-                        h += '<div class="relative bg-warm-200" style="aspect-ratio:4/5">';
-                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-cover lazy-placeholder" onerror="this.style.display=\'none\'">';
-                        h += '<div class="absolute bottom-1 right-1 bg-white/90 rounded-lg p-0.5 shadow-sm">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:32px') + '</div>';
+                        h += '<div class="bg-warm-100 flex items-center justify-center" style="aspect-ratio:4/5">';
+                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.parentElement.innerHTML=\'<div class=\\\'w-full h-full flex items-center justify-center text-warm-400 text-3xl\\\'>🎨</div>\'">';
                         h += '</div>';
                     } else {
-                        h += '<div class="flex justify-center items-center px-2 pt-3 pb-1 bg-warm-200 min-h-[90px]">' + mn + '</div>';
+                        h += '<div class="flex justify-center items-center bg-warm-100 py-4" style="aspect-ratio:4/5">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:120px') + '</div>';
                     }
 
                     h += '<div class="px-2.5 pt-2 pb-2.5">';
@@ -14701,7 +14700,7 @@
                     ? (this.comm.friendsMode === 'mutual'
                         ? '서로 팔로우한 친구의 코디가 없어요<br><span class=\'text-[11px] text-warm-400 block mt-2\'>팔로잉 탭에서 더 많은 코디를 확인해보세요</span>'
                         : '팔로잉한 유저의 코디가 없어요<br><span class=\'text-[11px] text-warm-400 block mt-2\'>유저 검색에서 새로운 스타일을 발견해보세요</span>')
-                    : (this.comm.styleFilter ? '"' + (STYLE_GUIDE[this.comm.styleFilter]?.name || this.comm.styleFilter) + '" 스타일의 코디가 없어요' : (this.comm.contentFilter !== 'all' ? '이 필터에 맞는 코디가 없어요' : '아직 공유된 코디가 없어요<br>첫 번째로 공유해보세요!'));
+                    : (this.comm.styleFilter ? '"' + (STYLE_GUIDE[this.comm.styleFilter]?.name || this.comm.styleFilter) + '" 스타일의 코디가 없어요' : (this.comm.contentFilter === 'mannequin' ? '마네킹 코디가 없어요' : '아직 사진 코디가 없어요<br>첫 번째로 공유해보세요!'));
 
                 if (filtered.length === 0) {
                     grid.innerHTML = '';
@@ -14733,14 +14732,14 @@
 
                     h += '<div class="bg-white rounded-[14px] border border-warm-400 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm" onclick="app.openCommDetail(' + realIdx + ')">';
 
-                    // 사진 + 마네킹 동시 표시
+                    // 사진 모드: 이미지만 표시 (크롭 비율 유지, 잘림 방지)
                     if (hasPhoto) {
-                        h += '<div class="relative bg-warm-200" style="aspect-ratio:4/5">';
-                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-cover lazy-placeholder" onerror="this.style.display=\'none\'">';
-                        h += '<div class="absolute bottom-1 right-1 bg-white/90 rounded-lg p-0.5 shadow-sm">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:32px') + '</div>';
+                        h += '<div class="bg-warm-100 flex items-center justify-center" style="aspect-ratio:4/5">';
+                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.parentElement.innerHTML=\'<div class=\\\'w-full h-full flex items-center justify-center text-warm-400 text-3xl\\\'>🎨</div>\'">';
                         h += '</div>';
                     } else {
-                        h += '<div class="flex justify-center items-center px-2 pt-3 pb-1 bg-warm-200 min-h-[90px]">' + mn + '</div>';
+                        // 마네킹 모드: 마네킹만 크게 표시
+                        h += '<div class="flex justify-center items-center bg-warm-100 py-4" style="aspect-ratio:4/5">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:120px') + '</div>';
                     }
 
                     h += '<div class="px-2.5 pt-2 pb-2.5">';
