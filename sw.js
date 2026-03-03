@@ -1,6 +1,6 @@
-// 바루픽 Service Worker
-const CACHE_NAME = 'barupick-v1';
-const SHELL_CACHE = 'barupick-shell-v1';
+// 바루픽 Service Worker v2 (Push Notifications)
+const CACHE_NAME = 'barupick-v2';
+const SHELL_CACHE = 'barupick-shell-v2';
 const IMG_CACHE = 'barupick-img-v1';
 
 // 앱 셸 (필수 파일)
@@ -44,7 +44,96 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// 요청 처리
+// ── 푸시 알림 수신 ──
+self.addEventListener('push', e => {
+  if (!e.data) return;
+
+  let payload;
+  try {
+    payload = e.data.json();
+  } catch (err) {
+    payload = { title: '바루픽', body: e.data.text() || '새 알림이 있어요' };
+  }
+
+  const typeIcons = {
+    like: '❤️', comment: '💬', follow: '👤',
+    friend: '👫', save: '💾', system: '📢'
+  };
+  const emoji = typeIcons[payload.type] || '🔔';
+  const title = payload.title || '바루픽';
+  const body = (emoji + ' ' + (payload.body || '새 알림이 있어요')).trim();
+
+  const options = {
+    body: body,
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    tag: payload.noti_id || 'barupick-' + Date.now(),
+    renotify: true,
+    vibrate: [100, 50, 100],
+    data: {
+      type: payload.type || 'system',
+      related_id: payload.related_id || null,
+      url: '/'
+    },
+    actions: payload.type === 'follow' || payload.type === 'friend'
+      ? [{ action: 'view', title: '프로필 보기' }]
+      : payload.type === 'like' || payload.type === 'comment' || payload.type === 'save'
+        ? [{ action: 'view', title: '게시물 보기' }]
+        : []
+  };
+
+  e.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// ── 알림 클릭 처리 ──
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+
+  const data = e.notification.data || {};
+  let targetUrl = '/';
+
+  // 타입별 딥링크 (앱 내 라우팅은 클라이언트에서 처리)
+  if (data.type === 'follow' || data.type === 'friend') {
+    targetUrl = '/?screen=notifications';
+  } else if (data.related_id && (data.type === 'like' || data.type === 'comment' || data.type === 'save')) {
+    targetUrl = '/?screen=notifications';
+  } else {
+    targetUrl = '/?screen=notifications';
+  }
+
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // 이미 열려있는 창 포커스
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.focus();
+          client.postMessage({ type: 'PUSH_CLICK', data: data });
+          return;
+        }
+      }
+      // 없으면 새 창 열기
+      return clients.openWindow(targetUrl);
+    })
+  );
+});
+
+// ── 푸시 구독 변경 (브라우저가 구독 갱신 시) ──
+self.addEventListener('pushsubscriptionchange', e => {
+  e.waitUntil(
+    self.registration.pushManager.subscribe(e.oldSubscription.options).then(sub => {
+      // 새 구독 정보를 서버에 전달
+      return fetch('/api/push-resubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub.toJSON())
+      }).catch(() => {});
+    })
+  );
+});
+
+// ── 요청 처리 (캐싱) ──
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
@@ -77,6 +166,13 @@ self.addEventListener('fetch', e => {
 
   // 기타 → stale-while-revalidate
   e.respondWith(staleWhileRevalidate(e.request, CACHE_NAME));
+});
+
+// ── 클라이언트 메시지 수신 ──
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // ── 전략 함수들 ──
