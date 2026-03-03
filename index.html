@@ -10,7 +10,7 @@
         style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: blob: https://storage.googleapis.com https://*.supabase.co;
-        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com data: blob:;
+        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com https://cdn.jsdelivr.net data: blob:;
     ">
     <title>바루픽</title>
     <link rel="icon" type="image/png" href="favicon.png">
@@ -8078,7 +8078,6 @@
                                     const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
                                     if (result) photoUrls.push(result.url);
                                 } catch(photoErr) { console.warn('Photo processing error:', photoErr); }
-                            }
                             }
 
                             const outfit = {};
@@ -18408,21 +18407,24 @@
                 return `<div class="screen active">
                     <div class="prose-sm text-warm-800 leading-relaxed">
                         <h2 class="font-display text-xl font-bold text-warm-900 mb-4">개인정보처리방침</h2>
-                        <p class="text-xs text-warm-500 mb-4">시행일: 2025년 3월 1일 | 최종 수정: 2025년 3월 1일</p>
+                        <p class="text-xs text-warm-500 mb-4">시행일: 2025년 3월 1일 | 최종 수정: 2026년 3월 3일</p>
+
+                        <p class="text-sm mb-4">바루픽(이하 "서비스")은 이용자의 개인정보를 중요시하며, 개인정보보호법 등 관련 법령을 준수합니다.</p>
 
                         <div class="mb-4">
                             <h3 class="text-sm font-bold text-warm-900 mb-2">1. 수집하는 개인정보 항목</h3>
-                            <p class="text-sm mb-1"><strong>필수:</strong> 이메일 주소, 닉네임, 비밀번호(암호화)</p>
-                            <p class="text-sm mb-1"><strong>선택:</strong> 프로필 사진, 퍼스널컬러 진단 결과, 체형 정보, OOTD 사진</p>
-                            <p class="text-sm"><strong>자동 수집:</strong> 기기 정보, 접속 로그, 서비스 이용 기록</p>
+                            <p class="text-sm mb-1"><strong>필수:</strong> 이메일 주소, 비밀번호(암호화 저장)</p>
+                            <p class="text-sm mb-1"><strong>선택:</strong> 닉네임, 프로필 사진, 퍼스널컬러 진단 결과, 체형 정보, OOTD 사진, 코디 기록</p>
+                            <p class="text-sm"><strong>자동 수집:</strong> 기기 식별 정보, 푸시 토큰, 접속 로그</p>
                         </div>
 
                         <div class="mb-4">
                             <h3 class="text-sm font-bold text-warm-900 mb-2">2. 수집 및 이용 목적</h3>
                             <p class="text-sm mb-1">• 회원 가입·인증 및 회원 관리</p>
-                            <p class="text-sm mb-1">• 맞춤형 코디 추천 서비스 제공</p>
-                            <p class="text-sm mb-1">• 커뮤니티 서비스 운영 (코디 공유, 좋아요, 팔로우)</p>
-                            <p class="text-sm">• 서비스 개선 및 통계 분석</p>
+                            <p class="text-sm mb-1">• 맞춤형 AI 코디 추천 서비스 제공</p>
+                            <p class="text-sm mb-1">• 커뮤니티 서비스 운영 (코디 공유, 좋아요, 댓글, 팔로우)</p>
+                            <p class="text-sm mb-1">• 푸시 알림 발송 (좋아요, 댓글, 팔로우, 이벤트 알림)</p>
+                            <p class="text-sm">• 서비스 개선, 이용 통계 분석, 부정 이용 방지</p>
                         </div>
 
                         <div class="mb-4">
@@ -18438,20 +18440,44 @@
                         </div>
 
                         <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">5. 개인정보의 파기</h3>
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">5. 개인정보 처리 위탁</h3>
+                            <p class="text-sm mb-1">• Supabase Inc. — 데이터베이스 호스팅 및 사용자 인증</p>
+                            <p class="text-sm">• Google Cloud Platform — 이미지 저장 및 CDN</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">6. 개인정보의 파기</h3>
                             <p class="text-sm">보유 기간이 경과하거나 처리 목적이 달성된 경우, 해당 개인정보를 지체 없이 파기합니다. 전자적 파일은 복구 불가능한 방법으로 삭제하며, 종이 문서는 분쇄합니다.</p>
                         </div>
 
                         <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">6. 이용자의 권리</h3>
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">7. 이용자의 권리</h3>
                             <p class="text-sm mb-1">• 개인정보 열람, 수정, 삭제 요청 권리</p>
                             <p class="text-sm mb-1">• 개인정보 처리 정지 요청 권리</p>
-                            <p class="text-sm">• 설정 > 계정 삭제를 통해 언제든지 탈퇴 가능</p>
+                            <p class="text-sm mb-1">• 설정 → 계정 삭제를 통해 언제든지 탈퇴 가능</p>
+                            <p class="text-sm">• 설정 → 데이터 백업으로 데이터 이동 가능</p>
                         </div>
 
                         <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">7. 개인정보보호 책임자</h3>
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">8. 만 14세 미만 아동의 개인정보</h3>
+                            <p class="text-sm">바루픽은 만 14세 미만 아동의 회원가입을 제한하며, 아동의 개인정보를 수집하지 않습니다.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">9. 개인정보 보호 조치</h3>
+                            <p class="text-sm mb-1">• 비밀번호 암호화(bcrypt) 저장</p>
+                            <p class="text-sm mb-1">• SSL/TLS 암호화 통신</p>
+                            <p class="text-sm">• Supabase Row Level Security(RLS) 적용</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">10. 개인정보보호 책임자</h3>
                             <p class="text-sm">이메일: stylepick.app@gmail.com</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">11. 개인정보처리방침 변경</h3>
+                            <p class="text-sm">본 방침이 변경될 경우, 시행일 7일 전 앱 내 공지를 통해 안내합니다.</p>
                         </div>
 
                         <div class="text-center mt-6">
