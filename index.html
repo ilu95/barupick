@@ -14067,7 +14067,15 @@
 
             deleteSavedOutfit(id) {
                 if (!confirm('이 코디를 삭제할까요?')) return;
-                var saved = this.getSavedOutfits().filter(function (s) { return s.id !== id; });
+                var saved = this.getSavedOutfits();
+                var item = saved.find(function(s) { return s.id === id; });
+                // 커뮤니티 북마크면 서버에서도 삭제
+                if (item && item.commPostId && sb && auth.user) {
+                    this.comm.myBookmarks.delete(item.commPostId);
+                    sb.from('bookmarks').delete().eq('user_id', auth.user.id).eq('post_id', item.commPostId).then(function(){}).catch(function(e){ console.warn('Bookmark delete error:', e); });
+                    sb.rpc('decrement_save_count', { p_post_id: item.commPostId }).catch(function(){});
+                }
+                saved = saved.filter(function (s) { return s.id !== id; });
                 try { localStorage.setItem('cs_saved', JSON.stringify(saved)); } catch (e) {}
                 this.render();
             },
@@ -14439,10 +14447,7 @@
                             (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
                         } catch(likeErr) {}
                     }
-                    const saved = this.getSavedOutfits();
-                    (data||[]).forEach(p => {
-                        if (saved.find(s => s.commPostId === p.id)) this.comm.myBookmarks.add(p.id);
-                    });
+                    // 내 북마크는 _initBookmarks에서 이미 로드됨 (서버 동기화)
 
                     if (myVer === this._commLoadVer) {
                         this.renderCommunityGrid();
@@ -15126,20 +15131,27 @@
             async commToggleBookmark(postId) {
                 const post = this.comm.posts.find(x=>x.id===postId) || this.comm.detail;
                 if (!post) return;
-                // localStorage cs_saved에 저장
-                const saved = this.getSavedOutfits();
-                const already = saved.find(s => s.commPostId === postId);
-                if (already) {
-                    // 이미 저장됨 → 제거
-                    const newSaved = saved.filter(s => s.commPostId !== postId);
-                    localStorage.setItem('cs_saved', JSON.stringify(newSaved));
+                if (!auth.user) { this.goTo('auth-login'); return; }
+
+                const isBookmarked = this.comm.myBookmarks.has(postId);
+
+                if (isBookmarked) {
+                    // 제거: 서버 → 로컬
                     this.comm.myBookmarks.delete(postId);
+                    if (sb) { try { await sb.from('bookmarks').delete().eq('user_id', auth.user.id).eq('post_id', postId); } catch(e) { console.warn('Bookmark delete error:', e); } }
+                    // localStorage 동기화
+                    const saved = this.getSavedOutfits().filter(s => s.commPostId !== postId);
+                    try { localStorage.setItem('cs_saved', JSON.stringify(saved)); } catch(e) {}
                     this.showShareToast('저장 목록에서 제거했어요');
                     // 서버 save_count 감소
                     if (sb) { try { await sb.rpc('decrement_save_count', { p_post_id: postId }); post.save_count = Math.max(0,(post.save_count||1)-1); } catch(e) {} }
                 } else {
-                    // 저장
+                    // 추가: 서버 → 로컬
+                    const saved = this.getSavedOutfits();
                     if (saved.length >= 50) { alert('저장 가능한 코디는 최대 50개입니다'); return; }
+                    this.comm.myBookmarks.add(postId);
+                    if (sb) { try { await sb.from('bookmarks').delete().eq('user_id', auth.user.id).eq('post_id', postId); await sb.from('bookmarks').insert({ user_id: auth.user.id, post_id: postId }); } catch(e) { console.warn('Bookmark insert error:', e); } }
+                    // localStorage 동기화 (저장 목록 표시용)
                     const nick = escapeHtml(post.profiles?.nickname) || '유저';
                     saved.unshift({
                         id: 'comm_' + Date.now(),
@@ -15154,8 +15166,7 @@
                         midType: 'knit',
                         createdAt: new Date().toISOString()
                     });
-                    localStorage.setItem('cs_saved', JSON.stringify(saved));
-                    this.comm.myBookmarks.add(postId);
+                    try { localStorage.setItem('cs_saved', JSON.stringify(saved)); } catch(e) {}
                     this.showShareToast('내 코디에 저장했어요! 💾');
                     // 서버 save_count 증가
                     if (sb) { try { await sb.rpc('increment_save_count', { p_post_id: postId }); post.save_count = (post.save_count||0)+1; } catch(e) {} }
@@ -15164,6 +15175,7 @@
                         this._sendNotification(post.user_id, 'save', (auth.profile?.nickname || '누군가') + ' 님이 회원님의 코디를 저장했어요', postId);
                     }
                 }
+                this._invalidateCommCache();
                 // 상세 화면이면 북마크 버튼만 갱신
                 if (this.screen === 'community-detail') {
                     const btns = document.querySelectorAll('[data-bookmark-btn]');
@@ -15504,6 +15516,58 @@
                     const friends = JSON.parse(localStorage.getItem('sp_friends') || '[]');
                     return friends.includes(userId);
                 } catch(e) { return false; }
+            },
+
+            // ── 북마크 (서버 동기화) ──
+            _initBookmarks() {
+                // localStorage에서 기존 커뮤니티 북마크 로드 (즉시 표시용)
+                try {
+                    const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]');
+                    saved.forEach(s => { if (s.commPostId) this.comm.myBookmarks.add(s.commPostId); });
+                } catch(e) {}
+                // 서버에서 동기화
+                this._syncBookmarksFromServer();
+            },
+            async _syncBookmarksFromServer() {
+                if (!sb || !auth.user) return;
+                try {
+                    const { data } = await sb.from('bookmarks').select('post_id').eq('user_id', auth.user.id);
+                    if (data) {
+                        this.comm.myBookmarks = new Set(data.map(b => b.post_id));
+                        // localStorage도 동기화: 서버에 있는데 로컬에 없는 것 추가
+                        const saved = this.getSavedOutfits();
+                        const localPostIds = new Set(saved.filter(s => s.commPostId).map(s => s.commPostId));
+                        const serverOnly = data.filter(b => !localPostIds.has(b.post_id)).map(b => b.post_id);
+                        if (serverOnly.length > 0) {
+                            // 서버에만 있는 북마크의 게시물 데이터 가져오기
+                            const { data: posts } = await sb.from('posts').select('id, outfit, score, style, layer_type, caption, profiles!posts_user_id_fkey(nickname)').in('id', serverOnly);
+                            if (posts) {
+                                posts.forEach(p => {
+                                    const nick = p.profiles?.nickname || '유저';
+                                    saved.unshift({
+                                        id: 'comm_' + p.id.slice(0, 8),
+                                        commPostId: p.id,
+                                        name: '@' + nick + '의 코디',
+                                        memo: p.caption || '',
+                                        outfit: p.outfit || {},
+                                        score: p.score || 0,
+                                        style: p.style || '',
+                                        layerType: p.layer_type || 'basic',
+                                        outerType: 'coat', midType: 'knit',
+                                        createdAt: new Date().toISOString()
+                                    });
+                                });
+                                try { localStorage.setItem('cs_saved', JSON.stringify(saved.slice(0, 50))); } catch(e) {}
+                            }
+                        }
+                        // 로컬에 있는데 서버에 없는 것 제거
+                        const serverPostIds = new Set(data.map(b => b.post_id));
+                        const cleaned = saved.filter(s => !s.commPostId || serverPostIds.has(s.commPostId));
+                        if (cleaned.length !== saved.length) {
+                            try { localStorage.setItem('cs_saved', JSON.stringify(cleaned)); } catch(e) {}
+                        }
+                    }
+                } catch(e) { console.warn('Bookmark sync error:', e); }
             },
 
             async commToggleFollow(userId) {
@@ -18677,6 +18741,7 @@
             }
 
             app._initFollows();
+            app._initBookmarks();
             app._initNotifications();
             app._initBlocks();
             app._initPush();
