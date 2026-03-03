@@ -6830,6 +6830,13 @@
             // 메인 렌더러
             // ============================================================
             render() {
+                try { this._renderInner(); } catch(e) {
+                    console.error('Render error:', e);
+                    const content = document.getElementById('content');
+                    if (content) content.innerHTML = '<div class="screen active"><div class="text-center py-16"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-4">화면 로딩 중 오류가 발생했어요</div><button onclick="app.render()" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">다시 시도</button></div></div>';
+                }
+            },
+            _renderInner() {
                 const content = document.getElementById('content');
                 const backBtn = document.getElementById('backBtn');
                 const homeBtn = document.getElementById('homeBtn');
@@ -7027,7 +7034,13 @@
                     case 'community':
                         headerTitle.textContent = '커뮤니티';
                         content.innerHTML = this.renderCommunity();
-                        this.communityLoad(this.comm.posts.length === 0);
+                        // auth가 아직 init 중이면 잠시 대기 후 로드
+                        if (!this._authReady && sb) {
+                            const waitAuth = new Promise(r => { if (this._authReady) r(); else { const orig = this._onAuthReady; this._onAuthReady = () => { if(orig) orig(); r(); }; setTimeout(r, 2000); }});
+                            waitAuth.then(() => this.communityLoad(this.comm.posts.length === 0));
+                        } else {
+                            this.communityLoad(this.comm.posts.length === 0);
+                        }
                         break;
                     case 'community-detail':
                         headerTitle.textContent = '코디 상세';
@@ -14353,10 +14366,13 @@
             },
 
             async communityLoad(reset) {
-                if (!sb) { document.getElementById('comm-status')&&(document.getElementById('comm-status').innerHTML='<div class="text-center py-10 text-warm-600"><div class="text-5xl mb-3">⚠️</div>서버에 연결할 수 없어요</div>'); return; }
-                if (this.comm.loading) return;
+                if (!sb) { document.getElementById('comm-status')&&(document.getElementById('comm-status').innerHTML='<div class="text-center py-10 text-warm-600"><div class="text-5xl mb-3">⚠️</div>서버에 연결할 수 없어요<br><button onclick="location.reload()" class="mt-3 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold">새로고침</button></div>'); return; }
+
+                // 로드 버전 관리: 새 로드 요청이 오면 이전 로드 결과 무시
+                this._commLoadVer = (this._commLoadVer || 0) + 1;
+                const myVer = this._commLoadVer;
+
                 if (reset) { this.comm.posts = []; this.comm.page = 0; this.comm.hasMore = true; const g = document.getElementById('comm-grid'); if(g) g.innerHTML=''; }
-                this.comm.loading = true;
                 const status = document.getElementById('comm-status');
                 if (status) status.innerHTML = '<div class="text-center py-8 text-warm-600 text-sm">불러오는 중...</div>';
 
@@ -14366,12 +14382,21 @@
                     const PAGE_SIZE = 20;
 
                     if (tab === 'ranking') {
-                        await this._loadRanking();
-                        this.comm.loading = false;
+                        await this._loadRanking(myVer);
                         return;
                     }
 
-                    let query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)');
+                    // FK 조인 결정 (캐싱)
+                    const fkMode = await this._getFkMode();
+                    let query;
+                    if (fkMode === 'explicit') {
+                        query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)');
+                    } else if (fkMode === 'simple') {
+                        query = sb.from('posts').select('*, profiles(nickname, avatar_url, instagram_id)');
+                    } else {
+                        query = sb.from('posts').select('*');
+                    }
+
                     query = query.eq('status', 'approved');
 
                     if (tab === 'friends' && auth.user) {
@@ -14381,17 +14406,16 @@
                             this.comm.posts = [];
                             this.comm.hasMore = false;
                             this.renderCommunityGrid();
-                            this.comm.loading = false;
+                            if (status) status.innerHTML = '';
                             return;
                         }
                         if (this.comm.friendsMode === 'mutual') {
-                            // 서로 팔로우만
                             const friends = JSON.parse(localStorage.getItem('sp_friends') || '[]');
                             if (friends.length === 0) {
                                 this.comm.posts = [];
                                 this.comm.hasMore = false;
                                 this.renderCommunityGrid();
-                                this.comm.loading = false;
+                                if (status) status.innerHTML = '';
                                 return;
                             }
                             query = query.in('user_id', friends);
@@ -14408,18 +14432,23 @@
 
                     query = query.range(this.comm.page * PAGE_SIZE, (this.comm.page+1) * PAGE_SIZE - 1);
 
-                    const { data, error } = await query;
+                    const { data, error } = await this._sbQuery(query);
                     if (error) throw error;
+
+                    // 버전 체크: 더 새로운 로드가 시작됐으면 결과 무시
+                    if (myVer !== this._commLoadVer) return;
 
                     this.comm.posts = this.comm.posts.concat(data || []);
                     this.comm.hasMore = (data||[]).length === PAGE_SIZE;
                     this.comm.page++;
 
-                    // 내 좋아요 로드 (서버)
+                    // 내 좋아요 로드 (서버) - 에러 무시
                     if (auth.user && data && data.length > 0) {
-                        const pids = data.map(p => p.id);
-                        const likesRes = await sb.from('likes').select('post_id').eq('user_id', auth.user.id).in('post_id', pids);
-                        (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
+                        try {
+                            const pids = data.map(p => p.id);
+                            const likesRes = await sb.from('likes').select('post_id').eq('user_id', auth.user.id).in('post_id', pids);
+                            (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
+                        } catch(likeErr) { /* 좋아요 로드 실패는 무시 */ }
                     }
                     // 내 저장 로드 (로컬)
                     const saved = this.getSavedOutfits();
@@ -14427,26 +14456,75 @@
                         if (saved.find(s => s.commPostId === p.id)) this.comm.myBookmarks.add(p.id);
                     });
 
-                    this.renderCommunityGrid();
+                    // 최종 버전 체크 후 렌더
+                    if (myVer === this._commLoadVer) {
+                        this.renderCommunityGrid();
+                    }
                 } catch(e) {
                     console.error('Community load error:', e);
-                    if (status) status.innerHTML = '<div class="text-center py-10 text-warm-600">로딩 실패: ' + (e.message||'') + '</div>';
+                    if (myVer !== this._commLoadVer) return;
+                    // FK 캐시가 틀렸을 수 있으니 리셋
+                    localStorage.removeItem('sp_fk_mode');
+                    this._fkVerified = null;
+                    const status2 = document.getElementById('comm-status');
+                    if (status2) status2.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-3">로딩 실패</div><button onclick="app.communityLoad(true)" class="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all">다시 시도</button></div>';
+                    // 자동 재시도 (3초 후, 최대 2회)
+                    this._commRetry = (this._commRetry || 0) + 1;
+                    if (this._commRetry <= 2) {
+                        setTimeout(() => { if (myVer === this._commLoadVer) this.communityLoad(true); }, 3000);
+                    }
                 }
-                this.comm.loading = false;
             },
 
-            async _loadRanking() {
+            // Supabase 쿼리 타임아웃 래퍼 (10초)
+            _sbQuery(query, timeoutMs) {
+                timeoutMs = timeoutMs || 10000;
+                return Promise.race([
+                    query,
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('쿼리 타임아웃 (' + (timeoutMs/1000) + '초)')), timeoutMs))
+                ]);
+            },
+
+            // FK 조인 모드 결정 (localStorage 캐싱)
+            async _getFkMode() {
+                // 이미 확인 완료
+                if (this._fkVerified) return this._fkVerified;
+                // localStorage 캐시 확인
+                const cached = localStorage.getItem('sp_fk_mode');
+                if (cached) { this._fkVerified = cached; return cached; }
+                // 명시적 FK 시도
+                try {
+                    const res = await this._sbQuery(sb.from('posts').select('id, profiles!posts_user_id_fkey(nickname)').limit(1), 5000);
+                    if (!res.error) { this._fkVerified = 'explicit'; localStorage.setItem('sp_fk_mode', 'explicit'); return 'explicit'; }
+                } catch(e) {}
+                // 단순 FK 시도
+                try {
+                    const res = await this._sbQuery(sb.from('posts').select('id, profiles(nickname)').limit(1), 5000);
+                    if (!res.error) { this._fkVerified = 'simple'; localStorage.setItem('sp_fk_mode', 'simple'); return 'simple'; }
+                } catch(e) {}
+                // 조인 없이
+                this._fkVerified = 'none';
+                localStorage.setItem('sp_fk_mode', 'none');
+                return 'none';
+            },
+
+            async _loadRanking(loadVer) {
                 const mode = this.comm.rankingMode;
                 const grid = document.getElementById('comm-grid');
                 const status = document.getElementById('comm-status');
                 if (!grid) return;
 
+                // FK 조인 결정
+                const fkMode = await this._getFkMode();
+                const profileSelect = fkMode === 'explicit' ? ', profiles!posts_user_id_fkey(nickname, avatar_url)' : fkMode === 'simple' ? ', profiles(nickname, avatar_url)' : '';
+
                 try {
                     if (mode === 'event') {
-                        // 이벤트 랭킹: 진행 중/예정/최근 종료 이벤트 표시
-                        const now = new Date().toISOString();
+                        // 이벤트 랭킹
                         const recent = new Date(Date.now() - 7 * 86400000).toISOString();
-                        const { data: events } = await sb.from('events').select('*').or('end_date.gte.' + recent).order('start_date', {ascending:false}).limit(10);
+                        const { data: events, error: evErr } = await this._sbQuery(sb.from('events').select('*').gte('end_date', recent).order('start_date', {ascending:false}).limit(10));
+                        if (evErr) throw evErr;
+                        if (loadVer !== this._commLoadVer) return;
                         if (!events || events.length === 0) {
                             grid.innerHTML = '';
                             if (status) status.innerHTML = '<div class="text-center py-16"><div class="text-4xl mb-3">🎉</div><div class="text-sm text-warm-600">이벤트가 없어요</div></div>';
@@ -14479,24 +14557,27 @@
 
                     if (mode === 'user') {
                         // 유저 랭킹: 누적 좋아요 합산
-                        const { data } = await sb.from('posts').select('user_id, likes_count, profiles!posts_user_id_fkey(nickname, avatar_url)').eq('status','approved');
+                        const { data, error: userErr } = await this._sbQuery(sb.from('posts').select('user_id, likes_count' + profileSelect).eq('status','approved'));
+                        if (userErr) throw userErr;
+                        if (loadVer !== this._commLoadVer) return;
                         if (!data) { grid.innerHTML = ''; return; }
-                        // 유저별 좋아요 합산
                         const userMap = {};
                         data.forEach(p => {
-                            if (!userMap[p.user_id]) userMap[p.user_id] = { nick: escapeHtml(p.profiles?.nickname)||'유저', avatar: escapeHtml(p.profiles?.avatar_url), likes: 0, posts: 0 };
+                            const prof = p.profiles || {};
+                            if (!userMap[p.user_id]) userMap[p.user_id] = { nick: escapeHtml(prof.nickname)||'유저', avatar: escapeHtml(prof.avatar_url), likes: 0, posts: 0 };
                             userMap[p.user_id].likes += (p.likes_count||0);
                             userMap[p.user_id].posts++;
                         });
                         // rpc가 없을 수 있으므로 안전하게 시도
                         try {
-                            const rpcRes = await sb.rpc('get_user_like_rankings', { lim: 20 });
+                            const rpcRes = await this._sbQuery(sb.rpc('get_user_like_rankings', { lim: 20 }), 5000);
                             if (rpcRes.data && Array.isArray(rpcRes.data)) {
                                 rpcRes.data.forEach(r => {
                                     if (userMap[r.user_id]) userMap[r.user_id].likes = r.total_likes || userMap[r.user_id].likes;
                                 });
                             }
                         } catch(rpcErr) { /* rpc 없으면 클라이언트 집계 사용 */ }
+                        if (loadVer !== this._commLoadVer) return;
                         let ranked = Object.entries(userMap).map(([id,u]) => ({id,...u})).sort((a,b)=>b.likes-a.likes).slice(0,20);
 
                         let h = '<div class="col-span-2 space-y-2">';
@@ -14520,7 +14601,7 @@
                     let startDate;
                     if (mode === 'weekly') {
                         const day = now.getDay();
-                        const diff = day === 0 ? 6 : day - 1; // 월요일 기준
+                        const diff = day === 0 ? 6 : day - 1;
                         startDate = new Date(now);
                         startDate.setDate(now.getDate() - diff);
                         startDate.setHours(0,0,0,0);
@@ -14528,29 +14609,36 @@
                         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
                     }
 
-                    const { data } = await sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url)')
+                    const { data, error: rankErr } = await this._sbQuery(sb.from('posts').select('*' + profileSelect)
                         .eq('status', 'approved')
                         .gte('created_at', startDate.toISOString())
                         .order('likes_count', {ascending:false})
-                        .limit(20);
+                        .limit(20));
+                    if (rankErr) throw rankErr;
+                    if (loadVer !== this._commLoadVer) return;
 
                     this.comm.posts = data || [];
                     this.comm.hasMore = false;
 
                     // 내 좋아요 로드
                     if (auth.user && data && data.length > 0) {
-                        const pids = data.map(p => p.id);
-                        const likesRes = await sb.from('likes').select('post_id').eq('user_id', auth.user.id).in('post_id', pids);
-                        (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
+                        try {
+                            const pids = data.map(p => p.id);
+                            const likesRes = await sb.from('likes').select('post_id').eq('user_id', auth.user.id).in('post_id', pids);
+                            (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
+                        } catch(likeErr) { /* 무시 */ }
                     }
 
-                    // 랭킹 번호 달아서 그리드에 표시
                     this._renderRankingGrid(data || []);
                     if (status) status.innerHTML = (data||[]).length === 0 ? '<div class="text-center py-10 text-warm-600 text-sm">' + (mode==='weekly'?'이번 주':'이번 달') + ' 랭킹 데이터가 없어요</div>' : '';
 
                 } catch(e) {
                     console.error('Ranking load error:', e);
-                    if (status) status.innerHTML = '<div class="text-center py-10 text-warm-600">랭킹 로딩 실패</div>';
+                    if (loadVer !== this._commLoadVer) return;
+                    // FK 캐시 리셋
+                    localStorage.removeItem('sp_fk_mode');
+                    this._fkVerified = null;
+                    if (status) status.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-3">랭킹 로딩 실패</div><button onclick="app.communityLoad(true)" class="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all">다시 시도</button></div>';
                 }
             },
 
@@ -15811,12 +15899,9 @@
                 if (!sb) return;
                 try {
                     const now = new Date().toISOString();
-                    // 진행중 + 예정
-                    const { data } = await sb.from('events').select('*').or('end_date.gte.' + now + ',start_date.gte.' + now).order('start_date', { ascending: true }).limit(5);
-                    this._activeEvents = (data || []).filter(e => {
-                        const end = new Date(e.end_date);
-                        return end >= new Date();
-                    });
+                    // 아직 종료되지 않은 이벤트 (진행중 + 예정)
+                    const { data } = await sb.from('events').select('*').gte('end_date', now).order('start_date', { ascending: true }).limit(5);
+                    this._activeEvents = data || [];
                     // 최근 종료 이벤트 (7일 이내 — 집계중 + 결과 발표 모두 포함)
                     const { data: recentEnded } = await sb.from('events').select('*').lt('end_date', now).gte('end_date', new Date(Date.now() - 7 * 86400000).toISOString()).order('end_date', { ascending: false }).limit(5);
                     if (recentEnded && recentEnded.length > 0) {
@@ -18560,7 +18645,34 @@
             }
             if (localStorage.getItem('sp_a11y_labels') === '1') document.documentElement.classList.add('a11y-labels');
 
-            await auth.init();
+            // 먼저 화면을 렌더하고, auth는 백그라운드에서 처리
+            const onboarded = !!localStorage.getItem('sp_onboarded');
+            if (onboarded) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetScreen = urlParams.get('screen');
+                if (targetScreen) {
+                    app.goTo(targetScreen);
+                    window.history.replaceState({}, '', '/');
+                } else {
+                    app.render();
+                }
+            }
+
+            // auth 초기화 (타임아웃 5초)
+            try {
+                await Promise.race([
+                    auth.init(),
+                    new Promise(r => setTimeout(r, 5000))
+                ]);
+            } catch(e) { console.warn('Auth init timeout or error:', e); }
+
+            // auth 완료 후 재렌더 (로그인 상태 반영)
+            app._authReady = true;
+            if (app._onAuthReady) { app._onAuthReady(); app._onAuthReady = null; }
+            if (auth.user) {
+                app.render();
+            }
+
             app._initFollows();
             app._initNotifications();
             app._initBlocks();
@@ -18622,19 +18734,8 @@
             }
 
             // 온보딩 체크 (#5)
-            if (!localStorage.getItem('sp_onboarded')) {
+            if (!onboarded) {
                 app.showOnboarding();
-            } else {
-                // 푸시 알림 클릭에서 온 경우 해당 화면으로 이동
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetScreen = urlParams.get('screen');
-                if (targetScreen) {
-                    app.goTo(targetScreen);
-                    // URL 파라미터 제거
-                    window.history.replaceState({}, '', '/');
-                } else {
-                    app.render();
-                }
             }
         });
 
