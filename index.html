@@ -6788,11 +6788,7 @@
                 const notiBadge = document.getElementById('notiBadge');
                 if (notiBtn) {
                     notiBtn.style.display = '';
-                    const unread = this.notifications.filter(n => !n.read).length;
-                    if (notiBadge) {
-                        notiBadge.style.display = unread > 0 ? '' : 'none';
-                        notiBadge.textContent = unread > 9 ? '9+' : unread;
-                    }
+                    this._renderNotiBadge();
                 }
 
                 // 빛 진단 다크 테마일 때 헤더 숨기기
@@ -9136,7 +9132,7 @@
                         <span class="text-[15px] text-warm-900 flex-1">개인정보처리방침</span>
                         ${svg("chevron-right", 16, "#D6D3D1")}
                     </button>
-                    <div class="flex items-center justify-between py-3 text-sm border-b border-warm-300"><span class="text-warm-600">버전</span><span class="font-display text-warm-800 font-medium">0.24 (beta)</span></div>
+                    <div class="flex items-center justify-between py-3 text-sm border-b border-warm-300"><span class="text-warm-600">버전</span><span class="font-display text-warm-800 font-medium">0.25 (beta)</span></div>
                     <div class="flex items-center justify-between py-3 text-sm"><span class="text-warm-600">개발</span><span class="text-warm-800 font-medium">바루픽</span></div>
                 </div>
 
@@ -14779,6 +14775,11 @@
                     } else {
                         await sb.from('likes').insert({ user_id: auth.user.id, post_id: postId });
                         this.comm.myLikes.add(postId);
+                        // 좋아요 알림 전송
+                        const p2 = this.comm.posts.find(x=>x.id===postId) || this.comm.detail;
+                        if (p2 && p2.user_id) {
+                            this._sendNotification(p2.user_id, 'like', '회원님의 코디를 좋아해요', postId);
+                        }
                     }
                     const p = this.comm.posts.find(x=>x.id===postId);
                     if (p) p.likes_count = liked ? Math.max(0,(p.likes_count||1)-1) : (p.likes_count||0)+1;
@@ -14834,6 +14835,10 @@
                     this.showShareToast('내 코디에 저장했어요! 💾');
                     // 서버 save_count 증가
                     if (sb) { try { await sb.rpc('increment_save_count', { p_post_id: postId }); post.save_count = (post.save_count||0)+1; } catch(e) {} }
+                    // 저장 알림 전송
+                    if (post.user_id) {
+                        this._sendNotification(post.user_id, 'save', '회원님의 코디를 저장했어요', postId);
+                    }
                 }
                 // 상세 화면이면 북마크 버튼만 갱신
                 if (this.screen === 'community-detail') {
@@ -14927,6 +14932,11 @@
                     // 댓글 수 갱신
                     const p = this.comm.detail;
                     if (p) p.comments_count = (p.comments_count||0) + 1;
+                    // 댓글 알림 전송
+                    if (p && p.user_id) {
+                        const preview = content.length > 20 ? content.slice(0, 20) + '…' : content;
+                        this._sendNotification(p.user_id, 'comment', '댓글을 남겼어요: ' + preview, p.id);
+                    }
                     spToast('댓글이 등록되었어요 💬');
                     this._loadComments(postId);
                 } catch(e) {
@@ -15176,9 +15186,10 @@
                     this.showShareToast('팔로우를 취소했어요');
                 } else {
                     follows.push(userId);
-                    // 알림 추가
-                    this._addNotification('follow', '새로운 팔로우!', userId);
                     this.showShareToast('팔로우했어요! ✓');
+
+                    // 팔로우 알림 전송
+                    this._sendNotification(userId, 'follow', '회원님을 팔로우하기 시작했어요', userId);
 
                     // 맞팔 확인 (상대가 나를 팔로우하고 있는지 서버에서 확인)
                     if (sb) {
@@ -15188,7 +15199,8 @@
                                 let friends = JSON.parse(localStorage.getItem('sp_friends') || '[]');
                                 if (!friends.includes(userId)) friends.push(userId);
                                 localStorage.setItem('sp_friends', JSON.stringify(friends));
-                                this._addNotification('friend', '새 친구가 됐어요! 👫', userId);
+                                // 맞팔 알림 양방향 전송
+                                this._sendNotification(userId, 'friend', '서로 친구가 되었어요! 이제 댓글로 소통해보세요 👫', userId);
                             }
                         } catch(e) {}
                     }
@@ -16013,29 +16025,116 @@
                 }
             },
             // ============================================================
-            _initNotifications() {
-                try { this.notifications = JSON.parse(localStorage.getItem('sp_notifications') || '[]'); } catch(e) { this.notifications = []; }
+            // ── 알림 시스템 (Supabase 서버 연동) ──
+            _notiSubscription: null,
+            _notiUnreadCount: 0,
+
+            async _initNotifications() {
+                // localStorage 잔여 데이터 정리 (마이그레이션)
+                localStorage.removeItem('sp_notifications');
+                this.notifications = [];
+
+                if (!sb || !auth.user) return;
+
+                // 서버에서 알림 로드
+                try {
+                    const { data, error } = await sb.from('notifications')
+                        .select('*, actor:profiles!notifications_actor_id_profiles_fkey(nickname, avatar_url)')
+                        .eq('user_id', auth.user.id)
+                        .order('created_at', { ascending: false })
+                        .limit(50);
+                    if (!error && data) this.notifications = data;
+                } catch(e) { console.error('Notification load error:', e); }
+
+                // 안읽은 수 조회
+                await this._updateNotiBadge();
+
+                // Realtime 구독
+                try {
+                    this._notiSubscription = sb.channel('noti_' + auth.user.id)
+                        .on('postgres_changes', {
+                            event: 'INSERT',
+                            schema: 'public',
+                            table: 'notifications',
+                            filter: 'user_id=eq.' + auth.user.id
+                        }, async (payload) => {
+                            // 새 알림 도착
+                            const noti = payload.new;
+                            // actor 프로필 로드
+                            if (noti.actor_id) {
+                                try {
+                                    const { data: prof } = await sb.from('profiles').select('nickname, avatar_url').eq('id', noti.actor_id).single();
+                                    noti.actor = prof;
+                                } catch(e) {}
+                            }
+                            this.notifications.unshift(noti);
+                            if (this.notifications.length > 50) this.notifications = this.notifications.slice(0, 50);
+                            this._notiUnreadCount++;
+                            this._renderNotiBadge();
+                            // 토스트 (현재 알림 화면이 아닐 때만)
+                            if (this.screen !== 'notifications') {
+                                const typeEmoji = { like:'❤️', comment:'💬', follow:'👤', friend:'👫', save:'💾', system:'📢' };
+                                spToast((typeEmoji[noti.type]||'🔔') + ' ' + (noti.message||'새 알림'));
+                            }
+                        })
+                        .subscribe();
+                } catch(e) { console.error('Realtime noti error:', e); }
             },
+
+            async _updateNotiBadge() {
+                if (!sb || !auth.user) return;
+                try {
+                    const { data } = await sb.rpc('get_unread_notification_count', { p_user_id: auth.user.id });
+                    this._notiUnreadCount = data || 0;
+                } catch(e) { this._notiUnreadCount = 0; }
+                this._renderNotiBadge();
+            },
+
+            _renderNotiBadge() {
+                const notiBadge = document.getElementById('notiBadge');
+                if (notiBadge) {
+                    const c = this._notiUnreadCount;
+                    notiBadge.style.display = c > 0 ? '' : 'none';
+                    notiBadge.textContent = c > 9 ? '9+' : c;
+                }
+            },
+
+            async _sendNotification(targetUserId, type, message, relatedId) {
+                if (!sb || !auth.user) return;
+                if (targetUserId === auth.user.id) return; // 자기 자신에겐 안 보냄
+                try {
+                    await sb.rpc('send_notification', {
+                        p_user_id: targetUserId,
+                        p_actor_id: auth.user.id,
+                        p_type: type,
+                        p_message: message,
+                        p_related_id: relatedId || null
+                    });
+                } catch(e) { console.error('Send noti error:', e); }
+            },
+
+            // 하위 호환 (gamification 등에서 호출될 수 있음)
             _addNotification(type, message, relatedId) {
-                const noti = {
+                // 서버 없이 로컬로만 추가 (폴백)
+                if (sb && auth.user) return; // 서버 있으면 _sendNotification 사용
+                this.notifications.unshift({
                     id: Date.now().toString(36),
-                    type: type, // 'like', 'follow', 'friend', 'badge', 'level', 'challenge'
-                    message: message,
-                    relatedId: relatedId || null,
-                    createdAt: new Date().toISOString(),
-                    read: false
-                };
-                this.notifications.unshift(noti);
-                if (this.notifications.length > 50) this.notifications = this.notifications.slice(0, 50);
-                localStorage.setItem('sp_notifications', JSON.stringify(this.notifications));
+                    type, message, related_id: relatedId,
+                    read: false, created_at: new Date().toISOString()
+                });
             },
 
             renderNotifications() {
                 const notis = this.notifications;
 
-                // 열람 시 모두 읽음 처리
-                notis.forEach(n => n.read = true);
-                localStorage.setItem('sp_notifications', JSON.stringify(notis));
+                // 서버 읽음 처리
+                if (sb && auth.user && this._notiUnreadCount > 0) {
+                    sb.rpc('mark_notifications_read', { p_user_id: auth.user.id }).then(() => {
+                        this._notiUnreadCount = 0;
+                        this._renderNotiBadge();
+                    });
+                    notis.forEach(n => n.read = true);
+                }
 
                 if (notis.length === 0) {
                     return '<div class="screen active"><div class="text-center py-16">' +
@@ -16044,41 +16143,95 @@
                     '</div></div>';
                 }
 
-                const typeIcons = { like:'❤️', follow:'👤', friend:'👫', badge:'🏅', level:'⬆️', challenge:'🎯' };
+                const typeIcons = { like:'❤️', comment:'💬', follow:'👤', friend:'👫', save:'💾', badge:'🏅', level:'⬆️', challenge:'🎯', system:'📢' };
                 let h = '<div class="screen active">';
                 h += '<div class="text-sm text-warm-600 mb-4">총 ' + notis.length + '개의 알림</div>';
 
-                // 오늘 / 이전
-                const today = new Date().toDateString();
-                let todayNotis = [], olderNotis = [];
+                // 오늘 / 이번주 / 이전
+                const now = Date.now();
+                const todayStart = new Date().setHours(0,0,0,0);
+                const weekStart = todayStart - 6 * 86400000;
+                let todayNotis = [], weekNotis = [], olderNotis = [];
                 notis.forEach(n => {
-                    if (new Date(n.createdAt).toDateString() === today) todayNotis.push(n);
+                    const t = new Date(n.created_at).getTime();
+                    if (t >= todayStart) todayNotis.push(n);
+                    else if (t >= weekStart) weekNotis.push(n);
                     else olderNotis.push(n);
                 });
 
-                if (todayNotis.length > 0) {
-                    h += '<div class="text-xs font-semibold text-warm-500 uppercase tracking-wider mb-2">오늘</div>';
-                    todayNotis.forEach(n => {
-                        h += '<div class="flex items-center gap-3 py-3 border-b border-warm-300">';
-                        h += '<span class="text-lg">' + (typeIcons[n.type] || '📢') + '</span>';
-                        h += '<div class="flex-1"><div class="text-sm text-warm-900">' + n.message + '</div><div class="text-[10px] text-warm-500 mt-0.5">' + this._timeAgo(n.createdAt) + '</div></div>';
-                        h += '</div>';
-                    });
-                }
+                const renderGroup = (label, items, dimmed) => {
+                    if (items.length === 0) return '';
+                    let g = '<div class="text-xs font-semibold text-warm-500 uppercase tracking-wider mb-2 mt-4">' + label + '</div>';
+                    items.forEach(n => {
+                        const actor = n.actor || {};
+                        const actorNick = escapeHtml(actor.nickname || '');
+                        const actorAvatar = escapeHtml(actor.avatar_url || '');
+                        const initial = actorNick ? actorNick.charAt(0).toUpperCase() : '?';
+                        const isUnread = !n.read;
+                        const clickAction = n.actor_id && (n.type === 'follow' || n.type === 'friend')
+                            ? ' onclick="app.openUserProfile(\'' + n.actor_id + '\')"'
+                            : (n.related_id && (n.type === 'like' || n.type === 'comment' || n.type === 'save')
+                                ? ' onclick="app._openNotiPost(\'' + n.related_id + '\')"'
+                                : '');
 
-                if (olderNotis.length > 0) {
-                    h += '<div class="text-xs font-semibold text-warm-500 uppercase tracking-wider mb-2 mt-4">이전</div>';
-                    olderNotis.forEach(n => {
-                        h += '<div class="flex items-center gap-3 py-3 border-b border-warm-300">';
-                        h += '<span class="text-lg">' + (typeIcons[n.type] || '📢') + '</span>';
-                        h += '<div class="flex-1"><div class="text-sm text-warm-800">' + n.message + '</div><div class="text-[10px] text-warm-500 mt-0.5">' + this._timeAgo(n.createdAt) + '</div></div>';
-                        h += '</div>';
+                        g += '<div class="flex items-center gap-3 py-3 border-b border-warm-200 ' + (isUnread ? 'bg-terra-50/50 -mx-1 px-1 rounded-lg' : '') + (clickAction ? ' cursor-pointer active:bg-warm-100 transition-colors' : '') + '"' + clickAction + '>';
+                        // 아바타 or 아이콘
+                        if (actorAvatar) {
+                            g += '<img src="' + actorAvatar + '" class="w-9 h-9 rounded-full object-cover flex-shrink-0" onerror="this.outerHTML=\'<div class=\\\'w-9 h-9 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xs flex-shrink-0\\\'>' + initial + '</div>\'">';
+                        } else if (actorNick) {
+                            g += '<div class="w-9 h-9 rounded-full bg-terra-100 flex items-center justify-center text-terra-700 font-bold text-xs flex-shrink-0">' + initial + '</div>';
+                        } else {
+                            g += '<span class="text-lg flex-shrink-0 w-9 text-center">' + (typeIcons[n.type] || '🔔') + '</span>';
+                        }
+                        g += '<div class="flex-1 min-w-0">';
+                        g += '<div class="text-[13px] ' + (dimmed ? 'text-warm-600' : 'text-warm-900') + ' leading-snug">';
+                        if (actorNick) g += '<span class="font-semibold">@' + actorNick + '</span> ';
+                        g += (n.message || '') + '</div>';
+                        g += '<div class="text-[10px] text-warm-400 mt-0.5">' + this._timeAgo(n.created_at) + '</div>';
+                        g += '</div>';
+                        if (isUnread) g += '<div class="w-2 h-2 rounded-full bg-terra-500 flex-shrink-0"></div>';
+                        g += '</div>';
                     });
-                }
+                    return g;
+                };
 
-                h += '<button onclick="app.notifications=[];localStorage.removeItem(\'sp_notifications\');app.render()" class="w-full mt-4 py-2.5 text-xs text-warm-500 text-center active:text-warm-700 transition-colors">모두 지우기</button>';
+                h += renderGroup('오늘', todayNotis, false);
+                h += renderGroup('이번 주', weekNotis, false);
+                h += renderGroup('이전', olderNotis, true);
+
+                h += '<button onclick="app._clearAllNotifications()" class="w-full mt-4 py-2.5 text-xs text-warm-500 text-center active:text-warm-700 transition-colors">모두 지우기</button>';
                 h += '</div>';
                 return h;
+            },
+
+            async _clearAllNotifications() {
+                if (!sb || !auth.user) return;
+                if (!confirm('모든 알림을 삭제할까요?')) return;
+                try {
+                    await sb.from('notifications').delete().eq('user_id', auth.user.id);
+                    this.notifications = [];
+                    this._notiUnreadCount = 0;
+                    this._renderNotiBadge();
+                    this.render();
+                    spToast('알림을 모두 삭제했어요');
+                } catch(e) { spToast('삭제 실패'); }
+            },
+
+            async _openNotiPost(postId) {
+                // 알림에서 게시물로 이동
+                if (!sb) return;
+                try {
+                    const { data } = await sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)').eq('id', postId).single();
+                    if (data) {
+                        this.comm.detail = data;
+                        this.comm._detailSource = 'all';
+                        // comm.posts에 없으면 추가
+                        if (!this.comm.posts.find(p => p.id === data.id)) this.comm.posts.push(data);
+                        this.goTo('community-detail');
+                    } else {
+                        spToast('게시물을 찾을 수 없어요');
+                    }
+                } catch(e) { spToast('게시물을 불러올 수 없어요'); }
             },
 
             // ── 인증 화면 ──
