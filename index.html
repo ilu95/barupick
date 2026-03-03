@@ -15999,7 +15999,7 @@
                     this._eventVotes[submissionId] = (this._eventVotes[submissionId] || 0) + 1;
                     this._eventMyVote = submissionId;
                     spToast('투표 완료!');
-                    this.render();
+                    const sy = window.scrollY; this.render(); requestAnimationFrame(() => window.scrollTo(0, sy));
                 } catch(e) { spToast('오류가 발생했어요'); console.error(e); }
             },
 
@@ -16011,7 +16011,7 @@
                     // 먼저 내 투표 찾기
                     const { data: myVotes, error: findErr } = await sb.from('event_votes').select('id').eq('event_id', ev.id).eq('user_id', auth.user.id);
                     if (findErr) { console.error('Vote find error:', findErr); spToast('철회 실패: ' + findErr.message); return; }
-                    if (!myVotes || myVotes.length === 0) { spToast('투표 기록이 없어요'); this._eventMyVote = null; this.render(); return; }
+                    if (!myVotes || myVotes.length === 0) { spToast('투표 기록이 없어요'); this._eventMyVote = null; const sy = window.scrollY; this.render(); requestAnimationFrame(() => window.scrollTo(0, sy)); return; }
 
                     // ID로 직접 삭제
                     const { error } = await sb.from('event_votes').delete().eq('id', myVotes[0].id);
@@ -16022,7 +16022,7 @@
                     }
                     this._eventMyVote = null;
                     spToast('투표 철회됨');
-                    this.render();
+                    const sy = window.scrollY; this.render(); requestAnimationFrame(() => window.scrollTo(0, sy));
                 } catch(e) { console.error('Revoke error:', e); spToast('오류가 발생했어요'); }
             },
 
