@@ -10,7 +10,7 @@
         style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: blob: https://storage.googleapis.com https://*.supabase.co;
-        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com;
+        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com data: blob:;
     ">
     <title>바루픽</title>
     <link rel="icon" type="image/png" href="favicon.png">
@@ -8068,7 +8068,18 @@
                                 const dataUrl = origPhotos[i] || thumbPhotos[i];
                                 if (!dataUrl) continue;
                                 try {
-                                    const blob = await (await fetch(dataUrl)).blob();
+                                    // data URL → Blob 직접 변환 (CSP connect-src 우회)
+                                    let blob;
+                                    if (dataUrl.startsWith('data:')) {
+                                        const [header, b64] = dataUrl.split(',');
+                                        const mime = header.match(/:(.*?);/)?.[1] || 'image/webp';
+                                        const binary = atob(b64);
+                                        const arr = new Uint8Array(binary.length);
+                                        for (let j = 0; j < binary.length; j++) arr[j] = binary.charCodeAt(j);
+                                        blob = new Blob([arr], { type: mime });
+                                    } else {
+                                        blob = await (await fetch(dataUrl)).blob();
+                                    }
                                     // 5MB 초과 시 건너뛰기
                                     if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large:', (blob.size/1024/1024).toFixed(1) + 'MB, skipping'); continue; }
                                     const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
@@ -14468,7 +14479,7 @@
 
                     if (mode === 'user') {
                         // 유저 랭킹: 누적 좋아요 합산
-                        const { data } = await sb.from('posts').select('user_id, profiles!posts_user_id_fkey(nickname, avatar_url)').eq('status','approved').or('visibility.eq.public,visibility.is.null');
+                        const { data } = await sb.from('posts').select('user_id, likes_count, profiles!posts_user_id_fkey(nickname, avatar_url)').eq('status','approved');
                         if (!data) { grid.innerHTML = ''; return; }
                         // 유저별 좋아요 합산
                         const userMap = {};
@@ -14477,8 +14488,15 @@
                             userMap[p.user_id].likes += (p.likes_count||0);
                             userMap[p.user_id].posts++;
                         });
-                        // likes_count가 없을 수 있으므로 서버에서 직접 가져오기
-                        const { data: likeCounts } = await sb.rpc('get_user_like_rankings', { lim: 20 }).catch(() => ({ data: null }));
+                        // rpc가 없을 수 있으므로 안전하게 시도
+                        try {
+                            const rpcRes = await sb.rpc('get_user_like_rankings', { lim: 20 });
+                            if (rpcRes.data && Array.isArray(rpcRes.data)) {
+                                rpcRes.data.forEach(r => {
+                                    if (userMap[r.user_id]) userMap[r.user_id].likes = r.total_likes || userMap[r.user_id].likes;
+                                });
+                            }
+                        } catch(rpcErr) { /* rpc 없으면 클라이언트 집계 사용 */ }
                         let ranked = Object.entries(userMap).map(([id,u]) => ({id,...u})).sort((a,b)=>b.likes-a.likes).slice(0,20);
 
                         let h = '<div class="col-span-2 space-y-2">';
@@ -14512,7 +14530,6 @@
 
                     const { data } = await sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url)')
                         .eq('status', 'approved')
-                        .or('visibility.eq.public,visibility.is.null')
                         .gte('created_at', startDate.toISOString())
                         .order('likes_count', {ascending:false})
                         .limit(20);
@@ -14792,10 +14809,10 @@
                     (title ? '<div class="bg-warm-200 rounded-2xl p-3.5 text-sm text-warm-800 mb-3">' + title + '</div>' : '') +
 
                     // 점수 + 스타일
-                    '<div class="flex items-center gap-3 mb-3">' +
+                    ((post.hide_counts || (isMe && this._hideCountsEnabled)) ? (style ? '<div class="flex items-center gap-3 mb-3"><span class="text-[11px] text-warm-600 border border-warm-400 rounded-full px-2.5 py-0.5">' + style + '</span></div>' : '') : '<div class="flex items-center gap-3 mb-3">' +
                         '<span class="font-display text-3xl font-bold text-terra-600">' + (post.score||0) + '점</span>' +
                         (style ? '<span class="text-[11px] text-warm-600 border border-warm-400 rounded-full px-2.5 py-0.5">' + style + '</span>' : '') +
-                    '</div>' +
+                    '</div>') +
 
                     // 인스타그램 링크
                     instaHtml +
@@ -15309,10 +15326,21 @@
                     for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
                         const dataUrl = origPhotos[i] || thumbPhotos[i];
                         if (!dataUrl) continue;
-                        const blob = await (await fetch(dataUrl)).blob();
+                        let blob;
+                        if (dataUrl.startsWith('data:')) {
+                            const [header, b64] = dataUrl.split(',');
+                            const mime = header.match(/:(.*?);/)?.[1] || 'image/webp';
+                            const binary = atob(b64);
+                            const arr = new Uint8Array(binary.length);
+                            for (let j = 0; j < binary.length; j++) arr[j] = binary.charCodeAt(j);
+                            blob = new Blob([arr], { type: mime });
+                        } else {
+                            blob = await (await fetch(dataUrl)).blob();
+                        }
+                        if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large, skipping'); continue; }
                         const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
                         const path = auth.user.id + '/' + uuid + '.webp';
-                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp', upsert: false });
+                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: blob.type || 'image/webp', upsert: false });
                         if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
                         const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
                         photoUrls.push(urlData.publicUrl);
@@ -15506,7 +15534,7 @@
                             try {
                                 const [profileRes, postsRes, followersRes, followingRes] = await Promise.all([
                                     sb.from('profiles').select('*').eq('id', userId).single(),
-                                    sb.from('posts').select('*').eq('user_id', userId).eq('status', 'approved').or('visibility.eq.public,visibility.is.null').order('created_at', {ascending:false}).limit(30),
+                                    sb.from('posts').select('*').eq('user_id', userId).eq('status', 'approved').order('created_at', {ascending:false}).limit(30),
                                     sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', userId),
                                     sb.from('follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId)
                                 ]);
