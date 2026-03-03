@@ -7586,7 +7586,11 @@
                 });
 
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                this.ootd.photos[pe.idx] = dataUrl;
+                if (pe._isEvent) {
+                    this._eventSubmitPhotos[pe.idx] = dataUrl;
+                } else {
+                    this.ootd.photos[pe.idx] = dataUrl;
+                }
                 this.closePhotoEditor();
                 this.render();
                 spToast('편집이 저장되었어요 ✓');
@@ -16015,6 +16019,15 @@
             // ── 이벤트 제출 화면 ──
             _eventColors: { outer: null, top: null, middleware: null, bottom: null, shoes: null },
             _eventOpenPicker: null,
+            _EVENT_COLOR_CATS: {
+                '기본': ['white','ivory','cream','beige','lightgray','gray','silver','slate','charcoal','black'],
+                '브라운': ['brown','camel','tan','cognac','khaki','taupe','sienna','chocolate','espresso','dark_brown'],
+                '웜톤': ['red','orange','yellow','coral','amber','gold','mustard','rust','brick','terracotta','crimson','burnt_orange','burgundy','wine','maroon','dark_red'],
+                '쿨톤': ['blue','navy','denim','steel_blue','cobalt','royal_blue','powder_blue','teal','cyan','turquoise','emerald','indigo','dark_blue','midnight','dark_teal'],
+                '그린': ['green','olive','sage','moss','hunter_green','forest','lime','dark_green','dark_olive'],
+                '핑크퍼플': ['pink','magenta','plum','purple','eggplant','mauve','dusty_rose','dark_purple'],
+                '파스텔': ['pastel_pink','pastel_blue','pastel_green','pastel_yellow','pastel_purple','pastel_mint','pastel_peach','pastel_lavender','pastel_coral','pastel_sky','pastel_lilac','pastel_sage','pastel_lemon','pastel_rose','pastel_aqua']
+            },
 
             renderEventSubmit() {
                 const ev = this._eventData;
@@ -16042,13 +16055,7 @@
                 // 피커 렌더 함수
                 function renderColorPicker(part) {
                     if (self._eventOpenPicker !== part) return '';
-                    const catMap = {
-                        '기본': ['black','white','gray','ivory','beige','cream','charcoal','navy','brown'],
-                        '웜': ['red','orange','yellow','coral','peach','salmon','rust','burgundy','camel','cognac','amber','brick','terracotta','gold','mustard','wine','plum','eggplant'],
-                        '쿨': ['blue','sky_blue','steel_blue','mint','teal','forest_green','hunter_green','emerald','olive','sage','moss','lavender','lilac','mauve','purple'],
-                        '뉴트럴': ['khaki','sand','taupe','stone','warm_gray','cool_gray','oatmeal','linen','slate'],
-                        '비비드': ['hot_pink','magenta','electric_blue','cobalt','turquoise','lime','neon_yellow','tangerine','vermilion','rose']
-                    };
+                    const catMap = self._EVENT_COLOR_CATS;
                     let tabs = '', chips = '';
                     const tab = self._eventPickerTab || '기본';
                     Object.keys(catMap).forEach(cat => {
@@ -16153,13 +16160,7 @@
 
                 function renderColorPicker(part) {
                     if (self._eventOpenPicker !== part) return '';
-                    const catMap = {
-                        '기본': ['black','white','gray','ivory','beige','cream','charcoal','navy','brown'],
-                        '웜': ['red','orange','yellow','coral','peach','salmon','rust','burgundy','camel','cognac','amber','brick','terracotta','gold','mustard','wine','plum','eggplant'],
-                        '쿨': ['blue','sky_blue','steel_blue','mint','teal','forest_green','hunter_green','emerald','olive','sage','moss','lavender','lilac','mauve','purple'],
-                        '뉴트럴': ['khaki','sand','taupe','stone','warm_gray','cool_gray','oatmeal','linen','slate'],
-                        '비비드': ['hot_pink','magenta','electric_blue','cobalt','turquoise','lime','neon_yellow','tangerine','vermilion','rose']
-                    };
+                    const catMap = self._EVENT_COLOR_CATS;
                     let tabs = '', chips = '';
                     const tab = self._eventPickerTab || '기본';
                     Object.keys(catMap).forEach(cat => {
@@ -16263,79 +16264,44 @@
             },
 
             _openEventPhotoEditor(idx) {
-                // 기존 사진 편집기를 이벤트 사진에 적용
+                // OOTD 편집기와 동일한 구조로 열기
                 const src = this._eventSubmitPhotos[idx];
                 if (!src) return;
                 this._photoEd = { idx, items: [], tool: 'sticker', activeItem: -1, dragOffset: null, stickerType: '😎', _mosaicColor: '#000000', _isEvent: true };
 
-                // openPhotoEditor 내부 로직 재활용 (ootd.photos 대신 _eventSubmitPhotos 사용)
                 const ov = document.createElement('div');
                 ov.id = 'photoEdOverlay';
                 ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;';
                 ov.innerHTML = '<div style="display:flex;align-items:center;padding:12px 16px;gap:10px;flex-shrink:0">' +
-                    '<button onclick="app._closeEventPhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:transparent">취소</button>' +
+                    '<button onclick="app.closePhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:transparent">취소</button>' +
                     '<span style="flex:1;text-align:center;color:#fff;font-size:15px;font-weight:600">사진 편집</span>' +
-                    '<button onclick="app._saveEventPhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border-radius:8px;background:#C2785C;font-weight:600">완료</button>' +
+                    '<button onclick="app.savePhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border-radius:8px;background:#C2785C;font-weight:600">완료</button>' +
                 '</div>' +
-                '<div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;touch-action:none" id="peCanvas"></div>' +
-                '<div id="peToolbar" style="flex-shrink:0;padding:8px 12px 16px;background:#111"></div>';
+                '<div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden" id="peCanvasWrap">' +
+                    '<canvas id="peCanvas" style="max-width:100%;max-height:100%;touch-action:none"></canvas>' +
+                '</div>' +
+                '<div id="peToolbar" style="flex-shrink:0;background:#1a1a1a;padding:10px 12px 24px"></div>';
                 document.body.appendChild(ov);
-                document.body.style.overflow = 'hidden';
 
-                const canvasArea = document.getElementById('peCanvas');
-                const imgEl = new Image();
-                imgEl.onload = () => {
-                    canvasArea.innerHTML = '';
-                    const c = document.createElement('canvas');
-                    c.id = 'peMainCanvas';
-                    const maxW = canvasArea.clientWidth, maxH = canvasArea.clientHeight;
-                    const ratio = Math.min(maxW / imgEl.width, maxH / imgEl.height, 1);
-                    c.width = imgEl.width * ratio;
-                    c.height = imgEl.height * ratio;
-                    c.style.cssText = 'border-radius:8px;touch-action:none';
-                    const ctx = c.getContext('2d');
-                    ctx.drawImage(imgEl, 0, 0, c.width, c.height);
-                    this._photoEd._baseImg = imgEl;
-                    this._photoEd._ratio = ratio;
-                    canvasArea.appendChild(c);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.getElementById('peCanvas');
+                    const wrap = document.getElementById('peCanvasWrap');
+                    if (!canvas || !wrap) return;
+                    const maxW = wrap.clientWidth, maxH = wrap.clientHeight;
+                    let w = img.width, h = img.height;
+                    const ratio = Math.min(maxW / w, maxH / h, 1);
+                    w = Math.round(w * ratio); h = Math.round(h * ratio);
+                    canvas.width = w; canvas.height = h;
+                    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+                    this._photoEd._img = img;
+                    this._photoEd._cw = w;
+                    this._photoEd._ch = h;
+                    this._peRedraw();
                     this._peRenderToolbar();
-                    this._peBindEvents(c);
+                    this._peBindEvents();
                 };
-                imgEl.src = src;
-            },
-
-            _closeEventPhotoEditor() {
-                const ov = document.getElementById('photoEdOverlay');
-                if (ov) ov.remove();
-                document.body.style.overflow = '';
-                this._photoEd = { idx: -1, items: [], tool: 'sticker', activeItem: -1, dragOffset: null, stickerType: '😎' };
-            },
-
-            _saveEventPhotoEditor() {
-                const pe = this._photoEd;
-                const canvas = document.getElementById('peMainCanvas');
-                if (!canvas || pe.idx < 0) return;
-                // 아이템 합성
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(pe._baseImg, 0, 0, canvas.width, canvas.height);
-                pe.items.forEach(item => {
-                    if (item.type === 'sticker') {
-                        ctx.font = item.size + 'px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(item.emoji, item.x, item.y);
-                    } else if (item.type === 'mosaic') {
-                        ctx.fillStyle = item.color || '#000';
-                        ctx.beginPath();
-                        ctx.arc(item.x, item.y, item.size / 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                });
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-                this._eventSubmitPhotos[pe.idx] = dataUrl;
-                spToast('편집이 저장되었어요 ✓');
-                this._closeEventPhotoEditor();
-                this.render();
+                img.src = src;
             },
 
             async _submitEvent() {
@@ -16363,9 +16329,14 @@
                     for (let i = 0; i < this._eventSubmitPhotos.length; i++) {
                         const dataUrl = this._eventSubmitPhotos[i];
                         const path = auth.user.id + '/event_' + ev.id + '_' + Date.now() + '_' + i + '.webp';
-                        const resp = await fetch(dataUrl);
-                        const blob = await resp.blob();
-                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp' });
+                        // dataURL → Blob (CSP-safe, no fetch)
+                        const parts = dataUrl.split(',');
+                        const mime = parts[0].match(/:(.*?);/)[1];
+                        const raw = atob(parts[1]);
+                        const arr = new Uint8Array(raw.length);
+                        for (let j = 0; j < raw.length; j++) arr[j] = raw.charCodeAt(j);
+                        const blob = new Blob([arr], { type: mime });
+                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: mime });
                         if (upErr) { spToast('사진 업로드 실패'); console.error(upErr); return; }
                         const { data: pub } = sb.storage.from('community').getPublicUrl(path);
                         photoUrls.push(pub.publicUrl);
