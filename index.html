@@ -10,7 +10,7 @@
         style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: blob: https://storage.googleapis.com https://*.supabase.co;
-        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com https://cdn.jsdelivr.net data: blob:;
+        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com data: blob:;
     ">
     <title>바루픽</title>
     <link rel="icon" type="image/png" href="favicon.png">
@@ -7034,7 +7034,12 @@
                     case 'community':
                         headerTitle.textContent = '커뮤니티';
                         content.innerHTML = this.renderCommunity();
-                        this.communityLoad(this.comm.posts.length === 0);
+                        if (this.comm.posts.length > 0) {
+                            this.renderCommunityGrid();
+                            this.communityLoad(false);
+                        } else {
+                            this.communityLoad(true);
+                        }
                         break;
                     case 'community-detail':
                         headerTitle.textContent = '코디 상세';
@@ -8067,7 +8072,7 @@
                     const isShared = record.visibility === 'public' || record.visibility === 'friends';
                     try {
                         if (isShared) {
-                            // 사진 업로드 (최적화: 원본 1200px + 썸네일 400px)
+                            // 사진 업로드
                             let photoUrls = [];
                             const origPhotos = this.ootd.photos_orig || [];
                             const thumbPhotos = this.ootd.photos || [];
@@ -8075,8 +8080,27 @@
                                 const dataUrl = origPhotos[i] || thumbPhotos[i];
                                 if (!dataUrl) continue;
                                 try {
-                                    const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
-                                    if (result) photoUrls.push(result.url);
+                                    // data URL → Blob 직접 변환 (CSP connect-src 우회)
+                                    let blob;
+                                    if (dataUrl.startsWith('data:')) {
+                                        const [header, b64] = dataUrl.split(',');
+                                        const mime = header.match(/:(.*?);/)?.[1] || 'image/webp';
+                                        const binary = atob(b64);
+                                        const arr = new Uint8Array(binary.length);
+                                        for (let j = 0; j < binary.length; j++) arr[j] = binary.charCodeAt(j);
+                                        blob = new Blob([arr], { type: mime });
+                                    } else {
+                                        blob = await (await fetch(dataUrl)).blob();
+                                    }
+                                    // 5MB 초과 시 건너뛰기
+                                    if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large:', (blob.size/1024/1024).toFixed(1) + 'MB, skipping'); continue; }
+                                    const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
+                                    const ext = blob.type === 'image/png' ? '.png' : blob.type === 'image/jpeg' ? '.jpg' : '.webp';
+                                    const path = auth.user.id + '/' + uuid + ext;
+                                    const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: blob.type || 'image/webp', upsert: false });
+                                    if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
+                                    const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
+                                    photoUrls.push(urlData.publicUrl);
                                 } catch(photoErr) { console.warn('Photo processing error:', photoErr); }
                             }
 
@@ -9199,28 +9223,6 @@
                             ? '<span class="text-[11px] text-warm-400 font-medium">' + (pushDenied ? '차단됨' : isIOSSafari ? 'Safari' : '미지원') + '</span>'
                             : '<div class="settings-toggle ' + (pushActive ? 'on' : '') + '" onclick="app.togglePush()"><div class="settings-toggle-dot"></div></div>'}
                     </div>
-                    ${pushActive ? (() => {
-                        const ps = this._getPushSettings();
-                        const types = [
-                            { key: 'like', icon: 'heart', label: '좋아요', desc: '내 코디에 좋아요를 받으면' },
-                            { key: 'comment', icon: 'message-circle', label: '댓글', desc: '내 게시물에 댓글이 달리면' },
-                            { key: 'follow', icon: 'user-plus', label: '팔로우', desc: '누군가 나를 팔로우하면' },
-                            { key: 'save', icon: 'bookmark', label: '저장', desc: '내 코디가 저장되면' },
-                            { key: 'system', icon: 'megaphone', label: '이벤트/공지', desc: '이벤트 소식과 공지사항' }
-                        ];
-                        return '<div class="ml-8 border-l-2 border-warm-300 pl-3">' +
-                            types.map(t =>
-                                '<div class="flex items-center justify-between py-2.5">' +
-                                    '<div class="flex items-center gap-2">' +
-                                        svg(t.icon, 14, "#A8A29E") +
-                                        '<div><span class="text-[13px] text-warm-800">' + t.label + '</span>' +
-                                        '<div class="text-[10px] text-warm-400">' + t.desc + '</div></div>' +
-                                    '</div>' +
-                                    '<div class="settings-toggle ' + (ps[t.key] !== false ? 'on' : '') + '" onclick="app._togglePushType(\'' + t.key + '\',this)"><div class="settings-toggle-dot"></div></div>' +
-                                '</div>'
-                            ).join('') + '</div>';
-                    })() : ''}
-                    </div>
                     <div class="flex items-center justify-between py-3.5">
                         <div class="flex items-center gap-2.5">
                             ${svg("camera", 18, "#A8A29E")}
@@ -9282,7 +9284,7 @@
                         <span class="text-[15px] text-warm-900 flex-1">개인정보처리방침</span>
                         ${svg("chevron-right", 16, "#D6D3D1")}
                     </button>
-                    <div class="flex items-center justify-between py-3 text-sm border-b border-warm-300"><span class="text-warm-600">버전</span><span class="font-display text-warm-800 font-medium">1.0</span></div>
+                    <div class="flex items-center justify-between py-3 text-sm border-b border-warm-300"><span class="text-warm-600">버전</span><span class="font-display text-warm-800 font-medium">0.26 (beta)</span></div>
                     <div class="flex items-center justify-between py-3 text-sm"><span class="text-warm-600">개발</span><span class="text-warm-800 font-medium">바루픽</span></div>
                 </div>
 
@@ -14070,15 +14072,7 @@
 
             deleteSavedOutfit(id) {
                 if (!confirm('이 코디를 삭제할까요?')) return;
-                var saved = this.getSavedOutfits();
-                var item = saved.find(function(s) { return s.id === id; });
-                // 커뮤니티 북마크면 서버에서도 삭제
-                if (item && item.commPostId && sb && auth.user) {
-                    this.comm.myBookmarks.delete(item.commPostId);
-                    sb.from('bookmarks').delete().eq('user_id', auth.user.id).eq('post_id', item.commPostId).then(function(){}).catch(function(e){ console.warn('Bookmark delete error:', e); });
-                    sb.rpc('decrement_save_count', { p_post_id: item.commPostId }).catch(function(){});
-                }
-                saved = saved.filter(function (s) { return s.id !== id; });
+                var saved = this.getSavedOutfits().filter(function (s) { return s.id !== id; });
                 try { localStorage.setItem('cs_saved', JSON.stringify(saved)); } catch (e) {}
                 this.render();
             },
@@ -14366,11 +14360,12 @@
                         const cacheKey = 'sp_cache_comm_' + tab + (this.comm.sort === 'popular' ? '_pop' : '') + (this.comm.styleFilter || '');
                         try {
                             const cached = JSON.parse(localStorage.getItem(cacheKey));
-                            if (cached && cached.posts && cached.posts.length > 0 && (Date.now() - cached.ts) < 300000) {
+                            if (cached && cached.posts && cached.posts.length > 0) {
                                 this.comm.posts = cached.posts;
                                 this.comm.hasMore = cached.hasMore || false;
                                 this.comm.page = 1;
                                 this.renderCommunityGrid();
+                                if ((Date.now() - cached.ts) < 1800000) { if (status) status.innerHTML = ''; return; }
                                 // 서버에서 갱신 (백그라운드)
                             }
                         } catch(ce) {}
@@ -14450,7 +14445,10 @@
                             (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
                         } catch(likeErr) {}
                     }
-                    // 내 북마크는 _initBookmarks에서 이미 로드됨 (서버 동기화)
+                    const saved = this.getSavedOutfits();
+                    (data||[]).forEach(p => {
+                        if (saved.find(s => s.commPostId === p.id)) this.comm.myBookmarks.add(p.id);
+                    });
 
                     if (myVer === this._commLoadVer) {
                         this.renderCommunityGrid();
@@ -14505,7 +14503,7 @@
                 // ── 캐시 우선 로딩: 캐시가 있으면 즉시 표시 ──
                 try {
                     const cached = JSON.parse(localStorage.getItem(cacheKey));
-                    if (cached && cached.html && (Date.now() - cached.ts) < 300000) {
+                    if (cached && cached.html) {
                         grid.innerHTML = cached.html;
                         if (status) status.innerHTML = cached.statusHtml || '';
                         if (mode === 'event' && cached.eventsCache) {
@@ -14516,6 +14514,7 @@
                             this.comm.posts = cached.posts || [];
                             this.comm.hasMore = false;
                         }
+                        if ((Date.now() - cached.ts) < 1800000) return;
                     }
                 } catch(ce) {}
 
@@ -14672,7 +14671,7 @@
 
                     if (hasPhoto) {
                         h += '<div class="bg-warm-100 flex items-center justify-center" style="aspect-ratio:4/5">';
-                        h += '<img data-src="' + this._getThumbUrl(photoUrl) + '" data-full="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.src=this.dataset.full||this.src">';
+                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.parentElement.innerHTML=\'<div class=\\\'w-full h-full flex items-center justify-center text-warm-400 text-3xl\\\'>🎨</div>\'">';
                         h += '</div>';
                     } else {
                         h += '<div class="flex justify-center items-center bg-warm-100 py-4" style="aspect-ratio:4/5">' + mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:120px') + '</div>';
@@ -14743,7 +14742,7 @@
                     // 사진 모드: 이미지만 표시 (크롭 비율 유지, 잘림 방지)
                     if (hasPhoto) {
                         h += '<div class="bg-warm-100 flex items-center justify-center" style="aspect-ratio:4/5">';
-                        h += '<img data-src="' + this._getThumbUrl(photoUrl) + '" data-full="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.src=this.dataset.full||this.src">';
+                        h += '<img data-src="' + photoUrl + '" class="w-full h-full object-contain lazy-placeholder" onerror="this.parentElement.innerHTML=\'<div class=\\\'w-full h-full flex items-center justify-center text-warm-400 text-3xl\\\'>🎨</div>\'">';
                         h += '</div>';
                     } else {
                         // 마네킹 모드: 마네킹만 크게 표시
@@ -15109,7 +15108,7 @@
                         // 좋아요 알림 전송
                         const p2 = this.comm.posts.find(x=>x.id===postId) || this.comm.detail;
                         if (p2 && p2.user_id) {
-                            this._sendNotification(p2.user_id, 'like', (auth.profile?.nickname || '누군가') + ' 님이 회원님의 코디를 좋아해요', postId);
+                            this._sendNotification(p2.user_id, 'like', '회원님의 코디를 좋아해요', postId);
                         }
                     }
                     const p = this.comm.posts.find(x=>x.id===postId);
@@ -15134,27 +15133,20 @@
             async commToggleBookmark(postId) {
                 const post = this.comm.posts.find(x=>x.id===postId) || this.comm.detail;
                 if (!post) return;
-                if (!auth.user) { this.goTo('auth-login'); return; }
-
-                const isBookmarked = this.comm.myBookmarks.has(postId);
-
-                if (isBookmarked) {
-                    // 제거: 서버 → 로컬
+                // localStorage cs_saved에 저장
+                const saved = this.getSavedOutfits();
+                const already = saved.find(s => s.commPostId === postId);
+                if (already) {
+                    // 이미 저장됨 → 제거
+                    const newSaved = saved.filter(s => s.commPostId !== postId);
+                    localStorage.setItem('cs_saved', JSON.stringify(newSaved));
                     this.comm.myBookmarks.delete(postId);
-                    if (sb) { try { await sb.from('bookmarks').delete().eq('user_id', auth.user.id).eq('post_id', postId); } catch(e) { console.warn('Bookmark delete error:', e); } }
-                    // localStorage 동기화
-                    const saved = this.getSavedOutfits().filter(s => s.commPostId !== postId);
-                    try { localStorage.setItem('cs_saved', JSON.stringify(saved)); } catch(e) {}
                     this.showShareToast('저장 목록에서 제거했어요');
                     // 서버 save_count 감소
                     if (sb) { try { await sb.rpc('decrement_save_count', { p_post_id: postId }); post.save_count = Math.max(0,(post.save_count||1)-1); } catch(e) {} }
                 } else {
-                    // 추가: 서버 → 로컬
-                    const saved = this.getSavedOutfits();
+                    // 저장
                     if (saved.length >= 50) { alert('저장 가능한 코디는 최대 50개입니다'); return; }
-                    this.comm.myBookmarks.add(postId);
-                    if (sb) { try { await sb.from('bookmarks').delete().eq('user_id', auth.user.id).eq('post_id', postId); await sb.from('bookmarks').insert({ user_id: auth.user.id, post_id: postId }); } catch(e) { console.warn('Bookmark insert error:', e); } }
-                    // localStorage 동기화 (저장 목록 표시용)
                     const nick = escapeHtml(post.profiles?.nickname) || '유저';
                     saved.unshift({
                         id: 'comm_' + Date.now(),
@@ -15169,16 +15161,16 @@
                         midType: 'knit',
                         createdAt: new Date().toISOString()
                     });
-                    try { localStorage.setItem('cs_saved', JSON.stringify(saved)); } catch(e) {}
+                    localStorage.setItem('cs_saved', JSON.stringify(saved));
+                    this.comm.myBookmarks.add(postId);
                     this.showShareToast('내 코디에 저장했어요! 💾');
                     // 서버 save_count 증가
                     if (sb) { try { await sb.rpc('increment_save_count', { p_post_id: postId }); post.save_count = (post.save_count||0)+1; } catch(e) {} }
                     // 저장 알림 전송
                     if (post.user_id) {
-                        this._sendNotification(post.user_id, 'save', (auth.profile?.nickname || '누군가') + ' 님이 회원님의 코디를 저장했어요', postId);
+                        this._sendNotification(post.user_id, 'save', '회원님의 코디를 저장했어요', postId);
                     }
                 }
-                this._invalidateCommCache();
                 // 상세 화면이면 북마크 버튼만 갱신
                 if (this.screen === 'community-detail') {
                     const btns = document.querySelectorAll('[data-bookmark-btn]');
@@ -15274,7 +15266,7 @@
                     // 댓글 알림 전송
                     if (p && p.user_id) {
                         const preview = content.length > 20 ? content.slice(0, 20) + '…' : content;
-                        this._sendNotification(p.user_id, 'comment', (auth.profile?.nickname || '누군가') + ' 님이 댓글을 남겼어요: ' + preview, p.id);
+                        this._sendNotification(p.user_id, 'comment', '댓글을 남겼어요: ' + preview, p.id);
                     }
                     spToast('댓글이 등록되었어요 💬');
                     this._loadComments(postId);
@@ -15421,15 +15413,31 @@
                 if (btn) { btn.disabled = true; btn.textContent = '공유 중...'; }
 
                 try {
-                    // 사진 업로드 (최적화: 원본 1200px + 썸네일 400px)
+                    // 사진 업로드
                     let photoUrls = [];
                     const origPhotos = this.comm.postPhotos_orig || [];
                     const thumbPhotos = this.comm.postPhotos || [];
                     for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
                         const dataUrl = origPhotos[i] || thumbPhotos[i];
                         if (!dataUrl) continue;
-                        const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
-                        if (result) photoUrls.push(result.url);
+                        let blob;
+                        if (dataUrl.startsWith('data:')) {
+                            const [header, b64] = dataUrl.split(',');
+                            const mime = header.match(/:(.*?);/)?.[1] || 'image/webp';
+                            const binary = atob(b64);
+                            const arr = new Uint8Array(binary.length);
+                            for (let j = 0; j < binary.length; j++) arr[j] = binary.charCodeAt(j);
+                            blob = new Blob([arr], { type: mime });
+                        } else {
+                            blob = await (await fetch(dataUrl)).blob();
+                        }
+                        if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large, skipping'); continue; }
+                        const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
+                        const path = auth.user.id + '/' + uuid + '.webp';
+                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: blob.type || 'image/webp', upsert: false });
+                        if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
+                        const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
+                        photoUrls.push(urlData.publicUrl);
                     }
 
                     const caption = (document.getElementById('comm-caption')?.value || '').trim().slice(0, 200) || null;
@@ -15505,58 +15513,6 @@
                 } catch(e) { return false; }
             },
 
-            // ── 북마크 (서버 동기화) ──
-            _initBookmarks() {
-                // localStorage에서 기존 커뮤니티 북마크 로드 (즉시 표시용)
-                try {
-                    const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]');
-                    saved.forEach(s => { if (s.commPostId) this.comm.myBookmarks.add(s.commPostId); });
-                } catch(e) {}
-                // 서버에서 동기화
-                this._syncBookmarksFromServer();
-            },
-            async _syncBookmarksFromServer() {
-                if (!sb || !auth.user) return;
-                try {
-                    const { data } = await sb.from('bookmarks').select('post_id').eq('user_id', auth.user.id);
-                    if (data) {
-                        this.comm.myBookmarks = new Set(data.map(b => b.post_id));
-                        // localStorage도 동기화: 서버에 있는데 로컬에 없는 것 추가
-                        const saved = this.getSavedOutfits();
-                        const localPostIds = new Set(saved.filter(s => s.commPostId).map(s => s.commPostId));
-                        const serverOnly = data.filter(b => !localPostIds.has(b.post_id)).map(b => b.post_id);
-                        if (serverOnly.length > 0) {
-                            // 서버에만 있는 북마크의 게시물 데이터 가져오기
-                            const { data: posts } = await sb.from('posts').select('id, outfit, score, style, layer_type, caption, profiles!posts_user_id_fkey(nickname)').in('id', serverOnly);
-                            if (posts) {
-                                posts.forEach(p => {
-                                    const nick = p.profiles?.nickname || '유저';
-                                    saved.unshift({
-                                        id: 'comm_' + p.id.slice(0, 8),
-                                        commPostId: p.id,
-                                        name: '@' + nick + '의 코디',
-                                        memo: p.caption || '',
-                                        outfit: p.outfit || {},
-                                        score: p.score || 0,
-                                        style: p.style || '',
-                                        layerType: p.layer_type || 'basic',
-                                        outerType: 'coat', midType: 'knit',
-                                        createdAt: new Date().toISOString()
-                                    });
-                                });
-                                try { localStorage.setItem('cs_saved', JSON.stringify(saved.slice(0, 50))); } catch(e) {}
-                            }
-                        }
-                        // 로컬에 있는데 서버에 없는 것 제거
-                        const serverPostIds = new Set(data.map(b => b.post_id));
-                        const cleaned = saved.filter(s => !s.commPostId || serverPostIds.has(s.commPostId));
-                        if (cleaned.length !== saved.length) {
-                            try { localStorage.setItem('cs_saved', JSON.stringify(cleaned)); } catch(e) {}
-                        }
-                    }
-                } catch(e) { console.warn('Bookmark sync error:', e); }
-            },
-
             async commToggleFollow(userId) {
                 if (!auth.user) { this.goTo('auth-login'); return; }
                 if (!this._throttle('follow_' + userId, 1500)) return;
@@ -15576,7 +15532,7 @@
                     this.showShareToast('팔로우했어요! ✓');
 
                     // 팔로우 알림 전송
-                    this._sendNotification(userId, 'follow', (auth.profile?.nickname || '누군가') + ' 님이 회원님을 팔로우했어요', userId);
+                    this._sendNotification(userId, 'follow', '님이 회원님을 팔로우했어요', userId);
 
                     // 맞팔 확인 (상대가 나를 팔로우하고 있는지 서버에서 확인)
                     if (sb) {
@@ -15587,7 +15543,7 @@
                                 if (!friends.includes(userId)) friends.push(userId);
                                 localStorage.setItem('sp_friends', JSON.stringify(friends));
                                 // 맞팔 알림 양방향 전송
-                                this._sendNotification(userId, 'friend', (auth.profile?.nickname || '누군가') + ' 님과 서로 친구가 되었어요! 이제 댓글로 소통해보세요 👫', userId);
+                                this._sendNotification(userId, 'friend', '서로 친구가 되었어요! 이제 댓글로 소통해보세요 👫', userId);
                             }
                         } catch(e) {}
                     }
@@ -15772,7 +15728,7 @@
                         const hasPhoto = post.photo_urls && post.photo_urls.length > 0;
                         let thumb;
                         if (hasPhoto) {
-                            thumb = '<img data-src="' + escapeHtml(this._getThumbUrl(post.photo_urls[0])) + '" data-full="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl lazy-placeholder" onerror="this.src=this.dataset.full||this.src">';
+                            thumb = '<img data-src="' + escapeHtml(post.photo_urls[0]) + '" class="w-full h-full object-cover rounded-xl lazy-placeholder" onerror="this.style.display=\'none\'">';
                         } else {
                             thumb = mannequinToImg(createMannequinSVG(outfitHex, {}), 'height:55px');
                         }
@@ -16729,9 +16685,18 @@
                 if (this._eventSubmitPhotos && this._eventSubmitPhotos.length > 0) {
                     for (let i = 0; i < this._eventSubmitPhotos.length; i++) {
                         const dataUrl = this._eventSubmitPhotos[i];
-                        const result = await this._uploadOptimized('community', dataUrl, auth.user.id);
-                        if (result) photoUrls.push(result.url);
-                        else { spToast('사진 업로드 실패'); return; }
+                        const path = auth.user.id + '/event_' + ev.id + '_' + Date.now() + '_' + i + '.webp';
+                        // dataURL → Blob (CSP-safe, no fetch)
+                        const parts = dataUrl.split(',');
+                        const mime = parts[0].match(/:(.*?);/)[1];
+                        const raw = atob(parts[1]);
+                        const arr = new Uint8Array(raw.length);
+                        for (let j = 0; j < raw.length; j++) arr[j] = raw.charCodeAt(j);
+                        const blob = new Blob([arr], { type: mime });
+                        const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: mime });
+                        if (upErr) { spToast('사진 업로드 실패'); console.error(upErr); return; }
+                        const { data: pub } = sb.storage.from('community').getPublicUrl(path);
+                        photoUrls.push(pub.publicUrl);
                     }
                 }
 
@@ -17695,116 +17660,8 @@
                 return arr;
             },
 
-            // ── 이미지 최적화 유틸 ──
-            _compressImage(src, maxPx, quality) {
-                // src: Image 객체 또는 data URL → Promise<Blob> (WebP)
-                return new Promise((resolve) => {
-                    const process = (img) => {
-                        let w = img.width, h = img.height;
-                        if (w > maxPx || h > maxPx) {
-                            const r = Math.min(maxPx / w, maxPx / h);
-                            w = Math.round(w * r); h = Math.round(h * r);
-                        }
-                        const c = document.createElement('canvas');
-                        c.width = w; c.height = h;
-                        c.getContext('2d').drawImage(img, 0, 0, w, h);
-                        c.toBlob((blob) => resolve(blob), 'image/webp', quality || 0.82);
-                    };
-                    if (src instanceof HTMLImageElement) { process(src); return; }
-                    // data URL
-                    const img = new Image();
-                    img.onload = () => process(img);
-                    img.onerror = () => resolve(null);
-                    img.src = src;
-                });
-            },
-
-            async _uploadOptimized(bucket, dataUrl, userId) {
-                // 원본(max 1200px) + 썸네일(max 400px) 업로드
-                // returns { url, thumbUrl } or null
-                if (!sb || !dataUrl) return null;
-                try {
-                    const img = await new Promise((res, rej) => {
-                        const i = new Image();
-                        i.onload = () => res(i);
-                        i.onerror = rej;
-                        i.src = dataUrl;
-                    });
-
-                    const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-                    const basePath = userId + '/' + uuid;
-
-                    // 원본 (max 1200px, WebP 0.82)
-                    const mainBlob = await this._compressImage(img, 1200, 0.82);
-                    if (!mainBlob) return null;
-                    const mainPath = basePath + '.webp';
-                    const { error: e1 } = await sb.storage.from(bucket).upload(mainPath, mainBlob, { contentType: 'image/webp', upsert: false });
-                    if (e1) { console.warn('Upload main error:', e1.message); return null; }
-                    const { data: d1 } = sb.storage.from(bucket).getPublicUrl(mainPath);
-
-                    // 썸네일 (max 400px, WebP 0.72)
-                    const thumbBlob = await this._compressImage(img, 400, 0.72);
-                    const thumbPath = basePath + '_thumb.webp';
-                    if (thumbBlob) {
-                        await sb.storage.from(bucket).upload(thumbPath, thumbBlob, { contentType: 'image/webp', upsert: false }).catch(() => {});
-                    }
-                    const { data: d2 } = sb.storage.from(bucket).getPublicUrl(thumbPath);
-
-                    return { url: d1.publicUrl, thumbUrl: d2.publicUrl };
-                } catch(e) {
-                    console.warn('_uploadOptimized error:', e);
-                    return null;
-                }
-            },
-
-            _getThumbUrl(photoUrl) {
-                // photo URL → 썸네일 URL 변환
-                if (!photoUrl) return '';
-                // 이미 _thumb이면 그대로
-                if (photoUrl.includes('_thumb.')) return photoUrl;
-                // .webp → _thumb.webp
-                return photoUrl.replace(/\.webp(\?.*)?$/, '_thumb.webp$1')
-                               .replace(/\.jpg(\?.*)?$/, '_thumb.webp$1')
-                               .replace(/\.jpeg(\?.*)?$/, '_thumb.webp$1')
-                               .replace(/\.png(\?.*)?$/, '_thumb.webp$1');
-            },
-
             _isPushActive() {
                 return !!this._pushSubscription && this._pushPermission === 'granted';
-            },
-
-            _getPushSettings() {
-                try { return JSON.parse(localStorage.getItem('sp_push_settings') || '{}'); } catch(e) { return {}; }
-            },
-
-            _togglePushType(type, el) {
-                const ps = this._getPushSettings();
-                ps[type] = ps[type] === false ? true : false;
-                localStorage.setItem('sp_push_settings', JSON.stringify(ps));
-                if (el) el.classList.toggle('on');
-                // 서버에 설정 저장 (push_subscriptions의 settings 컬럼 또는 user_data)
-                this._syncPushSettingsToServer(ps);
-            },
-
-            async _syncPushSettingsToServer(ps) {
-                if (!sb || !auth.user) return;
-                try {
-                    // user_data의 data jsonb에 push_settings 키로 저장
-                    const { data: ud } = await sb.from('user_data').select('data').eq('user_id', auth.user.id).single();
-                    const existing = ud?.data || {};
-                    existing.push_settings = ps;
-                    await sb.from('user_data').upsert({ user_id: auth.user.id, data: existing });
-                } catch(e) { console.warn('Push settings sync error:', e); }
-            },
-
-            async _loadPushSettingsFromServer() {
-                if (!sb || !auth.user) return;
-                try {
-                    const { data: ud } = await sb.from('user_data').select('data').eq('user_id', auth.user.id).single();
-                    if (ud?.data?.push_settings) {
-                        localStorage.setItem('sp_push_settings', JSON.stringify(ud.data.push_settings));
-                    }
-                } catch(e) {}
             },
 
             // ── 인증 화면 ──
@@ -18407,24 +18264,21 @@
                 return `<div class="screen active">
                     <div class="prose-sm text-warm-800 leading-relaxed">
                         <h2 class="font-display text-xl font-bold text-warm-900 mb-4">개인정보처리방침</h2>
-                        <p class="text-xs text-warm-500 mb-4">시행일: 2025년 3월 1일 | 최종 수정: 2026년 3월 3일</p>
-
-                        <p class="text-sm mb-4">바루픽(이하 "서비스")은 이용자의 개인정보를 중요시하며, 개인정보보호법 등 관련 법령을 준수합니다.</p>
+                        <p class="text-xs text-warm-500 mb-4">시행일: 2025년 3월 1일 | 최종 수정: 2025년 3월 1일</p>
 
                         <div class="mb-4">
                             <h3 class="text-sm font-bold text-warm-900 mb-2">1. 수집하는 개인정보 항목</h3>
-                            <p class="text-sm mb-1"><strong>필수:</strong> 이메일 주소, 비밀번호(암호화 저장)</p>
-                            <p class="text-sm mb-1"><strong>선택:</strong> 닉네임, 프로필 사진, 퍼스널컬러 진단 결과, 체형 정보, OOTD 사진, 코디 기록</p>
-                            <p class="text-sm"><strong>자동 수집:</strong> 기기 식별 정보, 푸시 토큰, 접속 로그</p>
+                            <p class="text-sm mb-1"><strong>필수:</strong> 이메일 주소, 닉네임, 비밀번호(암호화)</p>
+                            <p class="text-sm mb-1"><strong>선택:</strong> 프로필 사진, 퍼스널컬러 진단 결과, 체형 정보, OOTD 사진</p>
+                            <p class="text-sm"><strong>자동 수집:</strong> 기기 정보, 접속 로그, 서비스 이용 기록</p>
                         </div>
 
                         <div class="mb-4">
                             <h3 class="text-sm font-bold text-warm-900 mb-2">2. 수집 및 이용 목적</h3>
                             <p class="text-sm mb-1">• 회원 가입·인증 및 회원 관리</p>
-                            <p class="text-sm mb-1">• 맞춤형 AI 코디 추천 서비스 제공</p>
-                            <p class="text-sm mb-1">• 커뮤니티 서비스 운영 (코디 공유, 좋아요, 댓글, 팔로우)</p>
-                            <p class="text-sm mb-1">• 푸시 알림 발송 (좋아요, 댓글, 팔로우, 이벤트 알림)</p>
-                            <p class="text-sm">• 서비스 개선, 이용 통계 분석, 부정 이용 방지</p>
+                            <p class="text-sm mb-1">• 맞춤형 코디 추천 서비스 제공</p>
+                            <p class="text-sm mb-1">• 커뮤니티 서비스 운영 (코디 공유, 좋아요, 팔로우)</p>
+                            <p class="text-sm">• 서비스 개선 및 통계 분석</p>
                         </div>
 
                         <div class="mb-4">
@@ -18440,44 +18294,20 @@
                         </div>
 
                         <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">5. 개인정보 처리 위탁</h3>
-                            <p class="text-sm mb-1">• Supabase Inc. — 데이터베이스 호스팅 및 사용자 인증</p>
-                            <p class="text-sm">• Google Cloud Platform — 이미지 저장 및 CDN</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">6. 개인정보의 파기</h3>
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">5. 개인정보의 파기</h3>
                             <p class="text-sm">보유 기간이 경과하거나 처리 목적이 달성된 경우, 해당 개인정보를 지체 없이 파기합니다. 전자적 파일은 복구 불가능한 방법으로 삭제하며, 종이 문서는 분쇄합니다.</p>
                         </div>
 
                         <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">7. 이용자의 권리</h3>
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">6. 이용자의 권리</h3>
                             <p class="text-sm mb-1">• 개인정보 열람, 수정, 삭제 요청 권리</p>
                             <p class="text-sm mb-1">• 개인정보 처리 정지 요청 권리</p>
-                            <p class="text-sm mb-1">• 설정 → 계정 삭제를 통해 언제든지 탈퇴 가능</p>
-                            <p class="text-sm">• 설정 → 데이터 백업으로 데이터 이동 가능</p>
+                            <p class="text-sm">• 설정 > 계정 삭제를 통해 언제든지 탈퇴 가능</p>
                         </div>
 
                         <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">8. 만 14세 미만 아동의 개인정보</h3>
-                            <p class="text-sm">바루픽은 만 14세 미만 아동의 회원가입을 제한하며, 아동의 개인정보를 수집하지 않습니다.</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">9. 개인정보 보호 조치</h3>
-                            <p class="text-sm mb-1">• 비밀번호 암호화(bcrypt) 저장</p>
-                            <p class="text-sm mb-1">• SSL/TLS 암호화 통신</p>
-                            <p class="text-sm">• Supabase Row Level Security(RLS) 적용</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">10. 개인정보보호 책임자</h3>
+                            <h3 class="text-sm font-bold text-warm-900 mb-2">7. 개인정보보호 책임자</h3>
                             <p class="text-sm">이메일: stylepick.app@gmail.com</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h3 class="text-sm font-bold text-warm-900 mb-2">11. 개인정보처리방침 변경</h3>
-                            <p class="text-sm">본 방침이 변경될 경우, 시행일 7일 전 앱 내 공지를 통해 안내합니다.</p>
                         </div>
 
                         <div class="text-center mt-6">
@@ -18854,11 +18684,9 @@
             }
 
             app._initFollows();
-            app._initBookmarks();
             app._initNotifications();
             app._initBlocks();
             app._initPush();
-            app._loadPushSettingsFromServer();
 
             // 서비스 워커 등록
             if ('serviceWorker' in navigator) {
