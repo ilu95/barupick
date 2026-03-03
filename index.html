@@ -16013,11 +16013,18 @@
             },
 
             // ── 이벤트 제출 화면 ──
+            _eventColors: { outer: null, top: null, middleware: null, bottom: null, shoes: null },
+            _eventOpenPicker: null,
+
             renderEventSubmit() {
                 const ev = this._eventData;
                 if (!ev) return '<div class="screen active"><div class="text-center py-10 text-warm-500">이벤트 정보 없음</div></div>';
+                const self = this;
+                const ec = this._eventColors;
+                const parts = ['outer','top','middleware','bottom','shoes'];
+                const partLabels = {outer:'아우터',top:'상의',middleware:'미들웨어',bottom:'하의',shoes:'신발'};
 
-                let h = '<div class="screen active">';
+                let h = '<div class="screen active" id="event-submit-screen">';
                 h += '<div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">';
                 h += '<div class="text-sm font-bold text-warm-900 mb-1">' + escapeHtml(ev.title) + '</div>';
                 if (ev.reward) h += '<div class="text-xs text-amber-700">🎁 ' + escapeHtml(ev.reward) + '</div>';
@@ -16027,64 +16034,185 @@
                 h += '<div class="bg-red-50 border border-red-200 rounded-xl p-3 mb-5 text-xs text-red-700 leading-relaxed">' +
                     '⚠️ <b>얼굴이 보이지 않는 사진만</b> 제출해주세요. 얼굴이 노출된 사진은 관리자에 의해 숨김 처리될 수 있습니다. 제출 후에는 수정/삭제가 불가합니다.</div>';
 
-                // 현재 빌드 정보
-                const outfit = this.build.colors || {};
-                h += '<div class="text-sm font-bold text-warm-800 mb-2">🎨 코디 색상</div>';
-                h += '<div class="text-xs text-warm-500 mb-3">현재 빌드 화면의 코디가 자동으로 사용됩니다. 빌드 탭에서 코디를 먼저 완성해주세요.</div>';
+                // ── 코디 색상 (직접 선택) ──
+                const filledCount = parts.filter(p => ec[p]).length;
+                h += '<div class="text-sm font-bold text-warm-800 mb-1">🎨 코디 색상</div>';
+                h += '<div class="text-xs text-warm-500 mb-3">최소 2색 이상 선택해주세요 <span class="px-1.5 py-0.5 rounded-full bg-terra-100 text-terra-600 text-[10px] font-semibold">' + filledCount + '/5</span></div>';
 
-                // 미리보기
-                h += '<div class="bg-warm-50 border border-warm-200 rounded-2xl p-4 mb-4 flex items-center justify-center min-h-[120px]">';
-                const parts = ['outer','top','middleware','bottom','shoes'];
-                const hasParts = parts.some(p => outfit[p]);
-                if (hasParts) {
-                    h += '<div class="flex flex-col items-center gap-1">';
-                    parts.forEach(p => {
-                        if (outfit[p]) {
-                            const cObj = COLORS_60[outfit[p]];
-                            const c = cObj ? cObj.hex : '#ccc';
-                            const label = ({outer:'아우터',top:'상의',middleware:'미들웨어',bottom:'하의',shoes:'신발'})[p] || p;
-                            h += '<div class="flex items-center gap-2"><div class="rounded-lg" style="width:50px;height:24px;background:' + c + ';border:1px solid rgba(0,0,0,0.1)"></div><span class="text-[10px] text-warm-500">' + label + '</span></div>';
-                        }
+                // 피커 렌더 함수
+                function renderColorPicker(part) {
+                    if (self._eventOpenPicker !== part) return '';
+                    const catMap = {
+                        '기본': ['black','white','gray','ivory','beige','cream','charcoal','navy','brown'],
+                        '웜': ['red','orange','yellow','coral','peach','salmon','rust','burgundy','camel','cognac','amber','brick','terracotta','gold','mustard','wine','plum','eggplant'],
+                        '쿨': ['blue','sky_blue','steel_blue','mint','teal','forest_green','hunter_green','emerald','olive','sage','moss','lavender','lilac','mauve','purple'],
+                        '뉴트럴': ['khaki','sand','taupe','stone','warm_gray','cool_gray','oatmeal','linen','slate'],
+                        '비비드': ['hot_pink','magenta','electric_blue','cobalt','turquoise','lime','neon_yellow','tangerine','vermilion','rose']
+                    };
+                    let tabs = '', chips = '';
+                    const tab = self._eventPickerTab || '기본';
+                    Object.keys(catMap).forEach(cat => {
+                        tabs += '<button onclick="app._eventPickerTab=\'' + cat + '\';app._evSubmitRenderPicker(\'' + part + '\')" class="flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-semibold whitespace-nowrap ' + (tab===cat?'bg-terra-500 text-white':'bg-white border border-warm-300 text-warm-600') + '">' + cat + '</button>';
                     });
-                    h += '</div>';
-                } else {
-                    h += '<div class="text-center"><div class="text-2xl mb-1">🎨</div><div class="text-xs text-warm-400">빌드 탭에서 코디를 완성해주세요</div></div>';
+                    (catMap[tab] || []).forEach(k => {
+                        const c = COLORS_60[k];
+                        if (!c) return;
+                        const sel = ec[part] === k;
+                        const lum = (c.hcl && c.hcl[2] < 40) ? '#fff' : '#1c1917';
+                        const border = (c.hcl && c.hcl[2] > 85) ? 'border:1px solid #d6d3d1;' : '';
+                        chips += '<div onclick="app._evSelectColor(\'' + part + '\',\'' + k + '\')" class="color-chip ' + (sel ? 'ring-2 ring-terra-500 ring-offset-1' : '') + '" style="background:' + c.hex + ';' + border + '"><span class="chip-label" style="color:' + lum + '">' + self.chipBreakName(c.name) + '</span></div>';
+                    });
+                    return '<div class="mt-2 bg-warm-100 border border-warm-300 rounded-2xl p-3"><div class="flex gap-1.5 overflow-x-auto pb-2 mb-2">' + tabs + '</div><div class="color-grid">' + chips + '</div></div>';
                 }
+
+                // 부위별 버튼 그리드
+                h += '<div id="ev-color-area"><div class="grid grid-cols-3 gap-2 mb-2">';
+                parts.forEach(part => {
+                    const selected = ec[part];
+                    const c = selected ? COLORS_60[selected] : null;
+                    const isOpen = this._eventOpenPicker === part;
+                    h += '<button onclick="app._evTogglePicker(\'' + part + '\')" class="flex flex-col items-center gap-1.5 p-2.5 bg-white border ' + (isOpen ? 'border-terra-400 shadow-warm' : 'border-warm-400 shadow-warm-sm') + ' rounded-xl active:scale-95 transition-all relative">';
+                    h += '<div class="w-8 h-8 rounded-lg border border-warm-300 flex items-center justify-center" style="' + (c ? 'background:'+c.hex : '') + '">';
+                    if (!c) h += '<span class="text-warm-400 text-xs">' + partLabels[part].charAt(0) + '</span>';
+                    h += '</div>';
+                    h += '<div class="text-[11px] font-semibold ' + (c ? 'text-terra-600' : 'text-warm-500') + '">' + (c ? c.name : partLabels[part]) + '</div>';
+                    if (c) h += '<span onclick="event.stopPropagation();app._evClearColor(\'' + part + '\')" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-warm-400 text-white text-[10px] flex items-center justify-center">✕</span>';
+                    h += '</button>';
+                });
+                h += '</div>';
+                parts.forEach(part => { h += renderColorPicker(part); });
                 h += '</div>';
 
-                // 착용샷 업로드
-                h += '<div class="text-sm font-bold text-warm-800 mb-2">📷 착용샷 (선택)</div>';
+                // ── 착용샷 (크롭 + 편집) ──
+                h += '<div class="text-sm font-bold text-warm-800 mb-1 mt-5">📷 착용샷 (선택)</div>';
                 h += '<div class="text-xs text-warm-500 mb-3">마네킹(컬러 빌드)만으로도 참여 가능합니다</div>';
                 h += '<div class="mb-5">';
-                if (this._eventSubmitPhotos && this._eventSubmitPhotos.length > 0) {
+                const evPhotos = this._eventSubmitPhotos || [];
+                if (evPhotos.length > 0) {
                     h += '<div class="flex gap-2 mb-2">';
-                    this._eventSubmitPhotos.forEach((url, i) => {
-                        h += '<div class="relative"><img src="' + url + '" class="w-20 h-24 object-cover rounded-xl"><button onclick="app._eventSubmitPhotos.splice(' + i + ',1);app._eventSubmitPhotosOrig.splice(' + i + ',1);app.render()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button></div>';
+                    evPhotos.forEach((url, i) => {
+                        h += '<div class="relative w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 border border-warm-300 cursor-pointer" onclick="app._openEventPhotoEditor(' + i + ')">';
+                        h += '<img src="' + url + '" class="w-full h-full object-cover">';
+                        h += '<div class="absolute inset-0 flex items-end justify-center pb-0.5"><span class="text-[8px] text-white bg-black/50 px-1.5 rounded-full">편집</span></div>';
+                        h += '<button onclick="event.stopPropagation();app._evRemovePhoto(' + i + ')" class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 text-white text-[9px] flex items-center justify-center">✕</button>';
+                        h += '</div>';
                     });
                     h += '</div>';
                 }
-                if (!this._eventSubmitPhotos || this._eventSubmitPhotos.length < 2) {
+                if (evPhotos.length < 2) {
                     h += '<label class="flex items-center justify-center gap-2 py-3 bg-warm-100 border border-warm-300 rounded-xl text-xs text-warm-600 cursor-pointer active:scale-95 transition-all"><input type="file" accept="image/*" class="hidden" onchange="app._eventPhotoUpload(event)">📷 사진 추가 (최대 2장)</label>';
                 }
                 h += '</div>';
 
-                // 스타일 선택
-                h += '<div class="text-sm font-bold text-warm-800 mb-2">👔 스타일</div>';
-                h += '<div class="flex flex-wrap gap-1.5 mb-5">';
+                // ── 스타일 (선택사항) ──
+                h += '<div class="text-sm font-bold text-warm-800 mb-2">👔 스타일 <span class="text-[10px] font-normal text-warm-400">(선택)</span></div>';
+                h += '<div id="ev-style-area" class="flex flex-wrap gap-1.5 mb-5">';
                 const selectedStyle = this._eventSubmitStyle || '';
                 Object.entries(STYLE_GUIDE).forEach(([k, v]) => {
                     const active = selectedStyle === k;
-                    h += '<button class="px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (active ? 'bg-warm-800 text-white' : 'bg-warm-100 text-warm-600 active:scale-95') + '" onclick="app._eventSubmitStyle=\'' + k + '\';app.render()">' + v.name.replace(/ 룩$/, '') + '</button>';
+                    h += '<button class="px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (active ? 'bg-warm-800 text-white' : 'bg-warm-100 text-warm-600 active:scale-95') + '" onclick="app._evSetStyle(\'' + k + '\')">' + v.name.replace(/ 룩$/, '') + '</button>';
                 });
                 h += '</div>';
 
-                // 제출 버튼
-                const canSubmit = hasParts;
+                // ── 제출 버튼 ──
+                const canSubmit = filledCount >= 2;
                 h += '<button onclick="app._submitEvent()" class="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] ' + (canSubmit ? 'bg-terra-500 text-white shadow-terra' : 'bg-warm-200 text-warm-400') + '" ' + (canSubmit ? '' : 'disabled') + '>제출하기</button>';
-                if (!canSubmit) h += '<div class="text-center text-[10px] text-warm-400 mt-2">빌드 탭에서 코디를 먼저 완성해주세요</div>';
+                if (!canSubmit) h += '<div class="text-center text-[10px] text-warm-400 mt-2">최소 2색 이상 선택해주세요</div>';
 
                 h += '</div>';
                 return h;
+            },
+
+            _evTogglePicker(part) {
+                this._eventOpenPicker = this._eventOpenPicker === part ? null : part;
+                this._eventPickerTab = '기본';
+                this._evSubmitRenderPicker();
+            },
+
+            _evSelectColor(part, colorKey) {
+                this._eventColors[part] = colorKey;
+                this._eventOpenPicker = null;
+                this._evSubmitRenderPicker();
+            },
+
+            _evClearColor(part) {
+                this._eventColors[part] = null;
+                this._evSubmitRenderPicker();
+            },
+
+            _evSubmitRenderPicker() {
+                // 부분 DOM 업데이트 (스크롤 유지)
+                const area = document.getElementById('ev-color-area');
+                if (!area) { this.render(); return; }
+                const self = this;
+                const ec = this._eventColors;
+                const parts = ['outer','top','middleware','bottom','shoes'];
+                const partLabels = {outer:'아우터',top:'상의',middleware:'미들웨어',bottom:'하의',shoes:'신발'};
+
+                function renderColorPicker(part) {
+                    if (self._eventOpenPicker !== part) return '';
+                    const catMap = {
+                        '기본': ['black','white','gray','ivory','beige','cream','charcoal','navy','brown'],
+                        '웜': ['red','orange','yellow','coral','peach','salmon','rust','burgundy','camel','cognac','amber','brick','terracotta','gold','mustard','wine','plum','eggplant'],
+                        '쿨': ['blue','sky_blue','steel_blue','mint','teal','forest_green','hunter_green','emerald','olive','sage','moss','lavender','lilac','mauve','purple'],
+                        '뉴트럴': ['khaki','sand','taupe','stone','warm_gray','cool_gray','oatmeal','linen','slate'],
+                        '비비드': ['hot_pink','magenta','electric_blue','cobalt','turquoise','lime','neon_yellow','tangerine','vermilion','rose']
+                    };
+                    let tabs = '', chips = '';
+                    const tab = self._eventPickerTab || '기본';
+                    Object.keys(catMap).forEach(cat => {
+                        tabs += '<button onclick="app._eventPickerTab=\'' + cat + '\';app._evSubmitRenderPicker(\'' + part + '\')" class="flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-semibold whitespace-nowrap ' + (tab===cat?'bg-terra-500 text-white':'bg-white border border-warm-300 text-warm-600') + '">' + cat + '</button>';
+                    });
+                    (catMap[tab] || []).forEach(k => {
+                        const c = COLORS_60[k];
+                        if (!c) return;
+                        const sel = ec[part] === k;
+                        const lum = (c.hcl && c.hcl[2] < 40) ? '#fff' : '#1c1917';
+                        const border = (c.hcl && c.hcl[2] > 85) ? 'border:1px solid #d6d3d1;' : '';
+                        chips += '<div onclick="app._evSelectColor(\'' + part + '\',\'' + k + '\')" class="color-chip ' + (sel ? 'ring-2 ring-terra-500 ring-offset-1' : '') + '" style="background:' + c.hex + ';' + border + '"><span class="chip-label" style="color:' + lum + '">' + self.chipBreakName(c.name) + '</span></div>';
+                    });
+                    return '<div class="mt-2 bg-warm-100 border border-warm-300 rounded-2xl p-3"><div class="flex gap-1.5 overflow-x-auto pb-2 mb-2">' + tabs + '</div><div class="color-grid">' + chips + '</div></div>';
+                }
+
+                let nh = '<div class="grid grid-cols-3 gap-2 mb-2">';
+                parts.forEach(part => {
+                    const selected = ec[part];
+                    const c = selected ? COLORS_60[selected] : null;
+                    const isOpen = self._eventOpenPicker === part;
+                    nh += '<button onclick="app._evTogglePicker(\'' + part + '\')" class="flex flex-col items-center gap-1.5 p-2.5 bg-white border ' + (isOpen ? 'border-terra-400 shadow-warm' : 'border-warm-400 shadow-warm-sm') + ' rounded-xl active:scale-95 transition-all relative">';
+                    nh += '<div class="w-8 h-8 rounded-lg border border-warm-300 flex items-center justify-center" style="' + (c ? 'background:'+c.hex : '') + '">';
+                    if (!c) nh += '<span class="text-warm-400 text-xs">' + partLabels[part].charAt(0) + '</span>';
+                    nh += '</div>';
+                    nh += '<div class="text-[11px] font-semibold ' + (c ? 'text-terra-600' : 'text-warm-500') + '">' + (c ? c.name : partLabels[part]) + '</div>';
+                    if (c) nh += '<span onclick="event.stopPropagation();app._evClearColor(\'' + part + '\')" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-warm-400 text-white text-[10px] flex items-center justify-center">✕</span>';
+                    nh += '</button>';
+                });
+                nh += '</div>';
+                parts.forEach(part => { nh += renderColorPicker(part); });
+                area.innerHTML = nh;
+
+                // 제출 버튼 상태도 업데이트
+                const filledCount = parts.filter(p => ec[p]).length;
+                const submitBtn = area.parentElement?.querySelector('button[onclick*="_submitEvent"]');
+                if (submitBtn) {
+                    const canSubmit = filledCount >= 2;
+                    submitBtn.disabled = !canSubmit;
+                    submitBtn.className = 'w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] ' + (canSubmit ? 'bg-terra-500 text-white shadow-terra' : 'bg-warm-200 text-warm-400');
+                }
+            },
+
+            _evSetStyle(key) {
+                // 토글 동작 + 스크롤 유지
+                this._eventSubmitStyle = this._eventSubmitStyle === key ? '' : key;
+                const area = document.getElementById('ev-style-area');
+                if (!area) return;
+                let nh = '';
+                const selectedStyle = this._eventSubmitStyle || '';
+                Object.entries(STYLE_GUIDE).forEach(([k, v]) => {
+                    const active = selectedStyle === k;
+                    nh += '<button class="px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ' + (active ? 'bg-warm-800 text-white' : 'bg-warm-100 text-warm-600 active:scale-95') + '" onclick="app._evSetStyle(\'' + k + '\')">' + v.name.replace(/ 룩$/, '') + '</button>';
+                });
+                area.innerHTML = nh;
             },
 
             _eventPhotoUpload(e) {
@@ -16092,25 +16220,120 @@
                 if (!file) return;
                 if (!this._eventSubmitPhotos) { this._eventSubmitPhotos = []; this._eventSubmitPhotosOrig = []; }
                 if (this._eventSubmitPhotos.length >= 2) { spToast('최대 2장까지 가능해요'); return; }
+                if (file.size > 10 * 1024 * 1024) { spToast('10MB 이하 이미지만 가능해요'); return; }
 
                 const reader = new FileReader();
-                reader.onload = () => {
+                const self = this;
+                reader.onload = function(ev) {
                     const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const maxW = 800;
-                        const ratio = Math.min(maxW / img.width, 1);
-                        canvas.width = img.width * ratio;
-                        canvas.height = img.height * ratio;
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        const dataUrl = canvas.toDataURL('image/webp', 0.85);
-                        this._eventSubmitPhotos.push(dataUrl);
-                        this._eventSubmitPhotosOrig.push(file);
-                        this.render();
+                    img.onload = function() {
+                        // 4:5 크롭 UI
+                        self._showCropUI(img, 'rect', 4/5, (croppedDataUrl) => {
+                            // 원본도 리사이즈
+                            const maxW = 1200, maxH = 1200;
+                            let w = img.width, h = img.height;
+                            if (w > maxW || h > maxH) {
+                                const r = Math.min(maxW / w, maxH / h);
+                                w = Math.round(w * r); h = Math.round(h * r);
+                            }
+                            const origCanvas = document.createElement('canvas');
+                            origCanvas.width = w; origCanvas.height = h;
+                            origCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            const origDataUrl = origCanvas.toDataURL('image/jpeg', 0.8);
+
+                            if (!self._eventSubmitPhotos) self._eventSubmitPhotos = [];
+                            if (!self._eventSubmitPhotosOrig) self._eventSubmitPhotosOrig = [];
+                            self._eventSubmitPhotos.push(croppedDataUrl);
+                            self._eventSubmitPhotosOrig.push(origDataUrl);
+                            self.render();
+                        }, 'dataurl');
                     };
-                    img.src = reader.result;
+                    img.src = ev.target.result;
                 };
                 reader.readAsDataURL(file);
+                e.target.value = '';
+            },
+
+            _evRemovePhoto(idx) {
+                if (this._eventSubmitPhotos) this._eventSubmitPhotos.splice(idx, 1);
+                if (this._eventSubmitPhotosOrig) this._eventSubmitPhotosOrig.splice(idx, 1);
+                this.render();
+            },
+
+            _openEventPhotoEditor(idx) {
+                // 기존 사진 편집기를 이벤트 사진에 적용
+                const src = this._eventSubmitPhotos[idx];
+                if (!src) return;
+                this._photoEd = { idx, items: [], tool: 'sticker', activeItem: -1, dragOffset: null, stickerType: '😎', _mosaicColor: '#000000', _isEvent: true };
+
+                // openPhotoEditor 내부 로직 재활용 (ootd.photos 대신 _eventSubmitPhotos 사용)
+                const ov = document.createElement('div');
+                ov.id = 'photoEdOverlay';
+                ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;';
+                ov.innerHTML = '<div style="display:flex;align-items:center;padding:12px 16px;gap:10px;flex-shrink:0">' +
+                    '<button onclick="app._closeEventPhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:transparent">취소</button>' +
+                    '<span style="flex:1;text-align:center;color:#fff;font-size:15px;font-weight:600">사진 편집</span>' +
+                    '<button onclick="app._saveEventPhotoEditor()" style="color:#fff;font-size:14px;padding:6px 12px;border-radius:8px;background:#C2785C;font-weight:600">완료</button>' +
+                '</div>' +
+                '<div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;touch-action:none" id="peCanvas"></div>' +
+                '<div id="peToolbar" style="flex-shrink:0;padding:8px 12px 16px;background:#111"></div>';
+                document.body.appendChild(ov);
+                document.body.style.overflow = 'hidden';
+
+                const canvasArea = document.getElementById('peCanvas');
+                const imgEl = new Image();
+                imgEl.onload = () => {
+                    canvasArea.innerHTML = '';
+                    const c = document.createElement('canvas');
+                    c.id = 'peMainCanvas';
+                    const maxW = canvasArea.clientWidth, maxH = canvasArea.clientHeight;
+                    const ratio = Math.min(maxW / imgEl.width, maxH / imgEl.height, 1);
+                    c.width = imgEl.width * ratio;
+                    c.height = imgEl.height * ratio;
+                    c.style.cssText = 'border-radius:8px;touch-action:none';
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(imgEl, 0, 0, c.width, c.height);
+                    this._photoEd._baseImg = imgEl;
+                    this._photoEd._ratio = ratio;
+                    canvasArea.appendChild(c);
+                    this._peRenderToolbar();
+                    this._peBindEvents(c);
+                };
+                imgEl.src = src;
+            },
+
+            _closeEventPhotoEditor() {
+                const ov = document.getElementById('photoEdOverlay');
+                if (ov) ov.remove();
+                document.body.style.overflow = '';
+                this._photoEd = { idx: -1, items: [], tool: 'sticker', activeItem: -1, dragOffset: null, stickerType: '😎' };
+            },
+
+            _saveEventPhotoEditor() {
+                const pe = this._photoEd;
+                const canvas = document.getElementById('peMainCanvas');
+                if (!canvas || pe.idx < 0) return;
+                // 아이템 합성
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(pe._baseImg, 0, 0, canvas.width, canvas.height);
+                pe.items.forEach(item => {
+                    if (item.type === 'sticker') {
+                        ctx.font = item.size + 'px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(item.emoji, item.x, item.y);
+                    } else if (item.type === 'mosaic') {
+                        ctx.fillStyle = item.color || '#000';
+                        ctx.beginPath();
+                        ctx.arc(item.x, item.y, item.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                this._eventSubmitPhotos[pe.idx] = dataUrl;
+                spToast('편집이 저장되었어요 ✓');
+                this._closeEventPhotoEditor();
+                this.render();
             },
 
             async _submitEvent() {
@@ -16118,12 +16341,12 @@
                 const ev = this._eventData;
                 if (!ev) return;
 
-                // 현재 빌드 코디 가져오기
+                // 현재 이벤트 코디 가져오기
                 const outfit = {};
                 ['top','middleware','bottom','outer','shoes'].forEach(p => {
-                    if (this.build.colors && this.build.colors[p]) outfit[p] = this.build.colors[p];
+                    if (this._eventColors[p]) outfit[p] = this._eventColors[p];
                 });
-                if (Object.keys(outfit).length === 0) { spToast('코디를 먼저 완성해주세요'); return; }
+                if (Object.keys(outfit).length < 2) { spToast('최소 2색 이상 선택해주세요'); return; }
 
                 // 점수 계산
                 const pc = auth.profile?.personal_color || null;
@@ -16131,15 +16354,12 @@
                 const score = evalResult ? evalResult.total : 0;
                 const style = this._eventSubmitStyle || '';
 
-                // 사진 업로드
+                // 사진 업로드 (편집된 최종본 사용)
                 let photoUrls = [];
-                if (this._eventSubmitPhotosOrig && this._eventSubmitPhotosOrig.length > 0) {
-                    for (const file of this._eventSubmitPhotosOrig) {
-                        const ext = 'webp';
-                        const path = auth.user.id + '/event_' + ev.id + '_' + Date.now() + '.' + ext;
-                        // dataURL to blob
-                        const idx = this._eventSubmitPhotosOrig.indexOf(file);
-                        const dataUrl = this._eventSubmitPhotos[idx];
+                if (this._eventSubmitPhotos && this._eventSubmitPhotos.length > 0) {
+                    for (let i = 0; i < this._eventSubmitPhotos.length; i++) {
+                        const dataUrl = this._eventSubmitPhotos[i];
+                        const path = auth.user.id + '/event_' + ev.id + '_' + Date.now() + '_' + i + '.webp';
                         const resp = await fetch(dataUrl);
                         const blob = await resp.blob();
                         const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp' });
@@ -16168,6 +16388,7 @@
                 this._eventSubmitPhotos = null;
                 this._eventSubmitPhotosOrig = null;
                 this._eventSubmitStyle = '';
+                this._eventColors = { outer: null, top: null, middleware: null, bottom: null, shoes: null };
                 this._eventSubs = null; // 리로드
                 this.goTo('event-detail');
             },
