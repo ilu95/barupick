@@ -15795,10 +15795,10 @@
                     h += '<div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4 text-xs text-blue-700 text-center">이벤트 시작 전입니다. 미리 코디를 준비해보세요!</div>';
                 }
 
-                // 투표 현황
+                // 투표 현황 (결과 발표 시에는 포디움에 포함되므로 생략)
                 const myVote = this._eventMyVote;
                 const totalVotes = this._eventVotes ? Object.values(this._eventVotes).reduce((a,b)=>a+b, 0) : 0;
-                if (auth.user && (isActive || isEnded)) {
+                if (!isResult && auth.user && (isActive || isEnded)) {
                     h += '<div class="flex items-center justify-between mb-3">';
                     h += '<div class="text-xs text-warm-500">';
                     if (isLastDay || (isEnded && !isResult)) h += '투표수 비공개';
@@ -15811,7 +15811,90 @@
                 // 그리드/스와이프 전환
                 const subs = this._eventSubs || [];
                 const visibleSubs = subs.filter(s => s.status === 'visible');
-                if (visibleSubs.length > 0) {
+
+                // ── 결과 발표 모드: 시상식 UI ──
+                if (isResult && visibleSubs.length > 0) {
+                    // 득표순 정렬
+                    const ranked = [...visibleSubs].sort((a, b) => {
+                        const va = (this._eventVotes && this._eventVotes[a.id]) || 0;
+                        const vb = (this._eventVotes && this._eventVotes[b.id]) || 0;
+                        return vb - va;
+                    });
+                    const top3 = ranked.slice(0, 3);
+                    const rest = ranked.slice(3);
+
+                    h += '<div class="text-center mb-5">';
+                    h += '<div class="text-lg font-black text-warm-900 mb-1">🏆 최종 결과</div>';
+                    h += '<div class="text-xs text-warm-500">총 ' + visibleSubs.length + '명 참가 · ' + totalVotes + '표</div>';
+                    h += '</div>';
+
+                    // ── 포디움: 2위 / 1위(높게) / 3위 ──
+                    const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : (top3.length === 2 ? [top3[1], top3[0]] : [top3[0]]);
+                    h += '<div class="flex items-end justify-center gap-2 mb-6">';
+                    podiumOrder.forEach((sub, pi) => {
+                        if (!sub) return;
+                        const rank = top3.indexOf(sub);
+                        const votes = (this._eventVotes && this._eventVotes[sub.id]) || 0;
+                        const nick = sub._nickname || '???';
+                        const hasPhoto = sub.photo_urls && sub.photo_urls.length > 0;
+                        const medal = rank === 0 ? '🥇' : rank === 1 ? '🥈' : '🥉';
+                        const colors = rank === 0 ? 'from-amber-400 to-amber-500' : rank === 1 ? 'from-stone-300 to-stone-400' : 'from-amber-600 to-amber-700';
+                        const borderColor = rank === 0 ? 'border-amber-400 ring-amber-200' : rank === 1 ? 'border-stone-300 ring-stone-200' : 'border-amber-600 ring-amber-200';
+                        const imgSize = rank === 0 ? 'w-28 h-36' : 'w-20 h-28';
+                        const podH = rank === 0 ? 'h-20' : rank === 1 ? 'h-14' : 'h-10';
+                        const colW = rank === 0 ? 'flex-1 max-w-[130px]' : 'flex-1 max-w-[100px]';
+
+                        h += '<div class="flex flex-col items-center ' + colW + '">';
+                        // 메달
+                        h += '<div class="text-2xl mb-1">' + medal + '</div>';
+                        // 사진
+                        h += '<div class="relative ' + imgSize + ' rounded-2xl overflow-hidden border-2 ' + borderColor + ' ring-2 shadow-lg mb-2">';
+                        if (hasPhoto) {
+                            h += '<img src="' + sub.photo_urls[0] + '" class="w-full h-full object-cover">';
+                        } else {
+                            h += '<div class="w-full h-full bg-warm-50 flex items-center justify-center">' + this._renderMiniMannequin(sub.outfit) + '</div>';
+                        }
+                        h += '</div>';
+                        // 닉네임 + 득표
+                        h += '<div class="text-xs font-bold text-warm-800 text-center truncate w-full">@' + escapeHtml(nick) + '</div>';
+                        h += '<div class="text-[11px] font-bold text-terra-600">' + votes + '표</div>';
+                        if (sub._instagram) h += '<div class="text-[9px] text-warm-400">📸 @' + escapeHtml(sub._instagram) + '</div>';
+                        else if (sub.style) h += '<div class="text-[9px] text-warm-400">' + escapeHtml(sub.style) + '</div>';
+                        // 포디움 기둥
+                        h += '<div class="w-full ' + podH + ' bg-gradient-to-t ' + colors + ' rounded-t-lg mt-1.5 flex items-center justify-center">';
+                        h += '<span class="text-white font-black text-sm">' + (rank + 1) + '</span>';
+                        h += '</div>';
+                        h += '</div>';
+                    });
+                    h += '</div>';
+
+                    // ── 4위 이하 리스트 ──
+                    if (rest.length > 0) {
+                        h += '<div class="border-t border-warm-200 pt-4">';
+                        h += '<div class="text-xs font-bold text-warm-600 mb-3">참가자 전체 순위</div>';
+                        rest.forEach((sub, i) => {
+                            const votes = (this._eventVotes && this._eventVotes[sub.id]) || 0;
+                            const nick = sub._nickname || '???';
+                            const hasPhoto = sub.photo_urls && sub.photo_urls.length > 0;
+                            h += '<div class="flex items-center gap-3 py-2.5 border-b border-warm-100">';
+                            h += '<span class="text-xs font-bold text-warm-400 w-6 text-center">' + (i + 4) + '</span>';
+                            if (hasPhoto) {
+                                h += '<img src="' + sub.photo_urls[0] + '" class="w-10 h-12 object-cover rounded-lg flex-shrink-0">';
+                            } else {
+                                h += '<div class="w-10 h-12 bg-warm-50 rounded-lg flex items-center justify-center text-warm-300 flex-shrink-0">' + this._renderMiniMannequin(sub.outfit) + '</div>';
+                            }
+                            h += '<div class="flex-1 min-w-0">';
+                            h += '<div class="text-xs font-medium text-warm-800 truncate">@' + escapeHtml(nick) + '</div>';
+                            h += '<div class="text-[10px] text-warm-400">' + (sub._instagram ? '📸 @' + escapeHtml(sub._instagram) : '') + (sub.style ? (sub._instagram ? ' · ' : '') + escapeHtml(sub.style) : '') + '</div>';
+                            h += '</div>';
+                            h += '<div class="text-xs font-bold ' + (votes > 0 ? 'text-warm-700' : 'text-warm-400') + '">' + votes + '표</div>';
+                            h += '</div>';
+                        });
+                        h += '</div>';
+                    }
+
+                // ── 일반 모드: 그리드/스와이프 ──
+                } else if (visibleSubs.length > 0) {
                     h += '<div class="flex items-center justify-between mb-3">';
                     h += '<div class="text-sm font-bold text-warm-800">참가작 ' + visibleSubs.length + '</div>';
                     h += '<div class="flex gap-1"><button class="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all ' + (this._eventViewMode === 'grid' ? 'bg-warm-800 text-white' : 'bg-warm-100 text-warm-600') + '" onclick="app._eventViewMode=\'grid\';app.render()">그리드</button>' +
@@ -15989,10 +16072,14 @@
                     const isResult = now > end && (now - end) > 86400000;
                     if (isResult && subs && subs.length > 0) {
                         const uids = [...new Set(subs.map(s => s.user_id))];
-                        const { data: profs } = await sb.from('profiles').select('id, nickname').in('id', uids);
+                        const { data: profs } = await sb.from('profiles').select('id, nickname, instagram_id').in('id', uids);
                         const profMap = {};
-                        (profs || []).forEach(p => { profMap[p.id] = p.nickname; });
-                        subs.forEach(s => { s._nickname = profMap[s.user_id] || ''; });
+                        (profs || []).forEach(p => { profMap[p.id] = p; });
+                        subs.forEach(s => {
+                            const prof = profMap[s.user_id] || {};
+                            s._nickname = prof.nickname || '';
+                            s._instagram = prof.instagram_id || '';
+                        });
                     }
 
                     this._eventSubs = subs || [];
