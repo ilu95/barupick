@@ -7459,7 +7459,7 @@
                 else if (screen === 'closet' || screen.startsWith('closet-') || screen === 'ootd-calendar' || screen === 'ootd-detail' || screen === 'ootd-day-list' || screen === 'best-coord') activeTab = 'nav-closet';
                 else if (screen === 'ootd-record') activeTab = 'nav-ootd';
                 else if (screen === 'community' || screen === 'community-detail' || screen === 'community-post' || screen === 'user-profile' || screen === 'follow-list') activeTab = 'nav-community';
-                else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'my-posts' || screen === 'my-insights' || screen === 'post-insight' || screen === 'block-list' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy') activeTab = '';
+                else if (screen === 'profile' || screen.startsWith('pc-') || screen === 'body-quiz' || screen === 'body-select' || screen.startsWith('auth-') || screen === 'my-level' || screen === 'my-badges' || screen === 'my-settings' || screen === 'my-posts' || screen === 'my-insights' || screen === 'post-insight' || screen === 'block-list' || screen === 'color-ranking' || screen === 'color-pattern' || screen === 'challenges' || screen.startsWith('title-exam') || screen === 'notifications' || screen === 'terms' || screen === 'privacy' || screen === 'user-discover') activeTab = '';
                 else if (screen === 'shop') activeTab = 'nav-shop';
                 else activeTab = '';
 
@@ -7702,6 +7702,10 @@
                     case 'follow-list':
                         headerTitle.textContent = this._followListTab === 'followers' ? '팔로워' : '팔로잉';
                         content.innerHTML = this.renderFollowList();
+                        break;
+                    case 'user-discover':
+                        headerTitle.textContent = '유저 탐색';
+                        content.innerHTML = this.renderUserDiscover();
                         break;
                     case 'notifications':
                         headerTitle.textContent = '알림';
@@ -14857,14 +14861,14 @@
                             '<div class="text-sm font-bold text-warm-900 mb-1.5">친구를 찾아보세요!</div>' +
                             '<div class="text-xs text-warm-600 mb-4 leading-relaxed">다른 유저를 팔로우하면<br>이 탭에서 친구들의 코디를 볼 수 있어요</div>' +
                             '<div class="flex flex-col gap-2">' +
-                            '<button onclick="app.openFollowList(auth.user.id,\'following\')" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">👤 유저 검색하기</button>' +
+                            '<button onclick="app.goTo(\'user-discover\')" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">👤 유저 검색하기</button>' +
                             '<button onclick="app.comm.rankingMode=\'user\';app.commSwitchTab(\'ranking\')" class="px-6 py-2 bg-white text-warm-700 border border-warm-400 rounded-full text-xs font-medium active:scale-95 transition-all">🏆 랭킹에서 인기 유저 찾기</button>' +
                             '</div></div>';
                     } else if (myFollowCount <= 3) {
                         body += '<div class="bg-terra-50 border border-terra-200 rounded-2xl p-4 mb-4 flex items-center gap-3">' +
                             '<div class="text-2xl flex-shrink-0">💡</div>' +
                             '<div class="flex-1"><div class="text-xs font-semibold text-warm-800 mb-0.5">더 많은 코디를 발견하세요</div><div class="text-[11px] text-warm-600">더 많은 유저를 팔로우하면 다양한 스타일을 볼 수 있어요</div></div>' +
-                            '<button onclick="app.openFollowList(auth.user.id,\'following\')" class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0">탐색</button>' +
+                            '<button onclick="app.goTo(\'user-discover\')" class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0">탐색</button>' +
                             '</div>';
                     }
                 } else if (tab === 'ranking') {
@@ -15151,7 +15155,7 @@
                     grid.innerHTML = '';
                     let emptyH = '<div class="text-center py-10"><div class="text-4xl mb-2">' + (tab === 'friends' ? '👫' : '🎨') + '</div><div class="text-sm text-warm-600">' + emptyMsg + '</div>';
                     if (tab === 'friends') {
-                        emptyH += '<button onclick="app.openFollowList(auth.user.id,\'following\')" class="mt-4 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all shadow-terra">유저 검색하기</button>';
+                        emptyH += '<button onclick="app.goTo(\'user-discover\')" class="mt-4 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all shadow-terra">유저 검색하기</button>';
                     }
                     emptyH += '</div>';
                     if (status) status.innerHTML = emptyH;
@@ -16210,6 +16214,117 @@
                 this._userSearchQuery = '';
                 this._userSearchResults = null;
                 this.goTo('follow-list');
+            },
+
+            // ============================================================
+            // 유저 탐색 (전체 유저 검색 + 추천)
+            // ============================================================
+            _discoverQuery: '',
+            _discoverResults: null,
+            _discoverSuggested: null,
+
+            renderUserDiscover() {
+                // 추천 유저 로드 (첫 진입 시)
+                if (!this._discoverSuggested) this._loadSuggestedUsers();
+
+                let h = '<div class="screen active">';
+
+                // 검색바
+                h += '<div class="relative mb-5">';
+                h += '<input type="text" id="discover-input" placeholder="닉네임 또는 인스타 ID로 검색" value="' + escapeHtml(this._discoverQuery) + '" oninput="app._discoverQuery=this.value" onkeydown="if(event.key===\'Enter\')app._doDiscoverSearch()" class="w-full pl-10 pr-16 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-colors">';
+                h += '<i data-lucide="search" style="width:16px;height:16px;color:#A8A29E" class="absolute left-3.5 top-1/2 -translate-y-1/2"></i>';
+                h += '<button onclick="app._doDiscoverSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-terra-500 text-white text-[11px] font-semibold rounded-xl active:scale-95 transition-all">검색</button>';
+                h += '</div>';
+
+                // 검색 결과
+                h += '<div id="discover-results">';
+                if (this._discoverResults !== null) {
+                    if (this._discoverResults.length === 0) {
+                        h += '<div class="text-center py-6 text-warm-400 text-sm">검색 결과가 없어요</div>';
+                    } else {
+                        h += '<div class="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-2 px-1">' + svg("search", 12, "#A8A29E") + ' 검색 결과 ' + this._discoverResults.length + '명</div>';
+                        this._discoverResults.forEach(u => { h += this._renderFollowUserRow(u, true); });
+                    }
+                }
+                h += '</div>';
+
+                // 추천 유저 (검색 결과 없을 때)
+                if (this._discoverResults === null) {
+                    h += '<div id="discover-suggested">';
+                    if (this._discoverSuggested && this._discoverSuggested.length > 0) {
+                        h += '<div class="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-3 px-1">' + svg("sparkles", 12, "#A8A29E") + ' 추천 유저</div>';
+                        this._discoverSuggested.forEach(u => { h += this._renderFollowUserRow(u, true); });
+                    } else if (this._discoverSuggested === null) {
+                        h += '<div class="text-center py-10 text-warm-400 text-sm">불러오는 중...</div>';
+                    } else {
+                        h += '<div class="text-center py-10 text-warm-400 text-sm">아직 가입한 유저가 없어요</div>';
+                    }
+                    h += '</div>';
+                }
+
+                h += '</div>';
+                return h;
+            },
+
+            async _loadSuggestedUsers() {
+                if (!sb) return;
+                try {
+                    // 내가 팔로우하지 않는 활성 유저 추천 (최근 활동 기준)
+                    const myFollows = Array.from(this.comm.myFollows || []);
+                    const exclude = auth.user ? [auth.user.id, ...myFollows] : myFollows;
+
+                    const { data } = await sb.from('profiles')
+                        .select('id, nickname, avatar_url, instagram_id')
+                        .not('id', 'in', '(' + (exclude.length > 0 ? exclude.join(',') : '00000000-0000-0000-0000-000000000000') + ')')
+                        .not('nickname', 'is', null)
+                        .order('updated_at', { ascending: false })
+                        .limit(20);
+
+                    this._discoverSuggested = data || [];
+                    // DOM 업데이트
+                    const el = document.getElementById('discover-suggested');
+                    if (el && this._discoverSuggested.length > 0) {
+                        let sh = '<div class="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-3 px-1">' + svg("sparkles", 12, "#A8A29E") + ' 추천 유저</div>';
+                        this._discoverSuggested.forEach(u => { sh += this._renderFollowUserRow(u, true); });
+                        el.innerHTML = sh;
+                        refreshIcons();
+                    } else if (el) {
+                        el.innerHTML = this._discoverSuggested.length === 0
+                            ? '<div class="text-center py-10 text-warm-400 text-sm">아직 가입한 유저가 없어요</div>'
+                            : '';
+                    }
+                } catch (e) { console.error('Suggested users error:', e); }
+            },
+
+            async _doDiscoverSearch() {
+                const q = (this._discoverQuery || '').trim();
+                if (q.length < 2) { spToast('2글자 이상 입력해주세요'); return; }
+                if (!sb) return;
+                try {
+                    const { data } = await sb.from('profiles')
+                        .select('id, nickname, avatar_url, instagram_id')
+                        .or('nickname.ilike.%' + q + '%,instagram_id.ilike.%' + q + '%')
+                        .limit(30);
+                    this._discoverResults = data || [];
+                    // DOM 업데이트
+                    const el = document.getElementById('discover-results');
+                    if (el) {
+                        if (this._discoverResults.length === 0) {
+                            el.innerHTML = '<div class="text-center py-6 text-warm-400 text-sm">검색 결과가 없어요</div>';
+                        } else {
+                            let h = '<div class="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-2 px-1">' + svg("search", 12, "#A8A29E") + ' 검색 결과 ' + this._discoverResults.length + '명</div>';
+                            this._discoverResults.forEach(u => { h += this._renderFollowUserRow(u, true); });
+                            el.innerHTML = h;
+                        }
+                        // 추천 유저 숨김
+                        const sugEl = document.getElementById('discover-suggested');
+                        if (sugEl) sugEl.style.display = 'none';
+                        refreshIcons();
+                    }
+                } catch (e) {
+                    console.error('Discover search error:', e);
+                    spToast('검색 중 오류가 발생했어요');
+                }
             },
 
             renderFollowList() {
