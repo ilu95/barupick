@@ -586,19 +586,35 @@
         /* ========== SHOP TAB ========== */
 
         /* ========== VISUALIZER (Mannequin area) ========== */
+        .visualizer-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+        .visualizer-toggle span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-sub, #78716C);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         .visualizer {
-            position: sticky;
-            top: 52px;
-            z-index: 50;
             background: linear-gradient(180deg, #f8f7f5 0%, #faf9f7 100%);
-            height: 45vh;
-            min-height: 260px;
-            max-height: 360px;
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-bottom: 1px solid var(--border);
             overflow: hidden;
+            transition: height 0.25s ease;
+        }
+        .visualizer.collapsed {
+            height: 0;
+            border-bottom: none;
         }
 
         .visualizer .mannequin-wrap {
@@ -2046,6 +2062,23 @@
         .dark-mode .app-header .profile-btn { background: #3D2E28 !important; }
         .dark-mode .bottom-nav { background: rgba(28,25,23,0.95) !important; border-top-color: #3D3835 !important; }
         .dark-mode body { background: #1C1917 !important; }
+        /* 다크모드: 색상-50 계열 배경 오버라이드 */
+        .dark-mode .bg-amber-50 { background: #3D3020 !important; }
+        .dark-mode .bg-stone-50 { background: #2C2A28 !important; }
+        .dark-mode .bg-red-50 { background: #3D2020 !important; }
+        .dark-mode .bg-green-50 { background: #1E3320 !important; }
+        .dark-mode .bg-blue-50 { background: #1E2533 !important; }
+        .dark-mode .border-amber-300 { border-color: #6B5530 !important; }
+        .dark-mode .border-stone-300 { border-color: #57534E !important; }
+        .dark-mode .border-red-300, .dark-mode .border-red-200 { border-color: #6B3030 !important; }
+        .dark-mode .border-green-300, .dark-mode .border-green-200 { border-color: #2D5430 !important; }
+        .dark-mode .border-blue-300, .dark-mode .border-blue-200 { border-color: #2D3F5E !important; }
+        .dark-mode .text-amber-700 { color: #E8B84D !important; }
+        .dark-mode .text-red-700 { color: #F87171 !important; }
+        .dark-mode .text-green-700 { color: #6EE7A0 !important; }
+        .dark-mode .text-blue-700 { color: #93C5FD !important; }
+        .dark-mode .bg-warm-100 { background: #2C2A28 !important; }
+        .dark-mode .visualizer { background: linear-gradient(180deg, #1C1917 0%, #292524 100%) !important; border-bottom-color: #3D3835 !important; }
 
         /* ── 18. 색각이상자 접근성 ── */
         .a11y-labels .color-chip-label {
@@ -6623,6 +6656,7 @@
             comm: { posts: [], sort: 'latest', styleFilter: null, contentFilter: 'all', page: 0, hasMore: true, loading: false, detail: null, _detailSource: 'all', myLikes: new Set(), myBookmarks: new Set(), myFollows: new Set(), postOutfit: null, postScore: 0, postStyle: '', postLayerType: '', postOuterType: 'coat', postMidType: 'knit', tab: 'all', friendsMode: 'mutual', rankingMode: 'weekly', postPhotos: [], postPhotos_orig: [], newPost: { title: '', photos: [], photos_orig: [], colors: {}, caption: '', showInstagram: false } },
             // 이벤트 시스템
             _eventData: null, _eventSubs: null, _eventVotes: null, _eventMyVote: null, _eventViewMode: 'grid', _eventShuffle: null,
+            _vizCollapsed: false,
             notifications: [],
 
             // 코디 만들기(①) 상태
@@ -7282,12 +7316,10 @@
                     return `<button onclick="app.ootd.visibility='${v.key}';app._ootdRenderPicker()" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${sel ? 'bg-terra-500 text-white shadow-terra' : 'bg-white border border-warm-400 text-warm-700'}"><i data-lucide="${v.icon}" style="width:13px;height:13px"></i> ${v.label}</button>`;
                 }).join('');
 
+                const photos = this.ootd.photos || [];
                 const canSave = filledCount >= 2;
                 const needsPhoto = this.ootd.visibility === 'public' && photos.length === 0;
                 const canSubmit = canSave && !needsPhoto;
-
-                // 사진 미리보기
-                const photos = this.ootd.photos || [];
                 const photosHtml = photos.map((p, i) => `
                     <div class="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-warm-300 cursor-pointer" onclick="app.openPhotoEditor(${i})">
                         <img src="${p}" class="w-full h-full object-cover">
@@ -10217,6 +10249,14 @@
                 }
             },
 
+            _toggleViz() {
+                this._vizCollapsed = !this._vizCollapsed;
+                const viz = document.querySelector('.visualizer');
+                const tog = document.querySelector('.visualizer-toggle span');
+                if (viz) viz.classList.toggle('collapsed', this._vizCollapsed);
+                if (tog) tog.textContent = this._vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲';
+            },
+
             renderBuildColor() {
                 const item = this.build.currentItem;
                 const recommendations = this.build.mode === 'evaluate' ? [] : this.getColorRecommendations(item);
@@ -10229,7 +10269,10 @@
                 const mannequinHtml = mannequinToImg(createMannequinSVG(outfit, { outerType: this.build.outerType, midType: this.build.midType }));
 
                 return `
-            <div class="visualizer">
+            <div class="visualizer-toggle" onclick="app._toggleViz()">
+                <span>${this._vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲'}</span>
+            </div>
+            <div class="visualizer${this._vizCollapsed ? ' collapsed' : ''}">
                 <div class="mannequin-wrap">
                     ${mannequinHtml}
                     <div class="mannequin-labels" id="mannequin-labels"></div>
@@ -10848,7 +10891,10 @@
                 });
 
                 return `
-            <div class="visualizer">
+            <div class="visualizer-toggle" onclick="app._toggleViz()">
+                <span>${this._vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲'}</span>
+            </div>
+            <div class="visualizer${this._vizCollapsed ? ' collapsed' : ''}">
                 <div class="mannequin-wrap">
                     ${mannequinToImg(createMannequinSVG(outfitHex, { outerType: this.build.outerType, midType: this.build.midType }))}
                     <div class="mannequin-labels" id="mannequin-labels"></div>
@@ -11552,7 +11598,10 @@
                 });
 
                 return `
-            <div class="visualizer">
+            <div class="visualizer-toggle" onclick="app._toggleViz()">
+                <span>${this._vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲'}</span>
+            </div>
+            <div class="visualizer${this._vizCollapsed ? ' collapsed' : ''}">
                 <div class="mannequin-wrap">
                     ${mannequinToImg(createMannequinSVG(outfitHex, { outerType: this.recommend.outerType, midType: this.recommend.midType }))}
                 </div>
@@ -17256,7 +17305,9 @@
                             ? ' onclick="app.openUserProfile(\'' + n.actor_id + '\')"'
                             : (n.related_id && (n.type === 'like' || n.type === 'comment' || n.type === 'save')
                                 ? ' onclick="app._openNotiPost(\'' + n.related_id + '\')"'
-                                : '');
+                                : (n.related_id && n.type === 'system' && n.message && n.message.includes('이벤트')
+                                    ? ' onclick="app._openNotiEvent(\'' + n.related_id + '\')"'
+                                    : ''));
 
                         g += '<div class="flex items-center gap-3 py-3 border-b border-warm-200 ' + (isUnread ? 'bg-terra-50/50 -mx-1 px-1 rounded-lg' : '') + (clickAction ? ' cursor-pointer active:bg-warm-100 transition-colors' : '') + '"' + clickAction + '>';
                         // 아바타 or 아이콘
