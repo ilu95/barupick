@@ -3,6 +3,8 @@
     { "source": "/manifest.json", "destination": "/manifest.json" },
     { "source": "/sw.js", "destination": "/sw.js" },
     { "source": "/favicon.png", "destination": "/favicon.png" },
+    { "source": "/apple-touch-icon-:size.png", "destination": "/apple-touch-icon-:size.png" },
+    { "source": "/splash-:size.png", "destination": "/splash-:size.png" },
     { "source": "/icons/(.*)", "destination": "/icons/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
@@ -17,7 +19,8 @@
     {
       "source": "/manifest.json",
       "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" }
+        { "key": "Content-Type", "value": "application/manifest+json" },
+        { "key": "Cache-Control", "value": "no-cache" }
       ]
     }
   ]

@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
@@ -18,10 +19,37 @@
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#F7F5F2">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="바루픽">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+
+    <!-- iOS 스플래시 스크린 -->
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+        href="splash-1170x2532.png">
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)"
+        href="splash-1179x2556.png">
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
+        href="splash-1290x2796.png">
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+        href="splash-1125x2436.png">
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+        href="splash-828x1792.png">
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+        href="splash-1242x2688.png">
+    <link rel="apple-touch-startup-image"
+        media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+        href="splash-750x1334.png">
 
     <!-- SEO / 공유 -->
     <meta name="description" content="AI 컬러 코디 추천 · 퍼스널컬러 진단 · 20가지 스타일 × 83컬러">
@@ -198,6 +226,13 @@
 
             to {
                 opacity: 1;
+            }
+        }
+
+        /* PWA Standalone 모드 감지 */
+        @media (display-mode: standalone) {
+            html {
+                background: #F7F5F2;
             }
         }
 
@@ -387,6 +422,7 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 12px 20px;
+            padding-top: calc(12px + env(safe-area-inset-top, 0px));
             display: flex;
             align-items: center;
             gap: 12px;

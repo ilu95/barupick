@@ -2,7 +2,9 @@
   "name": "바루픽 - AI 컬러 코디",
   "short_name": "바루픽",
   "description": "AI가 추천하는 나만의 컬러 조합 · 퍼스널컬러 진단 · OOTD 기록",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F7F5F2",
@@ -29,6 +31,5 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [],
   "prefer_related_applications": false
 }
