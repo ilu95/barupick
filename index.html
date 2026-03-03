@@ -10,7 +10,7 @@
         style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: blob: https://storage.googleapis.com https://*.supabase.co;
-        connect-src 'self' https://*.supabase.co https://api.open-meteo.com;
+        connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com;
     ">
     <title>바루픽</title>
     <link rel="icon" type="image/png" href="favicon.png">
@@ -8067,17 +8067,24 @@
                             for (let i = 0; i < Math.min(origPhotos.length || thumbPhotos.length, 4); i++) {
                                 const dataUrl = origPhotos[i] || thumbPhotos[i];
                                 if (!dataUrl) continue;
-                                const blob = await (await fetch(dataUrl)).blob();
-                                const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
-                                const path = auth.user.id + '/' + uuid + '.webp';
-                                const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: 'image/webp', upsert: false });
-                                if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
-                                const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
-                                photoUrls.push(urlData.publicUrl);
+                                try {
+                                    const blob = await (await fetch(dataUrl)).blob();
+                                    // 5MB 초과 시 건너뛰기
+                                    if (blob.size > 5 * 1024 * 1024) { console.warn('Photo too large:', (blob.size/1024/1024).toFixed(1) + 'MB, skipping'); continue; }
+                                    const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + i;
+                                    const ext = blob.type === 'image/png' ? '.png' : blob.type === 'image/jpeg' ? '.jpg' : '.webp';
+                                    const path = auth.user.id + '/' + uuid + ext;
+                                    const { error: upErr } = await sb.storage.from('community').upload(path, blob, { contentType: blob.type || 'image/webp', upsert: false });
+                                    if (upErr) { console.warn('Photo upload failed:', upErr.message); continue; }
+                                    const { data: urlData } = sb.storage.from('community').getPublicUrl(path);
+                                    photoUrls.push(urlData.publicUrl);
+                                } catch(photoErr) { console.warn('Photo processing error:', photoErr); }
                             }
 
                             const outfit = {};
                             Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v; });
+
+                            // 기본 컬럼 (community-post와 동일한 검증된 구조)
                             const postData = {
                                 user_id: auth.user.id,
                                 title: (record.memo || '').slice(0, 100),
@@ -8088,25 +8095,52 @@
                                 caption: (record.memo || '').slice(0, 200) || null,
                                 photo_urls: photoUrls.length > 0 ? photoUrls : null,
                                 status: 'approved',
-                                visibility: record.visibility,
-                                show_instagram: this.ootd.showInstagram && !!auth.profile?.instagram_id,
-                                tags: record.situation ? [record.situation] : [],
-                                hide_counts: this._hideCountsEnabled || false
+                                tags: record.situation ? [record.situation] : []
                             };
 
+                            // 확장 컬럼 (DB에 있으면 추가)
+                            const extraCols = {};
+                            if (record.visibility) extraCols.visibility = record.visibility;
+                            if (this.ootd.showInstagram && auth.profile?.instagram_id) extraCols.show_instagram = true;
+                            if (this._hideCountsEnabled) extraCols.hide_counts = true;
+
                             if (existingPostId) {
-                                const { user_id: _u, ...updateData } = postData;
-                                await sb.from('posts').update(updateData).eq('id', existingPostId);
-                                spToast('🌐 커뮤니티 게시물이 수정되었어요!');
+                                const { user_id: _u, ...updateData } = { ...postData, ...extraCols };
+                                const { error: upErr } = await sb.from('posts').update(updateData).eq('id', existingPostId);
+                                if (upErr) {
+                                    // 확장 컬럼 제거 후 재시도
+                                    const { user_id: _u2, ...basicUpdate } = postData;
+                                    const { error: upErr2 } = await sb.from('posts').update(basicUpdate).eq('id', existingPostId);
+                                    if (upErr2) { console.error('Post update failed:', upErr2); spToast('게시물 수정 실패: ' + upErr2.message); }
+                                    else spToast('🌐 커뮤니티 게시물이 수정되었어요!');
+                                } else {
+                                    spToast('🌐 커뮤니티 게시물이 수정되었어요!');
+                                }
                             } else {
-                                const { data: inserted } = await sb.from('posts').insert(postData).select('id').single();
+                                // 확장 컬럼 포함 시도 → 실패 시 기본 컬럼만 재시도
+                                let inserted = null;
+                                const fullData = { ...postData, ...extraCols };
+                                const res1 = await sb.from('posts').insert(fullData).select('id').single();
+                                if (res1.error) {
+                                    console.warn('Post insert with extras failed:', res1.error.message, '→ retrying basic columns');
+                                    const res2 = await sb.from('posts').insert(postData).select('id').single();
+                                    if (res2.error) {
+                                        console.error('Post insert failed:', res2.error);
+                                        spToast('커뮤니티 공유 실패: ' + res2.error.message);
+                                    } else {
+                                        inserted = res2.data;
+                                    }
+                                } else {
+                                    inserted = res1.data;
+                                }
+
                                 if (inserted) {
                                     record.postId = inserted.id;
                                     let recs = this.getOotdRecords();
                                     const idx = recs.findIndex(r => r.id === record.id);
                                     if (idx >= 0) { recs[idx].postId = inserted.id; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)); }
+                                    spToast(record.visibility === 'friends' ? '👫 친구에게 공개되었어요!' : '🌐 커뮤니티에 공개되었어요!');
                                 }
-                                spToast(record.visibility === 'friends' ? '👫 친구에게 공개되었어요!' : '🌐 커뮤니티에 공개되었어요!');
                             }
                         } else if (existingPostId) {
                             // 공개 → 비공개로 변경 → 커뮤니티에서 삭제
@@ -14355,12 +14389,7 @@
                         }
                         query = query.order('created_at', {ascending:false});
                     } else {
-                        // 전체 탭: public + null(레거시) + 자기 글
-                        if (auth.user) {
-                            query = query.or('visibility.eq.public,visibility.is.null,user_id.eq.' + auth.user.id);
-                        } else {
-                            query = query.or('visibility.eq.public,visibility.is.null');
-                        }
+                        // 전체 탭: 모든 approved 게시물 조회
                         if (this.comm.styleFilter) query = query.eq('style', this.comm.styleFilter);
                         if (this.comm.sort === 'popular') query = query.order('likes_count', {ascending:false});
                         else query = query.order('created_at', {ascending:false});
@@ -15380,7 +15409,7 @@
                     this.showShareToast('팔로우했어요! ✓');
 
                     // 팔로우 알림 전송
-                    this._sendNotification(userId, 'follow', '회원님을 팔로우하기 시작했어요', userId);
+                    this._sendNotification(userId, 'follow', '님이 회원님을 팔로우했어요', userId);
 
                     // 맞팔 확인 (상대가 나를 팔로우하고 있는지 서버에서 확인)
                     if (sb) {
