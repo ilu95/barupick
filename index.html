@@ -16083,9 +16083,9 @@
                 parts.forEach(part => { h += renderColorPicker(part); });
                 h += '</div>';
 
-                // ── 착용샷 (크롭 + 편집) ──
-                h += '<div class="text-sm font-bold text-warm-800 mb-1 mt-5">📷 착용샷 (선택)</div>';
-                h += '<div class="text-xs text-warm-500 mb-3">마네킹(컬러 빌드)만으로도 참여 가능합니다</div>';
+                // ── 착용샷 (필수, 크롭 + 편집) ──
+                h += '<div class="text-sm font-bold text-warm-800 mb-1 mt-5">📷 착용샷 <span class="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">필수</span></div>';
+                h += '<div class="text-xs text-warm-500 mb-3">얼굴이 보이지 않도록 촬영하거나 스티커로 가려주세요</div>';
                 h += '<div class="mb-5">';
                 const evPhotos = this._eventSubmitPhotos || [];
                 if (evPhotos.length > 0) {
@@ -16115,9 +16115,11 @@
                 h += '</div>';
 
                 // ── 제출 버튼 ──
-                const canSubmit = filledCount >= 2;
+                const hasPhotos = evPhotos.length > 0;
+                const canSubmit = filledCount >= 2 && hasPhotos;
                 h += '<button onclick="app._submitEvent()" class="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] ' + (canSubmit ? 'bg-terra-500 text-white shadow-terra' : 'bg-warm-200 text-warm-400') + '" ' + (canSubmit ? '' : 'disabled') + '>제출하기</button>';
-                if (!canSubmit) h += '<div class="text-center text-[10px] text-warm-400 mt-2">최소 2색 이상 선택해주세요</div>';
+                if (!canSubmit && filledCount < 2) h += '<div class="text-center text-[10px] text-warm-400 mt-2">최소 2색 이상 선택해주세요</div>';
+                else if (!canSubmit && !hasPhotos) h += '<div class="text-center text-[10px] text-warm-400 mt-2">착용샷을 추가해주세요</div>';
 
                 h += '</div>';
                 return h;
@@ -16347,6 +16349,7 @@
                     if (this._eventColors[p]) outfit[p] = this._eventColors[p];
                 });
                 if (Object.keys(outfit).length < 2) { spToast('최소 2색 이상 선택해주세요'); return; }
+                if (!this._eventSubmitPhotos || this._eventSubmitPhotos.length === 0) { spToast('착용샷을 추가해주세요'); return; }
 
                 // 점수 계산
                 const pc = auth.profile?.personal_color || null;
