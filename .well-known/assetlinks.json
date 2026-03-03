@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "kr.co.barusa.barupick",
+        "sha256_cert_fingerprints": ["FE:2D:57:CB:FA:FC:7F:24:7E:75:D1:8B:BF:A5:A9:43:37:3D:B8:1D:FF:0F:3D:F9:19:A0:7F:99:21:D2:E3:77"]
+      }
+    }]
