@@ -15981,9 +15981,12 @@
                 if (!ev) return;
 
                 try {
-                    // 기존 투표 철회
+                    // 기존 투표 철회 (ID로 직접 삭제)
                     if (this._eventMyVote) {
-                        await sb.from('event_votes').delete().eq('event_id', ev.id).eq('user_id', auth.user.id);
+                        const { data: existing } = await sb.from('event_votes').select('id').eq('event_id', ev.id).eq('user_id', auth.user.id);
+                        if (existing && existing.length > 0) {
+                            await sb.from('event_votes').delete().eq('id', existing[0].id);
+                        }
                     }
                     // 새 투표
                     const { error } = await sb.from('event_votes').insert({ event_id: ev.id, submission_id: submissionId, user_id: auth.user.id });
@@ -16005,15 +16008,22 @@
                 const ev = this._eventData;
                 if (!ev) return;
                 try {
-                    const { error } = await sb.from('event_votes').delete().eq('event_id', ev.id).eq('user_id', auth.user.id);
-                    if (error) { spToast('철회 실패'); return; }
+                    // 먼저 내 투표 찾기
+                    const { data: myVotes, error: findErr } = await sb.from('event_votes').select('id').eq('event_id', ev.id).eq('user_id', auth.user.id);
+                    if (findErr) { console.error('Vote find error:', findErr); spToast('철회 실패: ' + findErr.message); return; }
+                    if (!myVotes || myVotes.length === 0) { spToast('투표 기록이 없어요'); this._eventMyVote = null; this.render(); return; }
+
+                    // ID로 직접 삭제
+                    const { error } = await sb.from('event_votes').delete().eq('id', myVotes[0].id);
+                    if (error) { console.error('Vote delete error:', error); spToast('철회 실패: ' + error.message); return; }
+
                     if (this._eventMyVote && this._eventVotes[this._eventMyVote]) {
                         this._eventVotes[this._eventMyVote] = Math.max(0, this._eventVotes[this._eventMyVote] - 1);
                     }
                     this._eventMyVote = null;
                     spToast('투표 철회됨');
                     this.render();
-                } catch(e) { spToast('오류가 발생했어요'); console.error(e); }
+                } catch(e) { console.error('Revoke error:', e); spToast('오류가 발생했어요'); }
             },
 
             // ── 이벤트 제출 화면 ──
