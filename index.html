@@ -8108,7 +8108,7 @@
                             const outfit = {};
                             Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v; });
 
-                            // 기본 컬럼 (community-post와 동일한 검증된 구조)
+                            // DB 컬럼 확정 (진단 완료: visibility, hide_counts, show_instagram 모두 존재)
                             const postData = {
                                 user_id: auth.user.id,
                                 title: (record.memo || '').slice(0, 100),
@@ -8119,46 +8119,23 @@
                                 caption: (record.memo || '').slice(0, 200) || null,
                                 photo_urls: photoUrls.length > 0 ? photoUrls : null,
                                 status: 'approved',
-                                tags: record.situation ? [record.situation] : []
+                                tags: record.situation ? [record.situation] : [],
+                                visibility: record.visibility || 'public',
+                                show_instagram: !!(this.ootd.showInstagram && auth.profile?.instagram_id),
+                                hide_counts: this._hideCountsEnabled || false
                             };
 
-                            // 확장 컬럼 (DB에 있으면 추가)
-                            const extraCols = {};
-                            if (record.visibility) extraCols.visibility = record.visibility;
-                            if (this.ootd.showInstagram && auth.profile?.instagram_id) extraCols.show_instagram = true;
-                            if (this._hideCountsEnabled) extraCols.hide_counts = true;
-
                             if (existingPostId) {
-                                const { user_id: _u, ...updateData } = { ...postData, ...extraCols };
+                                const { user_id: _u, ...updateData } = postData;
                                 const { error: upErr } = await sb.from('posts').update(updateData).eq('id', existingPostId);
-                                if (upErr) {
-                                    // 확장 컬럼 제거 후 재시도
-                                    const { user_id: _u2, ...basicUpdate } = postData;
-                                    const { error: upErr2 } = await sb.from('posts').update(basicUpdate).eq('id', existingPostId);
-                                    if (upErr2) { console.error('Post update failed:', upErr2); spToast('게시물 수정 실패: ' + upErr2.message); }
-                                    else spToast('🌐 커뮤니티 게시물이 수정되었어요!');
-                                } else {
-                                    spToast('🌐 커뮤니티 게시물이 수정되었어요!');
-                                }
+                                if (upErr) { console.error('Post update failed:', upErr); spToast('게시물 수정 실패: ' + upErr.message); }
+                                else spToast('🌐 커뮤니티 게시물이 수정되었어요!');
                             } else {
-                                // 확장 컬럼 포함 시도 → 실패 시 기본 컬럼만 재시도
-                                let inserted = null;
-                                const fullData = { ...postData, ...extraCols };
-                                const res1 = await sb.from('posts').insert(fullData).select('id').single();
-                                if (res1.error) {
-                                    console.warn('Post insert with extras failed:', res1.error.message, '→ retrying basic columns');
-                                    const res2 = await sb.from('posts').insert(postData).select('id').single();
-                                    if (res2.error) {
-                                        console.error('Post insert failed:', res2.error);
-                                        spToast('커뮤니티 공유 실패: ' + res2.error.message);
-                                    } else {
-                                        inserted = res2.data;
-                                    }
-                                } else {
-                                    inserted = res1.data;
-                                }
-
-                                if (inserted) {
+                                const { data: inserted, error: insErr } = await sb.from('posts').insert(postData).select('id').single();
+                                if (insErr) {
+                                    console.error('Post insert failed:', insErr);
+                                    spToast('커뮤니티 공유 실패: ' + insErr.message);
+                                } else if (inserted) {
                                     record.postId = inserted.id;
                                     let recs = this.getOotdRecords();
                                     const idx = recs.findIndex(r => r.id === record.id);
@@ -14368,7 +14345,6 @@
             async communityLoad(reset) {
                 if (!sb) { document.getElementById('comm-status')&&(document.getElementById('comm-status').innerHTML='<div class="text-center py-10 text-warm-600"><div class="text-5xl mb-3">⚠️</div>서버에 연결할 수 없어요<br><button onclick="location.reload()" class="mt-3 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold">새로고침</button></div>'); return; }
 
-                // 로드 버전 관리: 새 로드 요청이 오면 이전 로드 결과 무시
                 this._commLoadVer = (this._commLoadVer || 0) + 1;
                 const myVer = this._commLoadVer;
 
@@ -14386,25 +14362,14 @@
                         return;
                     }
 
-                    // FK 조인 결정 (캐싱)
-                    const fkMode = await this._getFkMode();
-                    let query;
-                    if (fkMode === 'explicit') {
-                        query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)');
-                    } else if (fkMode === 'simple') {
-                        query = sb.from('posts').select('*, profiles(nickname, avatar_url, instagram_id)');
-                    } else {
-                        query = sb.from('posts').select('*');
-                    }
-
+                    // FK 확정: posts_user_id_fkey (DB 진단 완료)
+                    let query = sb.from('posts').select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)');
                     query = query.eq('status', 'approved');
 
                     if (tab === 'friends' && auth.user) {
-                        // 친구 탭: 팔로우 목록 기반
                         const followIds = Array.from(this.comm.myFollows);
                         if (followIds.length === 0) {
-                            this.comm.posts = [];
-                            this.comm.hasMore = false;
+                            this.comm.posts = []; this.comm.hasMore = false;
                             this.renderCommunityGrid();
                             if (status) status.innerHTML = '';
                             return;
@@ -14412,8 +14377,7 @@
                         if (this.comm.friendsMode === 'mutual') {
                             const friends = JSON.parse(localStorage.getItem('sp_friends') || '[]');
                             if (friends.length === 0) {
-                                this.comm.posts = [];
-                                this.comm.hasMore = false;
+                                this.comm.posts = []; this.comm.hasMore = false;
                                 this.renderCommunityGrid();
                                 if (status) status.innerHTML = '';
                                 return;
@@ -14424,7 +14388,12 @@
                         }
                         query = query.order('created_at', {ascending:false});
                     } else {
-                        // 전체 탭: 모든 approved 게시물 조회
+                        // 전체 탭: public + null(레거시) + 자기 글
+                        if (auth.user) {
+                            query = query.or('visibility.eq.public,visibility.is.null,user_id.eq.' + auth.user.id);
+                        } else {
+                            query = query.or('visibility.eq.public,visibility.is.null');
+                        }
                         if (this.comm.styleFilter) query = query.eq('style', this.comm.styleFilter);
                         if (this.comm.sort === 'popular') query = query.order('likes_count', {ascending:false});
                         else query = query.order('created_at', {ascending:false});
@@ -14434,41 +14403,33 @@
 
                     const { data, error } = await this._sbQuery(query);
                     if (error) throw error;
-
-                    // 버전 체크: 더 새로운 로드가 시작됐으면 결과 무시
                     if (myVer !== this._commLoadVer) return;
 
                     this.comm.posts = this.comm.posts.concat(data || []);
                     this.comm.hasMore = (data||[]).length === PAGE_SIZE;
                     this.comm.page++;
 
-                    // 내 좋아요 로드 (서버) - 에러 무시
+                    // 내 좋아요 로드
                     if (auth.user && data && data.length > 0) {
                         try {
                             const pids = data.map(p => p.id);
                             const likesRes = await sb.from('likes').select('post_id').eq('user_id', auth.user.id).in('post_id', pids);
                             (likesRes.data||[]).forEach(l => this.comm.myLikes.add(l.post_id));
-                        } catch(likeErr) { /* 좋아요 로드 실패는 무시 */ }
+                        } catch(likeErr) {}
                     }
-                    // 내 저장 로드 (로컬)
                     const saved = this.getSavedOutfits();
                     (data||[]).forEach(p => {
                         if (saved.find(s => s.commPostId === p.id)) this.comm.myBookmarks.add(p.id);
                     });
 
-                    // 최종 버전 체크 후 렌더
                     if (myVer === this._commLoadVer) {
                         this.renderCommunityGrid();
                     }
                 } catch(e) {
                     console.error('Community load error:', e);
                     if (myVer !== this._commLoadVer) return;
-                    // FK 캐시가 틀렸을 수 있으니 리셋
-                    localStorage.removeItem('sp_fk_mode');
-                    this._fkVerified = null;
                     const status2 = document.getElementById('comm-status');
                     if (status2) status2.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-3">로딩 실패</div><button onclick="app.communityLoad(true)" class="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all">다시 시도</button></div>';
-                    // 자동 재시도 (3초 후, 최대 2회)
                     this._commRetry = (this._commRetry || 0) + 1;
                     if (this._commRetry <= 2) {
                         setTimeout(() => { if (myVer === this._commLoadVer) this.communityLoad(true); }, 3000);
@@ -14485,38 +14446,14 @@
                 ]);
             },
 
-            // FK 조인 모드 결정 (localStorage 캐싱)
-            async _getFkMode() {
-                // 이미 확인 완료
-                if (this._fkVerified) return this._fkVerified;
-                // localStorage 캐시 확인
-                const cached = localStorage.getItem('sp_fk_mode');
-                if (cached) { this._fkVerified = cached; return cached; }
-                // 명시적 FK 시도
-                try {
-                    const res = await this._sbQuery(sb.from('posts').select('id, profiles!posts_user_id_fkey(nickname)').limit(1), 5000);
-                    if (!res.error) { this._fkVerified = 'explicit'; localStorage.setItem('sp_fk_mode', 'explicit'); return 'explicit'; }
-                } catch(e) {}
-                // 단순 FK 시도
-                try {
-                    const res = await this._sbQuery(sb.from('posts').select('id, profiles(nickname)').limit(1), 5000);
-                    if (!res.error) { this._fkVerified = 'simple'; localStorage.setItem('sp_fk_mode', 'simple'); return 'simple'; }
-                } catch(e) {}
-                // 조인 없이
-                this._fkVerified = 'none';
-                localStorage.setItem('sp_fk_mode', 'none');
-                return 'none';
-            },
-
             async _loadRanking(loadVer) {
                 const mode = this.comm.rankingMode;
                 const grid = document.getElementById('comm-grid');
                 const status = document.getElementById('comm-status');
                 if (!grid) return;
 
-                // FK 조인 결정
-                const fkMode = await this._getFkMode();
-                const profileSelect = fkMode === 'explicit' ? ', profiles!posts_user_id_fkey(nickname, avatar_url)' : fkMode === 'simple' ? ', profiles(nickname, avatar_url)' : '';
+                // FK 확정: posts_user_id_fkey (DB 진단 완료)
+                const profileSelect = ', profiles!posts_user_id_fkey(nickname, avatar_url)';
 
                 try {
                     if (mode === 'event') {
@@ -14557,7 +14494,7 @@
 
                     if (mode === 'user') {
                         // 유저 랭킹: 누적 좋아요 합산
-                        const { data, error: userErr } = await this._sbQuery(sb.from('posts').select('user_id, likes_count' + profileSelect).eq('status','approved'));
+                        const { data, error: userErr } = await this._sbQuery(sb.from('posts').select('user_id, likes_count' + profileSelect).eq('status','approved').or('visibility.eq.public,visibility.is.null'));
                         if (userErr) throw userErr;
                         if (loadVer !== this._commLoadVer) return;
                         if (!data) { grid.innerHTML = ''; return; }
@@ -14611,6 +14548,7 @@
 
                     const { data, error: rankErr } = await this._sbQuery(sb.from('posts').select('*' + profileSelect)
                         .eq('status', 'approved')
+                        .or('visibility.eq.public,visibility.is.null')
                         .gte('created_at', startDate.toISOString())
                         .order('likes_count', {ascending:false})
                         .limit(20));
@@ -14635,9 +14573,6 @@
                 } catch(e) {
                     console.error('Ranking load error:', e);
                     if (loadVer !== this._commLoadVer) return;
-                    // FK 캐시 리셋
-                    localStorage.removeItem('sp_fk_mode');
-                    this._fkVerified = null;
                     if (status) status.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-3">랭킹 로딩 실패</div><button onclick="app.communityLoad(true)" class="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all">다시 시도</button></div>';
                 }
             },
@@ -15620,9 +15555,12 @@
                     if (sb) {
                         (async () => {
                             try {
+                                const isMe = auth.user && auth.user.id === userId;
+                                let postsQuery = sb.from('posts').select('*').eq('user_id', userId).eq('status', 'approved');
+                                if (!isMe) postsQuery = postsQuery.or('visibility.eq.public,visibility.is.null');
                                 const [profileRes, postsRes, followersRes, followingRes] = await Promise.all([
                                     sb.from('profiles').select('*').eq('id', userId).single(),
-                                    sb.from('posts').select('*').eq('user_id', userId).eq('status', 'approved').order('created_at', {ascending:false}).limit(30),
+                                    postsQuery.order('created_at', {ascending:false}).limit(30),
                                     sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', userId),
                                     sb.from('follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId)
                                 ]);
