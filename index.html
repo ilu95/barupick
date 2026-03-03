@@ -8125,6 +8125,13 @@
                 // 게이미피케이션 캐시 무효화
                 gamification.invalidate();
 
+                // 커뮤니티 캐시 무효화 (공개 글이면 커뮤니티 새로고침 필요)
+                if (record.visibility === 'public' || record.visibility === 'friends') {
+                    this.comm.posts = [];
+                    this.comm.page = 0;
+                    this.comm.hasMore = true;
+                }
+
                 // 상태 초기화
                 this.ootd = { colors: { top:null, middleware:null, bottom:null, outer:null, shoes:null, scarf:null, hat:null }, openPicker:null, photos:[], photos_orig:[], situation:null, mood:null, memo:'', visibility:'private', showInstagram:false };
                 this._ootdEditId = null;
@@ -14126,14 +14133,7 @@
 
             // ── 공유 기능 ──
             showShareToast(msg) {
-                var existing = document.querySelector('.share-toast');
-                if (existing) existing.remove();
-                var toast = document.createElement('div');
-                toast.className = 'share-toast';
-                toast.textContent = msg;
-                document.body.appendChild(toast);
-                setTimeout(function () { toast.classList.add('show'); }, 10);
-                setTimeout(function () { toast.classList.remove('show'); setTimeout(function () { toast.remove(); }, 300); }, 2500);
+                spToast(msg);
             },
 
             // ============================================================
@@ -14355,7 +14355,12 @@
                         }
                         query = query.order('created_at', {ascending:false});
                     } else {
-                        // 전체 탭: RLS가 visibility 필터링 처리 (public + 내 글 + 맞팔 친구의 friends 글)
+                        // 전체 탭: public + null(레거시) + 자기 글
+                        if (auth.user) {
+                            query = query.or('visibility.eq.public,visibility.is.null,user_id.eq.' + auth.user.id);
+                        } else {
+                            query = query.or('visibility.eq.public,visibility.is.null');
+                        }
                         if (this.comm.styleFilter) query = query.eq('style', this.comm.styleFilter);
                         if (this.comm.sort === 'popular') query = query.order('likes_count', {ascending:false});
                         else query = query.order('created_at', {ascending:false});
