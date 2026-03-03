@@ -7034,13 +7034,7 @@
                     case 'community':
                         headerTitle.textContent = '커뮤니티';
                         content.innerHTML = this.renderCommunity();
-                        // auth가 아직 init 중이면 잠시 대기 후 로드
-                        if (!this._authReady && sb) {
-                            const waitAuth = new Promise(r => { if (this._authReady) r(); else { const orig = this._onAuthReady; this._onAuthReady = () => { if(orig) orig(); r(); }; setTimeout(r, 2000); }});
-                            waitAuth.then(() => this.communityLoad(this.comm.posts.length === 0));
-                        } else {
-                            this.communityLoad(this.comm.posts.length === 0);
-                        }
+                        this.communityLoad(this.comm.posts.length === 0);
                         break;
                     case 'community-detail':
                         headerTitle.textContent = '코디 상세';
@@ -8129,7 +8123,7 @@
                                 const { user_id: _u, ...updateData } = postData;
                                 const { error: upErr } = await sb.from('posts').update(updateData).eq('id', existingPostId);
                                 if (upErr) { console.error('Post update failed:', upErr); spToast('게시물 수정 실패: ' + upErr.message); }
-                                else spToast('🌐 커뮤니티 게시물이 수정되었어요!');
+                                else { spToast('🌐 커뮤니티 게시물이 수정되었어요!'); this._invalidateCommCache(); }
                             } else {
                                 const { data: inserted, error: insErr } = await sb.from('posts').insert(postData).select('id').single();
                                 if (insErr) {
@@ -8141,6 +8135,7 @@
                                     const idx = recs.findIndex(r => r.id === record.id);
                                     if (idx >= 0) { recs[idx].postId = inserted.id; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)); }
                                     spToast(record.visibility === 'friends' ? '👫 친구에게 공개되었어요!' : '🌐 커뮤니티에 공개되었어요!');
+                                    this._invalidateCommCache();
                                 }
                             }
                         } else if (existingPostId) {
@@ -14348,11 +14343,32 @@
                 this._commLoadVer = (this._commLoadVer || 0) + 1;
                 const myVer = this._commLoadVer;
 
-                if (reset) { this.comm.posts = []; this.comm.page = 0; this.comm.hasMore = true; const g = document.getElementById('comm-grid'); if(g) g.innerHTML=''; }
-                const status = document.getElementById('comm-status');
-                if (status) status.innerHTML = '<div class="text-center py-8 text-warm-600 text-sm">불러오는 중...</div>';
-
                 const tab = this.comm.tab || 'all';
+                const status = document.getElementById('comm-status');
+
+                // ── 캐시 우선 로딩: reset 시 캐시가 있으면 즉시 표시 ──
+                if (reset) {
+                    this.comm.posts = []; this.comm.page = 0; this.comm.hasMore = true;
+                    const g = document.getElementById('comm-grid'); if(g) g.innerHTML='';
+
+                    if (tab !== 'ranking') {
+                        const cacheKey = 'sp_cache_comm_' + tab + (this.comm.sort === 'popular' ? '_pop' : '') + (this.comm.styleFilter || '');
+                        try {
+                            const cached = JSON.parse(localStorage.getItem(cacheKey));
+                            if (cached && cached.posts && cached.posts.length > 0 && (Date.now() - cached.ts) < 300000) {
+                                this.comm.posts = cached.posts;
+                                this.comm.hasMore = cached.hasMore || false;
+                                this.comm.page = 1;
+                                this.renderCommunityGrid();
+                                // 서버에서 갱신 (백그라운드)
+                            }
+                        } catch(ce) {}
+                    }
+                }
+
+                if (this.comm.posts.length === 0 && status) {
+                    status.innerHTML = '<div class="text-center py-8 text-warm-600 text-sm">불러오는 중...</div>';
+                }
 
                 try {
                     const PAGE_SIZE = 20;
@@ -14399,15 +14415,21 @@
                         else query = query.order('created_at', {ascending:false});
                     }
 
-                    query = query.range(this.comm.page * PAGE_SIZE, (this.comm.page+1) * PAGE_SIZE - 1);
+                    // 서버에서는 항상 0페이지부터 (캐시 교체)
+                    const serverPage = reset ? 0 : this.comm.page;
+                    query = query.range(serverPage * PAGE_SIZE, (serverPage+1) * PAGE_SIZE - 1);
 
                     const { data, error } = await this._sbQuery(query);
                     if (error) throw error;
                     if (myVer !== this._commLoadVer) return;
 
-                    this.comm.posts = this.comm.posts.concat(data || []);
+                    if (reset) {
+                        this.comm.posts = data || [];
+                    } else {
+                        this.comm.posts = this.comm.posts.concat(data || []);
+                    }
                     this.comm.hasMore = (data||[]).length === PAGE_SIZE;
-                    this.comm.page++;
+                    this.comm.page = serverPage + 1;
 
                     // 내 좋아요 로드
                     if (auth.user && data && data.length > 0) {
@@ -14424,10 +14446,17 @@
 
                     if (myVer === this._commLoadVer) {
                         this.renderCommunityGrid();
+                        // 캐시 저장 (첫 페이지만, 최대 20개)
+                        if (reset) {
+                            const cacheKey = 'sp_cache_comm_' + tab + (this.comm.sort === 'popular' ? '_pop' : '') + (this.comm.styleFilter || '');
+                            try { localStorage.setItem(cacheKey, JSON.stringify({ posts: (data||[]).slice(0, 20), hasMore: this.comm.hasMore, ts: Date.now() })); } catch(ce) {}
+                        }
                     }
                 } catch(e) {
                     console.error('Community load error:', e);
                     if (myVer !== this._commLoadVer) return;
+                    // 캐시로 이미 표시 중이면 에러 무시
+                    if (this.comm.posts.length > 0) { console.log('Using cached data after server error'); return; }
                     const status2 = document.getElementById('comm-status');
                     if (status2) status2.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-3">로딩 실패</div><button onclick="app.communityLoad(true)" class="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all">다시 시도</button></div>';
                     this._commRetry = (this._commRetry || 0) + 1;
@@ -14446,6 +14475,15 @@
                 ]);
             },
 
+            // 커뮤니티 캐시 무효화 (좋아요/게시/삭제 시)
+            _invalidateCommCache() {
+                try {
+                    Object.keys(localStorage).forEach(k => {
+                        if (k.startsWith('sp_cache_comm_') || k.startsWith('sp_cache_rank_')) localStorage.removeItem(k);
+                    });
+                } catch(e) {}
+            },
+
             async _loadRanking(loadVer) {
                 const mode = this.comm.rankingMode;
                 const grid = document.getElementById('comm-grid');
@@ -14454,6 +14492,28 @@
 
                 // FK 확정: posts_user_id_fkey (DB 진단 완료)
                 const profileSelect = ', profiles!posts_user_id_fkey(nickname, avatar_url)';
+                const cacheKey = 'sp_cache_rank_' + mode;
+
+                // ── 캐시 우선 로딩: 캐시가 있으면 즉시 표시 ──
+                try {
+                    const cached = JSON.parse(localStorage.getItem(cacheKey));
+                    if (cached && cached.html && (Date.now() - cached.ts) < 300000) {
+                        grid.innerHTML = cached.html;
+                        if (status) status.innerHTML = cached.statusHtml || '';
+                        if (mode === 'event' && cached.eventsCache) {
+                            app._rankingEventsCache = app._rankingEventsCache || {};
+                            Object.assign(app._rankingEventsCache, cached.eventsCache);
+                        }
+                        if (mode === 'weekly' || mode === 'monthly') {
+                            this.comm.posts = cached.posts || [];
+                            this.comm.hasMore = false;
+                        }
+                    }
+                } catch(ce) {}
+
+                if (!grid.innerHTML && status) {
+                    status.innerHTML = '<div class="text-center py-8 text-warm-600 text-sm">불러오는 중...</div>';
+                }
 
                 try {
                     if (mode === 'event') {
@@ -14489,6 +14549,7 @@
                         h += '</div>';
                         grid.innerHTML = h;
                         if (status) status.innerHTML = '';
+                        try { localStorage.setItem(cacheKey, JSON.stringify({ html: h, statusHtml: '', eventsCache: (function(){ var ec = {}; events.forEach(function(ev){ ec[ev.id] = ev; }); return ec; })(), ts: Date.now() })); } catch(ce) {}
                         return;
                     }
 
@@ -14530,6 +14591,7 @@
                         h += '</div>';
                         grid.innerHTML = h;
                         if (status) status.innerHTML = ranked.length === 0 ? '<div class="text-center py-10 text-warm-600 text-sm">아직 랭킹 데이터가 없어요</div>' : '';
+                        try { localStorage.setItem(cacheKey, JSON.stringify({ html: h, statusHtml: status ? status.innerHTML : '', ts: Date.now() })); } catch(ce) {}
                         return;
                     }
 
@@ -14569,10 +14631,12 @@
 
                     this._renderRankingGrid(data || []);
                     if (status) status.innerHTML = (data||[]).length === 0 ? '<div class="text-center py-10 text-warm-600 text-sm">' + (mode==='weekly'?'이번 주':'이번 달') + ' 랭킹 데이터가 없어요</div>' : '';
+                    try { localStorage.setItem(cacheKey, JSON.stringify({ html: grid.innerHTML, statusHtml: status ? status.innerHTML : '', posts: (data||[]).slice(0,20), ts: Date.now() })); } catch(ce) {}
 
                 } catch(e) {
                     console.error('Ranking load error:', e);
                     if (loadVer !== this._commLoadVer) return;
+                    if (grid.innerHTML) { console.log('Using cached ranking after server error'); return; }
                     if (status) status.innerHTML = '<div class="text-center py-10"><div class="text-4xl mb-3">⚠️</div><div class="text-sm text-warm-600 mb-3">랭킹 로딩 실패</div><button onclick="app.communityLoad(true)" class="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all">다시 시도</button></div>';
                 }
             },
@@ -15043,6 +15107,7 @@
                     }
                     const p = this.comm.posts.find(x=>x.id===postId);
                     if (p) p.likes_count = liked ? Math.max(0,(p.likes_count||1)-1) : (p.likes_count||0)+1;
+                    this._invalidateCommCache();
                     // 상세 화면이면 좋아요 버튼만 갱신 (깜빡임 방지)
                     if (this.screen === 'community-detail') {
                         const btns = document.querySelectorAll('[data-like-btn]');
@@ -15384,6 +15449,7 @@
                     });
                     if (error) throw error;
                     spToast('🌐 커뮤니티에 공개되었어요!');
+                    this._invalidateCommCache();
                     // 상태 초기화
                     this.comm.postPhotos = [];
                     this.comm.postPhotos_orig = [];
