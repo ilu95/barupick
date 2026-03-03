@@ -8107,6 +8107,20 @@
                 const uniqueDays = Object.keys(dayGroups).length;
                 const totalRecords = monthRecords.length;
 
+                // 남은 날 계산: 오늘 이후 미기록일만 카운트
+                const isCurrentMonth = month === today.getMonth() && year === today.getFullYear();
+                const isPastMonth = (year < today.getFullYear()) || (year === today.getFullYear() && month < today.getMonth());
+                let remainingDays;
+                if (isPastMonth) {
+                    remainingDays = 0;
+                } else if (isCurrentMonth) {
+                    let cnt = 0;
+                    for (let d = today.getDate(); d <= daysInMonth; d++) { if (!dayGroups[d]) cnt++; }
+                    remainingDays = cnt;
+                } else {
+                    remainingDays = daysInMonth - uniqueDays;
+                }
+
                 // 캘린더 그리드
                 let calendarGrid = '';
                 const dayNames = ['일','월','화','수','목','금','토'];
@@ -8179,7 +8193,7 @@
                             <div class="text-[11px] text-warm-600 font-medium mt-1">총 기록</div>
                         </div>
                         <div class="bg-white border border-warm-400 rounded-2xl py-4 text-center shadow-warm-sm">
-                            <div class="font-display text-2xl font-bold text-sage">${daysInMonth - uniqueDays}</div>
+                            <div class="font-display text-2xl font-bold text-sage">${remainingDays}</div>
                             <div class="text-[11px] text-warm-600 font-medium mt-1">남은 날</div>
                         </div>
                     </div>
@@ -14124,14 +14138,14 @@
                             '<div class="text-sm font-bold text-warm-900 mb-1.5">친구를 찾아보세요!</div>' +
                             '<div class="text-xs text-warm-600 mb-4 leading-relaxed">다른 유저를 팔로우하면<br>이 탭에서 친구들의 코디를 볼 수 있어요</div>' +
                             '<div class="flex flex-col gap-2">' +
-                                '<button onclick="app.goTo(\'user-search\')" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">👤 유저 검색하기</button>' +
-                                '<button onclick="app.commSwitchTab(\'ranking\')" class="px-6 py-2 bg-white text-warm-700 border border-warm-400 rounded-full text-xs font-medium active:scale-95 transition-all">🏆 랭킹에서 인기 유저 찾기</button>' +
+                                '<button onclick="app.openFollowList(auth.user.id,'following')" class="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">👤 유저 검색하기</button>' +
+                                '<button onclick="app.comm.rankingMode=\'user\';app.commSwitchTab(\'ranking\')" class="px-6 py-2 bg-white text-warm-700 border border-warm-400 rounded-full text-xs font-medium active:scale-95 transition-all">🏆 랭킹에서 인기 유저 찾기</button>' +
                             '</div></div>';
                     } else if (myFollowCount <= 3) {
                         body += '<div class="bg-terra-50 border border-terra-200 rounded-2xl p-4 mb-4 flex items-center gap-3">' +
                             '<div class="text-2xl flex-shrink-0">💡</div>' +
                             '<div class="flex-1"><div class="text-xs font-semibold text-warm-800 mb-0.5">더 많은 코디를 발견하세요</div><div class="text-[11px] text-warm-600">더 많은 유저를 팔로우하면 다양한 스타일을 볼 수 있어요</div></div>' +
-                            '<button onclick="app.goTo(\'user-search\')" class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0">탐색</button>' +
+                            '<button onclick="app.openFollowList(auth.user.id,'following')" class="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0">탐색</button>' +
                         '</div>';
                     }
                 } else if (tab === 'ranking') {
@@ -14418,7 +14432,7 @@
                     grid.innerHTML = '';
                     let emptyH = '<div class="text-center py-10"><div class="text-4xl mb-2">' + (tab==='friends'?'👫':'🎨') + '</div><div class="text-sm text-warm-600">' + emptyMsg + '</div>';
                     if (tab === 'friends') {
-                        emptyH += '<button onclick="app.goTo(\'user-search\')" class="mt-4 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all shadow-terra">유저 검색하기</button>';
+                        emptyH += '<button onclick="app.openFollowList(auth.user.id,'following')" class="mt-4 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all shadow-terra">유저 검색하기</button>';
                     }
                     emptyH += '</div>';
                     if (status) status.innerHTML = emptyH;
