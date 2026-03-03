@@ -9218,6 +9218,28 @@
                             ? '<span class="text-[11px] text-warm-400 font-medium">' + (pushDenied ? '차단됨' : isIOSSafari ? 'Safari' : '미지원') + '</span>'
                             : '<div class="settings-toggle ' + (pushActive ? 'on' : '') + '" onclick="app.togglePush()"><div class="settings-toggle-dot"></div></div>'}
                     </div>
+                    ${pushActive ? (() => {
+                        const ps = this._getPushSettings();
+                        const types = [
+                            { key: 'like', icon: 'heart', label: '좋아요', desc: '내 코디에 좋아요를 받으면' },
+                            { key: 'comment', icon: 'message-circle', label: '댓글', desc: '내 게시물에 댓글이 달리면' },
+                            { key: 'follow', icon: 'user-plus', label: '팔로우', desc: '누군가 나를 팔로우하면' },
+                            { key: 'save', icon: 'bookmark', label: '저장', desc: '내 코디가 저장되면' },
+                            { key: 'system', icon: 'megaphone', label: '이벤트/공지', desc: '이벤트 소식과 공지사항' }
+                        ];
+                        return '<div class="ml-8 border-l-2 border-warm-300 pl-3">' +
+                            types.map(t =>
+                                '<div class="flex items-center justify-between py-2.5">' +
+                                    '<div class="flex items-center gap-2">' +
+                                        svg(t.icon, 14, "#A8A29E") +
+                                        '<div><span class="text-[13px] text-warm-800">' + t.label + '</span>' +
+                                        '<div class="text-[10px] text-warm-400">' + t.desc + '</div></div>' +
+                                    '</div>' +
+                                    '<div class="settings-toggle ' + (ps[t.key] !== false ? 'on' : '') + '" onclick="app._togglePushType(\'' + t.key + '\',this)"><div class="settings-toggle-dot"></div></div>' +
+                                '</div>'
+                            ).join('') + '</div>';
+                    })() : ''}
+                    </div>
                     <div class="flex items-center justify-between py-3.5">
                         <div class="flex items-center gap-2.5">
                             ${svg("camera", 18, "#A8A29E")}
@@ -17721,6 +17743,40 @@
                 return !!this._pushSubscription && this._pushPermission === 'granted';
             },
 
+            _getPushSettings() {
+                try { return JSON.parse(localStorage.getItem('sp_push_settings') || '{}'); } catch(e) { return {}; }
+            },
+
+            _togglePushType(type, el) {
+                const ps = this._getPushSettings();
+                ps[type] = ps[type] === false ? true : false;
+                localStorage.setItem('sp_push_settings', JSON.stringify(ps));
+                if (el) el.classList.toggle('on');
+                // 서버에 설정 저장 (push_subscriptions의 settings 컬럼 또는 user_data)
+                this._syncPushSettingsToServer(ps);
+            },
+
+            async _syncPushSettingsToServer(ps) {
+                if (!sb || !auth.user) return;
+                try {
+                    // user_data의 data jsonb에 push_settings 키로 저장
+                    const { data: ud } = await sb.from('user_data').select('data').eq('user_id', auth.user.id).single();
+                    const existing = ud?.data || {};
+                    existing.push_settings = ps;
+                    await sb.from('user_data').upsert({ user_id: auth.user.id, data: existing });
+                } catch(e) { console.warn('Push settings sync error:', e); }
+            },
+
+            async _loadPushSettingsFromServer() {
+                if (!sb || !auth.user) return;
+                try {
+                    const { data: ud } = await sb.from('user_data').select('data').eq('user_id', auth.user.id).single();
+                    if (ud?.data?.push_settings) {
+                        localStorage.setItem('sp_push_settings', JSON.stringify(ud.data.push_settings));
+                    }
+                } catch(e) {}
+            },
+
             // ── 인증 화면 ──
             renderAuthLogin() {
                 return `<div class="screen active">
@@ -18745,6 +18801,7 @@
             app._initNotifications();
             app._initBlocks();
             app._initPush();
+            app._loadPushSettingsFromServer();
 
             // 서비스 워커 등록
             if ('serviceWorker' in navigator) {
