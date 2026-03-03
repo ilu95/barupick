@@ -15101,7 +15101,7 @@
                         // 좋아요 알림 전송
                         const p2 = this.comm.posts.find(x=>x.id===postId) || this.comm.detail;
                         if (p2 && p2.user_id) {
-                            this._sendNotification(p2.user_id, 'like', '회원님의 코디를 좋아해요', postId);
+                            this._sendNotification(p2.user_id, 'like', (auth.profile?.nickname || '누군가') + ' 님이 회원님의 코디를 좋아해요', postId);
                         }
                     }
                     const p = this.comm.posts.find(x=>x.id===postId);
@@ -15161,7 +15161,7 @@
                     if (sb) { try { await sb.rpc('increment_save_count', { p_post_id: postId }); post.save_count = (post.save_count||0)+1; } catch(e) {} }
                     // 저장 알림 전송
                     if (post.user_id) {
-                        this._sendNotification(post.user_id, 'save', '회원님의 코디를 저장했어요', postId);
+                        this._sendNotification(post.user_id, 'save', (auth.profile?.nickname || '누군가') + ' 님이 회원님의 코디를 저장했어요', postId);
                     }
                 }
                 // 상세 화면이면 북마크 버튼만 갱신
@@ -15259,7 +15259,7 @@
                     // 댓글 알림 전송
                     if (p && p.user_id) {
                         const preview = content.length > 20 ? content.slice(0, 20) + '…' : content;
-                        this._sendNotification(p.user_id, 'comment', '댓글을 남겼어요: ' + preview, p.id);
+                        this._sendNotification(p.user_id, 'comment', (auth.profile?.nickname || '누군가') + ' 님이 댓글을 남겼어요: ' + preview, p.id);
                     }
                     spToast('댓글이 등록되었어요 💬');
                     this._loadComments(postId);
@@ -15525,7 +15525,7 @@
                     this.showShareToast('팔로우했어요! ✓');
 
                     // 팔로우 알림 전송
-                    this._sendNotification(userId, 'follow', '님이 회원님을 팔로우했어요', userId);
+                    this._sendNotification(userId, 'follow', (auth.profile?.nickname || '누군가') + ' 님이 회원님을 팔로우했어요', userId);
 
                     // 맞팔 확인 (상대가 나를 팔로우하고 있는지 서버에서 확인)
                     if (sb) {
@@ -15536,7 +15536,7 @@
                                 if (!friends.includes(userId)) friends.push(userId);
                                 localStorage.setItem('sp_friends', JSON.stringify(friends));
                                 // 맞팔 알림 양방향 전송
-                                this._sendNotification(userId, 'friend', '서로 친구가 되었어요! 이제 댓글로 소통해보세요 👫', userId);
+                                this._sendNotification(userId, 'friend', (auth.profile?.nickname || '누군가') + ' 님과 서로 친구가 되었어요! 이제 댓글로 소통해보세요 👫', userId);
                             }
                         } catch(e) {}
                     }
