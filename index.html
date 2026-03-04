@@ -157,9 +157,20 @@
     }
 
     // 🔒 보안: 닉네임 sanitize (HTML 태그 + 특수문자 제거)
+    var _NICK_BANNED = ['관리자','운영자','admin','바루픽','barupick','바루사','barusa','시스템','system','테스트','test','공지','notice'];
     function sanitizeNickname(str) {
         if (!str) return '';
-        return String(str).replace(/<[^>]*>/g, '').replace(/[<>"'&]/g, '').trim().slice(0, 12);
+        return String(str).replace(/[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]/g, '').trim().slice(0, 12);
+    }
+    function validateNickname(clean) {
+        if (!clean || clean.length < 2) return '닉네임은 2자 이상 입력해주세요';
+        if (clean.length > 12) return '닉네임은 12자 이하로 입력해주세요';
+        if (/^[0-9]+$/.test(clean)) return '숫자로만 이루어진 닉네임은 사용할 수 없어요';
+        var lower = clean.toLowerCase();
+        for (var i = 0; i < _NICK_BANNED.length; i++) {
+            if (lower === _NICK_BANNED[i] || lower.indexOf(_NICK_BANNED[i]) >= 0) return '"' + clean + '"은(는) 사용할 수 없는 닉네임이에요';
+        }
+        return null;
     }
 
     function svg(name, size, color, cls) {
@@ -439,49 +450,6 @@
             background: var(--accent);
             color: white;
         }
-
-        .beta-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 5px 10px;
-            background: linear-gradient(135deg, var(--accent), #A8613F);
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            border: none;
-            border-radius: 100px;
-            cursor: pointer;
-            white-space: nowrap;
-            text-decoration: none;
-            letter-spacing: -0.2px;
-            box-shadow: 0 2px 8px rgba(194,112,58,0.3);
-            transition: all 0.2s;
-            animation: betaPulse 2s ease-in-out infinite;
-        }
-        .beta-btn:active { transform: scale(0.95); }
-        @keyframes betaPulse {
-            0%, 100% { box-shadow: 0 2px 8px rgba(194,112,58,0.3); }
-            50% { box-shadow: 0 2px 16px rgba(194,112,58,0.5); }
-        }
-
-        .feedback-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            padding: 5px 10px;
-            background: white;
-            color: var(--text-sub);
-            font-size: 10px;
-            font-weight: 600;
-            border: 1px solid #E7DDD2;
-            border-radius: 100px;
-            cursor: pointer;
-            white-space: nowrap;
-            letter-spacing: -0.2px;
-            transition: all 0.2s;
-        }
-        .feedback-btn:active { transform: scale(0.95); }
 
         /* 피드백 모달 */
         .fb-overlay {
@@ -2242,8 +2210,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </button>
         <span class="app-header-title" id="headerTitle">바루픽</span>
-        <button class="feedback-btn" id="feedbackBtn" onclick="app._openFeedback()">💬 피드백</button>
-        <a class="beta-btn" id="betaBtn" href="https://forms.gle/b7xpZUhKYVhi5kXY7" target="_blank" rel="noopener">🔥 베타 테스터 신청</a>
         <span id="levelBadge" class="header-level-badge" onclick="app.goTo('my-level')"></span>
         <button class="btn-icon" id="notiBtn" onclick="app.goTo('notifications')" style="display:none;position:relative">
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
@@ -6992,11 +6958,7 @@
                 homeBtn.classList.toggle('hidden', isHome || this.screenHistory.length < 2);
                 profileBtn.classList.toggle('active', profile.hasProfile());
 
-                // 베타 테스터 & 피드백 버튼: 홈에서만 표시
-                const betaBtn = document.getElementById('betaBtn');
-                const feedbackBtn = document.getElementById('feedbackBtn');
-                if (betaBtn) betaBtn.style.display = isHome ? '' : 'none';
-                if (feedbackBtn) feedbackBtn.style.display = isHome ? '' : 'none';
+                // 베타 테스터 & 피드백: 홈 본문에 포함됨 (헤더에서 제거)
 
                 // 헤더 레벨 배지 업데이트
                 const levelBadgeEl = document.getElementById('levelBadge');
@@ -9640,6 +9602,10 @@
                     <div class="flex gap-2 flex-wrap">
                         ${weatherChip}
                         ${streakChip}
+                    </div>
+                    <div class="flex gap-2 mt-2.5">
+                        <button onclick="app._openFeedback()" class="inline-flex items-center gap-1 bg-white border border-warm-400 rounded-full px-3 py-1.5 text-[11px] font-semibold text-warm-600 active:scale-95 transition-all shadow-warm-sm">💬 피드백</button>
+                        <a href="https://forms.gle/b7xpZUhKYVhi5kXY7" target="_blank" rel="noopener" class="inline-flex items-center gap-1 bg-gradient-to-r from-terra-500 to-terra-600 rounded-full px-3 py-1.5 text-[11px] font-bold text-white active:scale-95 transition-all shadow-terra no-underline">🔥 베타 테스터 신청</a>
                     </div>
                 </div>
 
@@ -12873,6 +12839,25 @@
             _fetchWeatherCore(callback) {
                 var self = this;
 
+                // ── 캐시 확인: 30분 이내면 저장된 데이터 사용 ──
+                try {
+                    var cached = JSON.parse(localStorage.getItem('sp_weather_cache'));
+                    if (cached && cached.data && (Date.now() - cached.ts) < 1800000) {
+                        self._weatherData = cached.data;
+                        if (callback) callback();
+                        return;
+                    }
+                } catch(ce) {}
+
+                // ── 저장된 좌표가 있으면 위치 권한 없이 바로 API 호출 ──
+                var savedLat = localStorage.getItem('sp_weather_lat');
+                var savedLon = localStorage.getItem('sp_weather_lon');
+
+                if (savedLat && savedLon) {
+                    self._fetchWeatherAPI(savedLat, savedLon, callback);
+                    return;
+                }
+
                 if (!navigator.geolocation) {
                     this._weatherError = '위치 정보를 사용할 수 없어요.';
                     if (callback) callback();
@@ -12883,34 +12868,10 @@
                     function (pos) {
                         var lat = pos.coords.latitude.toFixed(2);
                         var lon = pos.coords.longitude.toFixed(2);
-                        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
-                            '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m' +
-                            '&hourly=temperature_2m,weather_code&timezone=auto&forecast_days=1';
-
-                        fetch(url).then(function (r) { return r.json(); }).then(function (data) {
-                            if (!data.current) throw new Error('No data');
-                            self._weatherData = {
-                                temp: Math.round(data.current.temperature_2m),
-                                feels: Math.round(data.current.apparent_temperature),
-                                humidity: data.current.relative_humidity_2m,
-                                wind: Math.round(data.current.wind_speed_10m),
-                                code: data.current.weather_code,
-                                hourly: data.hourly ? data.hourly.temperature_2m.slice(0, 24).map(function (t, i) {
-                                    return { hour: i, temp: Math.round(t), code: data.hourly.weather_code[i] };
-                                }) : [],
-                                lat: lat, lon: lon
-                            };
-                            self._weatherData.location = '현재 위치';
-                            fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m&timezone=auto')
-                                .then(function (r) { return r.json(); })
-                                .then(function (d) {
-                                    if (d.timezone) self._weatherData.location = d.timezone.split('/').pop().replace(/_/g, ' ');
-                                    if (callback) callback();
-                                }).catch(function () { if (callback) callback(); });
-                        }).catch(function () {
-                            self._weatherError = '날씨 정보를 불러올 수 없어요.';
-                            if (callback) callback();
-                        });
+                        // 좌표 저장 (다음 새로고침에 재사용)
+                        localStorage.setItem('sp_weather_lat', lat);
+                        localStorage.setItem('sp_weather_lon', lon);
+                        self._fetchWeatherAPI(lat, lon, callback);
                     },
                     function () {
                         self._weatherError = '위치 접근이 거부되었어요.\n브라우저 설정에서 위치 권한을 허용해주세요.';
@@ -12918,6 +12879,39 @@
                     },
                     { timeout: 10000 }
                 );
+            },
+
+            _fetchWeatherAPI(lat, lon, callback) {
+                var self = this;
+                var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
+                    '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m' +
+                    '&hourly=temperature_2m,weather_code&timezone=auto&forecast_days=1';
+
+                fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+                    if (!data.current) throw new Error('No data');
+                    self._weatherData = {
+                        temp: Math.round(data.current.temperature_2m),
+                        feels: Math.round(data.current.apparent_temperature),
+                        humidity: data.current.relative_humidity_2m,
+                        wind: Math.round(data.current.wind_speed_10m),
+                        code: data.current.weather_code,
+                        hourly: data.hourly ? data.hourly.temperature_2m.slice(0, 24).map(function (t, i) {
+                            return { hour: i, temp: Math.round(t), code: data.hourly.weather_code[i] };
+                        }) : [],
+                        lat: lat, lon: lon
+                    };
+                    self._weatherData.location = '현재 위치';
+                    // 타임존으로 위치명 가져오기
+                    if (data.timezone) {
+                        self._weatherData.location = data.timezone.split('/').pop().replace(/_/g, ' ');
+                    }
+                    // 캐시 저장
+                    try { localStorage.setItem('sp_weather_cache', JSON.stringify({ data: self._weatherData, ts: Date.now() })); } catch(ce) {}
+                    if (callback) callback();
+                }).catch(function () {
+                    self._weatherError = '날씨 정보를 불러올 수 없어요.';
+                    if (callback) callback();
+                });
             },
 
             _weatherCodeEmoji(code) {
@@ -17937,7 +17931,7 @@
                 const agreed = document.getElementById('auth-agree')?.checked;
                 const errEl = document.getElementById('auth-error');
                 const btn = document.getElementById('auth-submit-btn');
-                if (!nick || nick.length < 2) { if(errEl){errEl.style.display='block';errEl.textContent='닉네임을 2자 이상 입력해주세요 (특수문자 제외)';} return; }
+                var nickErr = validateNickname(nick); if (nickErr) { if(errEl){errEl.style.display='block';errEl.textContent=nickErr;} return; }
                 if (!email || !pw) { if(errEl){errEl.style.display='block';errEl.textContent='이메일과 비밀번호를 입력해주세요';} return; }
                 if (pw.length < 6) { if(errEl){errEl.style.display='block';errEl.textContent='비밀번호는 6자리 이상이어야 합니다';} return; }
                 if (!agreed) { if(errEl){errEl.style.display='block';errEl.textContent='이용약관 및 개인정보처리방침에 동의해주세요';} return; }
@@ -18194,11 +18188,25 @@
 
             async editNickname() {
                 if (!sb || !auth.user) return;
+
+                // 7일 변경 제한
+                const lastChanged = localStorage.getItem('sp_nick_changed_' + auth.user.id);
+                if (lastChanged) {
+                    const elapsed = Date.now() - parseInt(lastChanged);
+                    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+                    if (elapsed < SEVEN_DAYS) {
+                        const remainDays = Math.ceil((SEVEN_DAYS - elapsed) / 86400000);
+                        spToast('닉네임은 7일에 1번만 변경할 수 있어요\n(' + remainDays + '일 후 변경 가능)');
+                        return;
+                    }
+                }
+
                 const current = auth.profile?.nickname || '';
-                const newNick = prompt('닉네임을 입력해주세요 (2~12자)', current);
+                const newNick = prompt('닉네임을 입력해주세요\n(한글/영문/숫자, 2~12자)', current);
                 if (!newNick || newNick.trim() === current) return;
                 const clean = sanitizeNickname(newNick);
-                if (clean.length < 2) { spToast('닉네임은 2자 이상이어야 해요'); return; }
+                const nickErr = validateNickname(clean);
+                if (nickErr) { spToast(nickErr); return; }
 
                 try {
                     // 중복 체크
@@ -18218,6 +18226,7 @@
                         return;
                     }
                     auth.profile.nickname = clean;
+                    localStorage.setItem('sp_nick_changed_' + auth.user.id, String(Date.now()));
                     spToast('닉네임이 변경되었어요 ✏️');
                     this.render();
                 } catch(e) {
