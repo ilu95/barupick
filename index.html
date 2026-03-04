@@ -465,6 +465,102 @@
             50% { box-shadow: 0 2px 16px rgba(194,112,58,0.5); }
         }
 
+        .feedback-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 5px 10px;
+            background: white;
+            color: var(--text-sub);
+            font-size: 10px;
+            font-weight: 600;
+            border: 1px solid #E7DDD2;
+            border-radius: 100px;
+            cursor: pointer;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+            transition: all 0.2s;
+        }
+        .feedback-btn:active { transform: scale(0.95); }
+
+        /* 피드백 모달 */
+        .fb-overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            align-items: flex-end; justify-content: center;
+        }
+        .fb-overlay.open { display: flex; }
+        .fb-sheet {
+            width: 100%; max-width: 480px;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+            animation: fbSlideUp 0.3s ease;
+        }
+        @keyframes fbSlideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .fb-sheet h3 {
+            font-size: 16px; font-weight: 700; margin-bottom: 4px;
+        }
+        .fb-sheet .fb-sub {
+            font-size: 12px; color: #8C7A6B; margin-bottom: 16px;
+        }
+        .fb-type-row {
+            display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .fb-type-chip {
+            padding: 6px 12px;
+            font-size: 11px; font-weight: 600;
+            border: 1px solid #E7DDD2;
+            border-radius: 100px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #8C7A6B;
+        }
+        .fb-type-chip.sel {
+            background: #C2703A; color: white; border-color: #C2703A;
+        }
+        .fb-textarea {
+            width: 100%;
+            min-height: 120px;
+            border: 1px solid #E7DDD2;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            color: #3C3632;
+        }
+        .fb-textarea:focus { border-color: #C2703A; }
+        .fb-textarea::placeholder { color: #C4B8AC; }
+        .fb-actions {
+            display: flex; gap: 8px; margin-top: 14px;
+        }
+        .fb-cancel {
+            flex: 1; padding: 12px;
+            background: #F5F0EB; color: #8C7A6B;
+            border: none; border-radius: 12px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer;
+        }
+        .fb-submit {
+            flex: 2; padding: 12px;
+            background: linear-gradient(135deg, #C2703A, #A8613F);
+            color: white; border: none; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .fb-submit:disabled { opacity: 0.5; cursor: default; }
+
         .header-level-badge {
             display: inline-flex;
             align-items: center;
@@ -2146,6 +2242,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </button>
         <span class="app-header-title" id="headerTitle">바루픽</span>
+        <button class="feedback-btn" id="feedbackBtn" onclick="app._openFeedback()">💬 피드백</button>
         <a class="beta-btn" id="betaBtn" href="https://forms.gle/b7xpZUhKYVhi5kXY7" target="_blank" rel="noopener">🔥 베타 테스터 신청</a>
         <span id="levelBadge" class="header-level-badge" onclick="app.goTo('my-level')"></span>
         <button class="btn-icon" id="notiBtn" onclick="app.goTo('notifications')" style="display:none;position:relative">
@@ -2167,6 +2264,25 @@
 
     <!-- Content container -->
     <div id="content"></div>
+
+    <!-- Feedback Modal -->
+    <div class="fb-overlay" id="fbOverlay" onclick="if(event.target===this)app._closeFeedback()">
+        <div class="fb-sheet">
+            <h3>💬 피드백 보내기</h3>
+            <p class="fb-sub">바루픽을 더 좋게 만들기 위해 의견을 들려주세요</p>
+            <div class="fb-type-row" id="fbTypes">
+                <span class="fb-type-chip" onclick="app._selectFbType(this)" data-type="버그">🐛 버그</span>
+                <span class="fb-type-chip" onclick="app._selectFbType(this)" data-type="기능요청">✨ 기능 요청</span>
+                <span class="fb-type-chip" onclick="app._selectFbType(this)" data-type="디자인">🎨 디자인</span>
+                <span class="fb-type-chip" onclick="app._selectFbType(this)" data-type="기타">💡 기타</span>
+            </div>
+            <textarea class="fb-textarea" id="fbText" placeholder="어떤 점이 불편하셨나요? 어떤 기능이 있으면 좋겠나요?" maxlength="1000"></textarea>
+            <div class="fb-actions">
+                <button class="fb-cancel" onclick="app._closeFeedback()">취소</button>
+                <button class="fb-submit" id="fbSubmit" onclick="app._submitFeedback()">보내기</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav" id="bottomNav">
@@ -6876,9 +6992,11 @@
                 homeBtn.classList.toggle('hidden', isHome || this.screenHistory.length < 2);
                 profileBtn.classList.toggle('active', profile.hasProfile());
 
-                // 베타 테스터 버튼: 홈에서만 표시
+                // 베타 테스터 & 피드백 버튼: 홈에서만 표시
                 const betaBtn = document.getElementById('betaBtn');
+                const feedbackBtn = document.getElementById('feedbackBtn');
                 if (betaBtn) betaBtn.style.display = isHome ? '' : 'none';
+                if (feedbackBtn) feedbackBtn.style.display = isHome ? '' : 'none';
 
                 // 헤더 레벨 배지 업데이트
                 const levelBadgeEl = document.getElementById('levelBadge');
@@ -18028,6 +18146,50 @@
                         outCanvas.toBlob((blob) => callback(blob), 'image/webp', 0.85);
                     }
                 };
+            },
+
+            // ── 피드백 ──
+            _fbType: '',
+            _openFeedback() {
+                this._fbType = '';
+                document.getElementById('fbText').value = '';
+                document.querySelectorAll('.fb-type-chip').forEach(c => c.classList.remove('sel'));
+                document.getElementById('fbSubmit').disabled = false;
+                document.getElementById('fbOverlay').classList.add('open');
+            },
+            _closeFeedback() {
+                document.getElementById('fbOverlay').classList.remove('open');
+            },
+            _selectFbType(el) {
+                document.querySelectorAll('.fb-type-chip').forEach(c => c.classList.remove('sel'));
+                el.classList.add('sel');
+                this._fbType = el.dataset.type;
+            },
+            async _submitFeedback() {
+                const text = (document.getElementById('fbText').value || '').trim();
+                if (!text) { spToast('내용을 입력해주세요'); return; }
+                const btn = document.getElementById('fbSubmit');
+                btn.disabled = true;
+                btn.textContent = '보내는 중...';
+                try {
+                    const payload = {
+                        type: this._fbType || '기타',
+                        content: text.substring(0, 1000),
+                        user_id: auth.user ? auth.user.id : null,
+                        nickname: auth.profile ? auth.profile.nickname : null,
+                        screen: this.currentScreen,
+                        user_agent: navigator.userAgent.substring(0, 300)
+                    };
+                    const { error } = await sb.from('feedbacks').insert(payload);
+                    if (error) throw error;
+                    this._closeFeedback();
+                    spToast('소중한 의견 감사합니다! 🙏');
+                } catch(e) {
+                    console.error('Feedback error:', e);
+                    spToast('전송 실패: ' + (e.message || ''));
+                    btn.disabled = false;
+                    btn.textContent = '보내기';
+                }
             },
 
             async editNickname() {
