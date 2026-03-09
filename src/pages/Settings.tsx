@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Check, Download } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -7,6 +7,7 @@ import { useAutoSync, useLastSyncTime } from '@/hooks/useAutoSync'
 
 export default function Settings() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { user, logout } = useAuth()
   const { syncNow } = useAutoSync()
   const lastSync = useLastSyncTime()
@@ -14,7 +15,7 @@ export default function Settings() {
   const [a11yLabels, setA11yLabels] = useState(localStorage.getItem('sp_a11y_labels') === '1')
   const [hideCounts, setHideCounts] = useState(localStorage.getItem('sp_hide_counts') === '1')
   const [syncing, setSyncing] = useState(false)
-  const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(searchParams.get('feedback') === '1')
 
   const toggleDark = () => {
     const next = !darkMode

@@ -57,7 +57,7 @@ export default function Home() {
 
         {/* 피드백 + 베타 테스터 */}
         <div className="flex gap-2 mb-4">
-          <button onClick={() => navigate('/profile/settings')} className="inline-flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3 py-1.5 text-[11px] font-semibold text-warm-600 dark:text-warm-400 active:scale-95 transition-all shadow-warm-sm">
+          <button onClick={() => navigate('/profile/settings?feedback=1')} className="inline-flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3 py-1.5 text-[11px] font-semibold text-warm-600 dark:text-warm-400 active:scale-95 transition-all shadow-warm-sm">
             💬 피드백
           </button>
           <a href="https://forms.gle/b7xpZUhKYVhi5kXY7" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 bg-gradient-to-r from-terra-500 to-terra-600 rounded-full px-3 py-1.5 text-[11px] font-bold text-white active:scale-95 transition-all shadow-terra no-underline">
