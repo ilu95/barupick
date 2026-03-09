@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
     const redirectTo = isNative
       ? 'com.barupick.app://callback'
-      : window.location.origin + window.location.pathname
+      : window.location.origin + '/home'
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,

@@ -1,11 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Shirt, UserPlus, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function Auth() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, loading } = useAuth()
   const isSignup = location.pathname === '/auth/signup'
+
+  // 이미 로그인된 상태면 홈으로 리다이렉트
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/home', { replace: true })
+    }
+  }, [user, loading])
+
+  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin" /></div>
+  if (user) return null
 
   return isSignup ? <Signup /> : <Login />
 }

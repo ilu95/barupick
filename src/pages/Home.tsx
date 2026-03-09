@@ -12,7 +12,7 @@ import { profile as profileLib } from '@/lib/profile'
 export default function Home() {
   const navigate = useNavigate()
   const { profile } = useAuth()
-  const { canInstall, install } = usePWA()
+  const { canInstall, isInstalled, install } = usePWA()
   const { weather, loading: wLoading } = useWeather()
 
   // 온보딩 체크
@@ -51,9 +51,19 @@ export default function Home() {
     <div className="animate-screen-fade px-5 pt-[18px] pb-10">
       {/* 인사 */}
       <div className="pb-4">
-        <h1 className="font-display text-[clamp(22px,5.5vw,28px)] font-bold tracking-tight text-warm-900 dark:text-warm-100 leading-tight mb-4">
+        <h1 className="font-display text-[clamp(22px,5.5vw,28px)] font-bold tracking-tight text-warm-900 dark:text-warm-100 leading-tight mb-3">
           {greetingText}
         </h1>
+
+        {/* 피드백 + 베타 테스터 */}
+        <div className="flex gap-2 mb-4">
+          <button onClick={() => navigate('/profile/settings')} className="inline-flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3 py-1.5 text-[11px] font-semibold text-warm-600 dark:text-warm-400 active:scale-95 transition-all shadow-warm-sm">
+            💬 피드백
+          </button>
+          <a href="https://forms.gle/b7xpZUhKYVhi5kXY7" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 bg-gradient-to-r from-terra-500 to-terra-600 rounded-full px-3 py-1.5 text-[11px] font-bold text-white active:scale-95 transition-all shadow-terra no-underline">
+            🔥 베타 테스터 신청
+          </a>
+        </div>
 
         {/* 날씨 카드 */}
         {weather ? (
@@ -206,22 +216,26 @@ export default function Home() {
         </div>
       </div>
 
-      {/* PWA 설치 배너 */}
-      {canInstall && (
-        <div className="bg-white border border-terra-200 rounded-2xl p-4 flex items-center gap-3 shadow-warm-sm animate-slide-up">
-          <div className="w-10 h-10 rounded-xl bg-terra-100 flex items-center justify-center flex-shrink-0">
+      {/* PWA 설치 배너 — 미설치 상태일 때 표시 (설치 완료 또는 사용자 닫기 시 숨김) */}
+      {!isInstalled && !localStorage.getItem('sp_pwa_dismissed') && (
+        <div className="bg-white dark:bg-warm-800 border border-terra-200 dark:border-terra-700 rounded-2xl p-4 flex items-center gap-3 shadow-warm-sm animate-slide-up relative">
+          <div className="w-10 h-10 rounded-xl bg-terra-100 dark:bg-terra-900/30 flex items-center justify-center flex-shrink-0">
             <Download size={20} className="text-terra-600" />
           </div>
           <div className="flex-1">
-            <div className="text-sm font-semibold text-warm-900">홈 화면에 추가</div>
-            <div className="text-[11px] text-warm-600">앱처럼 빠르게 실행할 수 있어요</div>
+            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">홈 화면에 추가</div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400">앱처럼 빠르게 실행할 수 있어요</div>
           </div>
-          <button
-            onClick={install}
-            className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0"
-          >
-            설치
-          </button>
+          {canInstall ? (
+            <button onClick={install} className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0">
+              설치
+            </button>
+          ) : (
+            <button onClick={() => { alert('브라우저 메뉴(⋮)에서 "홈 화면에 추가"를 선택해주세요'); localStorage.setItem('sp_pwa_dismissed', '1') }} className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0">
+              방법 보기
+            </button>
+          )}
+          <button onClick={() => { localStorage.setItem('sp_pwa_dismissed', '1'); window.location.reload() }} className="absolute top-2 right-2 w-5 h-5 rounded-full bg-warm-200 dark:bg-warm-700 text-warm-500 text-[10px] flex items-center justify-center">✕</button>
         </div>
       )}
     </div>
