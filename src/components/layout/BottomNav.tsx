@@ -18,7 +18,6 @@ const HIDDEN_ROUTES = [
   '/pc-light',
   '/home/build',
   '/home/recommend',
-  '/record',
   '/community/post',
   '/closet/coord',
 ]

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, Download, X, Droplets, Wind } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
@@ -6,14 +6,16 @@ import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePWA } from '@/hooks/usePWA'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
+import { supabase } from '@/lib/supabase'
 
 import { profile as profileLib } from '@/lib/profile'
 
 export default function Home() {
   const navigate = useNavigate()
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const { canInstall, isInstalled, install } = usePWA()
   const { weather, loading: wLoading } = useWeather()
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   // 온보딩 체크
   useEffect(() => {
@@ -57,7 +59,7 @@ export default function Home() {
 
         {/* 피드백 + 베타 테스터 */}
         <div className="flex gap-2 mb-4">
-          <button onClick={() => navigate('/profile/settings?feedback=1')} className="inline-flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3 py-1.5 text-[11px] font-semibold text-warm-600 dark:text-warm-400 active:scale-95 transition-all shadow-warm-sm">
+          <button onClick={() => setFeedbackOpen(true)} className="inline-flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3 py-1.5 text-[11px] font-semibold text-warm-600 dark:text-warm-400 active:scale-95 transition-all shadow-warm-sm">
             💬 피드백
           </button>
           <a href="https://forms.gle/b7xpZUhKYVhi5kXY7" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 bg-gradient-to-r from-terra-500 to-terra-600 rounded-full px-3 py-1.5 text-[11px] font-bold text-white active:scale-95 transition-all shadow-terra no-underline">
@@ -238,6 +240,54 @@ export default function Home() {
           <button onClick={() => { localStorage.setItem('sp_pwa_dismissed', '1'); window.location.reload() }} className="absolute top-2 right-2 w-5 h-5 rounded-full bg-warm-200 dark:bg-warm-700 text-warm-500 text-[10px] flex items-center justify-center">✕</button>
         </div>
       )}
+
+      {/* 피드백 모달 */}
+      {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} userId={user?.id} />}
+    </div>
+  )
+}
+
+// ─── 피드백 모달 ───
+function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: string }) {
+  const [type, setType] = useState('')
+  const [message, setMessage] = useState('')
+  const [sending, setSending] = useState(false)
+
+  const types = [
+    { key: 'bug', label: '🐛 버그' },
+    { key: 'feature', label: '✨ 기능 요청' },
+    { key: 'design', label: '🎨 디자인' },
+    { key: 'other', label: '💡 기타' },
+  ]
+
+  const submit = async () => {
+    if (!type || !message.trim()) { alert('유형과 내용을 입력해주세요'); return }
+    setSending(true)
+    try {
+      await supabase.from('feedbacks').insert({ user_id: userId || null, type, message: message.trim(), screen: 'home' })
+      alert('소중한 의견 감사합니다!')
+      onClose()
+    } catch (e: any) {
+      alert('전송 실패: ' + (e.message || ''))
+    } finally { setSending(false) }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[300] flex items-end justify-center" onClick={onClose}>
+      <div className="w-full max-w-[480px] bg-white dark:bg-warm-800 rounded-t-3xl p-6 pb-8 animate-screen-enter" onClick={e => e.stopPropagation()}>
+        <div className="w-10 h-1 bg-warm-400 rounded-full mx-auto mb-5" />
+        <h3 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 mb-4">피드백 보내기</h3>
+        <div className="flex gap-2 mb-4">
+          {types.map(t => (
+            <button key={t.key} onClick={() => setType(t.key)} className={`px-3.5 py-2 rounded-full text-[12px] font-medium transition-all ${type === t.key ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 active:scale-95'}`}>{t.label}</button>
+          ))}
+        </div>
+        <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="의견을 자유롭게 작성해주세요 (최대 1000자)" maxLength={1000}
+          className="w-full h-32 px-4 py-3 bg-warm-100 dark:bg-warm-700 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 focus:outline-none focus:border-terra-400 resize-none mb-4" />
+        <button onClick={submit} disabled={sending} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra disabled:opacity-50">
+          {sending ? '보내는 중...' : '보내기'}
+        </button>
+      </div>
     </div>
   )
 }
