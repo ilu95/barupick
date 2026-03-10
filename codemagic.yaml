@@ -49,10 +49,12 @@ workflows:
 
       - name: Increment build number
         script: |
-          cd ios/App
           LATEST=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" || echo 0)
-          agvtool new-version -all $((LATEST + 1))
-          
+          NEW_BUILD=$((LATEST + 1))
+          echo "Setting build number to $NEW_BUILD"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD" ios/App/App/Info.plist
+          echo "Build number set to $NEW_BUILD"
+
       - name: Build iOS app
         script: |
           cd ios/App
