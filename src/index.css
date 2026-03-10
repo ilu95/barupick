@@ -5,11 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
 :root {
   --bg: #F7F5F2;
   --bg-card: #ffffff;
