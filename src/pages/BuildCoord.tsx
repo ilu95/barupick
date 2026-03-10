@@ -362,22 +362,25 @@ function StepColor({ build }: { build: BH }) {
             <Sparkles size={12} className="text-terra-500" /> 추천 색상
             {recs[0]?.reason && <span className="text-[10px] text-warm-500 font-normal ml-1">{recs[0].reason}</span>}
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {recs.slice(0, 12).map(r => {
+          <div className="grid grid-cols-5 gap-2">
+            {recs.slice(0, 10).map(r => {
               const c = COLORS_60[r.key]
               if (!c) return null
               const sel = currentColor === r.key
               const delta = showDelta ? build.calcScoreDelta(item, r.key) : 0
+              const isLight = c.hcl[2] > 60
               return (
                 <div key={r.key} className="relative">
                   <button
                     onClick={() => build.selectColor(r.key)}
-                    className={`w-11 h-11 rounded-xl border-[1.5px] transition-all active:scale-90 ${
-                      sel ? 'border-terra-500 ring-2 ring-terra-300 scale-110' : 'border-warm-400'
+                    className={`w-full aspect-square rounded-xl border-[1.5px] transition-all active:scale-90 flex items-center justify-center ${
+                      sel ? 'border-terra-500 ring-2 ring-terra-300 scale-105' : 'border-warm-400'
                     }`}
-                    style={{ background: c.hex }}
+                    style={{ background: c.hex, color: isLight ? '#1C1917' : '#ffffff' }}
                     title={`${c.name} (${r.score}점) ${r.reason || ''}`}
-                  />
+                  >
+                    <span className="text-[8px] font-semibold leading-tight text-center px-0.5">{c.name}</span>
+                  </button>
                   {/* PC/체형 뱃지 */}
                   {(r.badges?.pc || r.badges?.body) && (
                     <span className="absolute -top-1.5 -left-1.5 text-[8px] leading-none">
@@ -406,6 +409,7 @@ function StepColor({ build }: { build: BH }) {
           selected={currentColor}
           onSelect={(k) => build.selectColor(k)}
           onClear={() => build.update({ colors: { ...build.state.colors, [item]: null } })}
+          scoreDeltaFn={showDelta ? (k: string) => build.calcScoreDelta(item, k) : undefined}
         />
       </div>
 

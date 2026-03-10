@@ -12,7 +12,6 @@ export default function Settings() {
   const { syncNow } = useAutoSync()
   const lastSync = useLastSyncTime()
   const [darkMode, setDarkMode] = useState(localStorage.getItem('sp_dark_mode') === '1')
-  const [a11yLabels, setA11yLabels] = useState(localStorage.getItem('sp_a11y_labels') === '1')
   const [hideCounts, setHideCounts] = useState(localStorage.getItem('sp_hide_counts') === '1')
   const [syncing, setSyncing] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(searchParams.get('feedback') === '1')
@@ -23,12 +22,6 @@ export default function Settings() {
     localStorage.setItem('sp_dark_mode', next ? '1' : '0')
     document.documentElement.classList.toggle('dark', next)
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next ? '#1C1917' : '#F7F5F2')
-  }
-
-  const toggleA11y = () => {
-    const next = !a11yLabels
-    setA11yLabels(next)
-    localStorage.setItem('sp_a11y_labels', next ? '1' : '0')
   }
 
   const toggleHide = () => {
@@ -78,13 +71,6 @@ export default function Settings() {
         desc="눈의 피로를 줄여줍니다"
         value={darkMode}
         onChange={toggleDark}
-      />
-      <ToggleItem
-        icon={<Eye size={18} />}
-        label="색상 라벨 표시"
-        desc="색각이상자를 위한 색상명 표시"
-        value={a11yLabels}
-        onChange={toggleA11y}
       />
       <ToggleItem
         icon={<EyeOff size={18} />}

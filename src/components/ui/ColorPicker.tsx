@@ -8,6 +8,7 @@ interface Props {
   onClear?: () => void
   onClose?: () => void
   inline?: boolean // true = 인라인 렌더링, false = 바텀시트
+  scoreDeltaFn?: (colorKey: string) => number // 점수 변화 계산 함수
 }
 
 const COLOR_GROUPS = [
@@ -18,7 +19,7 @@ const COLOR_GROUPS = [
   { label: '다크', keys: ['dark_red', 'dark_blue', 'dark_green', 'dark_purple', 'dark_brown', 'dark_olive', 'dark_teal', 'wine', 'forest', 'midnight', 'chocolate', 'slate', 'maroon', 'indigo', 'espresso', 'powder_blue', 'silver'] },
 ]
 
-export default function ColorPicker({ selected, onSelect, onClear, onClose, inline }: Props) {
+export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn }: Props) {
   const [tab, setTab] = useState('베이직')
   const group = COLOR_GROUPS.find(g => g.label === tab) || COLOR_GROUPS[0]
 
@@ -47,23 +48,32 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
           const isSelected = selected === k
           const isLight = c.hcl[2] > 60
           const needsBorder = ['white', 'ivory', 'cream'].includes(k)
+          const delta = scoreDeltaFn ? scoreDeltaFn(k) : 0
 
           return (
-            <button
-              key={k}
-              onClick={() => onSelect(k)}
-              aria-label={c.name}
-              className={`aspect-square rounded-xl flex items-center justify-center text-[8px] font-semibold leading-tight transition-all active:scale-90 ${
-                isSelected ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
-              }`}
-              style={{
-                background: c.hex,
-                border: needsBorder ? '1px solid #ddd' : undefined,
-                color: isLight ? '#1C1917' : '#ffffff',
-              }}
-            >
-              <span className="text-center px-0.5">{breakName(c.name)}</span>
-            </button>
+            <div key={k} className="relative">
+              <button
+                onClick={() => onSelect(k)}
+                aria-label={c.name}
+                className={`w-full aspect-square rounded-xl flex items-center justify-center text-[8px] font-semibold leading-tight transition-all active:scale-90 ${
+                  isSelected ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
+                }`}
+                style={{
+                  background: c.hex,
+                  border: needsBorder ? '1px solid #ddd' : undefined,
+                  color: isLight ? '#1C1917' : '#ffffff',
+                }}
+              >
+                <span className="text-center px-0.5">{breakName(c.name)}</span>
+              </button>
+              {delta !== 0 && (
+                <span className={`absolute -top-2 -right-2 text-[9px] font-bold px-1 py-0.5 rounded-full pointer-events-none ${
+                  delta > 0 ? 'bg-green-500 text-white' : 'bg-red-400 text-white'
+                }`}>
+                  {delta > 0 ? '+' : ''}{delta}
+                </span>
+              )}
+            </div>
           )
         })}
       </div>
