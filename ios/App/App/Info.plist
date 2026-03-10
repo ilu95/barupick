@@ -56,5 +56,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>날씨 기반 코디 추천을 위해 위치 정보가 필요합니다.</string>
 </dict>
 </plist>
