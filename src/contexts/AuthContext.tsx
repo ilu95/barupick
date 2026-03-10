@@ -88,8 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     trackSocialLogin(provider)
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
     const redirectTo = isNative
-      ? 'com.barupick.app://callback'
-      : window.location.origin + '/home'
+      ? 'capacitor://localhost/home'    // ← iOS/Android 앱일 때만
+      : window.location.origin + '/home' // ← 웹일 때 (barupick.vercel.app/home)
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
