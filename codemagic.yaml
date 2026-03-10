@@ -11,31 +11,42 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: kr.co.barusa.barupick
+      vars:
+        BUNDLE_ID: "kr.co.barusa.barupick"
+        APP_STORE_CONNECT_ISSUER_ID: "3e10ed98-48a5-408a-b67b-8ee4812f1786"
+        APP_STORE_CONNECT_KEY_IDENTIFIER: "N8PL96544Y"
       node: 18
       xcode: latest
       cocoapods: default
     
     scripts:
       - name: Install dependencies
-        script: |
-          npm install
+        script: npm install
       
       - name: Build web app
-        script: |
-          npm run build
+        script: npm run build
       
       - name: Sync Capacitor
-        script: |
-          npx cap sync ios
+        script: npx cap sync ios
       
-      - name: Update Bundle ID in Xcode project
+      - name: Update Bundle ID
         script: |
           cd ios/App
           sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = kr.co.barusa.barupick;/" App.xcodeproj/project.pbxproj
       
-      - name: Set up code signing
+      - name: Fetch signing files
         script: |
-          xcode-project use-profiles
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+      
+      - name: Create certificate if needed
+        script: |
+          app-store-connect list-certificates --type IOS_DISTRIBUTION || \
+          app-store-connect create-certificate --type IOS_DISTRIBUTION
+      
+      - name: Use profiles
+        script: xcode-project use-profiles
       
       - name: Build iOS app
         script: |
@@ -57,11 +68,8 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - ios/App/build/App.xcarchive
     
     publishing:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
-        beta_groups:
-          - Beta Testers
