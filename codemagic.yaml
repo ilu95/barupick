@@ -46,7 +46,13 @@ workflows:
       
       - name: Set up profiles
         script: xcode-project use-profiles
-      
+
+      - name: Increment build number
+        script: |
+          cd ios/App
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" || echo 0)
+          agvtool new-version -all $((LATEST + 1))
+          
       - name: Build iOS app
         script: |
           cd ios/App
