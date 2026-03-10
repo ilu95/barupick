@@ -10,6 +10,7 @@ workflows:
     environment:
       groups:
         - signing
+        - app
       vars:
         BUNDLE_ID: "kr.co.barusa.barupick"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
