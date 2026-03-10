@@ -53,6 +53,8 @@ workflows:
           NEW_BUILD=$((LATEST + 1))
           echo "Setting build number to $NEW_BUILD"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD" ios/App/App/Info.plist
+          cd ios/App
+          sed -i '' "s/CURRENT_PROJECT_VERSION = .*;/CURRENT_PROJECT_VERSION = $NEW_BUILD;/g" App.xcodeproj/project.pbxproj
           echo "Build number set to $NEW_BUILD"
 
       - name: Build iOS app
