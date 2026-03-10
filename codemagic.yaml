@@ -5,7 +5,7 @@ workflows:
     instance_type: mac_mini_m2
     
     integrations:
-      app_store_connect: Codemagic
+      app_store_connect: Codemagic-Admin
     
     environment:
       ios_signing:
@@ -27,6 +27,11 @@ workflows:
       - name: Sync Capacitor
         script: |
           npx cap sync ios
+      
+      - name: Update Bundle ID in Xcode project
+        script: |
+          cd ios/App
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = kr.co.barusa.barupick;/" App.xcodeproj/project.pbxproj
       
       - name: Set up code signing
         script: |
