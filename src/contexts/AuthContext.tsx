@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { trackSocialLogin, trackSignup, setAnalyticsUser } from '@/lib/analytics'
 
+
 interface Profile {
   id: string
   nickname: string | null
@@ -37,7 +38,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       if (data) {
         setProfile(data)
-        // email 동기화
         if (!data.email && user.email) {
           supabase.from('profiles').update({ email: user.email }).eq('id', user.id)
         }
@@ -48,13 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // 초기 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    // 인증 상태 변경 리스너
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (!session?.user) setProfile(null)
@@ -68,6 +66,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) { fetchProfile(); setAnalyticsUser(user.id) }
     else setAnalyticsUser(null)
   }, [user])
+
+  // Deep link 처리 (iOS 소셜 로그인 콜백)
+  useEffect(() => {
+    const handleDeepLink = async () => {
+      const hash = window.location.hash
+      if (hash && hash.includes('access_token')) {
+        const params = new URLSearchParams(hash.substring(1))
+        const access_token = params.get('access_token')
+        const refresh_token = params.get('refresh_token')
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token })
+          window.location.hash = ''
+        }
+      }
+    }
+    handleDeepLink()
+
+    // Capacitor App URL Open listener
+    const setupDeepLink = async () => {
+      try {
+        // @ts-ignore
+        const { App: CapApp } = await import('@capacitor/app') as any
+        CapApp.addListener('appUrlOpen', async ({ url }: { url: string }) => {
+          if (url.includes('callback') && url.includes('access_token')) {
+            const hashPart = url.split('#')[1]
+            if (hashPart) {
+              const params = new URLSearchParams(hashPart)
+              const access_token = params.get('access_token')
+              const refresh_token = params.get('refresh_token')
+              if (access_token && refresh_token) {
+                await supabase.auth.setSession({ access_token, refresh_token })
+              }
+            }
+          }
+        })
+      } catch { }
+    }
+    setupDeepLink()
+  }, [])
 
   const login = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -87,18 +124,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const socialLogin = async (provider: 'kakao' | 'google') => {
     trackSocialLogin(provider)
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
-    const redirectTo = isNative
-      ? 'capacitor://localhost/home'    // ← iOS/Android 앱일 때만
-      : window.location.origin + '/home' // ← 웹일 때 (barupick.vercel.app/home)
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo,
-        queryParams: provider === 'kakao' ? { prompt: 'login' } : {}
+    if (isNative) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: 'https://barupick.vercel.app/auth/callback.html',
+          skipBrowserRedirect: true,
+          queryParams: provider === 'kakao' ? { prompt: 'login' } : {}
+        }
+      })
+      if (error) throw error
+      if (data?.url) {
+        window.open(data.url, '_blank')
       }
-    })
-    if (error) throw error
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + '/home',
+          queryParams: provider === 'kakao' ? { prompt: 'login' } : {}
+        }
+      })
+      if (error) throw error
+    }
   }
 
   const logout = async () => {

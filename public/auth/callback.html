@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 중...</title>
+</head>
+
+<body>
+    <p>로그인 처리 중...</p>
+    <script>
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const access_token = params.get('access_token');
+        const refresh_token = params.get('refresh_token');
+
+        if (access_token) {
+            // Capacitor 앱으로 돌아가기
+            window.location.href = 'kr.co.barusa.barupick://callback#' + hash;
+            // 3초 후에도 앱이 안 열리면 웹으로 이동
+            setTimeout(() => {
+                window.location.href = '/home#' + hash;
+            }, 3000);
+        } else {
+            window.location.href = '/home';
+        }
+    </script>
+</body>
+
+</html>
