@@ -1,0 +1,62 @@
+workflows:
+  ios-release:
+    name: iOS Release
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    
+    integrations:
+      app_store_connect: Codemagic
+    
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: kr.co.barusa.barupick
+      node: 18
+      xcode: latest
+      cocoapods: default
+    
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+      
+      - name: Build web app
+        script: |
+          npm run build
+      
+      - name: Sync Capacitor
+        script: |
+          npx cap sync ios
+      
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+      
+      - name: Build iOS app
+        script: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/App.xcarchive \
+            archive
+      
+      - name: Export IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App \
+            --archive-path ios/App/build/App.xcarchive
+    
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - ios/App/build/App.xcarchive
+    
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Beta Testers
