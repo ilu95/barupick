@@ -8,13 +8,10 @@ workflows:
       app_store_connect: Codemagic-Admin
     
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: kr.co.barusa.barupick
       vars:
         BUNDLE_ID: "kr.co.barusa.barupick"
-        APP_STORE_CONNECT_ISSUER_ID: "3e10ed98-48a5-408a-b67b-8ee4812f1786"
-        APP_STORE_CONNECT_KEY_IDENTIFIER: "N8PL96544Y"
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
       node: 18
       xcode: latest
       cocoapods: default
@@ -32,7 +29,7 @@ workflows:
       - name: Update Bundle ID
         script: |
           cd ios/App
-          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = kr.co.barusa.barupick;/" App.xcodeproj/project.pbxproj
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" App.xcodeproj/project.pbxproj
       
       - name: Fetch signing files
         script: |
@@ -40,29 +37,26 @@ workflows:
             --type IOS_APP_STORE \
             --create
       
-      - name: Create certificate if needed
-        script: |
-          app-store-connect list-certificates --type IOS_DISTRIBUTION || \
-          app-store-connect create-certificate --type IOS_DISTRIBUTION
+      - name: Add certs to keychain
+        script: keychain add-certificates
       
-      - name: Use profiles
+      - name: Set up profiles
         script: xcode-project use-profiles
       
       - name: Build iOS app
         script: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
+          xcodebuild -workspace "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -archivePath build/App.xcarchive \
+            -archivePath ios/App/build/App.xcarchive \
             archive
       
       - name: Export IPA
         script: |
           xcode-project build-ipa \
-            --workspace ios/App/App.xcworkspace \
-            --scheme App \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
             --archive-path ios/App/build/App.xcarchive
     
     artifacts:
