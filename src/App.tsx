@@ -41,6 +41,12 @@ import PostInsight from '@/pages/PostInsight'
 import DevDiag from '@/pages/DevDiag'
 import { useAutoSync } from '@/hooks/useAutoSync'
 
+
+// Capacitor 네이티브 앱에서만 상단 패딩 제거
+if ((window as any).Capacitor?.isNativePlatform?.()) {
+  document.body.style.paddingTop = '0px'
+}
+
 // 자동 동기화 래퍼 (AuthProvider 내부에서 실행)
 function AutoSyncProvider({ children }: { children: React.ReactNode }) {
   useAutoSync()
@@ -60,75 +66,75 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-        <ModalProvider>
-        <AutoSyncProvider>
-        <AppHeader />
-        <Suspense fallback={<PageLoading />}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/home/build" element={<BuildCoord />} />
-            <Route path="/home/build/improve" element={<BuildCoord />} />
-            <Route path="/home/evaluate" element={<BuildCoord />} />
-            <Route path="/home/recommend" element={<RecommendCoord />} />
-            <Route path="/home/weather" element={<Weather />} />
-            <Route path="/home/saved" element={<SavedCoords />} />
-            <Route path="/home/quiz" element={<Quiz />} />
-            <Route path="/home/fabric" element={<FabricGuide />} />
-            <Route path="/home/body" element={<BodyGuide />} />
+          <ModalProvider>
+            <AutoSyncProvider>
+              <AppHeader />
+              <Suspense fallback={<PageLoading />}>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/home" replace />} />
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/home/build" element={<BuildCoord />} />
+                  <Route path="/home/build/improve" element={<BuildCoord />} />
+                  <Route path="/home/evaluate" element={<BuildCoord />} />
+                  <Route path="/home/recommend" element={<RecommendCoord />} />
+                  <Route path="/home/weather" element={<Weather />} />
+                  <Route path="/home/saved" element={<SavedCoords />} />
+                  <Route path="/home/quiz" element={<Quiz />} />
+                  <Route path="/home/fabric" element={<FabricGuide />} />
+                  <Route path="/home/body" element={<BodyGuide />} />
 
-            <Route path="/closet" element={<Closet />} />
-            <Route path="/closet/add" element={<ClosetAdd />} />
-            <Route path="/closet/coord" element={<ClosetCoord />} />
-            <Route path="/closet/calendar" element={<OotdCalendar />} />
-            <Route path="/closet/ootd/:date" element={<OotdDetail />} />
-            <Route path="/closet/best" element={<BestCoord />} />
-            <Route path="/record" element={<OotdRecord />} />
+                  <Route path="/closet" element={<Closet />} />
+                  <Route path="/closet/add" element={<ClosetAdd />} />
+                  <Route path="/closet/coord" element={<ClosetCoord />} />
+                  <Route path="/closet/calendar" element={<OotdCalendar />} />
+                  <Route path="/closet/ootd/:date" element={<OotdDetail />} />
+                  <Route path="/closet/best" element={<BestCoord />} />
+                  <Route path="/record" element={<OotdRecord />} />
 
-            <Route path="/community" element={<Community />} />
-            <Route path="/community/post" element={<CommunityPost />} />
-            <Route path="/community/discover" element={<UserDiscover />} />
-            <Route path="/community/event/:eventId" element={<EventDetail />} />
-            <Route path="/community/event/:eventId/submit" element={<EventSubmit />} />
-            <Route path="/community/:postId" element={<CommunityDetail />} />
-            <Route path="/user/:userId" element={<UserProfile />} />
-            <Route path="/user/:userId/followers" element={<FollowList />} />
-            <Route path="/user/:userId/following" element={<FollowList />} />
+                  <Route path="/community" element={<Community />} />
+                  <Route path="/community/post" element={<CommunityPost />} />
+                  <Route path="/community/discover" element={<UserDiscover />} />
+                  <Route path="/community/event/:eventId" element={<EventDetail />} />
+                  <Route path="/community/event/:eventId/submit" element={<EventSubmit />} />
+                  <Route path="/community/:postId" element={<CommunityDetail />} />
+                  <Route path="/user/:userId" element={<UserProfile />} />
+                  <Route path="/user/:userId/followers" element={<FollowList />} />
+                  <Route path="/user/:userId/following" element={<FollowList />} />
 
-            <Route path="/shop" element={<Shop />} />
+                  <Route path="/shop" element={<Shop />} />
 
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/level" element={<MyLevel />} />
-            <Route path="/profile/badges" element={<MyBadges />} />
-            <Route path="/profile/posts" element={<MyPosts />} />
-            <Route path="/profile/insights" element={<Insights />} />
-            <Route path="/profile/insights/:postId" element={<PostInsight />} />
-            <Route path="/profile/settings" element={<Settings />} />
-            <Route path="/profile/color-ranking" element={<ColorRanking />} />
-            <Route path="/profile/color-pattern" element={<ColorPattern />} />
-            <Route path="/profile/challenges" element={<Challenges />} />
-            <Route path="/profile/title-exam" element={<TitleExam />} />
-            <Route path="/profile/block-list" element={<BlockList />} />
-            <Route path="/profile/personal-color" element={<PcSelect />} />
-            <Route path="/profile/personal-color/light" element={<PcLight />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile/level" element={<MyLevel />} />
+                  <Route path="/profile/badges" element={<MyBadges />} />
+                  <Route path="/profile/posts" element={<MyPosts />} />
+                  <Route path="/profile/insights" element={<Insights />} />
+                  <Route path="/profile/insights/:postId" element={<PostInsight />} />
+                  <Route path="/profile/settings" element={<Settings />} />
+                  <Route path="/profile/color-ranking" element={<ColorRanking />} />
+                  <Route path="/profile/color-pattern" element={<ColorPattern />} />
+                  <Route path="/profile/challenges" element={<Challenges />} />
+                  <Route path="/profile/title-exam" element={<TitleExam />} />
+                  <Route path="/profile/block-list" element={<BlockList />} />
+                  <Route path="/profile/personal-color" element={<PcSelect />} />
+                  <Route path="/profile/personal-color/light" element={<PcLight />} />
 
-            <Route path="/auth/login" element={<Auth />} />
-            <Route path="/auth/signup" element={<Auth />} />
+                  <Route path="/auth/login" element={<Auth />} />
+                  <Route path="/auth/signup" element={<Auth />} />
 
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/dev/diag" element={<DevDiag />} />
-            <Route path="*" element={<Navigate to="/home" replace />} />
-          </Routes>
-        </Suspense>
-        <BottomNav />
-        <AnalyticsTracker />
-        <Analytics />
-        <SpeedInsights />
-        </AutoSyncProvider>
-        </ModalProvider>
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/dev/diag" element={<DevDiag />} />
+                  <Route path="*" element={<Navigate to="/home" replace />} />
+                </Routes>
+              </Suspense>
+              <BottomNav />
+              <AnalyticsTracker />
+              <Analytics />
+              <SpeedInsights />
+            </AutoSyncProvider>
+          </ModalProvider>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
