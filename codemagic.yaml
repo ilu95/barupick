@@ -39,8 +39,10 @@ workflows:
             --type IOS_APP_STORE \
             --create
       
-      - name: Add certs to keychain
-        script: keychain add-certificates
+      - name: Initialize keychain
+        script: |
+          keychain initialize
+          keychain add-certificates
       
       - name: Set up profiles
         script: xcode-project use-profiles
