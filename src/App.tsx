@@ -1,10 +1,13 @@
 import { Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ToastProvider } from '@/components/ui/Toast'
 import { ModalProvider } from '@/components/ui/Modal'
 import BottomNav from '@/components/layout/BottomNav'
 import AppHeader from '@/components/layout/AppHeader'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 // Pages
 import Home from '@/pages/Home'
@@ -121,10 +124,19 @@ export default function App() {
           </Routes>
         </Suspense>
         <BottomNav />
+        <AnalyticsTracker />
+        <Analytics />
+        <SpeedInsights />
         </AutoSyncProvider>
         </ModalProvider>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )
+}
+
+// 페이지뷰 자동 기록
+function AnalyticsTracker() {
+  useAnalytics()
+  return null
 }

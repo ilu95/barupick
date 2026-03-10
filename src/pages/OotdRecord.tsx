@@ -8,6 +8,7 @@ import CropOverlay from '@/components/ui/CropOverlay'
 import { COLORS_60 } from '@/lib/colors'
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
+import { trackOotdRecord } from '@/lib/analytics'
 
 const PARTS = ['top', 'middleware', 'bottom', 'outer', 'shoes', 'scarf', 'hat'] as const
 const PART_LABELS: Record<string, string> = {
@@ -68,6 +69,7 @@ export default function OotdRecord() {
     try {
       const ok = ootd.saveRecord()
       if (ok) {
+        trackOotdRecord(ootd.photos.length > 0, ootd.visibility)
         setSaved(true)
         setTimeout(() => {
           setSaved(false)

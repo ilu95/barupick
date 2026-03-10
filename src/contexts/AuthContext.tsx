@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
+import { trackSocialLogin, trackSignup, setAnalyticsUser } from '@/lib/analytics'
 
 interface Profile {
   id: string
@@ -62,9 +63,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // user 변경 시 프로필 fetch
+  // user 변경 시 프로필 fetch + analytics 연동
   useEffect(() => {
-    if (user) fetchProfile()
+    if (user) { fetchProfile(); setAnalyticsUser(user.id) }
+    else setAnalyticsUser(null)
   }, [user])
 
   const login = async (email: string, password: string) => {
@@ -79,9 +81,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       options: { data: { nickname } }
     })
     if (error) throw error
+    trackSignup()
   }
 
   const socialLogin = async (provider: 'kakao' | 'google') => {
+    trackSocialLogin(provider)
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
     const redirectTo = isNative
       ? 'com.barupick.app://callback'

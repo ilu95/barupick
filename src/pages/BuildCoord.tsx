@@ -10,6 +10,7 @@ import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS } from '@/lib/styles'
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
 import { useBuild, type BuildStep } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
+import { trackSave, trackClick } from '@/lib/analytics'
 
 // ─── 스텝 인디케이터 ───
 const STEP_LABELS: Partial<Record<BuildStep, string>> = {
@@ -688,6 +689,7 @@ function StepResult({ build, navigate }: { build: BH, navigate: any }) {
     saved.unshift({ id: Date.now().toString(36), outfit, score: build.getScore(), name, createdAt: Date.now() })
     if (saved.length > 100) saved.length = 100
     localStorage.setItem('cs_saved', JSON.stringify(saved))
+    trackSave('build', build.getScore())
     toast.success('코디를 저장했어요!')
   }
 

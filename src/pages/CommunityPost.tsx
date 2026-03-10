@@ -6,6 +6,7 @@ import CropOverlay from '@/components/ui/CropOverlay'
 import { COLORS_60 } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { trackCommunityPost } from '@/lib/analytics'
 
 export default function CommunityPost() {
   const navigate = useNavigate()
@@ -89,6 +90,7 @@ export default function CommunityPost() {
       if (error) throw error
 
       localStorage.removeItem('_pending_post_outfit')
+      trackCommunityPost()
       setDone(true)
       setTimeout(() => navigate('/community', { replace: true }), 1500)
     } catch (e: any) {

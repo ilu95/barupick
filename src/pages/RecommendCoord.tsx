@@ -8,6 +8,7 @@ import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, STYLE_ICONS } from '@/lib/style
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
+import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
 import { useRecommend, type RecStep } from '@/hooks/useRecommend'
 
 export default function RecommendCoord() {
@@ -405,6 +406,11 @@ function StepResults({ rec, navigate }: { rec: RecHook, navigate: any }) {
   const pinned = rec.state.pinned || {}
   const hasPins = Object.keys(pinned).length > 0
 
+  // 결과 표시 시 트래킹
+  useEffect(() => {
+    if (results.length > 0) trackRecommendComplete(rec.state.style, rec.state.layerType, results.length)
+  }, [])
+
   if (results.length === 0) {
     return (
       <div className="animate-screen-fade text-center py-12">
@@ -573,6 +579,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
     localStorage.setItem('cs_saved', JSON.stringify(saved))
     setSaveModal(false)
     setSaveName('')
+    trackSave('recommend', finalScore)
     alert('저장했어요!')
   }
 
