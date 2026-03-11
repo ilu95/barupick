@@ -22,7 +22,7 @@ export default function BuildCoord() {
   const build = useBuild('coord')
 
   return (
-    <div className="min-h-screen bg-warm-100 dark:bg-[#1C1917]">
+    <div className="min-h-screen dark:bg-[#1C1917]">
       <div className="max-w-[480px] mx-auto px-5 py-4 pb-8">
         {build.step === 'style' && <StepStyle build={build} />}
         {build.step === 'builder' && <StepBuilder build={build} navigate={navigate} />}
@@ -114,11 +114,17 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
     return null
   }, [tmpItem, editMode, upper])
 
+  // 현재 편집 중인 슬롯 (상체 + 하체/악세서리 모두 포함)
+  const currentSlot = useMemo(() => {
+    if (editMode.type === 'edit_simple') return editMode.target
+    return predictedSlot
+  }, [editMode, predictedSlot])
+
   // 색상 추천
   const recommendations = useMemo(() => {
-    if (!predictedSlot || build.state.mode === 'evaluate') return []
-    return build.getColorRecommendations(predictedSlot)
-  }, [predictedSlot, build.state])
+    if (!currentSlot || build.state.mode === 'evaluate') return []
+    return build.getColorRecommendations(currentSlot)
+  }, [currentSlot, build.state])
 
   const recKeys = useMemo(() => new Set(recommendations.slice(0, 10).map(r => r.key)), [recommendations])
 
@@ -356,7 +362,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
         {(isEditing || upper.length === 0) && (tmpItem || isSimpleEdit || (editMode.type === 'edit_upper')) && (
           <>
             {/* 추천 색상 */}
-            {recommendations.length > 0 && !isSimpleEdit && (
+            {recommendations.length > 0 && (
               <>
                 <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">추천 색상</div>
                 <div className="grid grid-cols-5 gap-1.5 mb-3">
@@ -365,7 +371,8 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                     if (!c) return null
                     const light = (c.hcl[2] > 60)
                     const selected = tmpColor === rec.key || (!tmpColor && editMode.type === 'edit_upper' && upper[editMode.index]?.colorKey === rec.key)
-                    const delta = predictedSlot ? build.calcScoreDelta(predictedSlot, rec.key) : 0
+                      || (!tmpColor && editMode.type === 'edit_simple' && build.state[editMode.target + 'Color'] === rec.key)
+                    const delta = currentSlot ? build.calcScoreDelta(currentSlot, rec.key) : 0
                     return (
                       <button key={rec.key} onClick={() => handleColorTap(rec.key)}
                         className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90 ${
@@ -381,7 +388,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               </>
             )}
 
-            <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{isSimpleEdit ? '색상' : '전체 색상'}</div>
+            <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{recommendations.length > 0 ? '전체 색상' : '색상'}</div>
             <div className="grid grid-cols-5 gap-1.5 mb-3">
               {Object.entries(COLORS_60).filter(([k]) => !recKeys.has(k)).slice(0, 40).map(([key, c]) => {
                 const light = (c.hcl[2] > 60)
@@ -389,12 +396,15 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                   (editMode.type === 'edit_upper' && upper[editMode.index]?.colorKey === key) ||
                   (editMode.type === 'edit_simple' && build.state[editMode.target + 'Color'] === key)
                 ))
+                const delta = currentSlot ? build.calcScoreDelta(currentSlot, key) : 0
                 return (
                   <button key={key} onClick={() => handleColorTap(key)}
-                    className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold transition-all active:scale-90 ${
+                    className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90 ${
                       selected ? 'ring-2 ring-terra-500 scale-105' : ''
                     }`} style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
                     {c.name}
+                    {delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{delta}</span>}
+                    {delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{delta}</span>}
                   </button>
                 )
               })}
@@ -407,7 +417,12 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           <div className="text-center py-6">
             {!build.isComplete && (
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 mb-4 text-[13px] text-blue-800 dark:text-blue-300">
-                💡 {!build.state.bottomColor ? '하의' : '신발'}까지 선택하면 결과를 볼 수 있어요
+                💡 {(() => {
+                  const missing = []
+                  if (!build.state.bottomColor) missing.push('하의')
+                  if (!build.state.shoesColor) missing.push('신발')
+                  return missing.length > 0 ? `${missing.join(', ')}까지 선택하면 결과를 볼 수 있어요` : '결과를 볼 수 있어요'
+                })()}
                 <div className="flex gap-2 mt-2 justify-center">
                   {!build.state.bottomColor && (
                     <button onClick={() => startEdit({ type: 'edit_simple', target: 'bottom' })}
@@ -415,7 +430,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                       👖 하의 선택
                     </button>
                   )}
-                  {build.state.bottomColor && !build.state.shoesColor && (
+                  {!build.state.shoesColor && (
                     <button onClick={() => startEdit({ type: 'edit_simple', target: 'shoes' })}
                       className="px-3 py-1.5 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded-lg text-[11px] font-semibold active:scale-95">
                       👞 신발 선택
@@ -457,11 +472,11 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
             </button>
           </div>
         ) : (
-          <button onClick={goToResult} disabled={!build.isComplete}
+          <button onClick={build.isComplete ? goToResult : () => startEdit({ type: 'add' })} disabled={false}
             className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-98 ${
-              build.isComplete ? 'bg-terra-500 text-white shadow-terra' : 'bg-warm-300 dark:bg-warm-700 text-warm-500'
+              build.isComplete ? 'bg-terra-500 text-white shadow-terra' : 'bg-terra-500 text-white shadow-terra'
             }`}>
-            {build.isComplete ? '결과 보기 →' : '아이템을 선택해주세요'}
+            {build.isComplete ? '결과 보기 →' : '+ 옷 추가하기'}
           </button>
         )}
       </div>
