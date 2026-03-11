@@ -151,11 +151,13 @@ export default function CropOverlay({
 
   return (
     <div className="fixed inset-0 z-[10000] bg-black flex flex-col">
-      <div className="flex justify-between items-center px-4 py-3 flex-shrink-0">
-        <button onClick={onCancel} className="text-white/70 text-sm px-4 py-2 bg-white/15 rounded-full">취소</button>
+      {/* 상단: 제목만 */}
+      <div className="flex justify-center items-center px-4 py-3 flex-shrink-0"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <span className="text-white text-sm font-semibold">{title || (isCircle ? '프로필 사진' : '사진 크롭')}</span>
-        <button onClick={handleDone} className="text-white text-sm px-4 py-2 bg-terra-500 rounded-full font-semibold">완료</button>
       </div>
+      {/* 중앙: 크롭 영역 */}
       <div ref={areaRef} className="flex-1 relative overflow-hidden flex items-center justify-center" style={{ touchAction: 'none' }}
         onTouchStart={onTS} onTouchMove={onTM} onTouchEnd={onTE}
         onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU} onWheel={onWh}
@@ -163,7 +165,16 @@ export default function CropOverlay({
         <canvas ref={canvasRef} />
         <div ref={guideRef} className={guideClass} style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.55)' }} />
       </div>
-      <div className="text-center text-white/40 text-xs py-3 flex-shrink-0">두 손가락으로 확대/축소 · 드래그로 위치 조정</div>
+      {/* 하단: 안내 + 버튼 */}
+      <div className="flex-shrink-0 px-5"
+        style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="text-center text-white/40 text-xs py-2">두 손가락으로 확대/축소 · 드래그로 위치 조정</div>
+        <div className="flex gap-3">
+          <button onClick={onCancel} className="flex-1 text-white/70 text-sm py-3 bg-white/15 rounded-2xl font-medium active:scale-[0.98] transition-all">취소</button>
+          <button onClick={handleDone} className="flex-1 text-white text-sm py-3 bg-terra-500 rounded-2xl font-semibold active:scale-[0.98] transition-all shadow-terra">완료</button>
+        </div>
+      </div>
     </div>
   )
 }
