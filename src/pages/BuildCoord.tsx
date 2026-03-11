@@ -214,17 +214,9 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
       {!mannCollapsed && (
         <div className="px-3 py-2">
           <div className="flex gap-1" style={{ minHeight: 200 }}>
-            {/* 좌: 마네킹 + 옷 추가 */}
-            <div className="flex flex-col items-center justify-between" style={{ width: 120 }}>
-              <div className="flex-1 flex items-center justify-center">
-                <MannequinSVG outfit={previewHex || build.outfitHex} options={{ outerType: build.outerType, midType: build.midType }} size={110} />
-              </div>
-              <button onClick={() => startEdit({ type: 'add' })}
-                className={`w-full py-2 mt-1 border border-dashed rounded-xl text-[11px] font-semibold active:scale-95 transition-all ${
-                  editMode.type === 'add' ? 'border-terra-500 bg-terra-100 text-terra-700' : 'border-warm-400 text-warm-600 dark:text-warm-400'
-                }`}>
-                + 옷 추가
-              </button>
+            {/* 좌: 마네킹 */}
+            <div className="flex flex-col items-center justify-center" style={{ width: 120 }}>
+              <MannequinSVG outfit={previewHex || build.outfitHex} options={{ outerType: build.outerType, midType: build.midType }} size={110} />
             </div>
 
             {/* 중: 상체 레이어 */}
@@ -352,7 +344,15 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
             {/* 추천 색상 */}
             {recommendations.length > 0 && (
               <>
-                <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">추천 색상</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400">추천 색상</div>
+                  {recommendations.some(r => r.badges?.pc || r.badges?.body) && (
+                    <div className="flex items-center gap-2 text-[9px] text-warm-500 dark:text-warm-400">
+                      {recommendations.some(r => r.badges?.pc) && <span>👤 퍼스널컬러</span>}
+                      {recommendations.some(r => r.badges?.body) && <span>📐 체형</span>}
+                    </div>
+                  )}
+                </div>
                 <div className="grid grid-cols-5 gap-1.5 mb-3">
                   {recommendations.slice(0, 10).map(rec => {
                     const c = COLORS_60[rec.key]
@@ -369,6 +369,12 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                         {c.name}
                         {delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{delta}</span>}
                         {delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{delta}</span>}
+                        {(rec.badges?.pc || rec.badges?.body) && (
+                          <span className="absolute -bottom-1 -left-1 flex gap-px">
+                            {rec.badges.pc && <span className="bg-purple-100 text-purple-600 text-[6px] font-bold px-0.5 rounded leading-none py-px">👤</span>}
+                            {rec.badges.body && <span className="bg-blue-100 text-blue-600 text-[6px] font-bold px-0.5 rounded leading-none py-px">📐</span>}
+                          </span>
+                        )}
                       </button>
                     )
                   })}
