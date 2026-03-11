@@ -336,6 +336,31 @@ function StepColor({ build }: { build: BH }) {
         </div>
       )}
 
+      {/* 선택된 부위 컬러 칩 바 — 탭하면 해당 부위로 바로 이동 */}
+      {filledCount > 0 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 hide-scrollbar">
+          {Object.entries(build.state.colors).filter(([_, v]) => v).map(([part, colorKey]) => {
+            const c = COLORS_60[colorKey as string]
+            if (!c) return null
+            const isCurrent = part === item
+            return (
+              <button
+                key={part}
+                onClick={() => { if (!isCurrent) build.editPart(part) }}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all active:scale-95 flex-shrink-0 ${
+                  isCurrent
+                    ? 'bg-terra-500 text-white shadow-terra'
+                    : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300'
+                }`}
+              >
+                <span className="w-3.5 h-3.5 rounded-full border border-white/30 flex-shrink-0" style={{ background: c.hex }} />
+                {(CATEGORY_NAMES as any)?.[part] || part}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1 flex items-center gap-2">
         <Palette size={20} className="text-terra-500" />
         {(CATEGORY_NAMES as any)?.[item] || item} 색상 선택
@@ -445,9 +470,9 @@ function StepColor({ build }: { build: BH }) {
         <div className="flex gap-2">
           <button
             onClick={build.goBack}
-            className="px-5 py-3 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-2xl text-sm font-medium active:scale-[0.98] transition-all"
+            className="px-5 py-3 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-2xl text-sm font-medium active:scale-[0.98] transition-all flex items-center gap-1"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} /> 이전
           </button>
           <button
             onClick={handleNext}
@@ -471,11 +496,14 @@ function StepAsk({ build }: { build: BH }) {
 
   return (
     <div className="animate-screen-enter text-center py-8">
+      <button onClick={build.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-6 mx-auto active:opacity-70">
+        <ArrowLeft size={16} /> 이전 단계로
+      </button>
       <div className="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center mx-auto mb-4">
         <span className="text-3xl">{emoji}</span>
       </div>
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2">{(CATEGORY_NAMES as any)?.[item]}</h2>
-      <p className="text-sm text-warm-600 mb-6">{(CATEGORY_NAMES as any)?.[item]}도 코디에 포함할까요?</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{(CATEGORY_NAMES as any)?.[item]}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-6">{(CATEGORY_NAMES as any)?.[item]}도 코디에 포함할까요?</p>
       <div className="flex gap-2.5 max-w-xs mx-auto">
         <button
           onClick={() => build.answerOptional(true)}
@@ -485,7 +513,7 @@ function StepAsk({ build }: { build: BH }) {
         </button>
         <button
           onClick={() => build.answerOptional(false)}
-          className="flex-1 py-3.5 bg-white border border-warm-400 text-warm-700 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all"
+          className="flex-1 py-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all"
         >
           건너뛰기
         </button>
