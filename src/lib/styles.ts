@@ -131,3 +131,31 @@ export const LAYER_LEVELS: Record<string, { name: string; parts: string[]; partK
 
 export const STYLE_ICONS = { preppy: '🏫', ivy: '🎓', dandy: '🎩', oldmoney: '💎', ralphlook: '🐎', minimal: '◻️', casual: '👟', cityboy: '🌿', normcore: '🤍', athleisure: '🏃', amekaji: '👖', workwear: '🔧', military: '🪖', british: '🧥', gorpcore: '⛰️', street: '🛹', grunge: '🎸', contemporary: '🖤', techwear: '⚡', genderless: '🌈' };
 // New layers data (mid_inner, scarf_top, scarf_basic, scarf_mid)
+
+// ═══════════════════════════════════════════════════════
+// 아이템 카탈로그 — 코디 만들기 v2 자유형 빌더용
+// outerness: 바깥일수록 높음. 자동 정렬에 사용.
+// ═══════════════════════════════════════════════════════
+export interface ItemDef {
+  id: string
+  emoji: string
+  label: string
+  outerness: number
+  outerType?: 'coat' | 'jacket' | 'padding'
+  midType?: 'knit' | 'cardigan' | 'vest'
+}
+
+export const ITEMS_CATALOG: ItemDef[] = [
+  { id: 'padding',   emoji: '🧥', label: '패딩',     outerness: 100, outerType: 'padding' },
+  { id: 'coat',      emoji: '🧥', label: '코트',     outerness: 95,  outerType: 'coat' },
+  { id: 'jacket',    emoji: '🧥', label: '자켓',     outerness: 90,  outerType: 'jacket' },
+  { id: 'hood_zip',  emoji: '🧥', label: '후드집업', outerness: 60,  outerType: 'jacket' },
+  { id: 'cardigan',  emoji: '🧶', label: '가디건',   outerness: 55,  midType: 'cardigan' },
+  { id: 'knit_zip',  emoji: '🧶', label: '니트집업', outerness: 53,  midType: 'knit' },
+  { id: 'vest',      emoji: '🧶', label: '조끼',     outerness: 50,  midType: 'vest' },
+  { id: 'hoodie',    emoji: '👕', label: '후디',     outerness: 45 },
+  { id: 'knit',      emoji: '🧶', label: '니트',     outerness: 43,  midType: 'knit' },
+  { id: 'mtm',       emoji: '👕', label: '맨투맨',   outerness: 40 },
+  { id: 'shirt',     emoji: '👕', label: '셔츠',     outerness: 30 },
+  { id: 'tshirt',    emoji: '👕', label: '티셔츠',   outerness: 10 },
+]

@@ -5,12 +5,12 @@
 // ================================================================
 
 export const CATEGORY_NAMES = {
-    outer: '아우터', middleware: '미들웨어', top: '상의',
+    outer: '아우터', middleware: '미들웨어', top: '상의', inner: '이너',
     bottom: '하의', scarf: '목도리', hat: '모자', shoes: '신발'
 };
 
 export const PART_ICONS = {
-    outer: '🧥', middleware: '🧶', top: '👔',
+    outer: '🧥', middleware: '🧶', top: '👔', inner: '👕',
     bottom: '👖', scarf: '🧣', hat: '🎩', shoes: '👟'
 };
 

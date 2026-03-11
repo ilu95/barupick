@@ -181,6 +181,7 @@ export const evaluationSystem = {
             ['bottom', 'shoes', 2.0],     // 하단 마무리
             ['outer', 'middleware', 1.5],  // 아우터↔중간층
             ['middleware', 'top', 1.5],    // 중간층↔이너
+            ['top', 'inner', 1.0],        // 이너↔속이너 (4겹)
             ['scarf', 'top', 1.0],        // 목도리↔상의
             ['scarf', 'outer', 1.0],      // 목도리↔아우터
             ['hat', 'top', 0.5],          // 모자↔상의
@@ -226,8 +227,8 @@ export const evaluationSystem = {
     // 지표 B: 역할 명확성 — 코디에서 색상의 역할 구분이 명확한가
     _calculateRoleClarity(outfit) {
         const layerWeights = {
-            'outer': 40, 'middleware': 25, 'top': 20, 'bottom': 35,
-            'scarf': 10, 'hat': 5, 'shoes': 15
+            'outer': 40, 'middleware': 25, 'top': 20, 'inner': 10,
+            'bottom': 35, 'scarf': 10, 'hat': 5, 'shoes': 15
         };
 
         const colorAreas = {};
@@ -273,8 +274,8 @@ export const evaluationSystem = {
     // 60-30-10 비율 점수 (0-15점)
     calculate603010Score(outfit) {
         const layerWeights = {
-            'outer': 40, 'middleware': 25, 'top': 20, 'bottom': 35,
-            'scarf': 10, 'hat': 5, 'shoes': 15
+            'outer': 40, 'middleware': 25, 'top': 20, 'inner': 10,
+            'bottom': 35, 'scarf': 10, 'hat': 5, 'shoes': 15
         };
 
         const colorAreas = {};
