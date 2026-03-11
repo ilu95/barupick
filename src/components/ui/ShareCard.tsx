@@ -19,7 +19,7 @@ interface ShareCardProps {
 }
 
 const CARD_W = 1080
-const CARD_H = 1920
+const CARD_H = 1350
 
 // ─── 헬퍼 ───
 const SKIN = '#ffe0bd'
@@ -219,9 +219,32 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
     } catch { handleDownload() }
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!imageUrl) return
-    const a = document.createElement('a'); a.href = imageUrl; a.download = `barupick-${Date.now()}.png`; a.click()
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
+    if (isIOS) {
+      // iOS: navigator.share로 "이미지 저장" 유도, 불가 시 새 탭에 이미지 열기
+      try {
+        const blob = await (await fetch(imageUrl)).blob()
+        const file = new File([blob], `barupick-${Date.now()}.png`, { type: 'image/png' })
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file] })
+          return
+        }
+      } catch {}
+      // fallback: 새 탭에서 이미지 열기 (길게 눌러서 저장)
+      const w = window.open()
+      if (w) {
+        w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#000"><img src="${imageUrl}" style="max-width:100%;max-height:100vh;object-fit:contain"/><p style="position:fixed;bottom:20px;width:100%;text-align:center;color:#fff;font-size:14px;">이미지를 길게 눌러서 저장해주세요</p></body></html>`)
+      }
+    } else {
+      // Android/Desktop: 기존 download 방식
+      const a = document.createElement('a')
+      a.href = imageUrl
+      a.download = `barupick-${Date.now()}.png`
+      a.click()
+    }
   }
 
   return (
@@ -232,11 +255,11 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
         </div>
         <div className="flex justify-center mb-5">
           {generating ? (
-            <div className="flex items-center justify-center rounded-2xl bg-warm-800/50" style={{ width: 240, height: 426 }}>
+            <div className="flex items-center justify-center rounded-2xl bg-warm-800/50" style={{ width: 240, height: 300 }}>
               <div className="w-6 h-6 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin" />
             </div>
           ) : imageUrl ? (
-            <img src={imageUrl} alt="공유 카드" className="rounded-2xl shadow-2xl" style={{ width: 240, height: 426, objectFit: 'contain', background: '#000' }} />
+            <img src={imageUrl} alt="공유 카드" className="rounded-2xl shadow-2xl" style={{ width: 240, height: 300, objectFit: 'contain', background: '#000' }} />
           ) : (
             <div className="text-white/50 text-sm py-20">생성 실패</div>
           )}
