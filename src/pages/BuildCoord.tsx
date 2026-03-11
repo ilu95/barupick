@@ -464,12 +464,16 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           <button onClick={() => {
             if (build.isComplete) goToResult()
             else if (tmpItem && tmpColor) handleConfirm()
-            else startEdit({ type: 'add' })
+            else if (upper.length > 0 && !tmpItem) startEdit({ type: 'add' })
           }}
+            disabled={upper.length === 0 && !(tmpItem && tmpColor)}
             className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-98 ${
-              build.isComplete ? 'bg-terra-500 text-white shadow-terra' : (tmpItem && tmpColor) ? 'bg-terra-500 text-white shadow-terra' : 'bg-terra-500 text-white shadow-terra'
+              build.isComplete ? 'bg-terra-500 text-white shadow-terra'
+              : (tmpItem && tmpColor) ? 'bg-terra-500 text-white shadow-terra'
+              : upper.length > 0 ? 'bg-terra-500 text-white shadow-terra'
+              : 'bg-warm-300 dark:bg-warm-700 text-warm-500'
             }`}>
-            {build.isComplete ? '결과 보기 →' : (tmpItem && tmpColor) ? '추가하기' : '+ 옷 추가하기'}
+            {build.isComplete ? '결과 보기 →' : (tmpItem && tmpColor) ? '추가하기' : upper.length === 0 ? '아이템과 색상을 선택해주세요' : '+ 옷 추가하기'}
           </button>
         )}
       </div>
