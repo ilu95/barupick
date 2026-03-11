@@ -349,7 +349,7 @@ export default function ImageEditor({ src, onSave, onCancel, cropMode = false }:
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 py-3 flex-shrink-0">
+      <div className="flex items-center px-4 py-3 flex-shrink-0" style={{ paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))' }}>
         <button onClick={onCancel} className="text-white text-sm px-3 py-1.5 border border-white/30 rounded-lg">취소</button>
         <span className="flex-1 text-center text-white text-[15px] font-semibold">사진 편집</span>
         <button onClick={handleSave} className="text-white text-sm px-3 py-1.5 bg-terra-500 rounded-lg font-semibold">완료</button>
