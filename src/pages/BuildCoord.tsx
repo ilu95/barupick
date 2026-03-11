@@ -455,11 +455,15 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
             </button>
           </div>
         ) : (
-          <button onClick={build.isComplete ? goToResult : () => startEdit({ type: 'add' })} disabled={false}
+          <button onClick={() => {
+            if (build.isComplete) goToResult()
+            else if (tmpItem && tmpColor) handleConfirm()
+            else startEdit({ type: 'add' })
+          }}
             className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-98 ${
-              build.isComplete ? 'bg-terra-500 text-white shadow-terra' : 'bg-terra-500 text-white shadow-terra'
+              build.isComplete ? 'bg-terra-500 text-white shadow-terra' : (tmpItem && tmpColor) ? 'bg-terra-500 text-white shadow-terra' : 'bg-terra-500 text-white shadow-terra'
             }`}>
-            {build.isComplete ? '결과 보기 →' : '+ 옷 추가하기'}
+            {build.isComplete ? '결과 보기 →' : (tmpItem && tmpColor) ? '추가하기' : '+ 옷 추가하기'}
           </button>
         )}
       </div>
