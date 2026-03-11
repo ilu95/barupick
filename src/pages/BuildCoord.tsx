@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { useToast } from '@/components/ui/Toast'
@@ -11,6 +11,7 @@ import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getF
 import { useBuild, type BuildStep } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick } from '@/lib/analytics'
+import { useWeather, weatherEmoji, getLayerAdvice } from '@/hooks/useWeather'
 
 // ─── 스텝 인디케이터 ───
 const STEP_LABELS: Partial<Record<BuildStep, string>> = {
@@ -493,17 +494,84 @@ function StepColor({ build }: { build: BH }) {
 function StepAsk({ build }: { build: BH }) {
   const item = build.state.currentItem
   const emoji = item === 'outer' ? '🧥' : item === 'middleware' ? '🧶' : item === 'scarf' ? '🧣' : item === 'hat' ? '🎩' : '👞'
+  const { weather } = useWeather()
+
+  // 날씨 기반 조언 (아우터/미들웨어/목도리/모자에만 표시)
+  const showWeather = weather && ['outer', 'middleware', 'scarf', 'hat'].includes(item)
+  const advice = weather ? getLayerAdvice(weather.feels) : null
+
+  // 아이템별 날씨 판단 조언
+  const getWeatherHint = () => {
+    if (!weather || !advice) return null
+    const feels = weather.feels
+    const wind = weather.wind
+
+    if (item === 'outer') {
+      if (feels >= 23) return { hint: '겉옷 없이도 괜찮아요', recommend: false }
+      if (feels >= 17) return { hint: '가벼운 아우터 추천', recommend: true }
+      if (feels >= 5) return { hint: '아우터 꼭 챙기세요', recommend: true }
+      return { hint: '두꺼운 아우터 필수!', recommend: true }
+    }
+    if (item === 'middleware') {
+      if (feels >= 23) return { hint: '미들웨어 없이도 충분해요', recommend: false }
+      if (feels >= 12) return { hint: '얇은 니트나 가디건 정도면 좋아요', recommend: true }
+      return { hint: '니트/맨투맨으로 보온하세요', recommend: true }
+    }
+    if (item === 'scarf') {
+      if (feels >= 12) return { hint: '목도리 없어도 괜찮아요', recommend: false }
+      if (feels >= 0) return { hint: '바람이 있으니 목도리 추천', recommend: wind >= 10 }
+      return { hint: '목도리 필수! 보온 효과가 커요', recommend: true }
+    }
+    if (item === 'hat') {
+      if (feels >= 12) return { hint: '모자는 스타일링 포인트로', recommend: false }
+      if (feels >= 0) return { hint: '비니로 보온 + 스타일을 같이', recommend: wind >= 15 }
+      return { hint: '모자 꼭 쓰세요, 체온 유지에 중요해요', recommend: true }
+    }
+    return null
+  }
+
+  const weatherHint = showWeather ? getWeatherHint() : null
 
   return (
     <div className="animate-screen-enter text-center py-8">
       <button onClick={build.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-6 mx-auto active:opacity-70">
         <ArrowLeft size={16} /> 이전 단계로
       </button>
-      <div className="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center mx-auto mb-4">
+      <div className="w-16 h-16 rounded-full bg-terra-100 dark:bg-terra-900/30 flex items-center justify-center mx-auto mb-4">
         <span className="text-3xl">{emoji}</span>
       </div>
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{(CATEGORY_NAMES as any)?.[item]}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-6">{(CATEGORY_NAMES as any)?.[item]}도 코디에 포함할까요?</p>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-4">{(CATEGORY_NAMES as any)?.[item]}도 코디에 포함할까요?</p>
+
+      {/* 날씨 정보 */}
+      {showWeather && weather && (
+        <div className="max-w-xs mx-auto mb-5 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-2xl px-4 py-3 text-left">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-2xl">{weatherEmoji(weather.code)}</span>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <Thermometer size={13} className="text-sky-600 dark:text-sky-400" />
+                <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">{weather.temp}°C</span>
+                <span className="text-xs text-warm-500">체감 {weather.feels}°C</span>
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                <Wind size={13} className="text-sky-600 dark:text-sky-400" />
+                <span className="text-xs text-warm-600 dark:text-warm-400">바람 {weather.wind}km/h</span>
+              </div>
+            </div>
+          </div>
+          {weatherHint && (
+            <div className={`text-xs font-medium px-2.5 py-1.5 rounded-lg ${
+              weatherHint.recommend
+                ? 'bg-terra-100 dark:bg-terra-900/30 text-terra-700 dark:text-terra-300'
+                : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400'
+            }`}>
+              {weatherHint.recommend ? '👉 ' : '💡 '}{weatherHint.hint}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex gap-2.5 max-w-xs mx-auto">
         <button
           onClick={() => build.answerOptional(true)}
@@ -727,7 +795,7 @@ function StepResult({ build, navigate }: { build: BH, navigate: any }) {
 
   // 공유 핸들러
   const handleShare = () => {
-    navigator.share?.({ title: "바루픽 코디", text: "코디 점수: " + score + "점", url: "https://barupick-react.vercel.app" }).catch(() => {})
+    navigator.share?.({ title: "바루픽 코디", text: `코디 점수: ${score}점`, url: "https://barupick-react.vercel.app" }).catch(() => {})
   }
 
   // 커뮤니티 공유 핸들러

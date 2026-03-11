@@ -4,3 +4,6 @@ dist
 .env.local
 .DS_Store
 *.log
+"*.pem" 
+"*.p8" 
+"*.p12" 

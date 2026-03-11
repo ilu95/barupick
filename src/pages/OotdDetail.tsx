@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Pencil, Trash2, Share, Globe, Calendar, Tag, Smile, Cloud, ArrowLeft } from 'lucide-react'
+import { Pencil, Trash2, Share, Globe, Calendar, Tag, Smile, Cloud, ArrowLeft, Image } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { CATEGORY_NAMES } from '@/lib/categories'
@@ -8,6 +8,7 @@ import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
+import ShareCard, { useShareCard } from '@/components/ui/ShareCard'
 import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 
@@ -20,6 +21,7 @@ export default function OotdDetail() {
   const { profile: authProfile } = useAuth()
   const modal = useModal()
   const toast = useToast()
+  const { open: shareOpen, cardData, showShareCard, hideShareCard } = useShareCard()
   const [sharing, setSharing] = useState(false)
   const [shareMsg, setShareMsg] = useState('')
 
@@ -237,7 +239,7 @@ export default function OotdDetail() {
       </div>
 
       {/* 액션 */}
-      <div className="flex gap-2.5 mb-5">
+      <div className="flex gap-2.5 mb-3">
         <button
           onClick={handleEdit}
           className="flex-1 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
@@ -252,6 +254,21 @@ export default function OotdDetail() {
         </button>
       </div>
 
+      {/* 공유 카드 — 사진 있을 때만 */}
+      {record.photos && record.photos.length > 0 && (
+        <button
+          onClick={() => {
+            showShareCard({
+              photoUrl: record.photos[0],
+              outfitHex,
+            })
+          }}
+          className="w-full py-3 mb-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
+        >
+          <Image size={16} /> 공유 카드 만들기
+        </button>
+      )}
+
       {shareMsg && (
         <div className="mb-3 text-center text-xs font-medium text-terra-600 dark:text-terra-400 bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 rounded-xl py-2 animate-screen-fade">
           {shareMsg}
@@ -265,6 +282,11 @@ export default function OotdDetail() {
       >
         <Globe size={16} /> {sharing ? '공유 중...' : record.postId ? '이미 공유됨' : '커뮤니티에 공유'}
       </button>
+
+      {/* 공유 카드 모달 */}
+      {shareOpen && cardData && (
+        <ShareCard data={cardData} onClose={hideShareCard} />
+      )}
     </div>
   )
 }
