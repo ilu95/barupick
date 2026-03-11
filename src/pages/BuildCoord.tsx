@@ -209,20 +209,10 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
 
   return (
     <div className="animate-screen-enter -mx-5 -my-4">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between px-5 py-3">
-        <button onClick={build.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 active:opacity-70">
-          <ArrowLeft size={16} /> 스타일
-        </button>
-        <h2 className="font-display text-[16px] font-bold text-warm-900 dark:text-warm-100">코디 만들기</h2>
-        <div className={`px-3 py-1 rounded-full text-xs font-bold font-display ${scoreColor}`}>
-          {score > 0 ? `${score}점` : '--점'}
-        </div>
-      </div>
 
       {/* 마네킹 영역: 가로 3등분 */}
       {!mannCollapsed && (
-        <div className="bg-warm-100/50 dark:bg-warm-800/30 border-b border-warm-300 dark:border-warm-700 px-3 py-2">
+        <div className="px-3 py-2">
           <div className="flex gap-1" style={{ minHeight: 200 }}>
             {/* 좌: 마네킹 + 옷 추가 */}
             <div className="flex flex-col items-center justify-between" style={{ width: 120 }}>
@@ -235,11 +225,6 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                 }`}>
                 + 옷 추가
               </button>
-              {weatherComment && (
-                <div className="w-full mt-1 px-1 py-1 bg-sky-50 dark:bg-sky-900/20 rounded-lg text-[9px] text-center text-sky-700 dark:text-sky-300 leading-tight">
-                  {weatherEmoji(weather?.code || 0)} {weatherComment.temp}°C
-                </div>
-              )}
             </div>
 
             {/* 중: 상체 레이어 */}
@@ -265,8 +250,11 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               })}
             </div>
 
-            {/* 우: 하의 + 신발 + 악세서리 */}
+            {/* 우: 점수 + 하의 + 신발 + 악세서리 */}
             <div className="flex-1 flex flex-col gap-1 justify-center min-w-0">
+              <div className={`self-end px-2.5 py-0.5 rounded-full text-[10px] font-bold font-display mb-1 ${scoreColor}`}>
+                {score > 0 ? `${score}점` : '--점'}
+              </div>
               <div className="text-[9px] font-semibold text-warm-500 dark:text-warm-400 px-1 mb-0.5">하체·악세서리</div>
               {[
                 { key: 'bottom', emoji: '👖', label: '하의', color: build.state.bottomColor },
@@ -292,6 +280,13 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               })}
             </div>
           </div>
+
+          {/* 날씨 바 — 가로 전체 */}
+          {weatherComment && (
+            <div className="mt-2 px-1 py-1.5 bg-sky-50 dark:bg-sky-900/20 rounded-lg text-[11px] text-sky-700 dark:text-sky-300 text-center">
+              {weatherEmoji(weather?.code || 0)} {weatherComment.temp}°C 체감 {weatherComment.feels}°C · 💨 {weatherComment.wind}km/h{weatherComment.comment ? ` · ${weatherComment.comment}` : ''}
+            </div>
+          )}
         </div>
       )}
 
@@ -325,13 +320,6 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               {{ bottom: '👖 하의', shoes: '👞 신발', scarf: '🧣 목도리', hat: '🎩 모자' }[editMode.target]} 색상
             </span>
             <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">취소</button>
-          </div>
-        )}
-
-        {/* 날씨 코멘트 */}
-        {weatherComment && editMode.type !== 'idle' && (
-          <div className="bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl px-3 py-2 mb-3 text-[12px] text-sky-800 dark:text-sky-300">
-            ⛅ {weatherComment.temp}°C 체감 {weatherComment.feels}°C · {weatherComment.comment}
           </div>
         )}
 
@@ -437,11 +425,6 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                     </button>
                   )}
                 </div>
-              </div>
-            )}
-            {weatherComment && (
-              <div className="bg-warm-200/50 dark:bg-warm-800/30 rounded-xl px-3 py-2 text-[12px] text-warm-600 dark:text-warm-400 mb-4">
-                ⛅ {weatherComment.comment}
               </div>
             )}
             <div className="text-[12px] text-warm-500 dark:text-warm-400">마네킹 옆 아이템을 탭해서 수정하거나<br/><b>+ 옷 추가</b>를 눌러주세요</div>
