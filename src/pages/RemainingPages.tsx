@@ -13,6 +13,7 @@ import { PERSONAL_COLOR_12, PERSONAL_COLOR_DIAGNOSIS } from '@/lib/personalColor
 import { BODY_GUIDE_DATA, BODY_TYPE_DIAGNOSIS, BODY_QUIZ_QUESTIONS } from '@/lib/bodyType'
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, evaluateFabricCombo, getFabricCompat } from '@/lib/categories'
 import { supabase } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { profile } from '@/lib/profile'
 
@@ -454,6 +455,7 @@ export function FabricGuide() {
 // ─── 체형별 코디 4단계 ───
 export function BodyGuide() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [step, setStep] = useState<'list' | 'quiz' | 'select' | 'result'>('list')
   const [quizStep, setQuizStep] = useState(0)
   const [scores, setScores] = useState<Record<string, number>>({})
@@ -654,7 +656,7 @@ export function BodyGuide() {
 
       {/* 저장 + 코디 추천 */}
       <div className="flex flex-col gap-2.5">
-        <button onClick={() => { handleSave(); alert('체형이 저장되었어요! 코디 추천에 반영됩니다.') }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
+        <button onClick={() => { handleSave(); toast.success('체형이 저장되었어요! 코디 추천에 반영됩니다.') }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
           내 체형으로 저장하기
         </button>
         <button onClick={() => navigate('/home/recommend')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">

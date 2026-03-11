@@ -10,6 +10,7 @@ import { STYLE_GUIDE } from '@/lib/styles'
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/components/ui/Toast'
 
 const PARTS = ['outer', 'top', 'middleware', 'bottom', 'shoes'] as const
 
@@ -17,6 +18,7 @@ export default function EventSubmit() {
   const navigate = useNavigate()
   const { eventId } = useParams<{ eventId: string }>()
   const { user, profile } = useAuth()
+  const toast = useToast()
 
   const [event, setEvent] = useState<any>(null)
   const [colors, setColors] = useState<Record<string, string | null>>({ outer: null, top: null, middleware: null, bottom: null, shoes: null })
@@ -85,8 +87,8 @@ export default function EventSubmit() {
       setDone(true)
       setTimeout(() => navigate(`/community/event/${eventId}`, { replace: true }), 2000)
     } catch (e: any) {
-      if (e.code === '23505') alert('이미 이 이벤트에 참여했어요')
-      else alert('제출 실패: ' + (e.message || ''))
+      if (e.code === '23505') toast.error('이미 이 이벤트에 참여했어요')
+      else toast.error('제출 실패: ' + (e.message || ''))
     } finally {
       setSubmitting(false)
     }

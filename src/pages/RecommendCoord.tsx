@@ -10,6 +10,7 @@ import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
 import { useRecommend, type RecStep } from '@/hooks/useRecommend'
+import { useToast } from '@/components/ui/Toast'
 
 export default function RecommendCoord() {
   const navigate = useNavigate()
@@ -543,6 +544,7 @@ function StepResults({ rec, navigate }: { rec: RecHook, navigate: any }) {
 // Step 7: 상세
 // ═══════════════════════════════════════
 function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
+  const toast = useToast()
   const [vizCollapsed, setVizCollapsed] = useState(false)
   const [saveModal, setSaveModal] = useState(false)
   const [saveName, setSaveName] = useState('')
@@ -580,7 +582,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
     setSaveModal(false)
     setSaveName('')
     trackSave('recommend', finalScore)
-    alert('저장했어요!')
+    toast.success('저장했어요!')
   }
 
   return (

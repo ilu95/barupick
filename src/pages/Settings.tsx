@@ -4,6 +4,8 @@ import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, User
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useAutoSync, useLastSyncTime } from '@/hooks/useAutoSync'
+import { useModal } from '@/components/ui/Modal'
+import { useToast } from '@/components/ui/Toast'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -11,6 +13,8 @@ export default function Settings() {
   const { user, logout } = useAuth()
   const { syncNow } = useAutoSync()
   const lastSync = useLastSyncTime()
+  const modal = useModal()
+  const toast = useToast()
   const [darkMode, setDarkMode] = useState(localStorage.getItem('sp_dark_mode') === '1')
   const [hideCounts, setHideCounts] = useState(localStorage.getItem('sp_hide_counts') === '1')
   const [syncing, setSyncing] = useState(false)
@@ -36,27 +40,40 @@ export default function Settings() {
     setSyncing(true)
     try {
       await syncNow()
-      alert('동기화 완료!')
+      toast.success('동기화 완료!')
     } catch (e: any) {
-      alert('동기화 실패: ' + (e.message || ''))
+      toast.error('동기화 실패: ' + (e.message || ''))
     } finally {
       setSyncing(false)
     }
   }
 
   // 계정 삭제
-  const deleteAccount = async () => {
-    if (!confirm('정말 계정을 삭제하시겠어요?\n\n• 모든 코디 기록이 삭제됩니다\n• 커뮤니티 게시물이 삭제됩니다\n• 이 작업은 되돌릴 수 없습니다')) return
-    const input = prompt('확인을 위해 "계정삭제"를 입력해주세요:')
-    if (input !== '계정삭제') { alert('계정 삭제가 취소되었어요'); return }
-    try {
-      await supabase.rpc('delete_own_account')
-      localStorage.clear()
-      alert('계정이 삭제되었어요. 이용해주셔서 감사합니다.')
-      window.location.reload()
-    } catch (e: any) {
-      alert('계정 삭제 중 오류: ' + (e.message || ''))
-    }
+  const deleteAccount = () => {
+    modal.confirm({
+      title: '계정 삭제',
+      message: '정말 계정을 삭제하시겠어요?\n\n• 모든 코디 기록이 삭제됩니다\n• 커뮤니티 게시물이 삭제됩니다\n• 이 작업은 되돌릴 수 없습니다',
+      confirmLabel: '계속',
+      variant: 'danger',
+      onConfirm: () => {
+        modal.prompt({
+          title: '최종 확인',
+          message: '확인을 위해 "계정삭제"를 입력해주세요.',
+          placeholder: '계정삭제',
+          validate: (v) => v === '계정삭제' ? null : '"계정삭제"를 정확히 입력해주세요',
+          onConfirm: async () => {
+            try {
+              await supabase.rpc('delete_own_account')
+              localStorage.clear()
+              toast.success('계정이 삭제되었어요. 이용해주셔서 감사합니다.')
+              setTimeout(() => window.location.reload(), 1500)
+            } catch (e: any) {
+              toast.error('계정 삭제 중 오류: ' + (e.message || ''))
+            }
+          },
+        })
+      },
+    })
   }
 
   return (
@@ -121,7 +138,7 @@ export default function Settings() {
                 const url = URL.createObjectURL(blob)
                 const a = document.createElement('a'); a.href = url; a.download = 'barupick_backup.json'; a.click()
                 URL.revokeObjectURL(url)
-              } catch (e: any) { alert('내보내기 실패: ' + e.message) }
+              } catch (e: any) { toast.error('내보내기 실패: ' + e.message) }
             }}
             className="w-full flex items-center gap-2.5 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors"
           >
@@ -215,6 +232,7 @@ function ToggleItem({ icon, label, desc, value, onChange, last }: {
 
 // ─── 피드백 모달 ───
 function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: string }) {
+  const toast = useToast()
   const [type, setType] = useState('')
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
@@ -227,7 +245,7 @@ function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: stri
   ]
 
   const submit = async () => {
-    if (!type || !message.trim()) { alert('유형과 내용을 입력해주세요'); return }
+    if (!type || !message.trim()) { toast.error('유형과 내용을 입력해주세요'); return }
     setSending(true)
     try {
       await supabase.from('feedbacks').insert({
@@ -236,10 +254,10 @@ function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: stri
         message: message.trim(),
         screen: window.location.pathname,
       })
-      alert('소중한 의견 감사합니다!')
+      toast.success('소중한 의견 감사합니다!')
       onClose()
     } catch (e: any) {
-      alert('전송 실패: ' + (e.message || ''))
+      toast.error('전송 실패: ' + (e.message || ''))
     } finally {
       setSending(false)
     }

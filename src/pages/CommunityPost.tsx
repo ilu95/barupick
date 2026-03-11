@@ -7,10 +7,12 @@ import { COLORS_60 } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { trackCommunityPost } from '@/lib/analytics'
+import { useToast } from '@/components/ui/Toast'
 
 export default function CommunityPost() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
+  const toast = useToast()
   const [caption, setCaption] = useState('')
   const [photos, setPhotos] = useState<string[]>([])
   const [visibility, setVisibility] = useState<'public' | 'friends'>('public')
@@ -94,7 +96,7 @@ export default function CommunityPost() {
       setDone(true)
       setTimeout(() => navigate('/community', { replace: true }), 1500)
     } catch (e: any) {
-      alert('공유 실패: ' + (e.message || ''))
+      toast.error('공유 실패: ' + (e.message || ''))
     } finally {
       setPosting(false)
     }

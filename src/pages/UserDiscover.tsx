@@ -4,6 +4,7 @@ import { Search, Sparkles, User } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
+import { useToast } from '@/components/ui/Toast'
 
 interface UserRow {
   id: string
@@ -16,6 +17,7 @@ export default function UserDiscover() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { isFollowing, isFriend, toggleFollow } = useSocial()
+  const toast = useToast()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<UserRow[] | null>(null)
   const [suggested, setSuggested] = useState<UserRow[] | null>(null)
@@ -46,7 +48,7 @@ export default function UserDiscover() {
 
   const doSearch = async () => {
     const q = query.trim()
-    if (q.length < 2) { alert('2글자 이상 입력해주세요'); return }
+    if (q.length < 2) { toast.error('2글자 이상 입력해주세요'); return }
     setSearching(true)
     try {
       const { data } = await supabase.from('profiles')
@@ -56,7 +58,7 @@ export default function UserDiscover() {
       setResults(data || [])
     } catch (e) {
       console.error('Search error:', e)
-      alert('검색 중 오류가 발생했어요')
+      toast.error('검색 중 오류가 발생했어요')
     } finally {
       setSearching(false)
     }

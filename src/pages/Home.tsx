@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { usePWA } from '@/hooks/usePWA'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
 import { supabase } from '@/lib/supabase'
+import { useToast } from '@/components/ui/Toast'
+import { useModal } from '@/components/ui/Modal'
 
 import { profile as profileLib } from '@/lib/profile'
 
@@ -15,6 +17,8 @@ export default function Home() {
   const { profile, user } = useAuth()
   const { canInstall, isInstalled, install } = usePWA()
   const { weather, loading: wLoading } = useWeather()
+  const toast = useToast()
+  const modal = useModal()
   const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   // 온보딩 체크
@@ -233,7 +237,7 @@ export default function Home() {
               설치
             </button>
           ) : (
-            <button onClick={() => { alert('브라우저 메뉴(⋮)에서 "홈 화면에 추가"를 선택해주세요'); localStorage.setItem('sp_pwa_dismissed', '1') }} className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0">
+            <button onClick={() => { modal.alert({ title: '홈 화면에 추가', message: '브라우저 메뉴(⋮)에서 "홈 화면에 추가"를 선택해주세요.' }); localStorage.setItem('sp_pwa_dismissed', '1') }} className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0">
               방법 보기
             </button>
           )}
@@ -249,6 +253,7 @@ export default function Home() {
 
 // ─── 피드백 모달 ───
 function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: string }) {
+  const toast = useToast()
   const [type, setType] = useState('')
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
@@ -261,14 +266,14 @@ function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: stri
   ]
 
   const submit = async () => {
-    if (!type || !message.trim()) { alert('유형과 내용을 입력해주세요'); return }
+    if (!type || !message.trim()) { toast.error('유형과 내용을 입력해주세요'); return }
     setSending(true)
     try {
       await supabase.from('feedbacks').insert({ user_id: userId || null, type, message: message.trim(), screen: 'home' })
-      alert('소중한 의견 감사합니다!')
+      toast.success('소중한 의견 감사합니다!')
       onClose()
     } catch (e: any) {
-      alert('전송 실패: ' + (e.message || ''))
+      toast.error('전송 실패: ' + (e.message || ''))
     } finally { setSending(false) }
   }
 

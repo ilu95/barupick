@@ -6,6 +6,7 @@ import { COLORS_60 } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
+import { useToast } from '@/components/ui/Toast'
 
 interface ProfileData {
   id: string; nickname: string | null; avatar_url: string | null; bio: string | null; instagram_id: string | null
@@ -16,6 +17,7 @@ export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>()
   const { user } = useAuth()
   const { isFollowing, isFriend, toggleFollow, toggleBlock } = useSocial()
+  const toast = useToast()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [posts, setPosts] = useState<any[]>([])
@@ -81,7 +83,7 @@ export default function UserProfile() {
               onClick={async () => {
                 const blocked = await toggleBlock(userId)
                 setMenuOpen(false)
-                alert(blocked ? '차단했어요' : '차단을 해제했어요')
+                toast.success(blocked ? '차단했어요' : '차단을 해제했어요')
               }}
               className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 active:bg-warm-100 rounded-lg w-full text-left"
             >

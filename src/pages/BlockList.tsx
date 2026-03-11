@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { User, ShieldOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/components/ui/Toast'
 
 interface BlockedUser {
   id: string
@@ -14,6 +15,7 @@ interface BlockedUser {
 export default function BlockList() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const toast = useToast()
   const [blocked, setBlocked] = useState<BlockedUser[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -39,7 +41,7 @@ export default function BlockList() {
       await supabase.from('blocks').delete().eq('id', blockId)
       setBlocked(prev => prev.filter(b => b.id !== blockId))
     } catch (e: any) {
-      alert('차단 해제 실패: ' + (e.message || ''))
+      toast.error('차단 해제 실패: ' + (e.message || ''))
     }
   }
 
