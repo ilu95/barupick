@@ -35,7 +35,6 @@ import { Weather, Quiz, FabricGuide, BodyGuide, Shop, Terms, Privacy, EventDetai
 
 import Onboarding from '@/pages/Onboarding'
 import ClosetCoord from '@/pages/ClosetCoord'
-import TodayCoord from '@/pages/TodayCoord'
 import PurchaseSimulate from '@/pages/PurchaseSimulate'
 import WardrobeReport from '@/pages/WardrobeReport'
 import AllCombos from '@/pages/AllCombos'
