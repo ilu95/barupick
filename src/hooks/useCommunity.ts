@@ -123,16 +123,12 @@ export function useCommunity() {
         } else {
           query = query.in('user_id', followIds)
         }
-        // 비공개 게시물 제외 (public, friends, null만 노출)
+        // 친구 탭: 전체 공개 + 친구 공개만 (비공개 제외)
         query = query.or('visibility.eq.public,visibility.eq.friends,visibility.is.null')
         query = query.order('created_at', { ascending: false })
       } else {
-        // 전체 탭
-        if (user) {
-          query = query.or(`visibility.eq.public,visibility.is.null,user_id.eq.${user.id}`)
-        } else {
-          query = query.or('visibility.eq.public,visibility.is.null')
-        }
+        // 전체 탭: 전체 공개만 (작성자 본인 포함 비공개/친구공개 제외)
+        query = query.or('visibility.eq.public,visibility.is.null')
         if (styleFilter) query = query.eq('style', styleFilter)
         if (sort === 'popular') query = query.order('likes_count', { ascending: false })
         else query = query.order('created_at', { ascending: false })

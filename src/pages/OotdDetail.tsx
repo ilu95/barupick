@@ -95,8 +95,24 @@ export default function OotdDetail() {
         if (Array.isArray(theories) && theories.length > 0) autoStyle = theories.join(', ')
       } catch {}
 
-      if (record.postId) {
+      if (record.postId && record.visibility !== 'private') {
         setShareMsg('이미 공유된 기록이에요')
+      } else if (record.postId && record.visibility === 'private') {
+        // 비공개→다시 공개: 기존 게시물 visibility 업데이트
+        await supabase.from('posts').update({
+          visibility: 'public', outfit, score: record.score,
+          caption: record.memo?.slice(0, 200) || null,
+          photo_urls: record.photos,
+          show_instagram: record.showInstagram || false,
+        }).eq('id', record.postId)
+        // localStorage 업데이트
+        const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
+        const ri = recs.findIndex((r: any) => r.id === record.id)
+        if (ri >= 0) {
+          recs[ri].visibility = 'public'
+          localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
+        }
+        setShareMsg('커뮤니티에 다시 공유했어요!')
       } else {
         const { data: inserted } = await supabase.from('posts').insert({
           user_id: userId,
@@ -283,7 +299,7 @@ export default function OotdDetail() {
         disabled={sharing}
         className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
       >
-        <Globe size={16} /> {sharing ? '공유 중...' : record.postId ? '이미 공유됨' : '커뮤니티에 공유'}
+        <Globe size={16} /> {sharing ? '공유 중...' : (record.postId && record.visibility !== 'private') ? '이미 공유됨' : '커뮤니티에 공유'}
       </button>
 
       {/* 공유 카드 모달 */}
