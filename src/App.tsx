@@ -38,6 +38,7 @@ import ClosetCoord from '@/pages/ClosetCoord'
 import TodayCoord from '@/pages/TodayCoord'
 import PurchaseSimulate from '@/pages/PurchaseSimulate'
 import WardrobeReport from '@/pages/WardrobeReport'
+import AllCombos from '@/pages/AllCombos'
 import EventSubmit from '@/pages/EventSubmit'
 import PcLight from '@/pages/PcLight'
 import PostInsight from '@/pages/PostInsight'
@@ -80,7 +81,7 @@ export default function App() {
                   <Route path="/home/build/improve" element={<BuildCoord />} />
                   <Route path="/home/evaluate" element={<BuildCoord />} />
                   <Route path="/home/recommend" element={<RecommendCoord />} />
-                  <Route path="/home/today" element={<TodayCoord />} />
+                  <Route path="/home/today" element={<Navigate to="/closet/combos" replace />} />
                   <Route path="/home/weather" element={<Weather />} />
                   <Route path="/home/saved" element={<SavedCoords />} />
                   <Route path="/home/quiz" element={<Quiz />} />
@@ -90,6 +91,7 @@ export default function App() {
                   <Route path="/closet" element={<Closet />} />
                   <Route path="/closet/add" element={<ClosetAdd />} />
                   <Route path="/closet/coord" element={<ClosetCoord />} />
+                  <Route path="/closet/combos" element={<AllCombos />} />
                   <Route path="/closet/simulate" element={<PurchaseSimulate />} />
                   <Route path="/closet/report" element={<WardrobeReport />} />
                   <Route path="/closet/calendar" element={<OotdCalendar />} />

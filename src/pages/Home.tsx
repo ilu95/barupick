@@ -158,7 +158,7 @@ export default function Home() {
         const needed = Math.max(0, 3 - wardrobeCount)
         return (
           <button
-            onClick={() => enabled ? navigate('/home/today') : navigate('/closet/add')}
+            onClick={() => enabled ? navigate('/closet/combos') : navigate('/closet/add')}
             className={`group w-full border-[1.5px] rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm mb-4 ${
               enabled
                 ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-warm-800 dark:to-warm-700 border-amber-300 dark:border-amber-700'
@@ -169,9 +169,9 @@ export default function Home() {
               <Shirt size={26} className={enabled ? 'text-amber-700 dark:text-amber-300' : 'text-warm-500 dark:text-warm-400'} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className={`font-display text-lg font-bold tracking-tight ${enabled ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>오늘 뭐 입지?</div>
+              <div className={`font-display text-lg font-bold tracking-tight ${enabled ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>내 옷장 전체 조합</div>
               <div className="text-sm text-warm-600 dark:text-warm-400 mt-0.5">
-                {enabled ? '내 옷장에서 AI가 골라주는 코디' : `옷장에 아이템 ${needed}개 더 등록하면 사용할 수 있어요`}
+                {enabled ? '내 옷으로 가능한 모든 코디 + 점수' : `옷장에 아이템 ${needed}개 더 등록하면 사용할 수 있어요`}
               </div>
             </div>
             <ChevronRight size={18} className={`flex-shrink-0 ${enabled ? 'text-amber-600 dark:text-amber-400' : 'text-warm-400'}`} />

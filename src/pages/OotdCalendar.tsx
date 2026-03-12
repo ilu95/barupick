@@ -93,20 +93,20 @@ export default function OotdCalendar() {
           if (day.date === 0) return <div key={idx} />
 
           const hasRecords = day.records.length > 0
-          const bestRecord = day.records.sort((a, b) => b.score - a.score)[0]
+          const bestRecord = hasRecords ? [...day.records].sort((a, b) => b.score - a.score)[0] : null
 
           return (
             <button
               key={idx}
               onClick={() => hasRecords && navigate(`/closet/ootd/${day.dateStr}`)}
               className={`aspect-square rounded-xl flex flex-col items-center justify-center transition-all ${
-                day.isToday ? 'bg-terra-100 border border-terra-300' :
-                hasRecords ? 'bg-white border border-warm-400 shadow-warm-sm active:scale-95' :
-                'bg-warm-100'
+                day.isToday ? 'bg-terra-100 dark:bg-terra-900/20 border border-terra-300 dark:border-terra-700' :
+                hasRecords ? 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 shadow-warm-sm active:scale-95' :
+                'bg-warm-100 dark:bg-warm-800'
               }`}
             >
               <span className={`text-[12px] font-medium ${
-                day.isToday ? 'text-terra-600 font-bold' : hasRecords ? 'text-warm-900' : 'text-warm-500'
+                day.isToday ? 'text-terra-600 dark:text-terra-400 font-bold' : hasRecords ? 'text-warm-900 dark:text-warm-100' : 'text-warm-500 dark:text-warm-400'
               }`}>
                 {day.date}
               </span>
@@ -120,16 +120,51 @@ export default function OotdCalendar() {
                 </div>
               )}
               {hasRecords && bestRecord && (
-                <div className="text-[7px] font-bold text-terra-600 mt-[1px]">{bestRecord.score}점</div>
+                <div className="text-[7px] font-bold text-terra-600 dark:text-terra-400 mt-[1px]">{bestRecord.score}점</div>
               )}
 
               {day.records.length > 1 && (
-                <span className="text-[7px] text-warm-500">+{day.records.length - 1}</span>
+                <span className="text-[7px] text-warm-500 dark:text-warm-400">+{day.records.length - 1}</span>
               )}
             </button>
           )
         })}
       </div>
+
+      {/* 컬러 반복 감지 */}
+      {(() => {
+        // 최근 7일 중 연속된 날짜의 컬러 유사도 체크
+        const recentDays = calendarDays.filter(d => d.date > 0 && d.records.length > 0).slice(-7)
+        if (recentDays.length < 2) return null
+
+        let streakDays = 0
+        for (let i = recentDays.length - 1; i > 0; i--) {
+          const todayColors = new Set(Object.values(recentDays[i].records[0]?.colors || {}).filter(Boolean))
+          const prevColors = new Set(Object.values(recentDays[i - 1].records[0]?.colors || {}).filter(Boolean))
+          if (todayColors.size === 0 || prevColors.size === 0) break
+          const overlap = [...todayColors].filter(c => prevColors.has(c)).length
+          const similarity = overlap / Math.max(todayColors.size, prevColors.size)
+          if (similarity >= 0.5) streakDays++
+          else break
+        }
+
+        if (streakDays < 2) return null
+
+        return (
+          <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-3.5">
+            <div className="text-[12px] text-amber-800 dark:text-amber-300 font-medium mb-1">
+              이번 주 비슷한 컬러가 {streakDays + 1}일 이어지고 있어요
+            </div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-2">다른 조합도 확인해볼까요?</div>
+            <button
+              onClick={() => navigate('/closet/combos')}
+              className="w-full py-2 bg-white dark:bg-warm-800 border border-amber-200 dark:border-amber-700 rounded-xl text-[11px] font-semibold text-amber-700 dark:text-amber-300 active:scale-[0.98] transition-all"
+            >
+              다른 조합 보기 →
+            </button>
+          </div>
+        )
+      })()}
     </div>
   )
 }

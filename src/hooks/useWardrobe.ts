@@ -155,8 +155,13 @@ export function useWardrobe() {
       if (!pools[slot] || pools[slot].length === 0) return []
     }
 
-    // 선택 슬롯: outer, middleware (있으면 포함)
+    // 선택 슬롯: outer, middleware (있으면 포함하되, "없음" 옵션도 추가)
     const optionalSlots = ['outer', 'middleware'].filter(s => pools[s] && pools[s].length > 0)
+    // optional 슬롯에는 "미착용" 옵션 추가 → 아우터 없는 조합도 생성됨
+    // 단, fixedSlot으로 고정된 슬롯은 제외
+    optionalSlots.forEach(s => {
+      if (s !== fixedSlot) { pools[s] = ['', ...pools[s]] }
+    })
     const activeSlots = [...requiredSlots, ...optionalSlots]
 
     // 조합 생성 (카테시안 곱)
