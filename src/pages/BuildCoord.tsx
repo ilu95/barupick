@@ -11,6 +11,7 @@ import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit,
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick } from '@/lib/analytics'
 import { useWeather, weatherEmoji, getLayerAdvice } from '@/hooks/useWeather'
+import { getScorePercentile } from '@/hooks/useWardrobe'
 
 type BH = BuildHook
 
@@ -621,6 +622,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
         <div className={`mt-3 text-sm font-bold ${scoreGrade.color} flex items-center gap-1.5`}>
           <span>{scoreGrade.emoji}</span><span>{scoreGrade.label}</span>
+          {(() => { const p = getScorePercentile(score); return p ? <span className="ml-1.5 text-[10px] font-semibold bg-terra-100 text-terra-600 dark:bg-terra-900/30 dark:text-terra-400 px-2 py-0.5 rounded-full">{p.label}</span> : null })()}
         </div>
       </div>
 

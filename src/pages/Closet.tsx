@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Calendar, Star, ChevronLeft, ChevronRight, Shirt, Trash2, Wand2 } from 'lucide-react'
+import { Plus, Calendar, Star, ChevronLeft, ChevronRight, Shirt, Trash2, Wand2, ShoppingBag, BarChart3 } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
@@ -140,11 +140,23 @@ function WardrobeTab({ navigate }: { navigate: any }) {
     <div>
       {/* 내 옷으로 코디하기 CTA */}
       {hasTop && hasBottom ? (
-        <button onClick={() => navigate('/closet/coord')} className="w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 mb-4 active:scale-[0.98] transition-all shadow-terra">
+        <button onClick={() => navigate('/closet/coord')} className="w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 mb-2 active:scale-[0.98] transition-all shadow-terra">
           <Wand2 size={16} /> 내 옷으로 코디하기
         </button>
       ) : (
-        <button disabled className="w-full py-3 bg-warm-400 dark:bg-warm-600 text-warm-600 dark:text-warm-400 rounded-2xl text-sm font-medium mb-4 cursor-not-allowed">내 옷으로 코디하기 (상의+하의 필요)</button>
+        <button disabled className="w-full py-3 bg-warm-400 dark:bg-warm-600 text-warm-600 dark:text-warm-400 rounded-2xl text-sm font-medium mb-2 cursor-not-allowed">내 옷으로 코디하기 (상의+하의 필요)</button>
+      )}
+
+      {/* 이 옷 사도 될까? + 활용도 분석 */}
+      {items.length >= 3 && (
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <button onClick={() => navigate('/closet/simulate')} className="py-3 bg-white dark:bg-warm-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 rounded-2xl font-semibold text-[12px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
+            <ShoppingBag size={15} /> 사도 될까?
+          </button>
+          <button onClick={() => navigate('/closet/report')} className="py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-semibold text-[12px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
+            <BarChart3 size={15} /> 활용도 분석
+          </button>
+        </div>
       )}
 
       {/* 카테고리 필터 */}

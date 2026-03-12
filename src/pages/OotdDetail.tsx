@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/Toast'
 import ShareCard, { useShareCard } from '@/components/ui/ShareCard'
 import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
+import { getScorePercentile } from '@/hooks/useWardrobe'
 
 export default function OotdDetail() {
   const navigate = useNavigate()
@@ -193,7 +194,9 @@ export default function OotdDetail() {
           <MannequinSVG outfit={outfitHex} size={record.photos?.length > 0 ? 80 : 120} />
         </div>
         <div className="flex-1">
-          <div className="font-display text-3xl font-bold text-warm-900 mb-1">{record.score}<span className="text-lg text-warm-500">점</span></div>
+          <div className="font-display text-3xl font-bold text-warm-900 mb-1">{record.score}<span className="text-lg text-warm-500">점</span>
+            {(() => { const p = getScorePercentile(record.score); return p ? <span className="ml-2 text-[10px] font-semibold bg-terra-100 text-terra-600 dark:bg-terra-900/30 dark:text-terra-400 px-2 py-0.5 rounded-full align-middle">{p.label}</span> : null })()}
+          </div>
           <div className="text-sm text-warm-600 mb-3">{dateLabel}</div>
 
           {/* 컬러 정보 */}

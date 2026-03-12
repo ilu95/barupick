@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, Download, X, Droplets, Wind } from 'lucide-react'
+import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, Download, X, Droplets, Wind, Shirt } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
@@ -150,6 +150,22 @@ export default function Home() {
       )}
 
       <div className="h-px bg-warm-400 mb-5" />
+
+      {/* 오늘 뭐 입지? — 옷장 아이템 3개 이상일 때만 표시 */}
+      {(() => {
+        try { const w = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]'); return w.length >= 3 } catch { return false }
+      })() && (
+        <button onClick={() => navigate('/home/today')} className="group w-full bg-gradient-to-br from-amber-50 to-orange-50 dark:from-warm-800 dark:to-warm-700 border-[1.5px] border-amber-300 dark:border-amber-700 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-amber-200 dark:bg-amber-800 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <Shirt size={26} className="text-amber-700 dark:text-amber-300" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-display text-lg font-bold text-amber-800 dark:text-amber-200 tracking-tight">오늘 뭐 입지?</div>
+            <div className="text-sm text-warm-600 dark:text-warm-400 mt-0.5">내 옷장에서 AI가 골라주는 코디</div>
+          </div>
+          <ChevronRight size={18} className="text-amber-600 dark:text-amber-400 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
+        </button>
+      )}
 
       {/* 메인 CTA */}
       <div className="flex flex-col gap-3 mb-6">

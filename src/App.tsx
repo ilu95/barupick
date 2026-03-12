@@ -35,6 +35,9 @@ import { Weather, Quiz, FabricGuide, BodyGuide, Shop, Terms, Privacy, EventDetai
 
 import Onboarding from '@/pages/Onboarding'
 import ClosetCoord from '@/pages/ClosetCoord'
+import TodayCoord from '@/pages/TodayCoord'
+import PurchaseSimulate from '@/pages/PurchaseSimulate'
+import WardrobeReport from '@/pages/WardrobeReport'
 import EventSubmit from '@/pages/EventSubmit'
 import PcLight from '@/pages/PcLight'
 import PostInsight from '@/pages/PostInsight'
@@ -77,6 +80,7 @@ export default function App() {
                   <Route path="/home/build/improve" element={<BuildCoord />} />
                   <Route path="/home/evaluate" element={<BuildCoord />} />
                   <Route path="/home/recommend" element={<RecommendCoord />} />
+                  <Route path="/home/today" element={<TodayCoord />} />
                   <Route path="/home/weather" element={<Weather />} />
                   <Route path="/home/saved" element={<SavedCoords />} />
                   <Route path="/home/quiz" element={<Quiz />} />
@@ -86,6 +90,8 @@ export default function App() {
                   <Route path="/closet" element={<Closet />} />
                   <Route path="/closet/add" element={<ClosetAdd />} />
                   <Route path="/closet/coord" element={<ClosetCoord />} />
+                  <Route path="/closet/simulate" element={<PurchaseSimulate />} />
+                  <Route path="/closet/report" element={<WardrobeReport />} />
                   <Route path="/closet/calendar" element={<OotdCalendar />} />
                   <Route path="/closet/ootd/:date" element={<OotdDetail />} />
                   <Route path="/closet/best" element={<BestCoord />} />

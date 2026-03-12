@@ -5,12 +5,14 @@
 // ================================================================
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BarChart3, Award, Palette, Target, GraduationCap, ScanLine, Star, ChevronRight, FileText, TrendingUp, Eye, Heart, Bookmark, ArrowLeft, Check, Gift, Trophy } from 'lucide-react'
+import { BarChart3, Award, Palette, Target, GraduationCap, ScanLine, Star, ChevronRight, FileText, TrendingUp, Eye, Heart, Bookmark, ArrowLeft, Check, Gift, Trophy, Sparkles, ShoppingBag } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, hcl } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { gamification } from '@/lib/gamification'
+import { evaluationSystem } from '@/lib/evaluation'
+import { profile } from '@/lib/profile'
 
 // @ts-nocheck
 
@@ -74,8 +76,9 @@ export function MyBadges() {
   )
 }
 
-// ─── 컬러 랭킹 ───
+// ─── 컬러 랭킹 + 컴포트 존 확장 ───
 export function ColorRanking() {
+  const navigate = useNavigate()
   const records = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('sp_ootd_records') || '[]') } catch { return [] }
   }, [])
@@ -88,10 +91,126 @@ export function ColorRanking() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 20)
   }, [records])
 
+  // 옷장 색상 분포
+  const wardrobeColors = useMemo(() => {
+    try {
+      const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
+      const colors = new Set<string>()
+      items.forEach((i: any) => {
+        const c = i.color || i.colorKey
+        if (c && COLORS_60[c]) colors.add(c)
+      })
+      return colors
+    } catch { return new Set<string>() }
+  }, [])
+
+  // 색온도 분석
+  const tempBias = useMemo(() => {
+    const warmKeys = ['red', 'orange', 'coral', 'salmon', 'peach', 'yellow', 'gold', 'mustard', 'brown', 'camel', 'beige', 'cream', 'ivory', 'terracotta', 'rust', 'burgundy', 'wine', 'olive', 'khaki', 'tan', 'taupe', 'cognac', 'sienna', 'brick', 'amber', 'burnt_orange']
+    const coolKeys = ['blue', 'navy', 'skyblue', 'lightblue', 'cobalt', 'indigo', 'purple', 'lavender', 'plum', 'violet', 'mint', 'teal', 'emerald', 'royal_blue', 'cyan', 'powder_blue', 'dark_blue', 'dark_teal', 'dark_purple']
+    let warm = 0, cool = 0
+    wardrobeColors.forEach(c => { if (warmKeys.includes(c)) warm++; if (coolKeys.includes(c)) cool++ })
+    return warm > cool * 1.5 ? 'warm' : cool > warm * 1.5 ? 'cool' : 'neutral'
+  }, [wardrobeColors])
+
+  const tempLabel = tempBias === 'warm' ? '웜톤 중심' : tempBias === 'cool' ? '쿨톤 중심' : '뉴트럴 균형'
+
+  // ─── 컴포트 존 확장 제안 ───
+  const expansionSuggestions = useMemo(() => {
+    if (wardrobeColors.size < 3) return []
+
+    const pc = profile.getPersonalColor()
+    const existing = Array.from(wardrobeColors)
+
+    // 옷장에 없는 색상 후보
+    const candidates = Object.keys(COLORS_60).filter(k => !wardrobeColors.has(k))
+    if (candidates.length === 0) return []
+
+    // 각 후보에 대해 기존 옷장 색상과의 "안전한 확장 점수" 계산
+    const scored = candidates.map(candidate => {
+      const candData = COLORS_60[candidate]
+      if (!candData) return null
+
+      // 기존 색상들과의 조화도 평균 계산 (evaluate로 간이 측정)
+      let totalScore = 0
+      let count = 0
+
+      // 옷장의 대표 색상 5개와 조합 테스트
+      const topExisting = existing.slice(0, 5)
+      topExisting.forEach(ex => {
+        try {
+          const testOutfit = { top: candidate, bottom: ex }
+          const result = evaluationSystem.evaluate(testOutfit, pc)
+          totalScore += result.total
+          count++
+        } catch {}
+        try {
+          const testOutfit2 = { top: ex, bottom: candidate }
+          const result2 = evaluationSystem.evaluate(testOutfit2, pc)
+          totalScore += result2.total
+          count++
+        } catch {}
+      })
+
+      const avgCompat = count > 0 ? Math.round(totalScore / count) : 0
+
+      // HCL 거리로 "새로움" 정도 계산
+      let minDist = Infinity
+      try {
+        const [ch, cc, cl] = hcl(candData.hex)
+        existing.forEach(ex => {
+          const exData = COLORS_60[ex]
+          if (!exData) return
+          try {
+            const [eh, ec, el] = hcl(exData.hex)
+            const dh = Math.min(Math.abs(ch - eh), 360 - Math.abs(ch - eh))
+            const dist = Math.sqrt(dh ** 2 + (cc - ec) ** 2 + (cl - el) ** 2)
+            if (dist < minDist) minDist = dist
+          } catch {}
+        })
+      } catch {}
+
+      // 너무 비슷(< 15) → 의미 없음, 너무 다름(> 80) → 위험
+      const novelty = minDist < 15 ? 0 : minDist > 80 ? 0.3 : minDist > 40 ? 0.8 : 1.0
+
+      // 최종 점수 = 조화도 × 새로움
+      const finalScore = avgCompat * novelty
+
+      // reason 생성
+      let reason = ''
+      if (minDist >= 15 && minDist <= 40) reason = '기존 색상과 톤이 비슷해 안전한 변화'
+      else if (minDist > 40 && minDist <= 80) reason = '새로운 색감이지만 조화도가 높아요'
+      else if (minDist > 80) reason = '과감한 변화, 포인트로 활용 가능'
+
+      // 같은 색온도면 보너스
+      if (tempBias === 'warm' && ['cognac', 'terracotta', 'rust', 'camel', 'mustard', 'olive', 'brick', 'sienna', 'tan'].includes(candidate)) {
+        reason = '웜톤 유지하면서 새로운 색감'
+      } else if (tempBias === 'cool' && ['lavender', 'mint', 'powder_blue', 'teal', 'steel_blue', 'sage'].includes(candidate)) {
+        reason = '쿨톤 유지하면서 새로운 색감'
+      }
+
+      return { colorKey: candidate, avgCompat, novelty, finalScore, reason }
+    }).filter(Boolean).sort((a, b) => b.finalScore - a.finalScore)
+
+    return scored.slice(0, 3)
+  }, [wardrobeColors, tempBias])
+
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">컬러 랭킹</h2>
-      <p className="text-sm text-warm-600 mb-5">내가 가장 많이 입은 색상</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">컬러 랭킹</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">내가 가장 많이 입은 색상</p>
+
+      {/* 색온도 프로필 */}
+      {wardrobeColors.size >= 3 && (
+        <div className="bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-4 py-3 mb-5 flex items-center gap-3">
+          <div className="text-lg">{tempBias === 'warm' ? '🔥' : tempBias === 'cool' ? '❄️' : '⚖️'}</div>
+          <div>
+            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{tempLabel}</div>
+            <div className="text-[11px] text-warm-500 dark:text-warm-400">옷장 {wardrobeColors.size}개 색상 기준</div>
+          </div>
+        </div>
+      )}
+
       {colorCounts.length > 0 ? (
         <div className="flex flex-col gap-2">
           {colorCounts.map(([ck, count], idx) => {
@@ -100,17 +219,55 @@ export function ColorRanking() {
             const maxCount = colorCounts[0][1]
             return (
               <div key={ck} className="flex items-center gap-3">
-                <span className="w-6 text-center text-sm font-bold text-warm-600">{idx + 1}</span>
+                <span className="w-6 text-center text-sm font-bold text-warm-600 dark:text-warm-400">{idx + 1}</span>
                 <span className="w-8 h-8 rounded-lg border border-warm-400 flex-shrink-0" style={{ background: c.hex }} />
-                <div className="flex-1"><div className="text-sm font-medium text-warm-900">{c.name}</div>
-                  <div className="h-1.5 bg-warm-300 rounded-full mt-1"><div className="h-full bg-terra-500 rounded-full" style={{ width: `${(count / maxCount) * 100}%` }} /></div>
+                <div className="flex-1"><div className="text-sm font-medium text-warm-900 dark:text-warm-100">{c.name}</div>
+                  <div className="h-1.5 bg-warm-300 dark:bg-warm-600 rounded-full mt-1"><div className="h-full bg-terra-500 rounded-full" style={{ width: `${(count / maxCount) * 100}%` }} /></div>
                 </div>
-                <span className="text-xs font-semibold text-warm-600">{count}회</span>
+                <span className="text-xs font-semibold text-warm-600 dark:text-warm-400">{count}회</span>
               </div>
             )
           })}
         </div>
-      ) : <div className="text-center py-16"><Palette size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">OOTD를 기록하면 컬러 랭킹을 볼 수 있어요</div></div>}
+      ) : <div className="text-center py-16"><Palette size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">OOTD를 기록하면 컬러 랭킹을 볼 수 있어요</div></div>}
+
+      {/* ─── 컴포트 존 확장 제안 ─── */}
+      {expansionSuggestions.length > 0 && (
+        <div className="mt-8">
+          <div className="flex items-center gap-1.5 mb-3">
+            <Sparkles size={16} className="text-terra-500" />
+            <h3 className="text-sm font-bold text-warm-900 dark:text-warm-100">새로운 시도 추천</h3>
+          </div>
+          <p className="text-[11px] text-warm-500 dark:text-warm-400 mb-4">기존 옷장과 잘 어울리지만 아직 시도하지 않은 색상</p>
+
+          <div className="flex flex-col gap-2.5">
+            {expansionSuggestions.map((sug, idx) => {
+              const c = COLORS_60[sug.colorKey]
+              if (!c) return null
+              return (
+                <div key={sug.colorKey} className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 shadow-warm-sm">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 rounded-xl border-2 border-terra-300 dark:border-terra-600 flex-shrink-0" style={{ background: c.hex }} />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">{c.name}</span>
+                        <span className="text-[10px] font-bold bg-terra-100 dark:bg-terra-900/30 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">조화도 {sug.avgCompat}점</span>
+                      </div>
+                      <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{sug.reason}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/closet/simulate?color=${sug.colorKey}`)}
+                    className="w-full py-2.5 bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-xl text-[12px] font-medium text-warm-700 dark:text-warm-300 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
+                  >
+                    <ShoppingBag size={13} /> 이 색으로 시뮬레이션
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
