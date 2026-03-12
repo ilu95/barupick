@@ -147,17 +147,41 @@ function WardrobeTab({ navigate }: { navigate: any }) {
         <button disabled className="w-full py-3 bg-warm-400 dark:bg-warm-600 text-warm-600 dark:text-warm-400 rounded-2xl text-sm font-medium mb-2 cursor-not-allowed">내 옷으로 코디하기 (상의+하의 필요)</button>
       )}
 
-      {/* 이 옷 사도 될까? + 활용도 분석 */}
-      {items.length >= 3 && (
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <button onClick={() => navigate('/closet/simulate')} className="py-3 bg-white dark:bg-warm-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 rounded-2xl font-semibold text-[12px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
-            <ShoppingBag size={15} /> 사도 될까?
-          </button>
-          <button onClick={() => navigate('/closet/report')} className="py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-semibold text-[12px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
-            <BarChart3 size={15} /> 활용도 분석
-          </button>
-        </div>
-      )}
+      {/* 이 옷 사도 될까? + 활용도 분석 — 항상 표시, 아이템 부족 시 비활성화 */}
+      {(() => {
+        const enabled = items.length >= 3
+        const needed = Math.max(0, 3 - items.length)
+        return (
+          <>
+            <div className="grid grid-cols-2 gap-2 mb-1.5">
+              <button
+                onClick={() => enabled ? navigate('/closet/simulate') : null}
+                className={`py-3 rounded-2xl font-semibold text-[12px] flex items-center justify-center gap-1.5 transition-all ${
+                  enabled
+                    ? 'bg-white dark:bg-warm-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 active:scale-[0.98]'
+                    : 'bg-warm-200 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-500 dark:text-warm-400 cursor-not-allowed'
+                }`}
+              >
+                <ShoppingBag size={15} /> 사도 될까?
+              </button>
+              <button
+                onClick={() => enabled ? navigate('/closet/report') : null}
+                className={`py-3 rounded-2xl font-semibold text-[12px] flex items-center justify-center gap-1.5 transition-all ${
+                  enabled
+                    ? 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-[0.98]'
+                    : 'bg-warm-200 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-500 dark:text-warm-400 cursor-not-allowed'
+                }`}
+              >
+                <BarChart3 size={15} /> 활용도 분석
+              </button>
+            </div>
+            {!enabled && (
+              <div className="text-[10px] text-warm-500 dark:text-warm-400 text-center mb-3">아이템 {needed}개 더 등록하면 사용할 수 있어요</div>
+            )}
+            {enabled && <div className="mb-3" />}
+          </>
+        )
+      })()}
 
       {/* 카테고리 필터 */}
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 hide-scrollbar">
