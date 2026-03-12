@@ -211,6 +211,17 @@ export function useOotd() {
           }
         }
       } catch(e) { console.warn('Community post error:', e) } })()
+    } else if (record.postId) {
+      // 비공개 전환: 기존 커뮤니티 게시물의 visibility를 private으로 업데이트
+      (async () => {
+        try {
+          const userId = (await supabase.auth.getUser())?.data?.user?.id
+          if (userId) {
+            await supabase.from('posts').update({ visibility: 'private' })
+              .eq('id', record.postId).eq('user_id', userId)
+          }
+        } catch(e) { console.warn('Visibility update error:', e) }
+      })()
     }
 
     // gamification

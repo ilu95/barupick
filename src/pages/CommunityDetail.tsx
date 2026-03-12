@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink } from 'lucide-react'
+import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink, Pencil } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { STYLE_GUIDE } from '@/lib/styles'
@@ -149,6 +149,71 @@ export default function CommunityDetail() {
     })
   }
 
+  // ── 내 게시물 수정 ──
+  const handleEditPost = () => {
+    if (!user || !post || post.user_id !== user.id) return
+    // localStorage에서 postId로 OOTD 기록 찾기
+    try {
+      const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
+      const ootdRecord = recs.find((r: any) => r.postId === postId)
+      if (ootdRecord) {
+        // OOTD 기록이 있으면 기존 편집 흐름 활용
+        localStorage.setItem('_ootd_edit', JSON.stringify(ootdRecord))
+        navigate('/record?edit=' + ootdRecord.id)
+        return
+      }
+    } catch {}
+    // OOTD 기록이 없으면 Supabase 데이터로 임시 기록 생성 후 편집
+    const tempRecord = {
+      id: 'comm_' + postId,
+      date: post.created_at ? new Date(post.created_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+      colors: post.outfit || {},
+      photos: post.photo_urls || [],
+      score: post.score || 0,
+      weather: '',
+      weatherData: null,
+      situation: null,
+      mood: null,
+      memo: post.caption || '',
+      visibility: post.visibility || 'public',
+      showInstagram: post.show_instagram || false,
+      postId: postId,
+      createdAt: Date.now(),
+    }
+    // OOTD 기록에도 추가 (saveRecord에서 postId 유지용)
+    try {
+      const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
+      recs.unshift(tempRecord)
+      localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
+    } catch {}
+    localStorage.setItem('_ootd_edit', JSON.stringify(tempRecord))
+    navigate('/record?edit=' + tempRecord.id)
+  }
+
+  // ── 내 게시물 삭제 ──
+  const handleDeletePost = () => {
+    if (!user || !post || post.user_id !== user.id) return
+    modal.confirm({
+      title: '게시물 삭제',
+      message: '이 게시물을 커뮤니티에서 삭제할까요? 되돌릴 수 없습니다.',
+      confirmLabel: '삭제',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await supabase.from('posts').delete().eq('id', postId).eq('user_id', user.id)
+          // localStorage에서 postId 제거
+          try {
+            const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
+            const ri = recs.findIndex((r: any) => r.postId === postId)
+            if (ri >= 0) { recs[ri].postId = null; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
+          } catch {}
+          toast.success('게시물을 삭제했어요')
+          navigate('/community', { replace: true })
+        } catch { toast.error('삭제 실패') }
+      },
+    })
+  }
+
   // ── 댓글 작성 ──
   const addComment = async () => {
     if (!user || !commentText.trim() || !postId) return
@@ -272,6 +337,24 @@ export default function CommunityDetail() {
           </button>
         )}
       </div>
+
+      {/* ═══ 내 게시물 수정/삭제 ═══ */}
+      {isMe && (
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={handleEditPost}
+            className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
+          >
+            <Pencil size={14} /> 수정
+          </button>
+          <button
+            onClick={handleDeletePost}
+            className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
+          >
+            <Trash2 size={14} /> 삭제
+          </button>
+        </div>
+      )}
 
       {/* ═══ 작성자 ═══ */}
       <div className="flex items-center gap-3 mb-4">
