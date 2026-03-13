@@ -47,7 +47,8 @@ export default function OotdDetail() {
     if (v) { const c = COLORS_60[v]; if (c) outfitHex[k] = c.hex }
   })
 
-  const dateObj = new Date(record.date)
+  const [ry, rm, rd] = (record.date || '').split('-').map(Number)
+  const dateObj = new Date(ry, rm - 1, rd)
   const dateLabel = dateObj.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
 
   const handleDelete = () => {

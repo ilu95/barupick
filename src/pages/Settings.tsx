@@ -170,7 +170,7 @@ export default function Settings() {
       </button>
       <div className="flex items-center justify-between py-3 text-sm border-b border-warm-300">
         <span className="text-warm-600">버전</span>
-        <span className="font-display text-warm-800 font-medium">2.0.0 (beta)</span>
+        <span className="font-display text-warm-800 font-medium">1.0.0</span>
       </div>
       <div className="flex items-center justify-between py-3 text-sm mb-6">
         <span className="text-warm-600">개발</span>

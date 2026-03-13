@@ -18,6 +18,9 @@ const SYNC_KEYS = [
   'sp_dark_mode',       // 다크모드
   'sp_a11y_labels',     // 접근성
   'sp_hide_counts',     // 카운트 숨김
+  'sp_challenges_done', // 주간 챌린지
+  'sp_quiz_result',     // 퀴즈 결과
+  'sp_title_results',   // 칭호 결과
 ]
 
 const SYNC_DEBOUNCE_MS = 3000    // 변경 후 3초 뒤 서버 push

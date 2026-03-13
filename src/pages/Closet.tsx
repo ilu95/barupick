@@ -285,12 +285,16 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
 
   const dateLabel = (() => {
     const today = new Date()
-    const d = new Date(record.date)
-    const diff = Math.floor((today.getTime() - d.getTime()) / 86400000)
+    const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0')
+    const [ty, tm, td] = todayStr.split('-').map(Number)
+    const [ry, rm, rd] = (record.date || todayStr).split('-').map(Number)
+    const todayMs = new Date(ty, tm - 1, td).getTime()
+    const recMs = new Date(ry, rm - 1, rd).getTime()
+    const diff = Math.floor((todayMs - recMs) / 86400000)
     if (diff === 0) return '오늘'
     if (diff === 1) return '어제'
     if (diff < 7) return `${diff}일 전`
-    return d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+    return new Date(ry, rm - 1, rd).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
   })()
 
   const hasPhoto = record.photos && record.photos.length > 0
