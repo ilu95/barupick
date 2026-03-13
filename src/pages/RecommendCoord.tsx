@@ -106,6 +106,8 @@ function StepPick({ rec }: { rec: RecHook }) {
   const sampleOutfit: Record<string, string> = { top: '#E7E5E4', bottom: '#44403C', shoes: '#78716C' }
   if (info.hasOuter) sampleOutfit.outer = '#57534E'
   if (info.hasMid) sampleOutfit.middleware = '#A8A29E'
+  if (info.hasScarf) sampleOutfit.scarf = '#D6D3D1'
+  if (info.hasHat) sampleOutfit.hat = '#78716C'
 
   return (
     <div className="animate-screen-enter">
@@ -130,9 +132,29 @@ function StepPick({ rec }: { rec: RecHook }) {
         <span>👕 이너 + 👖 하의 + 👟 신발은 항상 포함돼요</span>
       </div>
 
-      {/* 아이템 그리드 */}
+      {/* 아이템 그리드 — 의류 */}
+      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">의류</div>
+      <div className="grid grid-cols-4 gap-2 mb-4">
+        {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
+          const selected = picked.includes(item.id)
+          return (
+            <button key={item.id} onClick={() => rec.toggleItem(item.id)}
+              className={`flex flex-col items-center gap-1 py-3 px-1 rounded-xl text-center transition-all active:scale-93 ${
+                selected
+                  ? 'bg-terra-50 dark:bg-terra-900/30 border-[1.5px] border-terra-400 shadow-warm'
+                  : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
+              }`}>
+              <span className="text-xl">{item.emoji}</span>
+              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{item.label}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* 아이템 그리드 — 악세서리 */}
+      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">악세서리</div>
       <div className="grid grid-cols-4 gap-2 mb-6">
-        {ITEMS_CATALOG.map(item => {
+        {ITEMS_CATALOG.filter(i => i.slot).map(item => {
           const selected = picked.includes(item.id)
           return (
             <button key={item.id} onClick={() => rec.toggleItem(item.id)}
@@ -151,7 +173,7 @@ function StepPick({ rec }: { rec: RecHook }) {
       {/* 선택된 구성 요약 */}
       {picked.length > 0 && (
         <div className="mb-4 text-center text-xs text-warm-600 dark:text-warm-400">
-          {picked.map(id => ITEMS_CATALOG.find(i => i.id === id)?.label).filter(Boolean).join(' + ')} + 하의 + 신발
+          {picked.map(id => ITEMS_CATALOG.find(i => i.id === id)?.label).filter(Boolean).join(' + ')} + 이너 + 하의 + 신발
         </div>
       )}
 
@@ -264,7 +286,9 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
                   if (!item) continue
                   if (pk === 'outer' && item.outerType) return item.label
                   if (pk === 'middleware' && item.midType) return item.label
-                  if (pk === 'top' && !item.outerType && !item.midType) return item.label
+                  if (pk === 'scarf' && item.slot === 'scarf') return item.label
+                  if (pk === 'hat' && item.slot === 'hat') return item.label
+                  if (pk === 'top' && !item.outerType && !item.midType && !item.slot) return item.label
                 }
                 const fallbacks: Record<string, string> = { top: '이너', bottom: '하의', shoes: '신발', outer: '아우터', middleware: '미들웨어', scarf: '목도리', hat: '모자' }
                 return fallbacks[pk] || pk

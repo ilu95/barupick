@@ -57,6 +57,8 @@ export function itemsToLayerInfo(itemIds: string[]) {
 
   let hasOuter = false
   let hasMid = false
+  let hasScarf = false
+  let hasHat = false
   let outerType: 'coat' | 'jacket' | 'padding' = 'coat'
   let midType: 'knit' | 'cardigan' | 'vest' = 'knit'
 
@@ -67,17 +69,31 @@ export function itemsToLayerInfo(itemIds: string[]) {
     } else if (item.midType) {
       hasMid = true
       midType = item.midType
+    } else if (item.slot === 'scarf') {
+      hasScarf = true
+    } else if (item.slot === 'hat') {
+      hasHat = true
     }
   }
 
+  // 레이어 타입 결정 (LAYER_LEVELS 기반)
   let layerType = 'simple'
-  if (hasOuter && hasMid) layerType = 'layered'
+  if (hasOuter && hasMid && hasScarf) layerType = 'full'
+  else if (hasOuter && hasMid) layerType = 'layered'
+  else if (hasScarf && hasOuter) layerType = 'scarf_basic'
+  else if (hasScarf && hasMid) layerType = 'scarf_mid'
+  else if (hasScarf) layerType = 'scarf_top'
   else if (hasOuter) layerType = 'basic'
   else if (hasMid) layerType = 'mid_inner'
 
-  const partKeys = LAYER_LEVELS[layerType]?.partKeys || ['top', 'bottom', 'shoes']
+  let partKeys = LAYER_LEVELS[layerType]?.partKeys || ['top', 'bottom', 'shoes']
 
-  return { layerType, outerType, midType, partKeys, hasOuter, hasMid }
+  // hat은 LAYER_LEVELS에 없으므로 수동 추가
+  if (hasHat && !partKeys.includes('hat')) {
+    partKeys = [...partKeys, 'hat']
+  }
+
+  return { layerType, outerType, midType, partKeys, hasOuter, hasMid, hasScarf, hasHat }
 }
 
 // 스타일 → 무드그룹 역 매핑

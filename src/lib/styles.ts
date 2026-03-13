@@ -143,6 +143,7 @@ export interface ItemDef {
   outerness: number
   outerType?: 'coat' | 'jacket' | 'padding'
   midType?: 'knit' | 'cardigan' | 'vest'
+  slot?: 'scarf' | 'hat'
 }
 
 export const ITEMS_CATALOG: ItemDef[] = [
@@ -158,4 +159,6 @@ export const ITEMS_CATALOG: ItemDef[] = [
   { id: 'mtm',       emoji: '👕', label: '맨투맨',   outerness: 40 },
   { id: 'shirt',     emoji: '👕', label: '셔츠',     outerness: 30 },
   { id: 'tshirt',    emoji: '👕', label: '티셔츠',   outerness: 10 },
+  { id: 'scarf',     emoji: '🧣', label: '목도리',   outerness: 0, slot: 'scarf' },
+  { id: 'hat',       emoji: '🧢', label: '모자',     outerness: 0, slot: 'hat' },
 ]
