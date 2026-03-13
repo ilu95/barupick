@@ -43,6 +43,7 @@ import PcLight from '@/pages/PcLight'
 import PostInsight from '@/pages/PostInsight'
 import DevDiag from '@/pages/DevDiag'
 import { useAutoSync } from '@/hooks/useAutoSync'
+import { useAuth } from '@/contexts/AuthContext'
 
 
 // Capacitor 네이티브 앱에서만 상단 패딩 제거
@@ -62,6 +63,12 @@ function PageLoading() {
       <div className="w-8 h-8 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin" />
     </div>
   )
+}
+
+function AdminOnly({ children }: { children: React.ReactNode }) {
+  const { profile } = useAuth()
+  if (!profile?.bio?.includes('개발자')) return <Navigate to="/home" replace />
+  return <>{children}</>
 }
 
 export default function App() {
@@ -132,7 +139,7 @@ export default function App() {
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/dev/diag" element={<DevDiag />} />
+                  <Route path="/dev/diag" element={<AdminOnly><DevDiag /></AdminOnly>} />
                   <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>
               </Suspense>
