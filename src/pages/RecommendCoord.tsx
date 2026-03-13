@@ -256,15 +256,29 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
         <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
           <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">고정할 부위를 선택하세요</div>
           <div className="flex gap-1.5 mb-3">
-            {partKeys.map((pk: string) => (
+            {partKeys.map((pk: string) => {
+              // 유저가 선택한 아이템명으로 표시 (코트, 니트 등)
+              const pickedLabel = (() => {
+                for (const id of picked) {
+                  const item = ITEMS_CATALOG.find(i => i.id === id)
+                  if (!item) continue
+                  if (pk === 'outer' && item.outerType) return item.label
+                  if (pk === 'middleware' && item.midType) return item.label
+                  if (pk === 'top' && !item.outerType && !item.midType) return item.label
+                }
+                const fallbacks: Record<string, string> = { top: '이너', bottom: '하의', shoes: '신발', outer: '아우터', middleware: '미들웨어', scarf: '목도리', hat: '모자' }
+                return fallbacks[pk] || pk
+              })()
+              return (
               <button key={pk} onClick={() => setPinPart(pk)}
                 className={`flex-1 py-2 rounded-xl text-[11px] font-semibold text-center transition-all ${
                   pinPart === pk ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
                 }`}>
-                {(CATEGORY_NAMES as any)?.[pk] || pk}
+                {pickedLabel}
                 {pinned[pk] && <span className="ml-1">📌</span>}
               </button>
-            ))}
+              )
+            })}
           </div>
           <ColorPicker
             inline
