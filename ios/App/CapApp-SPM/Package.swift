@@ -1,6 +1,5 @@
 // swift-tools-version: 5.9
 import PackageDescription
-
 // DO NOT MODIFY THIS FILE - managed by Capacitor CLI commands
 let package = Package(
     name: "CapApp-SPM",
@@ -12,7 +11,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.2.0"),
-        .package(name: "CapacitorApp", path: "..\..\..\node_modules\@capacitor\app")
+        .package(name: "CapacitorApp", path: "../../../node_modules/@capacitor/app"),
+        .package(name: "CapacitorBrowser", path: "../../../node_modules/@capacitor/browser"),
+        .package(name: "Capacitor3KakaoLogin", path: "../../../node_modules/capacitor3-kakao-login"),
     ],
     targets: [
         .target(
@@ -20,7 +21,9 @@ let package = Package(
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "CapacitorApp", package: "CapacitorApp")
+                .product(name: "CapacitorApp", package: "CapacitorApp"),
+                .product(name: "CapacitorBrowser", package: "CapacitorBrowser"),
+                .product(name: "Capacitor3KakaoLogin", package: "Capacitor3KakaoLogin"),
             ]
         )
     ]
