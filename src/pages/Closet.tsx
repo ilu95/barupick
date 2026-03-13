@@ -257,7 +257,7 @@ function RecordsTab({ navigate }: { navigate: any }) {
       </div>
 
       {records.length > 0 ? (
-        <div className="flex flex-col gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           {records.slice(0, 20).map(record => (
             <RecordCard key={record.id} record={record} navigate={navigate} />
           ))}
@@ -299,31 +299,22 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
 
   const hasPhoto = record.photos && record.photos.length > 0
 
-  // 사진이 있으면 사진 중심 레이아웃, 없으면 마네킹 레이아웃
   if (hasPhoto) {
     return (
       <button
         onClick={() => navigate(`/closet/ootd/${record.date}?id=${record.id}`)}
-        className="w-full bg-white border border-warm-400 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
+        className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
       >
-        {/* 사진 — 큰 사이즈 */}
-        <img src={record.photos[0]} className="w-full aspect-[4/5] object-cover" alt="" />
-
-        {/* 하단 정보 바 */}
-        <div className="flex items-center gap-3 px-3 py-2.5">
-          <MannequinSVG outfit={outfitHex} size={36} />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] font-semibold text-warm-900">{dateLabel}</span>
-              <span className="font-display text-[11px] font-bold text-terra-600 bg-terra-100 px-2 py-0.5 rounded-full">{record.score}점</span>
-            </div>
-            {record.situation && <div className="text-[11px] text-warm-600 truncate">{record.situation}</div>}
+        <img src={record.photos[0]} className="w-full aspect-[3/4] object-cover" alt="" />
+        <div className="px-2.5 py-2">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
+            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
           </div>
-          {/* 컬러 도트 */}
-          <div className="flex gap-1 flex-shrink-0">
-            {Object.values(record.colors || {}).filter(Boolean).slice(0, 4).map((colorKey, i) => {
+          <div className="flex gap-0.5">
+            {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
               const c = COLORS_60[colorKey as string]
-              return c ? <div key={i} className="w-3 h-3 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
+              return c ? <div key={i} className="w-2.5 h-2.5 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
             })}
           </div>
         </div>
@@ -331,24 +322,23 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
     )
   }
 
-  // 사진 없음 → 기존 마네킹 카드
   return (
     <button
       onClick={() => navigate(`/closet/ootd/${record.date}?id=${record.id}`)}
-      className="w-full flex items-center gap-3 bg-white border border-warm-400 rounded-2xl p-3 shadow-warm-sm active:scale-[0.98] transition-all text-left"
+      className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
     >
-      <MannequinSVG outfit={outfitHex} size={60} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[13px] font-semibold text-warm-900">{dateLabel}</span>
-          <span className="font-display text-[11px] font-bold text-terra-600 bg-terra-100 px-2 py-0.5 rounded-full">{record.score}점</span>
+      <div className="flex items-center justify-center py-4 bg-warm-100 dark:bg-warm-700">
+        <MannequinSVG outfit={outfitHex} size={80} />
+      </div>
+      <div className="px-2.5 py-2">
+        <div className="flex items-center justify-between mb-0.5">
+          <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
+          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
         </div>
-        {record.situation && <div className="text-[11px] text-warm-600 mb-0.5">{record.situation}</div>}
-        {record.memo && <div className="text-[11px] text-warm-500 truncate">{record.memo}</div>}
-        <div className="flex gap-1 mt-1.5">
-          {Object.values(record.colors || {}).filter(Boolean).map((colorKey, i) => {
+        <div className="flex gap-0.5">
+          {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
             const c = COLORS_60[colorKey as string]
-            return c ? <div key={i} className="w-3 h-3 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
+            return c ? <div key={i} className="w-2.5 h-2.5 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
           })}
         </div>
       </div>
