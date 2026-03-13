@@ -53,8 +53,20 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kr.co.barusa.barupick</string>
+				<string>kakaodc85994b095e4c995b92a88bb0d5d580</string>
 			</array>
 		</dict>
+	</array>
+	<key>KAKAO_APP_KEY</key>
+	<string>dc85994b095e4c995b92a88bb0d5d580</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>kakaodc85994b095e4c995b92a88bb0d5d580</string>
+		<string>kakaokompassauth</string>
+		<string>storykompassauth</string>
+		<string>kakaolink</string>
+		<string>storylink</string>
+		<string>kakaotalk</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>날씨 기반 코디 추천을 위해 위치 정보가 필요합니다.</string>

@@ -130,13 +130,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     trackSocialLogin(provider)
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
 
+    if (isNative && provider === 'kakao') {
+      // ── 카카오 네이티브 SDK (Private Relay 우회) ──
+      try {
+        const cap = (window as any).Capacitor
+        const kakaoPlugin = cap?.Plugins?.Capacitor3KakaoLogin
+        if (kakaoPlugin) {
+          const result = await kakaoPlugin.kakaoLogin()
+          const parsed = typeof result.value === 'string' ? JSON.parse(result.value) : result.value
+
+          // OpenID Connect id_token으로 Supabase 세션 생성
+          const idToken = parsed.idToken || parsed.id_token
+          if (idToken) {
+            const { error } = await supabase.auth.signInWithIdToken({
+              provider: 'kakao',
+              token: idToken,
+            })
+            if (error) throw error
+            return
+          }
+          // id_token 없으면 fallback
+          throw new Error('id_token not available')
+        }
+      } catch (nativeErr: any) {
+        console.warn('Kakao native login failed, falling back to OAuth:', nativeErr.message)
+        // 네이티브 SDK 실패 시 기존 OAuth로 fallback
+      }
+    }
+
+    // ── 기존 OAuth 플로우 (웹 + fallback) ──
     if (isNative) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: 'https://barupick.vercel.app/auth/callback.html',
           skipBrowserRedirect: true,
-          queryParams: provider === 'kakao' ? { prompt: 'login' } : {}
         }
       })
       if (error) throw error
@@ -146,10 +174,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (cap?.Plugins?.Browser) {
             await cap.Plugins.Browser.open({ url: data.url, presentationStyle: 'popover' })
           } else {
-            window.open(data.url, '_blank')
+            window.location.href = data.url
           }
         } catch {
-          window.open(data.url, '_blank')
+          window.location.href = data.url
         }
       }
     } else {
@@ -157,7 +185,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         provider,
         options: {
           redirectTo: window.location.origin + '/home',
-          queryParams: provider === 'kakao' ? { prompt: 'login' } : {}
         }
       })
       if (error) throw error
@@ -165,6 +192,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
+    // 카카오 네이티브 로그아웃
+    try {
+      const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
+      if (isNative) {
+        const kakaoPlugin = (window as any).Capacitor?.Plugins?.Capacitor3KakaoLogin
+        if (kakaoPlugin) await kakaoPlugin.kakaoLogout()
+      }
+    } catch { }
     await supabase.auth.signOut()
     setUser(null)
     setProfile(null)
