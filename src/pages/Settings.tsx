@@ -170,7 +170,7 @@ export default function Settings() {
       </button>
       <div className="flex items-center justify-between py-3 text-sm border-b border-warm-300">
         <span className="text-warm-600">버전</span>
-        <span className="font-display text-warm-800 font-medium">1.0.0</span>
+        <span className="font-display text-warm-800 font-medium">1.0.1</span>
       </div>
       <div className="flex items-center justify-between py-3 text-sm mb-6">
         <span className="text-warm-600">개발</span>
@@ -274,9 +274,8 @@ function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: stri
             <button
               key={t.key}
               onClick={() => setType(t.key)}
-              className={`px-3.5 py-2 rounded-full text-[12px] font-medium transition-all ${
-                type === t.key ? 'bg-terra-500 text-white' : 'bg-warm-200 text-warm-700 active:scale-95'
-              }`}
+              className={`px-3.5 py-2 rounded-full text-[12px] font-medium transition-all ${type === t.key ? 'bg-terra-500 text-white' : 'bg-warm-200 text-warm-700 active:scale-95'
+                }`}
             >
               {t.label}
             </button>
