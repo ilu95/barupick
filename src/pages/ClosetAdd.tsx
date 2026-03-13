@@ -1,12 +1,12 @@
 // @ts-nocheck
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Camera, Edit3, ArrowLeft, X } from 'lucide-react'
+import { Camera, Edit3, ArrowLeft, X, ChevronDown } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
+import { CATEGORY_NAMES, FABRIC_ITEMS } from '@/lib/categories'
 
-const CATEGORIES_ENG = ['outer', 'middleware', 'top', 'bottom', 'scarf', 'hat', 'shoes']
+const CATEGORY_ORDER = ['outer', 'middleware', 'top', 'bottom', 'scarf', 'hat', 'shoes']
 const PART_EMOJIS = { outer: '🧥', middleware: '🧶', top: '👔', bottom: '👖', scarf: '🧣', hat: '🎩', shoes: '👞' }
 
 // ─── 사진에서 색상 추출 (Canvas 2D) ───
@@ -19,7 +19,6 @@ function extractColorsFromImage(img) {
   ctx.drawImage(img, 0, 0, size, size)
   const data = ctx.getImageData(0, 0, size, size).data
 
-  // 중앙 영역 위주 샘플링
   const pixels = []
   for (let y = 15; y < 85; y += 2) {
     for (let x = 15; x < 85; x += 2) {
@@ -31,7 +30,6 @@ function extractColorsFromImage(img) {
   }
   if (pixels.length === 0) return ['white', 'gray', 'black', 'beige', 'navy']
 
-  // 간이 클러스터링
   const buckets = {}
   pixels.forEach(p => {
     const key = `${Math.round(p[0] / 32)},${Math.round(p[1] / 32)},${Math.round(p[2] / 32)}`
@@ -41,7 +39,6 @@ function extractColorsFromImage(img) {
   const clusters = Object.values(buckets).sort((a, b) => b.count - a.count).slice(0, 5)
   const dominants = clusters.map(c => [Math.round(c.sum[0] / c.count), Math.round(c.sum[1] / c.count), Math.round(c.sum[2] / c.count)])
 
-  // COLORS_60 매칭 (RGB 유클리드 거리)
   const matched = []
   const usedKeys = {}
   dominants.forEach(rgb => {
@@ -58,7 +55,6 @@ function extractColorsFromImage(img) {
   return matched.length > 0 ? matched.slice(0, 5) : ['white', 'gray', 'black', 'beige', 'navy']
 }
 
-// ─── 썸네일 생성 ───
 function generateThumbnail(img) {
   const tc = document.createElement('canvas')
   tc.width = 150; tc.height = 150
@@ -72,8 +68,9 @@ function generateThumbnail(img) {
 
 export default function ClosetAdd() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState('select') // select | photo | manual
+  const [mode, setMode] = useState('select')
   const [category, setCategory] = useState(null)
+  const [subItem, setSubItem] = useState(null)
   const [color, setColor] = useState(null)
   const [itemName, setItemName] = useState('')
   const [saved, setSaved] = useState(false)
@@ -81,11 +78,18 @@ export default function ClosetAdd() {
   const [photoThumb, setPhotoThumb] = useState(null)
   const [candidates, setCandidates] = useState([])
   const [extracting, setExtracting] = useState(false)
+  const [expandedCat, setExpandedCat] = useState(null)
   const fileRef = useRef(null)
 
   const resetForm = () => {
-    setCategory(null); setColor(null); setItemName('')
-    setPhotoData(null); setPhotoThumb(null); setCandidates([])
+    setCategory(null); setSubItem(null); setColor(null); setItemName('')
+    setPhotoData(null); setPhotoThumb(null); setCandidates([]); setExpandedCat(null)
+  }
+
+  const selectSubItem = (cat, item) => {
+    setCategory(cat)
+    setSubItem(item)
+    setItemName(item.name)
   }
 
   const handleSave = () => {
@@ -94,10 +98,9 @@ export default function ClosetAdd() {
       const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
       items.unshift({
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        category,
-        color,
-        colorKey: color, // 원본 호환
+        category, color, colorKey: color,
         name: itemName || '',
+        subItemId: subItem?.id || null,
         photoThumb: photoThumb || null,
         createdAt: new Date().toISOString(),
       })
@@ -131,6 +134,60 @@ export default function ClosetAdd() {
     e.target.value = ''
   }
 
+  const ItemSelector = () => (
+    <div className="mb-5">
+      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. 아이템 종류</div>
+      <div className="flex flex-col gap-1.5">
+        {CATEGORY_ORDER.map(cat => {
+          const items = FABRIC_ITEMS[cat] || []
+          const isExpanded = expandedCat === cat
+          const hasSelection = category === cat && (subItem || items.length === 0)
+          const noSubItems = items.length === 0
+          return (
+            <div key={cat}>
+              <button
+                onClick={() => {
+                  if (noSubItems) {
+                    setCategory(cat); setSubItem(null); setItemName(CATEGORY_NAMES[cat] || cat); setExpandedCat(null)
+                  } else {
+                    setExpandedCat(isExpanded ? null : cat)
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+                  hasSelection
+                    ? 'bg-terra-500 text-white'
+                    : isExpanded
+                    ? 'bg-warm-200 dark:bg-warm-700 text-warm-900 dark:text-warm-100'
+                    : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-[0.98]'
+                }`}
+              >
+                <span>{PART_EMOJIS[cat]} {CATEGORY_NAMES[cat]} {hasSelection && subItem ? `— ${subItem.name}` : ''}</span>
+                {!noSubItems && <ChevronDown size={14} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
+              </button>
+              {isExpanded && items.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1.5 ml-2 mb-1">
+                  {items.map(item => (
+                    <button
+                      key={item.id}
+                      onClick={() => { selectSubItem(cat, item); setExpandedCat(null) }}
+                      className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
+                        subItem?.id === item.id
+                          ? 'bg-terra-500 text-white shadow-terra'
+                          : 'bg-warm-100 dark:bg-warm-700 text-warm-700 dark:text-warm-300 active:scale-95'
+                      }`}
+                    >
+                      {item.icon} {item.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+
   if (saved) {
     return (
       <div className="animate-screen-fade flex items-center justify-center py-32">
@@ -142,7 +199,6 @@ export default function ClosetAdd() {
     )
   }
 
-  // ─── 방법 선택 ───
   if (mode === 'select') {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
@@ -162,29 +218,17 @@ export default function ClosetAdd() {
     )
   }
 
-  // ─── 사진 등록 모드 ───
   if (mode === 'photo') {
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
         <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
         <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">사진으로 등록</h2>
 
-        {/* 1. 카테고리 */}
-        <div className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. 아이템 종류</div>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES_ENG.map(cat => (
-              <button key={cat} onClick={() => setCategory(cat)} className={`px-3.5 py-2 rounded-full text-[12px] font-medium transition-all ${category === cat ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
-                {PART_EMOJIS[cat] || ''} {(CATEGORY_NAMES)?.[cat] || cat}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ItemSelector />
 
-        {/* 2. 사진 */}
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. 사진 촬영/업로드</div>
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoSelect} />
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
           {photoData ? (
             <div className="relative w-full aspect-square max-w-[200px] mx-auto rounded-2xl overflow-hidden border border-warm-400 dark:border-warm-600 cursor-pointer" onClick={() => fileRef.current?.click()}>
               <img src={photoData} className="w-full h-full object-cover" alt="" />
@@ -199,7 +243,6 @@ export default function ClosetAdd() {
           {extracting && <div className="text-center text-xs text-terra-600 dark:text-terra-400 mt-2 animate-pulse">색상 추출 중...</div>}
         </div>
 
-        {/* 3. 추출 후보 */}
         {candidates.length > 0 && (
           <div className="mb-5">
             <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">3. 가장 비슷한 색상을 선택하세요</div>
@@ -219,7 +262,6 @@ export default function ClosetAdd() {
           </div>
         )}
 
-        {/* 4. 이름 */}
         {color && (
           <div className="mb-5">
             <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">4. 이름 (선택)</div>
@@ -235,25 +277,13 @@ export default function ClosetAdd() {
     )
   }
 
-  // ─── 직접 등록 모드 ───
   return (
     <div className="animate-screen-enter px-5 pt-2 pb-10">
       <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">직접 등록</h2>
 
-      {/* 1. 카테고리 */}
-      <div className="mb-5">
-        <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. 아이템 종류</div>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES_ENG.map(cat => (
-            <button key={cat} onClick={() => setCategory(cat)} className={`px-3.5 py-2 rounded-full text-[12px] font-medium transition-all ${category === cat ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
-              {PART_EMOJIS[cat] || ''} {(CATEGORY_NAMES)?.[cat] || cat}
-            </button>
-          ))}
-        </div>
-      </div>
+      <ItemSelector />
 
-      {/* 2. 색상 */}
       {category && (
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">
@@ -263,7 +293,6 @@ export default function ClosetAdd() {
         </div>
       )}
 
-      {/* 3. 이름 */}
       {category && color && (
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">3. 이름 (선택)</div>

@@ -1,21 +1,17 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, Download, X, Droplets, Wind, Shirt } from 'lucide-react'
+import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, X, Droplets, Wind, Shirt } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
-import { usePWA } from '@/hooks/usePWA'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
-import { useModal } from '@/components/ui/Modal'
 
 import { profile as profileLib } from '@/lib/profile'
 
 export default function Home() {
   const navigate = useNavigate()
   const { profile, user } = useAuth()
-  const { canInstall, isInstalled, install } = usePWA()
   const { weather, loading: wLoading } = useWeather()
-  const modal = useModal()
 
   // 온보딩 체크
   useEffect(() => {
@@ -237,28 +233,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* PWA 설치 배너 — 미설치 상태일 때 표시 (설치 완료 또는 사용자 닫기 시 숨김) */}
-      {!isInstalled && !localStorage.getItem('sp_pwa_dismissed') && (
-        <div className="bg-white dark:bg-warm-800 border border-terra-200 dark:border-terra-700 rounded-2xl p-4 flex items-center gap-3 shadow-warm-sm animate-slide-up relative">
-          <div className="w-10 h-10 rounded-xl bg-terra-100 dark:bg-terra-900/30 flex items-center justify-center flex-shrink-0">
-            <Download size={20} className="text-terra-600" />
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">홈 화면에 추가</div>
-            <div className="text-[11px] text-warm-600 dark:text-warm-400">앱처럼 빠르게 실행할 수 있어요</div>
-          </div>
-          {canInstall ? (
-            <button onClick={install} className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0">
-              설치
-            </button>
-          ) : (
-            <button onClick={() => { modal.alert({ title: '홈 화면에 추가', message: '브라우저 메뉴(⋮)에서 "홈 화면에 추가"를 선택해주세요.' }); localStorage.setItem('sp_pwa_dismissed', '1') }} className="px-3.5 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all shadow-terra flex-shrink-0">
-              방법 보기
-            </button>
-          )}
-          <button onClick={() => { localStorage.setItem('sp_pwa_dismissed', '1'); window.location.reload() }} className="absolute top-2 right-2 w-5 h-5 rounded-full bg-warm-200 dark:bg-warm-700 text-warm-500 text-[10px] flex items-center justify-center">✕</button>
-        </div>
-      )}
 
     </div>
   )
