@@ -1,15 +1,16 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, RefreshCw, Pin, Bookmark, Share, Users, ChevronRight, Palette } from 'lucide-react'
+import { ArrowRight, ArrowLeft, RefreshCw, Pin, Bookmark, Share, Users, ChevronRight, Palette, X, ChevronDown } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
-import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, STYLE_ICONS } from '@/lib/styles'
+import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styles'
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
-import { useRecommend, type RecStep } from '@/hooks/useRecommend'
+import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
 import { useToast } from '@/components/ui/Toast'
 
 export default function RecommendCoord() {
@@ -20,9 +21,7 @@ export default function RecommendCoord() {
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       {rec.step === 'mood' && <StepMood rec={rec} />}
       {rec.step === 'style' && <StepStyle rec={rec} />}
-      {rec.step === 'layer' && <StepLayer rec={rec} />}
-      {rec.step === 'garment' && <StepGarment rec={rec} />}
-      {rec.step === 'pin' && <StepPin rec={rec} />}
+      {rec.step === 'pick' && <StepPick rec={rec} />}
       {rec.step === 'results' && <StepResults rec={rec} navigate={navigate} />}
       {rec.step === 'detail' && <StepDetail rec={rec} navigate={navigate} />}
     </div>
@@ -37,38 +36,21 @@ type RecHook = ReturnType<typeof useRecommend>
 function StepMood({ rec }: { rec: RecHook }) {
   return (
     <div className="animate-screen-fade">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2">어떤 분위기를 원하세요?</h2>
-      <p className="text-sm text-warm-600 mb-5">무드를 선택하면 해당 스타일의 코디를 추천해 드려요.</p>
-
-      {/* 날씨 배너 (weatherLayerLocked 시) */}
-      {rec.state.weatherLayerLocked && (
-        <div className="flex items-center gap-3 bg-terra-100 border border-terra-200 rounded-2xl p-4 mb-5">
-          <span className="text-2xl">☀️</span>
-          <div>
-            <div className="text-sm font-semibold text-warm-900">날씨 코디</div>
-            <div className="text-xs text-warm-600 mt-0.5">레이어가 자동 설정되었어요. 스타일만 골라주세요!</div>
-          </div>
-        </div>
-      )}
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">어떤 분위기를 원하세요?</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">무드를 선택하면 해당 스타일의 코디를 추천해 드려요.</p>
 
       <div className="grid grid-cols-2 gap-2.5 mb-5">
         {Object.entries(MOOD_GROUPS).map(([key, group]) => (
-          <button
-            key={key}
-            onClick={() => rec.selectMood(key)}
-            className="bg-white border border-warm-400 rounded-2xl p-5 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm hover:border-terra-300"
-          >
+          <button key={key} onClick={() => rec.selectMood(key)}
+            className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 text-center shadow-warm-sm active:scale-[0.97] transition-all">
             <div className="text-2xl mb-2">{group.icon}</div>
-            <div className="text-sm font-semibold text-warm-900">{group.name}</div>
-            <div className="text-[11px] text-warm-600 mt-1 leading-snug">{group.description}</div>
+            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{group.name}</div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-1 leading-snug">{group.description}</div>
           </button>
         ))}
       </div>
-
-      <button
-        onClick={() => rec.selectMood(null)}
-        className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70 transition-opacity"
-      >
+      <button onClick={() => rec.selectMood(null)}
+        className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
         전체 스타일에서 추천 →
       </button>
     </div>
@@ -81,45 +63,32 @@ function StepMood({ rec }: { rec: RecHook }) {
 function StepStyle({ rec }: { rec: RecHook }) {
   const group = rec.state.mood ? MOOD_GROUPS[rec.state.mood] : null
   if (!group) return null
-
   return (
     <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 mb-4 active:opacity-70">
+      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
         <ArrowLeft size={16} /> 뒤로
       </button>
-
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2">
-        {group.icon} {group.name}
-      </h2>
-      <p className="text-sm text-warm-600 mb-5">
-        스타일을 선택하세요. 건너뛰면 {group.name} 전체에서 추천합니다.
-      </p>
-
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{group.icon} {group.name}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">스타일을 선택하세요.</p>
       <div className="flex flex-col gap-2.5 mb-5">
         {group.styles.map((s: string) => {
           const sd = STYLE_GUIDE[s]
           const icon = (STYLE_ICONS as any)?.[s] || '🎨'
           return (
-            <button
-              key={s}
-              onClick={() => rec.selectStyle(s)}
-              className="w-full flex items-center gap-3 bg-white border border-warm-400 rounded-2xl p-4 text-left shadow-warm-sm active:scale-[0.98] transition-all hover:border-terra-300"
-            >
+            <button key={s} onClick={() => rec.selectStyle(s)}
+              className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 text-left shadow-warm-sm active:scale-[0.98] transition-all">
               <span className="text-xl flex-shrink-0">{icon}</span>
               <div className="flex-1 min-w-0">
-                <div className="text-[15px] font-semibold text-warm-900">{sd?.name || s}</div>
-                <div className="text-xs text-warm-600 mt-0.5">{sd?.subtitle || ''}</div>
+                <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{sd?.name || s}</div>
+                <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{sd?.subtitle || ''}</div>
               </div>
               <ChevronRight size={16} className="text-warm-500 flex-shrink-0" />
             </button>
           )
         })}
       </div>
-
-      <button
-        onClick={() => rec.selectStyle(null)}
-        className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70 transition-opacity"
-      >
+      <button onClick={() => rec.selectStyle(null)}
+        className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
         전체에서 추천 →
       </button>
     </div>
@@ -127,448 +96,269 @@ function StepStyle({ rec }: { rec: RecHook }) {
 }
 
 // ═══════════════════════════════════════
-// Step 3: 레이어 선택
+// Step 3: 아이템 선택 (꼭 입고 싶은 옷)
 // ═══════════════════════════════════════
-function StepLayer({ rec }: { rec: RecHook }) {
+function StepPick({ rec }: { rec: RecHook }) {
+  const picked = rec.state.pickedItems
+  const info = itemsToLayerInfo(picked)
+
+  // 마네킹 미리보기
+  const sampleOutfit: Record<string, string> = { top: '#E7E5E4', bottom: '#44403C', shoes: '#78716C' }
+  if (info.hasOuter) sampleOutfit.outer = '#57534E'
+  if (info.hasMid) sampleOutfit.middleware = '#A8A29E'
+
   return (
     <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 mb-4 active:opacity-70">
+      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
         <ArrowLeft size={16} /> 뒤로
       </button>
 
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2">
-        몇 겹으로<br />입을까요?
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">
+        이건 꼭 입고 싶다!
       </h2>
-      <p className="text-sm text-warm-600 mb-5">레이어드 수준을 선택하세요.</p>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">
+        하는 옷이 있으면 골라주세요. 없으면 바로 넘어가도 돼요.
+      </p>
 
-      <div className="grid grid-cols-3 gap-2.5">
-        {Object.entries(LAYER_LEVELS).map(([key, lvl]) => {
-          // 샘플 마네킹용 기본 outfit
-          const sampleOutfit: Record<string, string> = { top: '#ffffff', bottom: '#1e293b', shoes: '#8B4513' }
-          if (lvl.partKeys.includes('outer')) sampleOutfit.outer = '#36454F'
-          if (lvl.partKeys.includes('middleware')) sampleOutfit.middleware = '#C19A6B'
+      {/* 마네킹 미리보기 */}
+      <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
+        <MannequinSVG outfit={sampleOutfit} options={{ outerType: info.outerType, midType: info.midType }} size={120} />
+      </div>
 
+      {/* 기본 포함 안내 */}
+      <div className="flex items-center gap-2 mb-3 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-50 dark:bg-warm-800 rounded-xl px-3 py-2">
+        <span>👕 이너 + 👖 하의 + 👟 신발은 항상 포함돼요</span>
+      </div>
+
+      {/* 아이템 그리드 */}
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        {ITEMS_CATALOG.map(item => {
+          const selected = picked.includes(item.id)
           return (
-            <button
-              key={key}
-              onClick={() => rec.selectLayer(key)}
-              className="bg-white border border-warm-400 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm hover:border-terra-300"
-            >
-              <div className="flex justify-center mb-3">
-                <MannequinSVG outfit={sampleOutfit} size={80} />
-              </div>
-              <div className="text-[13px] font-semibold text-warm-900 mb-1">{lvl.name}</div>
-              <div className="text-[10px] text-warm-600">{lvl.parts.join(' + ')}</div>
+            <button key={item.id} onClick={() => rec.toggleItem(item.id)}
+              className={`flex flex-col items-center gap-1 py-3 px-1 rounded-xl text-center transition-all active:scale-93 ${
+                selected
+                  ? 'bg-terra-50 dark:bg-terra-900/30 border-[1.5px] border-terra-400 shadow-warm'
+                  : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
+              }`}>
+              <span className="text-xl">{item.emoji}</span>
+              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{item.label}</span>
             </button>
           )
         })}
       </div>
-    </div>
-  )
-}
 
-// ═══════════════════════════════════════
-// Step 4: 옷 종류 선택
-// ═══════════════════════════════════════
-function StepGarment({ rec }: { rec: RecHook }) {
-  const pk = LAYER_LEVELS[rec.state.layerType]?.partKeys || []
-  const hasOuter = pk.includes('outer')
-  const hasMid = pk.includes('middleware')
-
-  const outerTypes = [
-    { key: 'coat', label: '코트', sub: '긴 기장 · 라펠' },
-    { key: 'jacket', label: '자켓', sub: '짧은 기장 · 라펠' },
-    { key: 'padding', label: '패딩', sub: '볼륨 · 퀼팅' },
-  ]
-  const midTypes = [
-    { key: 'knit', label: '니트/스웨터', sub: '크루넥 풀오버' },
-    { key: 'cardigan', label: '가디건', sub: '오픈 프론트' },
-    { key: 'vest', label: '조끼/베스트', sub: '소매 없음' },
-  ]
-
-  // 마네킹 미리보기용 샘플
-  const sampleOutfit: Record<string, string> = { top: '#ffffff', bottom: '#1e293b', shoes: '#8B4513' }
-  if (hasOuter) sampleOutfit.outer = '#36454F'
-  if (hasMid) sampleOutfit.middleware = '#C19A6B'
-
-  return (
-    <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 뒤로
-      </button>
-
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2">어떤 종류의 옷인가요?</h2>
-      <p className="text-sm text-warm-600 mb-5">마네킹에 표시될 옷의 형태를 선택해주세요</p>
-
-      {hasOuter && (
-        <div className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3">아우터 종류</div>
-          <div className="grid grid-cols-3 gap-2.5">
-            {outerTypes.map(t => {
-              const sel = rec.state.outerType === t.key
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => rec.setGarment('outerType', t.key)}
-                  className={`rounded-2xl border-[1.5px] p-3 text-center transition-all active:scale-[0.97] ${
-                    sel ? 'bg-terra-50 border-terra-400 shadow-warm' : 'bg-white border-warm-400 shadow-warm-sm hover:border-terra-300'
-                  }`}
-                >
-                  <div className="flex justify-center mb-2">
-                    <MannequinSVG
-                      outfit={sampleOutfit}
-                      options={{ outerType: t.key as any, midType: rec.state.midType }}
-                      size={70}
-                    />
-                  </div>
-                  <div className="text-[13px] font-semibold text-warm-900">{t.label}</div>
-                  <div className="text-[11px] text-warm-600 mt-0.5">{t.sub}</div>
-                </button>
-              )
-            })}
-          </div>
+      {/* 선택된 구성 요약 */}
+      {picked.length > 0 && (
+        <div className="mb-4 text-center text-xs text-warm-600 dark:text-warm-400">
+          {picked.map(id => ITEMS_CATALOG.find(i => i.id === id)?.label).filter(Boolean).join(' + ')} + 하의 + 신발
         </div>
       )}
 
-      {hasMid && (
-        <div className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3">이너웨어 종류</div>
-          <div className="grid grid-cols-3 gap-2.5">
-            {midTypes.map(t => {
-              const sel = rec.state.midType === t.key
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => rec.setGarment('midType', t.key)}
-                  className={`rounded-2xl border-[1.5px] p-3 text-center transition-all active:scale-[0.97] ${
-                    sel ? 'bg-terra-50 border-terra-400 shadow-warm' : 'bg-white border-warm-400 shadow-warm-sm hover:border-terra-300'
-                  }`}
-                >
-                  <div className="flex justify-center mb-2">
-                    <MannequinSVG
-                      outfit={sampleOutfit}
-                      options={{ outerType: rec.state.outerType, midType: t.key as any }}
-                      size={70}
-                    />
-                  </div>
-                  <div className="text-[13px] font-semibold text-warm-900">{t.label}</div>
-                  <div className="text-[11px] text-warm-600 mt-0.5">{t.sub}</div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={rec.confirmGarment}
-        className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra mt-3"
-      >
-        이 형태로 보기 <ArrowRight size={18} />
+      {/* CTA */}
+      <button onClick={rec.generateFromPick}
+        className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
+        {picked.length === 0 ? '전체 추천받기' : '이 옷으로 추천받기'} <ArrowRight size={18} />
       </button>
     </div>
   )
 }
 
 // ═══════════════════════════════════════
-// Step 5: 부위별 색상 고정
+// Step 4: 결과 리스트
 // ═══════════════════════════════════════
-function StepPin({ rec }: { rec: RecHook }) {
-  const ld = LAYER_LEVELS[rec.state.layerType]
-  const parts = ld?.partKeys || ['top', 'bottom', 'shoes']
-  const pinned = rec.state.pinned || {}
+function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
+  const toast = useToast()
+  const [showItemPicker, setShowItemPicker] = useState(false)
+  const [pinPart, setPinPart] = useState<string | null>(null)
 
-  // 색상 그룹
-  const colorGroups = [
-    { label: '베이직', keys: ['white', 'ivory', 'beige', 'lightgray', 'gray', 'charcoal', 'black', 'brown', 'camel', 'navy', 'burgundy', 'olive', 'khaki', 'cream', 'taupe'] },
-    { label: '파스텔', keys: ['pastel_pink', 'pastel_blue', 'pastel_green', 'pastel_yellow', 'pastel_purple', 'pastel_mint', 'pastel_peach', 'pastel_lavender'] },
-    { label: '비비드', keys: ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'teal', 'coral', 'turquoise', 'royal_blue', 'emerald'] },
-    { label: '다크', keys: ['dark_red', 'dark_blue', 'dark_green', 'dark_purple', 'dark_brown', 'wine', 'forest', 'midnight', 'chocolate', 'slate', 'maroon', 'indigo'] },
-  ]
-
-  return (
-    <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 뒤로
-      </button>
-
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2 flex items-center gap-2">
-        <Pin size={20} className="text-terra-500" /> 부위별 색상 고정
-      </h2>
-      <p className="text-sm text-warm-600 mb-5">고정하고 싶은 부위를 선택하면 색상을 지정할 수 있어요.</p>
-
-      <div className="flex flex-col gap-2.5 mb-5">
-        {parts.map((part: string) => {
-          const isPinned = pinned[part] != null
-          const pinnedColor = isPinned ? COLORS_60[pinned[part]] : null
-
-          return (
-            <PinPartCard
-              key={part}
-              part={part}
-              isPinned={isPinned}
-              pinnedColor={pinnedColor}
-              pinned={pinned}
-              colorGroups={colorGroups}
-              onPin={(colorKey) => rec.togglePin(part, colorKey)}
-              onClear={() => rec.clearPin(part)}
-            />
-          )
-        })}
-      </div>
-
-      <button
-        onClick={rec.applyPinsAndGenerate}
-        className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
-      >
-        이 설정으로 추천받기 <ArrowRight size={18} />
-      </button>
-
-      {Object.keys(pinned).length > 0 && (
-        <button
-          onClick={rec.clearAllPins}
-          className="w-full py-3 mt-2.5 bg-white border border-warm-400 text-warm-700 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all"
-        >
-          전체 해제
-        </button>
-      )}
-    </div>
-  )
-}
-
-// 핀 파트 카드 (색상 피커 펼치기)
-function PinPartCard({ part, isPinned, pinnedColor, pinned, colorGroups, onPin, onClear }: any) {
-  const [open, setOpen] = useState(false)
-  const partName = (CATEGORY_NAMES as any)?.[part] || part
-
-  return (
-    <div className="bg-white border border-warm-400 rounded-2xl p-4 shadow-warm-sm">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className="text-[15px] font-semibold text-warm-900">{partName}</span>
-          {isPinned && pinnedColor && (
-            <>
-              <span className="w-5 h-5 rounded border border-warm-400" style={{ background: pinnedColor.hex }} />
-              <span className="text-xs text-warm-600">{pinnedColor.name}</span>
-            </>
-          )}
-        </div>
-        <div className="flex gap-1.5">
-          {isPinned && (
-            <button onClick={onClear} className="px-3 py-1.5 rounded-full border border-warm-400 bg-white text-xs font-medium text-warm-600 active:scale-95 transition-all">
-              해제
-            </button>
-          )}
-          <button onClick={() => setOpen(!open)} className="px-3 py-1.5 rounded-full border border-terra-300 bg-terra-50 text-xs font-medium text-terra-700 active:scale-95 transition-all">
-            {isPinned ? '변경' : '고정'}
-          </button>
-        </div>
-      </div>
-
-      {open && (
-        <div className="mt-3 space-y-3">
-          {colorGroups.map((g: any) => (
-            <div key={g.label}>
-              <div className="text-[10px] font-semibold text-warm-500 uppercase tracking-wider mb-1.5">{g.label}</div>
-              <div className="flex flex-wrap gap-1.5">
-                {g.keys.map((k: string) => {
-                  const c = COLORS_60[k]
-                  if (!c) return null
-                  const isSelected = pinned[part] === k
-                  return (
-                    <button
-                      key={k}
-                      onClick={() => { onPin(k); setOpen(false) }}
-                      className={`w-8 h-8 rounded-lg border-[1.5px] transition-all active:scale-90 ${
-                        isSelected ? 'border-terra-500 ring-2 ring-terra-300 scale-110' : 'border-warm-400'
-                      }`}
-                      style={{ background: c.hex }}
-                      title={c.name}
-                    />
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// (useState imported at top)
-
-// ═══════════════════════════════════════
-// Step 6: 추천 결과
-// ═══════════════════════════════════════
-function StepResults({ rec, navigate }: { rec: RecHook, navigate: any }) {
   const results = rec.state.results
-  const ld = LAYER_LEVELS[rec.state.layerType]
+  const layerData = LAYER_LEVELS[rec.state.layerType]
+  const partKeys = layerData?.partKeys || ['top', 'bottom', 'shoes']
+  const picked = rec.state.pickedItems
   const pinned = rec.state.pinned || {}
-  const hasPins = Object.keys(pinned).length > 0
-
-  // 결과 표시 시 트래킹
-  useEffect(() => {
-    if (results.length > 0) trackRecommendComplete(rec.state.style, rec.state.layerType, results.length)
-  }, [])
-
-  if (results.length === 0) {
-    return (
-      <div className="animate-screen-fade text-center py-12">
-        <div className="w-16 h-16 rounded-full bg-warm-300 flex items-center justify-center mx-auto mb-3">
-          <Palette size={28} className="text-warm-600" />
-        </div>
-        <h2 className="font-display text-lg font-bold text-warm-900 mb-2">결과를 찾을 수 없어요</h2>
-        <p className="text-sm text-warm-600 mb-5">다른 스타일이나 레이어를 선택해 보세요.</p>
-        <button onClick={rec.goBack} className="px-6 py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
-          다시 선택
-        </button>
-      </div>
-    )
-  }
 
   return (
     <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 mb-4 active:opacity-70">
+      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
         <ArrowLeft size={16} /> 뒤로
       </button>
 
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">
         추천 코디 {results.length}개
       </h2>
-      <p className="text-sm text-warm-600 mb-3">마네킹을 탭하면 상세를 볼 수 있어요.</p>
 
-      {/* 퍼스널컬러·체형 맞춤 토글 */}
-      {profile.hasFitSettings() && (
-        <div className="flex items-center justify-between bg-white border border-warm-400 rounded-2xl px-4 py-3 mb-4 shadow-warm-sm">
-          <div>
-            <div className="text-sm font-semibold text-warm-900">퍼스널컬러·체형 맞춤</div>
-            <div className="text-[11px] text-warm-500 mt-0.5">내 퍼스널컬러와 체형에 맞춰 추천</div>
-          </div>
-          <button onClick={rec.toggleFitMode}
-            className={`w-12 h-7 rounded-full p-0.5 transition-colors ${rec.state.fitMode ? 'bg-terra-500' : 'bg-warm-400'}`}>
-            <div className={`w-6 h-6 rounded-full bg-white shadow transition-transform ${rec.state.fitMode ? 'translate-x-5' : ''}`} />
-          </button>
-        </div>
-      )}
+      {/* ─── 현재 조건 칩 ─── */}
+      <div className="flex flex-wrap gap-1.5 mb-3">
+        {/* 선택된 아이템 칩 */}
+        {picked.map(id => {
+          const item = ITEMS_CATALOG.find(i => i.id === id)
+          if (!item) return null
+          return (
+            <button key={id} onClick={() => rec.toggleItemInResults(id)}
+              className="flex items-center gap-1 bg-terra-50 dark:bg-terra-900/30 border border-terra-300 dark:border-terra-700 rounded-full px-2.5 py-1 text-[11px] font-semibold text-terra-700 dark:text-terra-400 active:scale-95">
+              {item.emoji} {item.label} <X size={10} />
+            </button>
+          )
+        })}
 
-      {/* 고정 칩 */}
-      {hasPins && (
-        <div className="flex flex-wrap gap-1.5 items-center mb-3">
-          {Object.entries(pinned).map(([part, colorKey]) => {
-            const c = COLORS_60[colorKey]
-            return (
-              <span key={part} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-warm-400 text-xs">
-                <span className="w-3.5 h-3.5 rounded-full border border-warm-400" style={{ background: c?.hex || '#ccc' }} />
-                {(CATEGORY_NAMES as any)?.[part] || part} 고정
-                <span className="cursor-pointer opacity-50 hover:opacity-100" onClick={() => rec.clearPin(part)}>✕</span>
-              </span>
-            )
-          })}
-          <button onClick={rec.clearAllPins} className="text-xs text-terra-600 font-medium ml-1 active:opacity-70">전체 해제</button>
-        </div>
-      )}
+        {/* 고정된 컬러 칩 */}
+        {Object.entries(pinned).map(([part, colorKey]) => {
+          const c = COLORS_60[colorKey]
+          if (!c) return null
+          const partName = (CATEGORY_NAMES as any)?.[part] || part
+          return (
+            <button key={part} onClick={() => rec.clearPin(part)}
+              className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-semibold text-warm-700 dark:text-warm-300 active:scale-95">
+              <span className="w-3 h-3 rounded-full border border-warm-300" style={{ background: c.hex }} />
+              {partName} 고정 <X size={10} />
+            </button>
+          )
+        })}
 
-      {/* 액션 버튼 */}
-      <div className="flex gap-2.5 mb-5">
-        <button
-          onClick={rec.regenerate}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white border border-warm-400 rounded-2xl text-sm font-medium text-warm-800 shadow-warm-sm active:scale-[0.98] transition-all"
-        >
-          <RefreshCw size={16} /> 새로 생성
+        {/* 옷 추가 버튼 */}
+        <button onClick={() => setShowItemPicker(!showItemPicker)}
+          className="flex items-center gap-1 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-medium text-warm-600 dark:text-warm-400 active:scale-95">
+          + 옷 변경
         </button>
-        <button
-          onClick={rec.goToPin}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white border border-warm-400 rounded-2xl text-sm font-medium text-warm-800 shadow-warm-sm active:scale-[0.98] transition-all"
-        >
-          <Pin size={16} /> 부위 고정
+
+        {/* 컬러 고정 버튼 */}
+        <button onClick={() => setPinPart(pinPart ? null : partKeys[0])}
+          className="flex items-center gap-1 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-medium text-warm-600 dark:text-warm-400 active:scale-95">
+          <Pin size={10} /> 컬러 고정
         </button>
       </div>
 
-      {/* 결과 카드 리스트 */}
+      {/* ─── 인라인 아이템 피커 ─── */}
+      {showItemPicker && (
+        <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
+          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">옷 추가/제거 (탭하면 바로 반영)</div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {ITEMS_CATALOG.map(item => {
+              const sel = picked.includes(item.id)
+              return (
+                <button key={item.id} onClick={() => rec.toggleItemInResults(item.id)}
+                  className={`flex flex-col items-center gap-0.5 py-2 rounded-xl text-center transition-all active:scale-93 ${
+                    sel ? 'bg-terra-100 dark:bg-terra-900/30 border-terra-400 border-[1.5px]' : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
+                  }`}>
+                  <span className="text-base">{item.emoji}</span>
+                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{item.label}</span>
+                </button>
+              )
+            })}
+          </div>
+          <button onClick={() => setShowItemPicker(false)} className="w-full mt-2 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">닫기</button>
+        </div>
+      )}
+
+      {/* ─── 인라인 컬러 고정 ─── */}
+      {pinPart && (
+        <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
+          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">고정할 부위를 선택하세요</div>
+          <div className="flex gap-1.5 mb-3">
+            {partKeys.map((pk: string) => (
+              <button key={pk} onClick={() => setPinPart(pk)}
+                className={`flex-1 py-2 rounded-xl text-[11px] font-semibold text-center transition-all ${
+                  pinPart === pk ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+                }`}>
+                {(CATEGORY_NAMES as any)?.[pk] || pk}
+                {pinned[pk] && <span className="ml-1">📌</span>}
+              </button>
+            ))}
+          </div>
+          <ColorPicker
+            inline
+            selected={pinned[pinPart]}
+            onSelect={(k) => rec.togglePin(pinPart, k)}
+            onClear={() => rec.clearPin(pinPart)}
+          />
+          <div className="flex gap-2 mt-2">
+            <button onClick={() => setPinPart(null)} className="flex-1 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">닫기</button>
+            {Object.keys(pinned).length > 0 && (
+              <button onClick={() => { rec.clearAllPins(); setPinPart(null) }} className="text-[11px] text-red-500 py-1">전체 해제</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── 셔플 ─── */}
+      <div className="flex justify-end mb-3">
+        <button onClick={rec.regenerate} className="flex items-center gap-1 text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">
+          <RefreshCw size={13} /> 다시 섞기
+        </button>
+      </div>
+
+      {/* ─── 결과 카드 ─── */}
       <div className="flex flex-col gap-3">
         {results.map((combo, idx) => {
-          const parts = ld?.partKeys || ['top', 'bottom', 'shoes']
+          const outfitHex = outfitToHex(combo.outfit)
+          const parts = Object.keys(combo.outfit).filter(k => combo.outfit[k])
           return (
-            <button
-              key={idx}
-              onClick={() => rec.openDetail(idx)}
-              className="w-full bg-white border border-warm-400 rounded-2xl p-4 text-left shadow-warm-sm active:scale-[0.99] transition-all hover:shadow-warm"
-            >
-              {/* 태그 + 점수 */}
-              <div className="flex flex-wrap gap-1.5 mb-2.5">
-                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-terra-100 text-terra-700">{combo.name}</span>
-                {combo.tags?.[0] && (
-                  <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 text-warm-700">{combo.tags[0]}</span>
-                )}
-                <span className="font-display text-[11px] font-bold px-2.5 py-1 rounded-full bg-warm-900 text-white ml-auto">{combo.score}점</span>
-              </div>
-
-              {/* 마네킹 + 컬러 목록 */}
-              <div className="flex items-center gap-3">
-                <MannequinSVG
-                  outfit={outfitToHex(combo.outfit)}
-                  options={{ outerType: rec.state.outerType, midType: rec.state.midType }}
-                  size={80}
-                />
-                <div className="flex-1 flex flex-col gap-1.5">
-                  {parts.map((k: string) => {
-                    const colorKey = combo.outfit[k]
-                    const c = COLORS_60[colorKey]
-                    const isPinned = pinned[k] === colorKey
-                    return (
-                      <div key={k} className="flex items-center gap-2 text-xs">
-                        <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400" style={{ background: c?.hex || '#ccc' }} />
-                        <span className="text-warm-500 w-8">{(CATEGORY_NAMES as any)?.[k] || k}</span>
-                        <span className="text-warm-800">{c?.name || colorKey || ''}</span>
-                        {isPinned && <Pin size={12} className="text-terra-500 flex-shrink-0" />}
-                      </div>
-                    )
+            <button key={idx} onClick={() => rec.openDetail(idx)}
+              className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm active:scale-[0.98] transition-all text-left">
+              <MannequinSVG outfit={outfitHex} options={{ outerType: rec.state.outerType, midType: rec.state.midType }} size={70} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`font-display text-lg font-bold ${
+                    combo.score >= 85 ? 'text-green-600 dark:text-green-400' : combo.score >= 70 ? 'text-warm-800 dark:text-warm-200' : 'text-warm-500'
+                  }`}>{combo.score}점</span>
+                  {combo.tags?.[0] && <span className="text-[9px] bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 px-1.5 py-0.5 rounded-full">{combo.tags[0]}</span>}
+                </div>
+                <div className="flex gap-1">
+                  {parts.slice(0, 5).map(k => {
+                    const c = COLORS_60[combo.outfit[k]]
+                    return c ? <div key={k} className="w-5 h-5 rounded border border-warm-300 dark:border-warm-500" style={{ background: c.hex }} /> : null
                   })}
                 </div>
               </div>
-
-              {combo.tip && (
-                <div className="mt-2.5 text-xs text-warm-600 bg-warm-200 rounded-xl px-3 py-2 leading-relaxed">{combo.tip}</div>
-              )}
-              <div className="mt-2 text-[11px] text-terra-500 text-center font-medium">탭하여 상세보기 · 색상 개선하기</div>
+              <ChevronRight size={16} className="text-warm-400 flex-shrink-0" />
             </button>
           )
         })}
       </div>
+
+      {results.length === 0 && (
+        <div className="text-center py-16">
+          <div className="text-3xl mb-3">🤔</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400">추천 결과가 없어요. 조건을 바꿔보세요.</div>
+        </div>
+      )}
     </div>
   )
 }
 
 // ═══════════════════════════════════════
-// Step 7: 상세
+// Step 5: 상세 보기
 // ═══════════════════════════════════════
-function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
+function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const toast = useToast()
-  const [vizCollapsed, setVizCollapsed] = useState(false)
+  const combo = rec.state.results[rec.state.detailIdx]
   const [saveModal, setSaveModal] = useState(false)
   const [saveName, setSaveName] = useState('')
-  const combo = rec.state.results[rec.state.detailIdx]
-  if (!combo) return null
+  const [vizCollapsed, setVizCollapsed] = useState(false)
+
+  if (!combo) return <div className="text-center py-16 text-warm-500 dark:text-warm-400">결과를 불러올 수 없어요</div>
 
   const outfitHex = outfitToHex(combo.outfit)
-  const parts = LAYER_LEVELS[rec.state.layerType]?.partKeys || ['top', 'bottom', 'shoes']
+  const parts = Object.keys(combo.outfit).filter(k => combo.outfit[k])
 
-  // evaluationSystem으로 점수 분해도
-  const pc = profile.getPersonalColor()
-  const evalResult = combo.evalResult || evaluationSystem.evaluate(combo.outfit, pc)
+  let evalResult: any = null
+  let finalScore = combo.score
+  try {
+    const pc = profile.getPersonalColor()
+    evalResult = evaluationSystem.evaluate(combo.outfit, pc)
+    finalScore = evalResult?.total || combo.score
+  } catch {}
 
   const circumference = 2 * Math.PI * 52
-  const finalScore = evalResult?.total || combo.score
   const offset = circumference * (1 - finalScore / 100)
 
-  // 점수 분해 항목
   const scoreItems = evalResult ? [
-    { label: '컬러 배치', value: evalResult.goldilocks, max: 33, desc: '인접 부위 연결 + 역할 명확성' },
-    { label: '비율', value: evalResult.ratio, max: 17, desc: '60-30-10 배분' },
-    { label: '조화도', value: evalResult.harmony, max: 17, desc: 'HCL 색상 조화' },
-    { label: '색온도', value: evalResult.season, max: 17, desc: '웜/쿨 일관성' },
-    { label: '밸런스', value: evalResult.balance, max: 8, desc: '명도 분포' },
+    { label: '컬러 배치', value: evalResult.goldilocks, max: 33, desc: '인접 부위 연결' },
+    { label: '색상 비율', value: evalResult.ratio, max: 17, desc: '주색·보조색 밸런스' },
+    { label: '색상 조화', value: evalResult.harmony, max: 17, desc: '전체 조화' },
+    { label: '계절감', value: evalResult.season, max: 8, desc: '컬러 온도' },
+    { label: '밸런스', value: evalResult.balance, max: 8, desc: '명도·채도 균형' },
     ...(evalResult.hasPersonalColor ? [{ label: '퍼스널컬러', value: evalResult.personal, max: 17, desc: '얼굴 근처 컬러' }] : []),
     ...(evalResult.hasBodyFit ? [{ label: '체형 맞춤', value: evalResult.bodyFit, max: 8, desc: '체형별 컬러 배치' }] : []),
   ] : []
@@ -587,22 +377,21 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
 
   return (
     <div className="animate-screen-enter">
-      {/* 마네킹 접기/펼치기 */}
-      <button onClick={() => setVizCollapsed(!vizCollapsed)} className="w-full text-center text-xs text-warm-600 py-2 mb-2 active:opacity-70">
+      <button onClick={() => setVizCollapsed(!vizCollapsed)} className="w-full text-center text-xs text-warm-600 dark:text-warm-400 py-2 mb-2 active:opacity-70">
         {vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲'}
       </button>
 
       {!vizCollapsed && (
-        <div className="flex justify-center mb-5 py-4 bg-warm-100 rounded-2xl">
+        <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
           <MannequinSVG outfit={outfitHex} options={{ outerType: rec.state.outerType, midType: rec.state.midType }} size={200} />
         </div>
       )}
 
       {/* 태그 */}
       <div className="flex flex-wrap gap-1.5 mb-4">
-        <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-terra-100 text-terra-700">{combo.name}</span>
-        {combo.tags?.[0] && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 text-warm-700">{combo.tags[0]}</span>}
-        {evalResult?.hasPersonalColor && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-pink-50 text-pink-700">퍼스널컬러✓</span>}
+        <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-terra-100 dark:bg-terra-900/30 text-terra-700 dark:text-terra-400">{combo.name}</span>
+        {combo.tags?.[0] && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{combo.tags[0]}</span>}
+        {evalResult?.hasPersonalColor && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400">퍼스널컬러✓</span>}
       </div>
 
       {/* 점수 원형 + 부위 컬러 */}
@@ -614,8 +403,8 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
               strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="transition-all duration-700" />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-display text-3xl font-bold text-warm-900">{finalScore}</span>
-            <span className="text-[10px] text-warm-600">/ 100</span>
+            <span className="font-display text-3xl font-bold text-warm-900 dark:text-warm-100">{finalScore}</span>
+            <span className="text-[10px] text-warm-600 dark:text-warm-400">/ 100</span>
           </div>
         </div>
         <div className="flex-1 flex flex-col gap-1.5">
@@ -623,9 +412,9 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
             const colorKey = combo.outfit[k]; const c = COLORS_60[colorKey]
             return (
               <div key={k} className="flex items-center gap-2 text-xs">
-                <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400" style={{ background: c?.hex || '#ccc' }} />
-                <span className="text-warm-500 w-10">{(CATEGORY_NAMES as any)?.[k] || k}</span>
-                <span className="text-warm-800 font-medium">{c?.name || ''}</span>
+                <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
+                <span className="text-warm-500 dark:text-warm-400 w-10">{(CATEGORY_NAMES as any)?.[k] || k}</span>
+                <span className="text-warm-800 dark:text-warm-200 font-medium">{c?.name || ''}</span>
               </div>
             )
           })}
@@ -636,26 +425,26 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
       {evalResult?.theory && evalResult.theory.length > 0 && (
         <div className="flex flex-wrap justify-center gap-1.5 mb-4">
           {evalResult.theory.map((t: string, i: number) => (
-            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 text-warm-700">{t}</span>
+            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{t}</span>
           ))}
         </div>
       )}
 
       {/* 피드백 */}
       {evalResult?.feedback && (
-        <div className="bg-warm-200 rounded-2xl p-4 text-sm text-warm-800 leading-relaxed mb-5">{evalResult.feedback}</div>
+        <div className="bg-warm-200 dark:bg-warm-700 rounded-2xl p-4 text-sm text-warm-800 dark:text-warm-200 leading-relaxed mb-5">{evalResult.feedback}</div>
       )}
 
       {/* 점수 분해도 */}
       {scoreItems.length > 0 && (
-        <div className="bg-white border border-warm-400 rounded-2xl p-4 mb-5 shadow-warm-sm">
+        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
           {scoreItems.map((item, idx) => (
             <div key={idx} className="mb-2.5 last:mb-0">
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-warm-700 font-medium">{item.label}</span>
-                <span className="text-warm-500">{Math.round(item.value)} / {item.max}</span>
+                <span className="text-warm-700 dark:text-warm-300 font-medium">{item.label}</span>
+                <span className="text-warm-500 dark:text-warm-400">{Math.round(item.value)} / {item.max}</span>
               </div>
-              <div className="h-1.5 bg-warm-300 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-warm-300 dark:bg-warm-600 rounded-full overflow-hidden">
                 <div className="h-full bg-terra-500 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }} />
               </div>
             </div>
@@ -663,17 +452,18 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
         </div>
       )}
 
-      {/* 액션 버튼 */}
+      {/* 액션 */}
       <div className="flex flex-col gap-2.5 mb-5">
-        <button onClick={() => { setSaveName(combo.name); setSaveModal(true) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
+        <button onClick={() => { setSaveName(combo.name); setSaveModal(true) }}
+          className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
           <Bookmark size={18} /> 이 코디 저장하기
         </button>
-        <button onClick={() => { navigator.share?.({ title: '바루픽 코디', text: combo?.name + ' ' + finalScore + '점', url: 'https://barupick-react.vercel.app' }).catch(() => {}) }} className="w-full py-3 bg-white border border-warm-400 text-warm-800 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+        <button onClick={() => { navigator.share?.({ title: '바루픽 코디', text: combo?.name + ' ' + finalScore + '점', url: 'https://barupick-react.vercel.app' }).catch(() => {}) }}
+          className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Share size={16} /> 이 조합 공유하기
         </button>
-        <button onClick={() => {
-            localStorage.setItem('_pending_post_outfit', JSON.stringify(combo.outfit)); window.location.href = '/community/post'
-          }} className="w-full py-3 bg-warm-900 text-white rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+        <button onClick={() => { localStorage.setItem('_pending_post_outfit', JSON.stringify(combo.outfit)); window.location.href = '/community/post' }}
+          className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Users size={16} /> 커뮤니티에 공유
         </button>
       </div>
@@ -694,25 +484,23 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
         </div>
       )}
 
-      {/* 색상 개선하기 */}
-      <div className="bg-white border border-warm-400 rounded-2xl p-4 mb-5 shadow-warm-sm">
-        <div className="flex items-center gap-1.5 text-sm font-bold text-warm-900 mb-1">
+      {/* 색상 개선 */}
+      <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
+        <div className="flex items-center gap-1.5 text-sm font-bold text-warm-900 dark:text-warm-100 mb-1">
           <Palette size={16} className="text-terra-500" /> 색상 개선하기
         </div>
-        <div className="text-xs text-warm-600 mb-3">부위를 탭하면 색상을 교체할 수 있어요</div>
+        <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">부위를 탭하면 색상을 교체할 수 있어요</div>
         <div className="flex gap-2 flex-wrap justify-center py-1 pb-2">
           {Object.entries(combo.outfit).filter(([_, v]) => v).map(([cat, colorKey]) => {
             const c = COLORS_60[colorKey as string]
             if (!c) return null
             return (
-              <div key={cat} className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0">
-                <div
-                  className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold active:scale-90 transition-transform border border-warm-400/30"
-                  style={{ background: c.hex }}
-                >
+              <div key={cat} className="flex flex-col items-center gap-1 flex-shrink-0">
+                <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold active:scale-90 transition-transform border border-warm-400/30"
+                  style={{ background: c.hex }}>
                   <span style={{ color: c.hcl[2] > 60 ? '#1C1917' : '#ffffff' }}>{c.name}</span>
                 </div>
-                <div className="text-[10px] text-warm-700 whitespace-nowrap">{(CATEGORY_NAMES as any)?.[cat] || cat}</div>
+                <div className="text-[10px] text-warm-700 dark:text-warm-300 whitespace-nowrap">{(CATEGORY_NAMES as any)?.[cat] || cat}</div>
               </div>
             )
           })}
@@ -720,10 +508,8 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
       </div>
 
       {/* 뒤로 */}
-      <button
-        onClick={rec.goBack}
-        className="w-full py-3 bg-white border border-warm-400 text-warm-700 rounded-2xl font-medium text-sm flex items-center justify-center gap-1.5 mb-12 active:scale-[0.98] transition-all"
-      >
+      <button onClick={rec.goBack}
+        className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm flex items-center justify-center gap-1.5 mb-12 active:scale-[0.98] transition-all">
         <ArrowLeft size={16} /> 목록으로
       </button>
     </div>
@@ -733,8 +519,6 @@ function StepDetail({ rec, navigate }: { rec: RecHook, navigate: any }) {
 // ─── 헬퍼: outfit colorKey → hex 변환 ───
 function outfitToHex(outfit: Record<string, string>): Record<string, string> {
   const hex: Record<string, string> = {}
-  Object.entries(outfit).forEach(([k, v]) => {
-    if (v) hex[k] = COLORS_60[v]?.hex || v
-  })
+  Object.entries(outfit).forEach(([k, v]) => { if (v) hex[k] = COLORS_60[v]?.hex || v })
   return hex
 }

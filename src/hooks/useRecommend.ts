@@ -1,12 +1,12 @@
 // @ts-nocheck
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE } from '@/lib/styles'
+import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, ITEMS_CATALOG, type ItemDef } from '@/lib/styles'
 import { getDynamicCombos } from '@/lib/recommend'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 
-export type RecStep = 'mood' | 'style' | 'layer' | 'garment' | 'pin' | 'results' | 'detail'
+export type RecStep = 'mood' | 'style' | 'pick' | 'results' | 'detail'
 
 export interface ComboResult {
   outfit: Record<string, string>
@@ -21,10 +21,15 @@ export interface ComboResult {
 export interface RecState {
   mood: string | null
   style: string | null
+  // 아이템 선택 (pick 단계)
+  pickedItems: string[]        // ITEMS_CATALOG item ids
+  // 자동 산출
   layerType: string
   outerType: 'coat' | 'jacket' | 'padding'
   midType: 'knit' | 'cardigan' | 'vest'
+  // 컬러 고정
   pinned: Record<string, string>
+  // 결과
   results: ComboResult[]
   weatherLayerLocked: boolean
   detailIdx: number
@@ -34,7 +39,8 @@ export interface RecState {
 const initialState: RecState = {
   mood: null,
   style: null,
-  layerType: 'basic',
+  pickedItems: [],
+  layerType: 'simple',
   outerType: 'coat',
   midType: 'knit',
   pinned: {},
@@ -42,6 +48,36 @@ const initialState: RecState = {
   weatherLayerLocked: false,
   detailIdx: 0,
   fitMode: false,
+}
+
+// ─── 아이템 선택 → 레이어/타입 자동 산출 ───
+export function itemsToLayerInfo(itemIds: string[]) {
+  const items = itemIds.map(id => ITEMS_CATALOG.find(i => i.id === id)).filter(Boolean) as ItemDef[]
+  const sorted = [...items].sort((a, b) => b.outerness - a.outerness)
+
+  let hasOuter = false
+  let hasMid = false
+  let outerType: 'coat' | 'jacket' | 'padding' = 'coat'
+  let midType: 'knit' | 'cardigan' | 'vest' = 'knit'
+
+  for (const item of sorted) {
+    if (item.outerType) {
+      hasOuter = true
+      outerType = item.outerType
+    } else if (item.midType) {
+      hasMid = true
+      midType = item.midType
+    }
+  }
+
+  let layerType = 'simple'
+  if (hasOuter && hasMid) layerType = 'layered'
+  else if (hasOuter) layerType = 'basic'
+  else if (hasMid) layerType = 'mid_inner'
+
+  const partKeys = LAYER_LEVELS[layerType]?.partKeys || ['top', 'bottom', 'shoes']
+
+  return { layerType, outerType, midType, partKeys, hasOuter, hasMid }
 }
 
 // 스타일 → 무드그룹 역 매핑
@@ -59,17 +95,15 @@ export function useRecommend() {
   const [history, setHistory] = useState<RecStep[]>([])
   const initRef = useRef(false)
 
-  // URL에서 style 파라미터 읽어서 해당 스타일로 바로 진입
+  // URL에서 style 파라미터 → 바로 pick 단계로
   useEffect(() => {
     if (initRef.current) return
     const styleParam = searchParams.get('style')
     if (styleParam && STYLE_GUIDE[styleParam]) {
       initRef.current = true
       const mood = findMoodForStyle(styleParam)
-      const newState = { ...initialState, mood, style: styleParam }
-      // 바로 레이어 선택 단계로
-      setState(newState)
-      setStep('layer')
+      setState(prev => ({ ...prev, mood, style: styleParam }))
+      setStep('pick')
       setHistory(['mood', 'style'])
     }
   }, [searchParams])
@@ -92,56 +126,57 @@ export function useRecommend() {
     setState(prev => ({ ...prev, ...partial }))
   }, [])
 
-  // 무드 선택
+  // ─── 무드 선택 ───
   const selectMood = useCallback((mood: string | null) => {
     update({ mood })
     if (mood) {
       pushStep('style')
     } else {
-      // "전체에서 추천"
-      if (state.weatherLayerLocked) {
-        generateAndGo()
-      } else {
-        pushStep('layer')
-      }
+      // "전체에서 추천" → pick으로
+      pushStep('pick')
     }
-  }, [state.weatherLayerLocked])
-
-  // 스타일 선택
-  const selectStyle = useCallback((style: string | null) => {
-    update({ style })
-    if (state.weatherLayerLocked) {
-      // 날씨 자동설정 → 바로 결과
-      setTimeout(() => generateAndGoWithState({ ...state, style }), 0)
-    } else {
-      pushStep('layer')
-    }
-  }, [state])
-
-  // 레이어 선택
-  const selectLayer = useCallback((layerType: string) => {
-    update({ layerType })
-    const pk = LAYER_LEVELS[layerType]?.partKeys || []
-    const hasOuter = pk.includes('outer')
-    const hasMid = pk.includes('middleware')
-    if (hasOuter || hasMid) {
-      pushStep('garment')
-    } else {
-      setTimeout(() => generateAndGoWithState({ ...state, layerType }), 0)
-    }
-  }, [state])
-
-  // 옷 종류 설정
-  const setGarment = useCallback((type: 'outerType' | 'midType', value: string) => {
-    update({ [type]: value } as any)
   }, [])
 
-  // 옷 종류 확인 → 결과
-  const confirmGarment = useCallback(() => {
-    generateAndGoWithState(state)
+  // ─── 스타일 선택 ───
+  const selectStyle = useCallback((style: string | null) => {
+    update({ style })
+    pushStep('pick')
+  }, [])
+
+  // ─── 아이템 토글 (pick 단계) ───
+  const toggleItem = useCallback((itemId: string) => {
+    setState(prev => {
+      const picked = prev.pickedItems.includes(itemId)
+        ? prev.pickedItems.filter(id => id !== itemId)
+        : [...prev.pickedItems, itemId]
+      const info = itemsToLayerInfo(picked)
+      return { ...prev, pickedItems: picked, ...info }
+    })
+  }, [])
+
+  // ─── pick에서 추천받기 ───
+  const generateFromPick = useCallback(() => {
+    const info = itemsToLayerInfo(state.pickedItems)
+    const newState = { ...state, ...info }
+    const results = generateRecommendations(newState)
+    setState(prev => ({ ...prev, ...newState, results }))
+    pushStep('results')
   }, [state])
 
-  // 핀 토글
+  // ─── 결과에서 아이템 추가/제거 (실시간 재생성) ───
+  const toggleItemInResults = useCallback((itemId: string) => {
+    setState(prev => {
+      const picked = prev.pickedItems.includes(itemId)
+        ? prev.pickedItems.filter(id => id !== itemId)
+        : [...prev.pickedItems, itemId]
+      const info = itemsToLayerInfo(picked)
+      const newState = { ...prev, pickedItems: picked, ...info }
+      const results = generateRecommendations(newState)
+      return { ...newState, results }
+    })
+  }, [])
+
+  // ─── 컬러 고정 (결과에서) ───
   const togglePin = useCallback((part: string, colorKey: string) => {
     setState(prev => {
       const pinned = { ...prev.pinned }
@@ -150,7 +185,9 @@ export function useRecommend() {
       } else {
         pinned[part] = colorKey
       }
-      return { ...prev, pinned }
+      const newState = { ...prev, pinned }
+      const results = generateRecommendations(newState)
+      return { ...newState, results }
     })
   }, [])
 
@@ -158,59 +195,44 @@ export function useRecommend() {
     setState(prev => {
       const pinned = { ...prev.pinned }
       delete pinned[part]
-      return { ...prev, pinned }
+      const newState = { ...prev, pinned }
+      const results = generateRecommendations(newState)
+      return { ...newState, results }
     })
   }, [])
 
   const clearAllPins = useCallback(() => {
-    update({ pinned: {} })
+    setState(prev => {
+      const newState = { ...prev, pinned: {} }
+      const results = generateRecommendations(newState)
+      return { ...newState, results }
+    })
   }, [])
 
-  // 결과에서 재생성
+  // ─── 셔플 (결과에서 다시 생성) ───
   const regenerate = useCallback(() => {
-    generateAndGoWithState(state, true)
-  }, [state])
+    setState(prev => {
+      const results = generateRecommendations(prev, true)
+      return { ...prev, results }
+    })
+  }, [])
 
-  // 상세 보기
+  // ─── 상세 보기 ───
   const openDetail = useCallback((idx: number) => {
     update({ detailIdx: idx })
     pushStep('detail')
   }, [])
 
-  // 핀 화면으로
-  const goToPin = useCallback(() => {
-    pushStep('pin')
-  }, [])
-
-  // 핀에서 추천받기
-  const applyPinsAndGenerate = useCallback(() => {
-    generateAndGoWithState(state, true)
-  }, [state])
-
-  // fitMode 토글
+  // ─── fitMode 토글 ───
   const toggleFitMode = useCallback(() => {
     setState(prev => {
-      const next = { ...prev, fitMode: !prev.fitMode }
-      return next
+      const newState = { ...prev, fitMode: !prev.fitMode }
+      const results = generateRecommendations(newState, true)
+      return { ...newState, results }
     })
-    // fitMode 변경 후 재생성
-    setTimeout(() => generateAndGoWithState({ ...state, fitMode: !state.fitMode }, true), 0)
-  }, [state])
+  }, [])
 
-  // ─── 추천 생성 핵심 로직 ───
-  function generateAndGo() {
-    generateAndGoWithState(state)
-  }
-
-  function generateAndGoWithState(s: RecState, stayOnResults = false) {
-    const results = generateRecommendations(s)
-    setState(prev => ({ ...prev, ...s, results }))
-    if (!stayOnResults) {
-      pushStep('results')
-    }
-  }
-
-  // 리셋
+  // ─── 리셋 ───
   const reset = useCallback(() => {
     setState(initialState)
     setStep('mood')
@@ -220,16 +242,17 @@ export function useRecommend() {
   return {
     step, state, history,
     pushStep, goBack, update, reset,
-    selectMood, selectStyle, selectLayer,
-    setGarment, confirmGarment,
+    selectMood, selectStyle,
+    toggleItem, generateFromPick,
+    toggleItemInResults,
     togglePin, clearPin, clearAllPins,
-    regenerate, openDetail, goToPin, applyPinsAndGenerate,
+    regenerate, openDetail,
     toggleFitMode,
   }
 }
 
-// ─── 추천 생성 함수 (recommend.ts 엔진 연결) ───
-function generateRecommendations(s: RecState): ComboResult[] {
+// ─── 추천 생성 함수 ───
+function generateRecommendations(s: RecState, shuffle = false): ComboResult[] {
   const { mood, style, layerType, pinned } = s
   let results: ComboResult[] = []
 
@@ -252,15 +275,21 @@ function generateRecommendations(s: RecState): ComboResult[] {
     console.error('Recommendation generation error:', e)
   }
 
-  // 결과 0이면 폴백: 기본 중립색 조합 생성
   if (results.length === 0) {
     results = generateFallbackCombos(s)
+  }
+
+  if (shuffle) {
+    // Fisher-Yates 셔플 (상위 유지하되 약간 섞기)
+    for (let i = results.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[results[i], results[j]] = [results[j], results[i]]
+    }
   }
 
   return results.slice(0, 30)
 }
 
-// 폴백 조합 생성 (엔진 실패 시)
 function generateFallbackCombos(s: RecState): ComboResult[] {
   const { layerType, pinned } = s
   const layer = LAYER_LEVELS[layerType]
@@ -280,23 +309,13 @@ function generateFallbackCombos(s: RecState): ComboResult[] {
 
   return palettes.map((pal, i) => {
     const outfit: Record<string, string> = {}
-    partKeys.forEach(pk => {
-      outfit[pk] = (pinned as any)?.[pk] || pal[pk] || 'white'
-    })
+    partKeys.forEach(pk => { outfit[pk] = pinned?.[pk] || pal[pk] || 'white' })
     let score = 50
     try {
       const pc = profile.getPersonalColor()
       const evalResult = evaluationSystem.evaluate(outfit, pc)
       score = evalResult?.total || 50
     } catch {}
-    return {
-      id: `fallback_${i}`,
-      name: `기본 코디 ${i + 1}`,
-      outfit,
-      tags: ['기본'],
-      tip: '기본 중립색 조합이에요',
-      score,
-      evalResult: null,
-    }
+    return { id: `fallback_${i}`, name: `기본 코디 ${i + 1}`, outfit, tags: ['기본'], tip: '기본 중립색 조합이에요', score, evalResult: null }
   })
 }
