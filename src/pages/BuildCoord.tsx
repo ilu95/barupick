@@ -472,18 +472,27 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               취소
             </button>
           </div>
+        ) : build.isComplete ? (
+          <div className="flex gap-2">
+            <button onClick={() => startEdit({ type: 'add' })}
+              className="flex-1 py-3.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm active:scale-98 flex items-center justify-center gap-1.5">
+              <Plus size={15} /> 옷 추가
+            </button>
+            <button onClick={goToResult}
+              className="flex-1 py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm shadow-terra active:scale-98">
+              결과 보기 →
+            </button>
+          </div>
         ) : (
           <button onClick={() => {
-            if (build.isComplete) goToResult()
-            else if (upper.length > 0) startEdit({ type: 'add' })
+            if (upper.length > 0) startEdit({ type: 'add' })
           }}
             disabled={upper.length === 0}
             className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-98 ${
-              build.isComplete ? 'bg-terra-500 text-white shadow-terra'
-              : upper.length > 0 ? 'bg-terra-500 text-white shadow-terra'
+              upper.length > 0 ? 'bg-terra-500 text-white shadow-terra'
               : 'bg-warm-300 dark:bg-warm-700 text-warm-500'
             }`}>
-            {build.isComplete ? '결과 보기 →' : upper.length === 0 ? '아이템을 선택해주세요' : '+ 옷 추가하기'}
+            {upper.length === 0 ? '아이템을 선택해주세요' : '+ 옷 추가하기'}
           </button>
         )}
       </div>
