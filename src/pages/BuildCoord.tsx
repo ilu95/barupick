@@ -110,10 +110,11 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
 
   // 현재 슬롯 예측 (추천/delta용)
   const predictedSlot = useMemo(() => {
-    if (!tmpItem) return null
-    if (editMode.type === 'edit_upper') return build.predictSlot(tmpItem, editMode.index)
-    if (editMode.type === 'add' || editMode.type === 'idle') return build.predictSlot(tmpItem)
-    return null
+    // edit_upper에서 tmpItem이 없으면 기존 아이템의 슬롯 사용
+    const itemId = tmpItem || (editMode.type === 'edit_upper' ? upper[editMode.index]?.itemId : null)
+    if (!itemId) return null
+    if (editMode.type === 'edit_upper') return build.predictSlot(itemId, editMode.index)
+    return build.predictSlot(itemId)
   }, [tmpItem, editMode, upper])
 
   // 현재 편집 중인 슬롯 (상체 + 하체/악세서리 모두 포함)
@@ -138,7 +139,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
       const target = editMode.target
       const c = COLORS_60[colorKey]
       if (c) hex[target] = c.hex
-    } else if (tmpItem) {
+    } else {
       const slot = predictedSlot
       if (slot && slot !== 'hidden' && slot !== 'inner') {
         const c = COLORS_60[colorKey]
@@ -146,24 +147,36 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
       }
     }
     setPreviewHex(hex)
-  }, [editMode, tmpItem, predictedSlot, build.outfitHex])
+  }, [editMode, predictedSlot, build.outfitHex])
 
-  // 추가/수정 확인
-  const handleConfirm = () => {
+  // 컬러 선택 → 자동 확정 + 닫기
+  const handleColorSelect = useCallback((colorKey: string) => {
+    // 프리뷰 먼저
+    handleColorTap(colorKey)
+    // 자동 확정
     if (editMode.type === 'edit_simple') {
-      if (tmpColor) build.setSimpleColor(editMode.target, tmpColor)
+      build.setSimpleColor(editMode.target, colorKey)
     } else if (editMode.type === 'edit_upper') {
       const idx = editMode.index
       const itemId = tmpItem || upper[idx]?.itemId
-      const colorKey = tmpColor || upper[idx]?.colorKey
-      if (itemId && colorKey) build.editUpper(idx, itemId, colorKey)
-    } else if (tmpItem && tmpColor) {
+      if (itemId) build.editUpper(idx, itemId, colorKey)
+    } else if (tmpItem) {
       if (upper.length >= 4) { toast.warning('상체는 최대 4겹까지 가능해요'); return }
       if (usedItemIds.has(tmpItem)) { toast.warning('이미 추가된 아이템이에요'); return }
-      build.addUpper(tmpItem, tmpColor)
+      build.addUpper(tmpItem, colorKey)
     }
+    // 닫기
     setTmpItem(null); setTmpColor(null); setPreviewHex(null)
-  }
+    build.setEditMode({ type: 'idle' })
+  }, [editMode, tmpItem, upper, usedItemIds, build, handleColorTap, toast])
+
+  // 아이템 탭 → 아이템 그리드 숨기고 컬러 피커 보이기
+  const handleItemTap = useCallback((itemId: string) => {
+    if (usedItemIds.has(itemId)) return
+    setTmpItem(itemId)
+    setTmpColor(null)
+    setPreviewHex(null)
+  }, [usedItemIds])
 
   const startEdit = (mode: EditMode) => {
     build.setEditMode(mode)
@@ -195,10 +208,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
 
   // 하단 버튼 상태
   const isEditing = editMode.type !== 'idle'
-  const isUpperEdit = editMode.type === 'add' || editMode.type === 'edit_upper'
   const isSimpleEdit = editMode.type === 'edit_simple'
-  const canConfirm = isSimpleEdit ? !!tmpColor : (!!tmpItem && !!tmpColor)
-  const btnLabel = editMode.type === 'edit_upper' ? '수정' : editMode.type === 'edit_simple' ? '선택' : editMode.type === 'add' ? '추가하기' : build.isComplete ? '결과 보기 →' : '아이템을 선택해주세요'
 
   // 결과 보기
   const goToResult = () => {
@@ -317,17 +327,17 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           </div>
         )}
 
-        {/* 아이템 그리드 (상체 추가/수정 시만) */}
-        {(editMode.type === 'add' || editMode.type === 'edit_upper' || editMode.type === 'idle') && (editMode.type !== 'idle' || upper.length === 0) && (
+        {/* 아이템 그리드 — 새로 추가할 때만 (편집 시에는 바로 컬러 피커) */}
+        {(editMode.type === 'add' || (editMode.type === 'idle' && upper.length === 0)) && !tmpItem && (
           <>
             <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">아이템</div>
             <div className="grid grid-cols-4 gap-1.5 mb-4">
-              {ITEMS_CATALOG.map(item => {
+              {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
                 const used = usedItemIds.has(item.id)
-                const selected = tmpItem === item.id || (editMode.type === 'edit_upper' && !tmpItem && upper[editMode.index]?.itemId === item.id)
+                const selected = editMode.type === 'edit_upper' && upper[editMode.index]?.itemId === item.id
                 return (
                   <button key={item.id} disabled={used}
-                    onClick={() => { if (!used) setTmpItem(item.id) }}
+                    onClick={() => handleItemTap(item.id)}
                     className={`flex flex-col items-center gap-0.5 py-2.5 px-1 rounded-xl text-center transition-all active:scale-93 ${
                       selected ? 'bg-terra-100 dark:bg-terra-900/30 border-terra-400 border-1.5' : used ? 'opacity-30 border border-warm-200' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
                     }`}>
@@ -340,16 +350,34 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           </>
         )}
 
-        {/* 색상 그리드 */}
-        {(isEditing || upper.length === 0) && (tmpItem || isSimpleEdit || (editMode.type === 'edit_upper')) && (
+        {/* 컬러 피커 — 아이템 선택 후 or 하체 편집 시 */}
+        {(tmpItem || isSimpleEdit || (editMode.type === 'edit_upper' && (tmpItem || upper[editMode.index]))) && (
           <>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400">
+                {tmpItem ? `${ITEMS_CATALOG.find(i => i.id === tmpItem)?.label || ''} 컬러` :
+                 isSimpleEdit ? `${{ bottom: '👖 하의', shoes: '👞 신발', scarf: '🧣 목도리', hat: '🎩 모자' }[editMode.target]} 컬러` :
+                 editMode.type === 'edit_upper' ? `${ITEMS_CATALOG.find(i => i.id === upper[editMode.index]?.itemId)?.label || ''} 컬러 변경` :
+                 '컬러'}
+              </div>
+              {(tmpItem || (editMode.type === 'edit_upper' && !tmpItem)) && (
+                <button onClick={() => {
+                  setTmpItem(null); setTmpColor(null); setPreviewHex(null)
+                  if (editMode.type !== 'edit_upper') return
+                  // edit_upper에서는 아이템 변경 모드로 전환
+                  build.setEditMode({ type: 'add' })
+                }}
+                  className="text-[10px] text-warm-500 dark:text-warm-400 underline">아이템 변경</button>
+              )}
+            </div>
+
             {/* 추천 색상 */}
             {recommendations.length > 0 && (
               <>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400">추천 색상</div>
+                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">추천 색상</div>
                   {recommendations.some(r => r.badges?.pc || r.badges?.body) && (
-                    <div className="flex items-center gap-2 text-[9px] text-warm-500 dark:text-warm-400">
+                    <div className="flex items-center gap-2 text-[9px] text-warm-400">
                       {recommendations.some(r => r.badges?.pc) && <span>👤 퍼스널컬러</span>}
                       {recommendations.some(r => r.badges?.body) && <span>📐 체형</span>}
                     </div>
@@ -359,15 +387,12 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                   {recommendations.slice(0, 10).map(rec => {
                     const c = COLORS_60[rec.key]
                     if (!c) return null
-                    const light = (c.hcl[2] > 60)
-                    const selected = tmpColor === rec.key || (!tmpColor && editMode.type === 'edit_upper' && upper[editMode.index]?.colorKey === rec.key)
-                      || (!tmpColor && editMode.type === 'edit_simple' && build.state[editMode.target + 'Color'] === rec.key)
+                    const light = (c.hcl[2] > 55)
                     const delta = currentSlot ? build.calcScoreDelta(currentSlot, rec.key) : 0
                     return (
-                      <button key={rec.key} onClick={() => handleColorTap(rec.key)}
-                        className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90 ${
-                          selected ? 'ring-2 ring-terra-500 scale-105' : ''
-                        }`} style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
+                      <button key={rec.key} onClick={() => handleColorSelect(rec.key)}
+                        className="h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90"
+                        style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
                         {c.name}
                         {delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{delta}</span>}
                         {delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{delta}</span>}
@@ -384,11 +409,11 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               </>
             )}
 
-            <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{recommendations.length > 0 ? '전체 색상' : '색상'}</div>
+            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{recommendations.length > 0 ? '전체 색상' : '색상'}</div>
             <ColorPicker
               inline
               selected={tmpColor || (editMode.type === 'edit_upper' ? upper[editMode.index]?.colorKey : editMode.type === 'edit_simple' ? build.state[editMode.target + 'Color'] : null) || null}
-              onSelect={(key) => handleColorTap(key)}
+              onSelect={(key) => handleColorSelect(key)}
               scoreDeltaFn={currentSlot ? (key) => build.calcScoreDelta(currentSlot, key) : undefined}
             />
           </>
@@ -436,14 +461,13 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
       {/* 하단 고정 */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white/90 dark:bg-[#1C1917]/90 backdrop-blur-xl border-t border-warm-300 dark:border-warm-700 px-5 py-3 z-50"
         style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
-        {isEditing ? (
+        {isEditing || tmpItem ? (
           <div className="flex gap-2">
-            <button onClick={handleConfirm} disabled={!canConfirm}
-              className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-98 ${
-                canConfirm ? 'bg-terra-500 text-white shadow-terra' : 'bg-warm-300 dark:bg-warm-700 text-warm-500'
-              }`}>
-              {editMode.type === 'edit_upper' ? '수정' : editMode.type === 'edit_simple' ? '선택' : '추가하기'}
-            </button>
+            <div className="flex-1 py-3.5 rounded-2xl font-semibold text-sm text-center text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-800">
+              {tmpItem ? `${ITEMS_CATALOG.find(i => i.id === tmpItem)?.label} 컬러를 선택하세요` :
+               isSimpleEdit ? '컬러를 선택하면 바로 적용돼요' :
+               editMode.type === 'edit_upper' ? '아이템을 선택하세요' : ''}
+            </div>
             <button onClick={cancelEdit} className="px-5 py-3.5 bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 rounded-2xl font-medium text-sm active:scale-98">
               취소
             </button>
@@ -451,17 +475,15 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
         ) : (
           <button onClick={() => {
             if (build.isComplete) goToResult()
-            else if (tmpItem && tmpColor) handleConfirm()
-            else if (upper.length > 0 && !tmpItem) startEdit({ type: 'add' })
+            else if (upper.length > 0) startEdit({ type: 'add' })
           }}
-            disabled={upper.length === 0 && !(tmpItem && tmpColor)}
+            disabled={upper.length === 0}
             className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-98 ${
               build.isComplete ? 'bg-terra-500 text-white shadow-terra'
-              : (tmpItem && tmpColor) ? 'bg-terra-500 text-white shadow-terra'
               : upper.length > 0 ? 'bg-terra-500 text-white shadow-terra'
               : 'bg-warm-300 dark:bg-warm-700 text-warm-500'
             }`}>
-            {build.isComplete ? '결과 보기 →' : (tmpItem && tmpColor) ? '추가하기' : upper.length === 0 ? '아이템과 색상을 선택해주세요' : '+ 옷 추가하기'}
+            {build.isComplete ? '결과 보기 →' : upper.length === 0 ? '아이템을 선택해주세요' : '+ 옷 추가하기'}
           </button>
         )}
       </div>
