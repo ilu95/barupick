@@ -225,6 +225,13 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
       {/* 마네킹 영역: 가로 3등분 */}
       {!mannCollapsed && (
         <div className="px-3 py-2">
+          {/* 안내 문구 — 상체+하체 영역 상단 */}
+          {(sorted.length > 0 || build.state.bottomColor || build.state.shoesColor) && editMode.type === 'idle' && (
+            <div className="text-[9px] text-warm-400 dark:text-warm-500 text-center mb-1" style={{ marginLeft: 120 }}>
+              수정을 원하시면 해당 부위를 탭해주세요
+            </div>
+          )}
+
           <div className="flex gap-1" style={{ minHeight: 200 }}>
             {/* 좌: 마네킹 */}
             <div className="flex flex-col items-center justify-center" style={{ width: 120 }}>
@@ -256,8 +263,10 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
 
             {/* 우: 점수 + 하의 + 신발 + 악세서리 */}
             <div className="flex-1 flex flex-col gap-1 justify-center min-w-0">
-              <div className={`self-end px-2.5 py-0.5 rounded-full text-[10px] font-bold font-display mb-1 ${scoreColor}`}>
-                {score > 0 ? `${score}점` : '--점'}
+              <div className="flex items-center justify-end mb-1 px-1">
+                <div className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-display ${scoreColor}`}>
+                  {score > 0 ? `${score}점` : '--점'}
+                </div>
               </div>
               <div className="text-[9px] font-semibold text-warm-500 dark:text-warm-400 px-1 mb-0.5">하체·악세서리</div>
               {[
