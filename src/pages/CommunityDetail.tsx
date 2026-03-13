@@ -377,7 +377,7 @@ export default function CommunityDetail() {
       {post.show_instagram && instaId && (
         <button
           onClick={() => window.open('https://instagram.com/' + instaId, '_blank')}
-          className="w-full bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-2xl p-3.5 mb-4 flex items-center gap-2.5 active:scale-[0.98] transition-all"
+          className="w-full bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 rounded-2xl p-3.5 mb-4 flex items-center gap-2.5 active:scale-[0.98] transition-all"
         >
           <span className="text-lg">📸</span>
           <div className="flex-1 text-left">
@@ -399,12 +399,12 @@ export default function CommunityDetail() {
       {!isMe && user && !isFollowing(post.user_id) && (
         <div
           onClick={() => toggleFollow(post.user_id)}
-          className="bg-gradient-to-r from-terra-50 to-warm-50 dark:from-terra-900/20 dark:to-warm-800 border border-terra-200 dark:border-terra-700 rounded-2xl p-3.5 mb-4 flex items-center gap-2.5 cursor-pointer active:scale-[0.98] transition-all"
+          className="bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3.5 mb-4 flex items-center gap-2.5 cursor-pointer active:scale-[0.98] transition-all"
         >
           <div className="text-lg flex-shrink-0">✨</div>
           <div className="flex-1">
-            <div className="text-xs font-semibold text-warm-800 dark:text-warm-200">@{nick}님의 코디 더 보기</div>
-            <div className="text-[10px] text-warm-500">팔로우하면 새 코디 알림을 받을 수 있어요</div>
+            <div className="text-xs font-semibold text-warm-900 dark:text-warm-100">@{nick}님의 코디 더 보기</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">팔로우하면 새 코디 알림을 받을 수 있어요</div>
           </div>
           <span className="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold flex-shrink-0">팔로우</span>
         </div>

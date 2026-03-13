@@ -149,26 +149,28 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
     setPreviewHex(hex)
   }, [editMode, predictedSlot, build.outfitHex])
 
-  // 컬러 선택 → 자동 확정 + 닫기
+  // 컬러 탭 → 프리뷰만 (확정은 handleConfirm)
   const handleColorSelect = useCallback((colorKey: string) => {
-    // 프리뷰 먼저
     handleColorTap(colorKey)
-    // 자동 확정
+  }, [handleColorTap])
+
+  // 확정 버튼
+  const handleConfirm = useCallback(() => {
+    if (!tmpColor) return
     if (editMode.type === 'edit_simple') {
-      build.setSimpleColor(editMode.target, colorKey)
+      build.setSimpleColor(editMode.target, tmpColor)
     } else if (editMode.type === 'edit_upper') {
       const idx = editMode.index
       const itemId = tmpItem || upper[idx]?.itemId
-      if (itemId) build.editUpper(idx, itemId, colorKey)
+      if (itemId) build.editUpper(idx, itemId, tmpColor)
     } else if (tmpItem) {
       if (upper.length >= 4) { toast.warning('상체는 최대 4겹까지 가능해요'); return }
       if (usedItemIds.has(tmpItem)) { toast.warning('이미 추가된 아이템이에요'); return }
-      build.addUpper(tmpItem, colorKey)
+      build.addUpper(tmpItem, tmpColor)
     }
-    // 닫기
     setTmpItem(null); setTmpColor(null); setPreviewHex(null)
     build.setEditMode({ type: 'idle' })
-  }, [editMode, tmpItem, upper, usedItemIds, build, handleColorTap, toast])
+  }, [editMode, tmpItem, tmpColor, upper, usedItemIds, build, toast])
 
   // 아이템 탭 → 아이템 그리드 숨기고 컬러 피커 보이기
   const handleItemTap = useCallback((itemId: string) => {
@@ -474,12 +476,25 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
       {/* 하단 고정 */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white/90 dark:bg-[#1C1917]/90 backdrop-blur-xl border-t border-warm-300 dark:border-warm-700 px-5 py-3 z-50"
         style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
-        {isEditing || tmpItem ? (
+        {/* 컬러 선택됨 → 확정 버튼 */}
+        {(isEditing || tmpItem) && tmpColor ? (
+          <div className="flex gap-2">
+            <button onClick={handleConfirm}
+              className="flex-1 py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm shadow-terra active:scale-98 flex items-center justify-center gap-1.5">
+              <Check size={15} />
+              {editMode.type === 'edit_upper' ? '이 컬러로 수정' : isSimpleEdit ? '이 컬러로 선택' : '이 컬러로 추가'}
+            </button>
+            <button onClick={cancelEdit} className="px-5 py-3.5 bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 rounded-2xl font-medium text-sm active:scale-98">
+              취소
+            </button>
+          </div>
+        ) : (isEditing || tmpItem) && !tmpColor ? (
+          /* 편집 중이지만 컬러 미선택 */
           <div className="flex gap-2">
             <div className="flex-1 py-3.5 rounded-2xl font-semibold text-sm text-center text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-800">
-              {tmpItem ? `${ITEMS_CATALOG.find(i => i.id === tmpItem)?.label} 컬러를 선택하세요` :
-               isSimpleEdit ? '컬러를 선택하면 바로 적용돼요' :
-               editMode.type === 'edit_upper' ? '아이템을 선택하세요' : ''}
+              {tmpItem && !tmpColor ? `${ITEMS_CATALOG.find(i => i.id === tmpItem)?.label || ''} 컬러를 선택하세요` :
+               isSimpleEdit ? '컬러를 선택해주세요' :
+               editMode.type === 'edit_upper' ? '컬러를 선택해주세요' : ''}
             </div>
             <button onClick={cancelEdit} className="px-5 py-3.5 bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 rounded-2xl font-medium text-sm active:scale-98">
               취소

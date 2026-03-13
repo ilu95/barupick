@@ -90,6 +90,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { App: CapApp } = await import('@capacitor/app') as any
         CapApp.addListener('appUrlOpen', async ({ url }: { url: string }) => {
           if (url.includes('callback') && url.includes('access_token')) {
+            // SFSafariViewController 닫기
+            try {
+              const { Browser } = await import('@capacitor/browser')
+              await Browser.close()
+            } catch { }
             const hashPart = url.split('#')[1]
             if (hashPart) {
               const params = new URLSearchParams(hashPart)
@@ -136,7 +141,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       if (error) throw error
       if (data?.url) {
-        window.open(data.url, '_blank')
+        try {
+          const { Browser } = await import('@capacitor/browser')
+          await Browser.open({ url: data.url, presentationStyle: 'popover' })
+        } catch {
+          // Browser 플러그인 로드 실패 시 fallback
+          window.open(data.url, '_blank')
+        }
       }
     } else {
       const { error } = await supabase.auth.signInWithOAuth({
