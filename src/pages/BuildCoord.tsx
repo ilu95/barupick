@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useToast } from '@/components/ui/Toast'
+import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
 import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styles'
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
@@ -384,26 +385,12 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
             )}
 
             <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{recommendations.length > 0 ? '전체 색상' : '색상'}</div>
-            <div className="grid grid-cols-5 gap-1.5 mb-3">
-              {Object.entries(COLORS_60).filter(([k]) => !recKeys.has(k)).slice(0, 40).map(([key, c]) => {
-                const light = (c.hcl[2] > 60)
-                const selected = tmpColor === key || (!tmpColor && (
-                  (editMode.type === 'edit_upper' && upper[editMode.index]?.colorKey === key) ||
-                  (editMode.type === 'edit_simple' && build.state[editMode.target + 'Color'] === key)
-                ))
-                const delta = currentSlot ? build.calcScoreDelta(currentSlot, key) : 0
-                return (
-                  <button key={key} onClick={() => handleColorTap(key)}
-                    className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90 ${
-                      selected ? 'ring-2 ring-terra-500 scale-105' : ''
-                    }`} style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
-                    {c.name}
-                    {delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{delta}</span>}
-                    {delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{delta}</span>}
-                  </button>
-                )
-              })}
-            </div>
+            <ColorPicker
+              inline
+              selected={tmpColor || (editMode.type === 'edit_upper' ? upper[editMode.index]?.colorKey : editMode.type === 'edit_simple' ? build.state[editMode.target + 'Color'] : null) || null}
+              onSelect={(key) => handleColorTap(key)}
+              scoreDeltaFn={currentSlot ? (key) => build.calcScoreDelta(currentSlot, key) : undefined}
+            />
           </>
         )}
 

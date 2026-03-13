@@ -1,66 +1,108 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, COLOR_TABS } from '@/lib/colors'
 
 interface Props {
   selected: string | null
   onSelect: (colorKey: string) => void
   onClear?: () => void
   onClose?: () => void
-  inline?: boolean // true = 인라인 렌더링, false = 바텀시트
-  scoreDeltaFn?: (colorKey: string) => number // 점수 변화 계산 함수
+  inline?: boolean
+  scoreDeltaFn?: (colorKey: string) => number
 }
 
-const COLOR_GROUPS = [
-  { label: '베이직', keys: ['white', 'ivory', 'beige', 'lightgray', 'gray', 'charcoal', 'black', 'brown', 'camel', 'navy', 'burgundy', 'olive', 'khaki', 'cream', 'taupe'] },
-  { label: '어스톤', keys: ['cognac', 'tan', 'sienna', 'terracotta', 'brick', 'dusty_rose', 'sage', 'moss', 'hunter_green', 'denim', 'steel_blue', 'mauve', 'plum', 'eggplant'] },
-  { label: '파스텔', keys: ['pastel_pink', 'pastel_blue', 'pastel_green', 'pastel_yellow', 'pastel_purple', 'pastel_mint', 'pastel_peach', 'pastel_lavender', 'pastel_coral', 'pastel_sky', 'pastel_lilac', 'pastel_sage', 'pastel_lemon', 'pastel_rose', 'pastel_aqua'] },
-  { label: '비비드', keys: ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'teal', 'coral', 'turquoise', 'royal_blue', 'emerald', 'cobalt', 'crimson', 'magenta', 'lime', 'cyan', 'gold', 'amber', 'mustard', 'rust', 'burnt_orange'] },
-  { label: '다크', keys: ['dark_red', 'dark_blue', 'dark_green', 'dark_purple', 'dark_brown', 'dark_olive', 'dark_teal', 'wine', 'forest', 'midnight', 'chocolate', 'slate', 'maroon', 'indigo', 'espresso', 'powder_blue', 'silver'] },
-]
+const RECENT_KEY = 'sp_recent_colors'
+const MAX_RECENT = 6
+
+function getRecentColors(): string[] {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]').slice(0, MAX_RECENT) } catch { return [] }
+}
+function addRecentColor(key: string) {
+  try {
+    const recent = getRecentColors().filter(k => k !== key)
+    recent.unshift(key)
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)))
+  } catch {}
+}
 
 export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn }: Props) {
-  const [tab, setTab] = useState('베이직')
-  const group = COLOR_GROUPS.find(g => g.label === tab) || COLOR_GROUPS[0]
+  const [tab, setTab] = useState(COLOR_TABS[0].id)
+  const [recent, setRecent] = useState<string[]>([])
+  const group = COLOR_TABS.find(t => t.id === tab) || COLOR_TABS[0]
+
+  useEffect(() => { setRecent(getRecentColors()) }, [])
+
+  const handleSelect = (key: string) => {
+    addRecentColor(key)
+    setRecent(getRecentColors())
+    onSelect(key)
+  }
 
   const content = (
-    <div className={inline ? 'bg-warm-100 border border-warm-300 rounded-2xl p-3' : ''}>
-      {/* 탭 */}
-      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2 hide-scrollbar">
-        {COLOR_GROUPS.map(g => (
+    <div className={inline ? 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3' : ''}>
+      {/* 2열 그리드 탭 */}
+      <div className="grid grid-cols-4 gap-1.5 mb-2.5">
+        {COLOR_TABS.map(t => (
           <button
-            key={g.label}
-            onClick={() => setTab(g.label)}
-            className={`px-3 py-2 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all ${
-              tab === g.label ? 'bg-terra-500 text-white' : 'bg-warm-200 text-warm-600'
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`py-2 px-1 rounded-xl text-[10px] font-semibold text-center transition-all active:scale-95 ${
+              tab === t.id
+                ? 'bg-terra-500 text-white'
+                : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400'
             }`}
           >
-            {g.label}
+            {t.emoji} {t.label}
           </button>
         ))}
       </div>
 
+      {/* 최근 사용 */}
+      {recent.length > 0 && (
+        <>
+          <div className="text-[9px] font-semibold text-warm-400 dark:text-warm-500 tracking-wider uppercase mb-1.5">최근 사용</div>
+          <div className="flex gap-1.5 mb-2.5 pb-2.5 border-b border-warm-300 dark:border-warm-600">
+            {recent.map(k => {
+              const c = COLORS_60[k]
+              if (!c) return null
+              const needsBorder = c.hcl[2] > 90
+              return (
+                <button
+                  key={k}
+                  onClick={() => handleSelect(k)}
+                  className={`w-8 h-8 rounded-lg transition-all active:scale-90 ${
+                    selected === k ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
+                  }`}
+                  style={{ background: c.hex, border: needsBorder ? '1px solid #ddd' : '1px solid rgba(0,0,0,0.06)' }}
+                  title={c.name}
+                />
+              )
+            })}
+          </div>
+        </>
+      )}
+
       {/* 컬러 그리드 */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-1.5">
         {group.keys.map(k => {
           const c = COLORS_60[k]
           if (!c) return null
           const isSelected = selected === k
-          const isLight = c.hcl[2] > 60
-          const needsBorder = ['white', 'ivory', 'cream'].includes(k)
+          const isLight = c.hcl[2] > 55
+          const needsBorder = c.hcl[2] > 90
           const delta = scoreDeltaFn ? scoreDeltaFn(k) : 0
 
           return (
             <div key={k} className="relative">
               <button
-                onClick={() => onSelect(k)}
+                onClick={() => handleSelect(k)}
                 aria-label={c.name}
                 className={`w-full aspect-square rounded-xl flex items-center justify-center text-[8px] font-semibold leading-tight transition-all active:scale-90 ${
                   isSelected ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
                 }`}
                 style={{
                   background: c.hex,
-                  border: needsBorder ? '1px solid #ddd' : undefined,
+                  border: needsBorder ? '1px solid #ddd' : '1px solid rgba(0,0,0,0.05)',
                   color: isLight ? '#1C1917' : '#ffffff',
                 }}
               >
@@ -77,6 +119,11 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
           )
         })}
       </div>
+
+      {/* 탭 정보 */}
+      <div className="text-center text-[10px] text-warm-400 dark:text-warm-500 mt-2">
+        {group.emoji} {group.label} · {group.keys.length}색
+      </div>
     </div>
   )
 
@@ -85,15 +132,15 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
   // 바텀시트 모드
   return (
     <div className="fixed inset-0 bg-black/40 z-[300] flex items-end justify-center" onClick={onClose} role="dialog" aria-modal="true" aria-label="색상 선택">
-      <div className="w-full max-w-[480px] bg-white rounded-t-3xl p-5 pb-8 animate-screen-enter" onClick={e => e.stopPropagation()}>
+      <div className="w-full max-w-[480px] bg-white dark:bg-warm-800 rounded-t-3xl p-5 pb-8 animate-screen-enter" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-lg font-bold text-warm-900">색상 선택</h3>
+          <h3 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">색상 선택</h3>
           <div className="flex gap-2">
             {selected && onClear && (
-              <button onClick={onClear} className="text-xs text-warm-600 active:opacity-70 py-1">초기화</button>
+              <button onClick={onClear} className="text-xs text-warm-600 dark:text-warm-400 active:opacity-70 py-1">초기화</button>
             )}
             {onClose && (
-              <button onClick={onClose} aria-label="닫기" className="w-9 h-9 rounded-full bg-warm-200 flex items-center justify-center active:scale-90">
+              <button onClick={onClose} aria-label="닫기" className="w-9 h-9 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center active:scale-90">
                 <X size={16} />
               </button>
             )}
