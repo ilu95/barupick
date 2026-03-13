@@ -268,7 +268,10 @@ export function useOotd() {
   }, [])
 
   const filledCount = Object.values(colors).filter(Boolean).length
-  const canSave = filledCount >= 2
+  const hasBottom = !!colors.bottom
+  const hasShoes = !!colors.shoes
+  const hasUpperItem = Object.entries(colors).some(([k, v]) => v && k !== 'bottom' && k !== 'shoes')
+  const canSave = hasBottom && hasShoes && hasUpperItem
   const needsPhoto = visibility === 'public' && photos.length === 0
 
   return {

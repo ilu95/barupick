@@ -130,7 +130,7 @@ export default function OotdRecord() {
 
   const handleSave = () => {
     if (!ootd.canSave) {
-      setSaveError('2색 이상 선택해주세요')
+      setSaveError('옷 1개 이상 + 하의 + 신발을 모두 선택해주세요')
       setTimeout(() => setSaveError(''), 2000)
       return
     }
@@ -201,7 +201,7 @@ export default function OotdRecord() {
     )
   }
 
-  const isReady = ootd.filledCount >= 2
+  const isReady = ootd.canSave
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
@@ -399,7 +399,13 @@ export default function OotdRecord() {
         <div className="mb-4 text-center text-[12px] text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-800 rounded-xl py-3">
           {ootd.filledCount === 0
             ? '위에서 오늘 입은 옷과 컬러를 골라주세요'
-            : <>컬러를 <span className="font-bold text-terra-500">{2 - ootd.filledCount}개</span> 더 선택하면 기록할 수 있어요</>}
+            : !ootd.colors.bottom && !ootd.colors.shoes
+              ? '하의와 신발 컬러도 골라주세요'
+              : !ootd.colors.bottom
+                ? '하의 컬러를 골라주세요'
+                : !ootd.colors.shoes
+                  ? '신발 컬러를 골라주세요'
+                  : '옷을 1개 이상 추가해주세요'}
         </div>
       )}
 
