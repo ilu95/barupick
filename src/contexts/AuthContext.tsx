@@ -92,7 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (url.includes('callback') && url.includes('access_token')) {
             // SFSafariViewController 닫기
             try {
-              const { Browser } = await import('@capacitor/browser')
+              // @ts-ignore
+          const { Browser } = await import('@capacitor/browser')
               await Browser.close()
             } catch { }
             const hashPart = url.split('#')[1]
@@ -142,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error
       if (data?.url) {
         try {
+          // @ts-ignore
           const { Browser } = await import('@capacitor/browser')
           await Browser.open({ url: data.url, presentationStyle: 'popover' })
         } catch {
