@@ -58,9 +58,21 @@ export default function OotdCalendar() {
   const prevMonth = () => setMonth(m => m.month === 0 ? { year: m.year - 1, month: 11 } : { ...m, month: m.month - 1 })
   const nextMonth = () => setMonth(m => m.month === 11 ? { year: m.year + 1, month: 0 } : { ...m, month: m.month + 1 })
 
+  const [typeFilter, setTypeFilter] = useState<'all' | 'photo' | 'mannequin'>('all')
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
+
   // 이번 달 기록 요약
   const monthRecords = records.filter(r => r.date.startsWith(`${month.year}-${String(month.month + 1).padStart(2, '0')}`))
   const daysWithRecords = new Set(monthRecords.map(r => r.date)).size
+
+  // 필터링된 기록
+  const filteredRecords = useMemo(() => {
+    let filtered = [...monthRecords]
+    if (typeFilter === 'photo') filtered = filtered.filter(r => r.photos && r.photos.length > 0)
+    if (typeFilter === 'mannequin') filtered = filtered.filter(r => !r.photos || r.photos.length === 0)
+    filtered.sort((a, b) => sortOrder === 'newest' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date))
+    return filtered
+  }, [monthRecords, typeFilter, sortOrder])
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
@@ -165,6 +177,103 @@ export default function OotdCalendar() {
           </div>
         )
       })()}
+
+      {/* 이번 달 기록 리스트 */}
+      {monthRecords.length > 0 && (
+        <div className="mt-6">
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">
+            {month.month + 1}월 기록 ({monthRecords.length})
+          </div>
+
+          {/* 필터 */}
+          <div className="flex gap-1.5 mb-3">
+            {(['all', 'photo', 'mannequin'] as const).map(f => (
+              <button key={f} onClick={() => setTypeFilter(f)}
+                className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${typeFilter === f ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-600 dark:text-warm-300 active:scale-95'}`}>
+                {f === 'all' ? '전체' : f === 'photo' ? '📷 사진' : '👤 마네킹'}
+              </button>
+            ))}
+            <div className="flex-1" />
+            <button onClick={() => setSortOrder(s => s === 'newest' ? 'oldest' : 'newest')}
+              className="px-3 py-1.5 rounded-full text-[11px] font-medium bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-600 dark:text-warm-300 active:scale-95 transition-all">
+              {sortOrder === 'newest' ? '최신순 ↓' : '오래된순 ↑'}
+            </button>
+          </div>
+
+          {/* 2열 그리드 */}
+          <div className="grid grid-cols-2 gap-2.5">
+            {filteredRecords.map(record => (
+              <CalendarRecordCard key={record.id} record={record} navigate={navigate} />
+            ))}
+          </div>
+
+          {filteredRecords.length === 0 && (
+            <div className="text-center py-8 text-sm text-warm-500 dark:text-warm-400">
+              {typeFilter === 'photo' ? '사진이 있는 기록이 없어요' : '마네킹만 있는 기록이 없어요'}
+            </div>
+          )}
+        </div>
+      )}
     </div>
+  )
+}
+
+// ─── 캘린더용 기록 카드 (Closet RecordCard 기반, 날짜 표시 변경) ───
+function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate: any }) {
+  const outfitHex: Record<string, string> = {}
+  Object.entries(record.colors || {}).forEach(([k, v]) => {
+    if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
+  })
+
+  const [ry, rm, rd] = (record.date || '').split('-').map(Number)
+  const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][new Date(ry, rm - 1, rd).getDay()]
+  const dateLabel = `${rm}/${rd} ${dayOfWeek}`
+
+  const hasPhoto = record.photos && record.photos.length > 0
+
+  if (hasPhoto) {
+    return (
+      <button
+        onClick={() => navigate(`/closet/ootd/${record.date}?id=${record.id}`)}
+        className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
+      >
+        <img src={record.photos[0]} className="w-full aspect-[4/5] object-cover" alt="" />
+        <div className="px-2.5 py-2">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
+            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+          </div>
+          <div className="flex gap-0.5">
+            {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
+              const c = COLORS_60[colorKey as string]
+              return c ? <div key={i} className="w-2.5 h-2.5 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
+            })}
+          </div>
+        </div>
+      </button>
+    )
+  }
+
+  return (
+    <button
+      onClick={() => navigate(`/closet/ootd/${record.date}?id=${record.id}`)}
+      className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
+    >
+      <div className="flex items-center justify-center py-4 bg-warm-100 dark:bg-warm-700">
+        <MannequinSVG outfit={outfitHex} size={80} />
+      </div>
+      <div className="px-2.5 py-2">
+        <div className="flex items-center justify-between mb-0.5">
+          <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
+          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+        </div>
+        <div className="flex gap-0.5">
+          {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
+            const c = COLORS_60[colorKey as string]
+            return c ? <div key={i} className="w-2.5 h-2.5 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
+          })}
+        </div>
+      </div>
+    </button>
   )
 }
