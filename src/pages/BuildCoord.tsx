@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useToast } from '@/components/ui/Toast'
 import ColorPicker from '@/components/ui/ColorPicker'
@@ -712,6 +712,9 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
       </div>
 
+      <button onClick={() => build.goBack()} className="w-full py-3 border border-terra-400 dark:border-terra-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-2">
+        <Edit3 size={16} /> 컬러 수정하기
+      </button>
       <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-3">
         <Bookmark size={18} /> 이 코디 저장하기
       </button>
