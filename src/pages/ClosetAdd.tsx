@@ -4,10 +4,27 @@ import { useNavigate } from 'react-router-dom'
 import { Camera, Edit3, ArrowLeft, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
+import { ITEMS_CATALOG } from '@/lib/styles'
 
-const CATEGORY_ORDER = ['outer', 'middleware', 'top', 'bottom', 'scarf', 'hat', 'shoes']
-const PART_EMOJIS = { outer: '🧥', middleware: '🧶', top: '👔', bottom: '👖', scarf: '🧣', hat: '🎩', shoes: '👞' }
+// ITEMS_CATALOG + 하의/신발 통합 목록
+const ALL_ITEMS = [
+  ...ITEMS_CATALOG,
+  { id: 'bottom', emoji: '👖', label: '하의', slot: 'bottom' },
+  { id: 'shoes',  emoji: '👞', label: '신발', slot: 'shoes' },
+]
+
+// 아이템 id → 저장용 category 매핑
+function itemToCategory(itemId) {
+  const outerIds = ['padding', 'coat', 'jacket', 'hood_zip']
+  const midIds = ['cardigan', 'knit_zip', 'vest']
+  if (outerIds.includes(itemId)) return 'outer'
+  if (midIds.includes(itemId)) return 'middleware'
+  if (itemId === 'bottom') return 'bottom'
+  if (itemId === 'shoes') return 'shoes'
+  if (itemId === 'scarf') return 'scarf'
+  if (itemId === 'hat') return 'hat'
+  return 'top'
+}
 
 function extractColorsFromImage(img) {
   const canvas = document.createElement('canvas')
@@ -65,7 +82,7 @@ function generateThumbnail(img) {
 export default function ClosetAdd() {
   const navigate = useNavigate()
   const [mode, setMode] = useState('select')
-  const [category, setCategory] = useState(null)
+  const [selectedItem, setSelectedItem] = useState(null) // ALL_ITEMS 중 하나
   const [color, setColor] = useState(null)
   const [brand, setBrand] = useState('')
   const [itemName, setItemName] = useState('')
@@ -77,19 +94,21 @@ export default function ClosetAdd() {
   const fileRef = useRef(null)
 
   const resetForm = () => {
-    setCategory(null); setColor(null); setBrand(''); setItemName('')
+    setSelectedItem(null); setColor(null); setBrand(''); setItemName('')
     setPhotoData(null); setPhotoThumb(null); setCandidates([])
   }
 
   const handleSave = () => {
-    if (!category || !color) return
+    if (!selectedItem || !color) return
     try {
       const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
       items.unshift({
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        category, color, colorKey: color,
+        category: itemToCategory(selectedItem.id),
+        itemType: selectedItem.id,
+        color, colorKey: color,
         brand: brand.trim() || null,
-        name: itemName.trim() || '',
+        name: itemName.trim() || selectedItem.label,
         photoThumb: photoThumb || null,
         createdAt: new Date().toISOString(),
       })
@@ -123,21 +142,21 @@ export default function ClosetAdd() {
     e.target.value = ''
   }
 
-  // ─── 카테고리 선택 (코디 만들기와 동일) ───
-  const CategorySelector = () => (
+  // ─── 아이템 선택 (코디 만들기와 동일한 아이템 목록) ───
+  const ItemSelector = () => (
     <div className="mb-5">
       <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. 아이템 종류</div>
       <div className="flex flex-wrap gap-2">
-        {CATEGORY_ORDER.map(cat => (
-          <button key={cat} onClick={() => setCategory(cat)} className={`px-3.5 py-2 rounded-full text-[12px] font-medium transition-all ${category === cat ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
-            {PART_EMOJIS[cat]} {CATEGORY_NAMES[cat]}
+        {ALL_ITEMS.map(item => (
+          <button key={item.id} onClick={() => setSelectedItem(item)} className={`px-3 py-2 rounded-full text-[12px] font-medium transition-all ${selectedItem?.id === item.id ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
+            {item.emoji} {item.label}
           </button>
         ))}
       </div>
     </div>
   )
 
-  // ─── 브랜드 + 상품명 입력 ───
+  // ─── 브랜드 + 상품명 ───
   const ItemInfo = ({ step }) => (
     <div className="mb-5">
       <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{step}. 아이템 정보 (선택)</div>
@@ -186,7 +205,7 @@ export default function ClosetAdd() {
         <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
         <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">사진으로 등록</h2>
 
-        <CategorySelector />
+        <ItemSelector />
 
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. 사진 촬영/업로드</div>
@@ -226,7 +245,7 @@ export default function ClosetAdd() {
 
         {color && <ItemInfo step={4} />}
 
-        {category && color && (
+        {selectedItem && color && (
           <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">등록 완료</button>
         )}
       </div>
@@ -238,9 +257,9 @@ export default function ClosetAdd() {
       <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">직접 등록</h2>
 
-      <CategorySelector />
+      <ItemSelector />
 
-      {category && (
+      {selectedItem && (
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">
             2. 색상 {color && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {COLORS_60[color]?.name}</span>}
@@ -249,9 +268,9 @@ export default function ClosetAdd() {
         </div>
       )}
 
-      {category && color && <ItemInfo step={3} />}
+      {selectedItem && color && <ItemInfo step={3} />}
 
-      {category && color && (
+      {selectedItem && color && (
         <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">등록하기</button>
       )}
     </div>
