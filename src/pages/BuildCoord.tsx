@@ -627,7 +627,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     toast.success('코디를 저장했어요!')
   }
 
-  const handleShare = () => { navigator.share?.({ title: "바루픽 코디", text: `코디 점수: ${score}점`, url: "https://barupick-react.vercel.app" }).catch(() => {}) }
+  const handleShare = () => { navigator.share?.({ title: "바루픽 코디", text: `코디 점수: ${score}점`, url: "https://barupick.vercel.app" }).catch(() => {}) }
   const handleCommunityShare = () => { localStorage.setItem("_pending_post_outfit", JSON.stringify(outfit)); navigate("/community/post") }
 
   const scoreGrade = score >= 90 ? { label: '완벽한 조합!', emoji: '🏆', color: 'text-amber-600' }

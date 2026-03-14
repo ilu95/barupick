@@ -496,7 +496,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
           className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
           <Bookmark size={18} /> 이 코디 저장하기
         </button>
-        <button onClick={() => { navigator.share?.({ title: '바루픽 코디', text: combo?.name + ' ' + finalScore + '점', url: 'https://barupick-react.vercel.app' }).catch(() => {}) }}
+        <button onClick={() => { navigator.share?.({ title: '바루픽 코디', text: combo?.name + ' ' + finalScore + '점', url: 'https://barupick.vercel.app' }).catch(() => {}) }}
           className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Share size={16} /> 이 조합 공유하기
         </button>
