@@ -152,7 +152,7 @@ export function useTodayCoord() {
         const scored = combos.map(outfit => {
           try {
             const result = evaluationSystem.evaluate(outfit, pc)
-            let baseScore = result.total
+            const baseScore = result.total
 
             // 상황 보정
             let adjust = 0

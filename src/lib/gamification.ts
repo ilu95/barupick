@@ -277,7 +277,7 @@ export const gamification = {
     },
 
     saveTitleResult(examId, score, passed) {
-        let results = this.getTitleResults();
+        const results = this.getTitleResults();
         const existing = results.findIndex(r => r.id === examId);
         if (existing >= 0) { results[existing] = { id: examId, score, passed, date: new Date().toISOString().slice(0,10) }; }
         else { results.push({ id: examId, score, passed, date: new Date().toISOString().slice(0,10) }); }
