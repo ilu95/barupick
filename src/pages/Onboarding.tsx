@@ -103,9 +103,9 @@ export default function Onboarding() {
         <div className="flex-1 flex flex-col items-center justify-center px-8 max-w-[480px] mx-auto w-full">
           <div className="text-5xl mb-6">🌍</div>
           <h2 className="font-display text-[22px] font-bold text-warm-900 tracking-tight mb-2">
-            Choose Language
+            {t('onboarding.langSelectTitle')}
           </h2>
-          <p className="text-sm text-warm-500 mb-10">Select your preferred language</p>
+          <p className="text-sm text-warm-500 mb-10">{t('onboarding.langSelectDesc')}</p>
 
           <div className="w-full flex flex-col gap-3">
             {LANGUAGES.map(lang => (

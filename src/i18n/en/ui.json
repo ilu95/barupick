@@ -120,7 +120,9 @@
     "slide4Title": "Personal Color & Body Type",
     "slide4Desc": "Get personalized recommendations based on your diagnosis",
     "start": "Get Started",
-    "skip": "Skip"
+    "skip": "Skip",
+    "langSelectTitle": "Choose Language",
+    "langSelectDesc": "Select your preferred language"
   },
   "home": {
     "greetingMorning": "Good morning",

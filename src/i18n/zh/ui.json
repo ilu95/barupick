@@ -120,7 +120,9 @@
     "slide4Title": "个人色彩 & 体型",
     "slide4Desc": "根据专属诊断结果获取定制推荐",
     "start": "开始",
-    "skip": "跳过"
+    "skip": "跳过",
+    "langSelectTitle": "选择语言",
+    "langSelectDesc": "请选择您要使用的语言"
   },
   "home": {
     "greetingMorning": "早上好",
