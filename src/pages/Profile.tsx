@@ -26,7 +26,7 @@ export default function Profile() {
   // @ts-ignore
   const gd = gamification._getData ? gamification._getData() : { records: [], streak: 0, savedCount: 0 }
   // @ts-ignore
-  const lv = gamification.getLevel ? gamification.getLevel() : { level: 1, name: '입문자', progress: 0 }
+  const lv = gamification.getLevel ? gamification.getLevel() : { level: 1, name: t('profile.defaultLevel'), progress: 0 }
   // @ts-ignore
   const badges = gamification.getBadges ? gamification.getBadges() : []
   const earnedBadges = badges.filter((b: any) => b.earned).length

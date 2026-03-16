@@ -18,7 +18,10 @@ export default function ClosetCoord() {
     try { return JSON.parse(localStorage.getItem('sp_wardrobe') || '[]') } catch { return [] }
   }, [])
 
-  const catMap = { '상의': 'top', '하의': 'bottom', '아우터': 'outer', '미들웨어': 'middleware', '신발': 'shoes' }
+  const catMap: Record<string, string> = {
+    '상의': 'top', '하의': 'bottom', '아우터': 'outer', '미들웨어': 'middleware', '신발': 'shoes',
+    'top': 'top', 'bottom': 'bottom', 'outer': 'outer', 'middleware': 'middleware', 'shoes': 'shoes'
+  }
   const byCat = useMemo(() => {
     const map = {}
     items.forEach(i => {

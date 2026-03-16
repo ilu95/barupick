@@ -175,11 +175,11 @@ export default function AllCombos() {
   const weatherComment = useMemo(() => {
     if (!weather) return null
     const temp = weather.feels ?? weather.temp
-    if (temp >= 28) return { emoji: '☀️', text: `${temp}°C — 가볍게 입기 좋은 날이에요` }
-    if (temp >= 20) return { emoji: '🌤', text: `${temp}°C — 간절기 코디 좋아요` }
-    if (temp >= 12) return { emoji: '🌥', text: `${temp}°C — 자켓이나 가디건 추천해요` }
-    if (temp >= 5) return { emoji: '🧥', text: `${temp}°C — 아우터가 필요해요` }
-    return { emoji: '❄️', text: `${temp}°C — 따뜻하게 레이어링하세요` }
+    if (temp >= 28) return { emoji: '☀️', text: t('allCombos.weatherHot', { temp }) }
+    if (temp >= 20) return { emoji: '🌤', text: t('allCombos.weatherWarm', { temp }) }
+    if (temp >= 12) return { emoji: '🌥', text: t('allCombos.weatherMild', { temp }) }
+    if (temp >= 5) return { emoji: '🧥', text: t('allCombos.weatherCool', { temp }) }
+    return { emoji: '❄️', text: t('allCombos.weatherCold', { temp }) }
   }, [weather])
 
   // ─── 옷장 진단 (조합 부족 시) ───
@@ -192,9 +192,9 @@ export default function AllCombos() {
       if (cat && color) pools[cat] = (pools[cat] || 0) + 1
     })
     const missing: string[] = []
-    if (!pools.top) missing.push('상의')
-    if (!pools.bottom) missing.push('하의')
-    if (!pools.shoes) missing.push('신발')
+    if (!pools.top) missing.push(t('allCombos.catTop'))
+    if (!pools.bottom) missing.push(t('allCombos.catBottom'))
+    if (!pools.shoes) missing.push(t('allCombos.catShoes'))
     return { pools, missing, total: wardrobe.items.length }
   }, [combos, wardrobe.items])
 
@@ -266,7 +266,7 @@ export default function AllCombos() {
       <div className="animate-screen-fade px-5 pt-2 pb-10">
         <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">{t('allCombos.title')}</h2>
         <div className="bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-5 mb-5">
-          <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 mb-3">현재 옷장 상태</div>
+          <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 mb-3">{t('allCombos.closetStatus')}</div>
           {['top', 'bottom', 'shoes', 'outer', 'middleware'].map(cat => {
             const count = diagnosis.pools[cat] || 0
             const label = (CATEGORY_NAMES as any)[cat] || cat
@@ -276,7 +276,7 @@ export default function AllCombos() {
                 <span>{count > 0 ? '✅' : isMissing ? '❌' : '➖'}</span>
                 <span className="w-16 font-medium text-warm-800 dark:text-warm-200">{label}</span>
                 <span className={`${isMissing ? 'text-red-500 font-semibold' : 'text-warm-500 dark:text-warm-400'}`}>
-                  {count > 0 ? `${count}개` : isMissing ? '없음 ← 필요!' : '없음'}
+                  {count > 0 ? t('allCombos.itemCountN', { count }) : isMissing ? t('allCombos.noneMissing') : t('allCombos.none')}
                 </span>
               </div>
             )
@@ -285,7 +285,7 @@ export default function AllCombos() {
         {diagnosis.missing.length > 0 && (
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 mb-5">
             <div className="text-sm text-amber-800 dark:text-amber-300">
-              <b>{diagnosis.missing.join(', ')}</b>을 등록하면 코디 조합을 볼 수 있어요
+              {t('allCombos.registerToSee', { items: diagnosis.missing.join(', ') })}
             </div>
           </div>
         )}
@@ -304,7 +304,7 @@ export default function AllCombos() {
       {/* 날씨 코멘트 (참고) */}
       {weatherComment && (
         <div className="text-sm text-warm-500 dark:text-warm-400 mb-4">
-          {weatherComment.emoji} {weatherComment.text} <span className="text-[10px] text-warm-400">(참고)</span>
+          {weatherComment.emoji} {weatherComment.text} <span className="text-[10px] text-warm-400">{t('allCombos.reference')}</span>
         </div>
       )}
       {!weatherComment && <div className="mb-3" />}
@@ -334,14 +334,14 @@ export default function AllCombos() {
           {wardrobeColorItems.slice(0, 10).map(item => {
             const c = COLORS_60[item.color || item.colorKey]
             if (!c) return null
-            return <option key={item.id} value={item.color || item.colorKey}>{c.name} 포함</option>
+            return <option key={item.id} value={item.color || item.colorKey}>{t('allCombos.includes', { name: c.name })}</option>
           })}
         </select>
       </div>
 
       {/* 결과 수 */}
       <div className="text-[11px] text-warm-500 dark:text-warm-400 mb-3">
-        {filtered.length}개 조합{filtered.length > showCount ? ` (${showCount}개 표시 중)` : ''}
+        {t('allCombos.comboCount', { count: filtered.length })}{filtered.length > showCount ? ` (${t('allCombos.showingCount', { count: showCount })})` : ''}
       </div>
 
       {/* 조합 리스트 */}

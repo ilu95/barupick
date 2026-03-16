@@ -56,7 +56,7 @@ export default function OotdCalendar() {
     return days
   }, [month, recordsByDate])
 
-  const monthLabel = `${month.year}년 ${month.month + 1}월`
+  const monthLabel = t('ootdCalendar.yearMonth', { year: month.year, month: month.month + 1 })
   const prevMonth = () => setMonth(m => m.month === 0 ? { year: m.year - 1, month: 11 } : { ...m, month: m.month - 1 })
   const nextMonth = () => setMonth(m => m.month === 11 ? { year: m.year + 1, month: 0 } : { ...m, month: m.month + 1 })
 
@@ -85,7 +85,7 @@ export default function OotdCalendar() {
         </button>
         <div className="text-center">
           <div className="font-display text-lg font-bold text-warm-900">{monthLabel}</div>
-          <div className="text-[11px] text-warm-600">{daysWithRecords}일 기록 · {monthRecords.length}개 코디</div>
+          <div className="text-[11px] text-warm-600">{t('ootdCalendar.monthSummary', { days: daysWithRecords, coords: monthRecords.length })}</div>
         </div>
         <button onClick={nextMonth} className="w-9 h-9 rounded-full bg-white border border-warm-400 flex items-center justify-center active:scale-90 transition-transform">
           <ChevronRight size={18} />
@@ -167,14 +167,14 @@ export default function OotdCalendar() {
         return (
           <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-3.5">
             <div className="text-[12px] text-amber-800 dark:text-amber-300 font-medium mb-1">
-              이번 주 비슷한 컬러가 {streakDays + 1}일 이어지고 있어요
+              {t('ootdCalendar.colorStreakMessage', { days: streakDays + 1 })}
             </div>
-            <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-2">다른 조합도 확인해볼까요?</div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-2">{t('ootdCalendar.tryOtherCombos')}</div>
             <button
               onClick={() => navigate('/closet/combos')}
               className="w-full py-2 bg-white dark:bg-warm-800 border border-amber-200 dark:border-amber-700 rounded-xl text-[11px] font-semibold text-amber-700 dark:text-amber-300 active:scale-[0.98] transition-all"
             >
-              다른 조합 보기 →
+              {t('ootdCalendar.viewOtherCombos')}
             </button>
           </div>
         )
@@ -184,7 +184,7 @@ export default function OotdCalendar() {
       {monthRecords.length > 0 && (
         <div className="mt-6">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">
-            {month.month + 1}월 기록 ({monthRecords.length})
+            {t('ootdCalendar.monthRecordTitle', { month: month.month + 1, count: monthRecords.length })}
           </div>
 
           {/* 필터 */}

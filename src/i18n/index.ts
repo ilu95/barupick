@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
 // i18n/index.ts — i18next initialization for BaruPick
-// Languages: ko (default), en, ja
+// Languages: ko (default), en
 // Namespaces: ui, colors, categories, styles, bodyType, personalColor
 // ═══════════════════════════════════════════════════════
 import i18n from 'i18next'
@@ -69,7 +69,6 @@ export function getLocale(lang?: string): string {
   const map: Record<string, string> = {
     ko: 'ko-KR',
     en: 'en-US',
-    ja: 'ja-JP',
   }
   return map[l] || 'ko-KR'
 }

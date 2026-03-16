@@ -433,6 +433,7 @@
   },
 
   "profile": {
+    "defaultLevel": "입문자",
     "stats": {
       "coords": "코디",
       "followers": "팔로워",

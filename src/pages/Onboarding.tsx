@@ -37,7 +37,6 @@ const SLIDES = [
 const LANGUAGES = [
   { code: 'ko', label: '한국어', flag: '🇰🇷', desc: 'Korean' },
   { code: 'en', label: 'English', flag: '🇺🇸', desc: 'English' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵', desc: 'Japanese' },
 ]
 
 const SWIPE_THRESHOLD = 50

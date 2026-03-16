@@ -433,6 +433,7 @@
   },
 
   "profile": {
+    "defaultLevel": "Beginner",
     "stats": {
       "coords": "Coords",
       "followers": "Followers",
