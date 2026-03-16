@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CloudSun, Thermometer, Droplets, Wind, HelpCircle, Scissors, Ruler, ShoppingBag, ExternalLink, Trophy, ChevronRight, Palette, ArrowRight, ArrowLeft, Check, ThumbsUp, ThumbsDown, Minus, CheckCircle, XCircle, Sparkles } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { STYLE_GUIDE, MOOD_GROUPS, LAYER_LEVELS, STYLE_ICONS } from '@/lib/styles'
 import { STYLE_MOODS } from '@/lib/styleMoods'
 import { PERSONAL_COLOR_12, PERSONAL_COLOR_DIAGNOSIS } from '@/lib/personalColor'
@@ -1019,7 +1019,7 @@ export function PcSelect() {
                 return (
                   <div key={ck} className="flex flex-col items-center gap-1">
                     <div className="w-10 h-10 rounded-xl border border-warm-400/50" style={{ background: c.hex }} />
-                    <span className="text-[9px] text-warm-600 dark:text-warm-400">{c.name}</span>
+                    <span className="text-[9px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span>
                   </div>
                 )
               })}
@@ -1040,7 +1040,7 @@ export function PcSelect() {
                     <div className="w-10 h-10 rounded-xl border border-warm-400/50 relative" style={{ background: c.hex }}>
                       <div className="absolute inset-0 flex items-center justify-center"><span className="text-white text-lg font-bold drop-shadow">✕</span></div>
                     </div>
-                    <span className="text-[9px] text-warm-600 dark:text-warm-400">{c.name}</span>
+                    <span className="text-[9px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span>
                   </div>
                 )
               })}

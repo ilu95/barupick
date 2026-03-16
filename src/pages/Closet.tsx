@@ -103,7 +103,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
   const renderItem = (item: any) => {
     const colorKey = getColor(item)
     const c = colorKey ? COLORS_60[colorKey] : null
-    const displayName = item.name || c?.name || colorKey || ''
+    const displayName = item.name || (colorKey ? getColorName(colorKey) : '') || colorKey || ''
     const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' }) : ''
 
     return (
@@ -118,7 +118,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
           <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 truncate">{displayName}</div>
           <div className="flex items-center gap-1.5 text-xs text-warm-600 dark:text-warm-400 mt-0.5">
             <span className="w-3 h-3 rounded-full border border-warm-400 inline-block flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
-            {c?.name || ''}{date ? ` · ${date}` : ''}
+            {colorKey ? getColorName(colorKey) : ''}{date ? ` · ${date}` : ''}
           </div>
         </div>
         <button onClick={() => handleDelete(item.id)} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg active:bg-warm-200 dark:active:bg-warm-700 transition-colors">

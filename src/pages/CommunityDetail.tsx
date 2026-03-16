@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink, Pencil } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -429,7 +429,7 @@ export default function CommunityDetail() {
                 <div key={part} className="flex items-center gap-1.5 text-xs">
                   <span className="w-4 h-4 rounded border border-warm-400" style={{ background: c.hex }} />
                   <span className="text-warm-500">{t('categories:names.' + part)}</span>
-                  <span className="text-warm-800 dark:text-warm-200">{c.name}</span>
+                  <span className="text-warm-800 dark:text-warm-200">{getColorName(ck as string)}</span>
                 </div>
               )
             })}

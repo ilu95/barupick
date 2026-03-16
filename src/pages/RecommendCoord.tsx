@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, RefreshCw, Pin, Bookmark, Share, Users, ChevronRight, Palette, X, ChevronDown } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import ColorPicker from '@/components/ui/ColorPicker'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styles'
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { evaluationSystem } from '@/lib/evaluation'
@@ -477,7 +477,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
               <div key={k} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
                 <span className="text-warm-500 dark:text-warm-400 w-10">{getPickedPartLabel(k, rec.state.pickedItems, t)}</span>
-                <span className="text-warm-800 dark:text-warm-200 font-medium">{c?.name || ''}</span>
+                <span className="text-warm-800 dark:text-warm-200 font-medium">{colorKey ? getColorName(colorKey) : ''}</span>
               </div>
             )
           })}

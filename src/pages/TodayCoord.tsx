@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Shirt, Calendar } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { useTodayCoord, getSituationOptions, type TodayCoordResult } from '@/hooks/useTodayCoord'
 import { useWeather } from '@/hooks/useWeather'
@@ -217,7 +217,7 @@ function CoordCard({ result, rank, total, navigate }: {
               <div key={part} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
                 <span className="text-warm-500 dark:text-warm-400 w-10">{t('categories:names.' + part)}</span>
-                <span className="text-warm-800 dark:text-warm-200 font-medium">{c.name}</span>
+                <span className="text-warm-800 dark:text-warm-200 font-medium">{getColorName(colorKey)}</span>
               </div>
             )
           })}

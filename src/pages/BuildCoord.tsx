@@ -412,7 +412,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                       <button key={rec.key} onClick={() => handleColorSelect(rec.key)}
                         className="h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90"
                         style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
-                        {c.name}
+                        {getColorName(rec.key)}
                         {delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{delta}</span>}
                         {delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{delta}</span>}
                         {(rec.badges?.pc || rec.badges?.body) && (
@@ -724,7 +724,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
             return (
               <div key={cat} className="flex flex-col items-center gap-1">
                 <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold border border-warm-400/30"
-                  style={{ background: c.hex, color: c.hcl[2] > 60 ? '#1C1917' : '#fff' }}>{c.name}</div>
+                  style={{ background: c.hex, color: c.hcl[2] > 60 ? '#1C1917' : '#fff' }}>{getColorName(colorKey)}</div>
                 <div className="text-[10px] text-warm-700 dark:text-warm-300">{getBuildPartLabel(cat, build.state.upper)}</div>
               </div>
             )
