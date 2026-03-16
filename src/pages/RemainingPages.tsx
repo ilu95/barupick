@@ -622,7 +622,7 @@ export function BodyGuide() {
           {Object.entries(data.colorRules || {}).filter(([k]) => k !== 'summary').map(([part, rule]) => (
             <div key={part} className="flex items-center gap-1.5 bg-warm-100 dark:bg-warm-700 rounded-full px-2.5 py-1 text-[11px]">
               <span className="font-semibold text-warm-700 dark:text-warm-300">{(CATEGORY_NAMES as any)?.[part] || part}</span>
-              <span className="text-warm-500 dark:text-warm-400">{rule === 'light' ? '밝게' : rule === 'dark' ? '어둡게' : rule === 'any' ? '자유' : rule}</span>
+              <span className="text-warm-500 dark:text-warm-400">{rule === 'light' ? t('bodyGuide.lightRule') : rule === 'dark' ? t('bodyGuide.darkRule') : rule === 'any' ? t('bodyGuide.anyRule') : rule}</span>
             </div>
           ))}
         </div>
@@ -631,7 +631,7 @@ export function BodyGuide() {
       {/* 추천 (DO) */}
       <div className="bg-white dark:bg-warm-800 border border-green-200 dark:border-green-800 rounded-2xl p-4 mb-3 shadow-warm-sm">
         <div className="flex items-center gap-1.5 text-sm font-bold text-green-700 dark:text-green-400 mb-3">
-          <CheckCircle size={16} /> 이렇게 입으세요
+          <CheckCircle size={16} /> {t('bodyGuide.doTitle')}
         </div>
         <div className="flex flex-col gap-2">
           {genderData.doList.map((item, idx) => (
@@ -646,7 +646,7 @@ export function BodyGuide() {
       {/* 피하세요 (DON'T) */}
       <div className="bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-2xl p-4 mb-5 shadow-warm-sm">
         <div className="flex items-center gap-1.5 text-sm font-bold text-red-600 dark:text-red-400 mb-3">
-          <XCircle size={16} /> 피해주세요
+          <XCircle size={16} /> {t('bodyGuide.dontTitle')}
         </div>
         <div className="flex flex-col gap-2">
           {genderData.dontList.map((item, idx) => (
@@ -660,11 +660,11 @@ export function BodyGuide() {
 
       {/* 저장 + 코디 추천 */}
       <div className="flex flex-col gap-2.5">
-        <button onClick={() => { handleSave(); toast.success('체형이 저장되었어요! 코디 추천에 반영됩니다.') }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
-          내 체형으로 저장하기
+        <button onClick={() => { handleSave(); toast.success(t('bodyGuide.saveSuccess')) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
+          {t('bodyGuide.saveBodyType')}
         </button>
         <button onClick={() => navigate('/home/recommend')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
-          이 체형으로 코디 추천받기
+          {t('bodyGuide.getRecommend')}
         </button>
       </div>
     </div>
@@ -673,6 +673,7 @@ export function BodyGuide() {
 
 // ─── 샵 ───
 export function Shop() {
+  const { t } = useTranslation()
   const SHOP_INSTA_IMG = 'https://storage.googleapis.com/barupick-stocks/barusa_vintage.jpg'
 
   return (
@@ -684,14 +685,14 @@ export function Shop() {
         <div className="relative z-10">
           <div className="font-display text-[10px] font-semibold tracking-[3px] uppercase text-terra-400 mb-3">Vintage Shop</div>
           <div className="font-display text-3xl font-bold tracking-tight mb-1">BARUSA</div>
-          <div className="text-warm-500 text-sm">프레피 &amp; 올드머니 빈티지샵</div>
+          <div className="text-warm-500 text-sm">{t('shop.heroSubtitle')}</div>
         </div>
       </div>
 
       {/* 추천 배지 */}
       <div className="flex items-center gap-2 rounded-xl px-4 py-3 mb-5 text-sm font-medium bg-terra-100 border border-terra-200 text-terra-600">
         <Sparkles size={16} className="flex-shrink-0" />
-        <span>바루픽 개발자가 운영중인 빈티지샵</span>
+        <span>{t('shop.devBadge')}</span>
       </div>
 
       {/* 인스타그램 프로필 이미지 */}
