@@ -85,7 +85,7 @@ export default function OotdDetail() {
     try {
       const userId = (await supabase.auth.getUser())?.data?.user?.id
       if (!userId) {
-        setShareMsg('로그인이 필요해요')
+        setShareMsg(t('common.loginRequired'))
         navigate('/auth/login')
         return
       }

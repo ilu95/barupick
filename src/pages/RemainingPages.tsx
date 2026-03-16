@@ -776,15 +776,16 @@ export function Terms() {
 
 // ─── 개인정보처리방침 ───
 export function Privacy() {
+  const { t } = useTranslation()
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">개인정보처리방침</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('privacy.title')}</h2>
       <div className="bg-white border border-warm-400 rounded-2xl p-5 shadow-warm-sm text-sm text-warm-700 leading-relaxed space-y-3">
-        <p><strong>1. 수집하는 개인정보</strong> 이메일, 닉네임, 프로필 사진(선택), 코디 기록</p>
-        <p><strong>2. 수집 목적</strong> 서비스 제공, 커뮤니티 기능, 맞춤 추천</p>
-        <p><strong>3. 보유 기간</strong> 회원 탈퇴 시 즉시 삭제</p>
-        <p><strong>4. 제3자 제공</strong> 제3자에게 개인정보를 제공하지 않습니다.</p>
-        <p><strong>5. 문의</strong> barusa.official@gmail.com</p>
+        <p><strong>{t('privacy.section1Title')}</strong> {t('privacy.section1Content')}</p>
+        <p><strong>{t('privacy.section2Title')}</strong> {t('privacy.section2Content')}</p>
+        <p><strong>{t('privacy.section3Title')}</strong> {t('privacy.section3Content')}</p>
+        <p><strong>{t('privacy.section4Title')}</strong> {t('privacy.section4Content')}</p>
+        <p><strong>{t('privacy.section5Title')}</strong> {t('privacy.section5Content')}</p>
       </div>
     </div>
   )
@@ -794,6 +795,7 @@ export function Privacy() {
 export function EventDetail() {
   const { eventId } = useParams<{ eventId: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [event, setEvent] = useState<any>(null)
   const [submissions, setSubmissions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -810,8 +812,8 @@ export function EventDetail() {
     })
   }, [eventId])
 
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">불러오는 중...</div>
-  if (!event) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">이벤트를 찾을 수 없어요</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('common.loading')}</div>
+  if (!event) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('eventDetail.notFound')}</div>
 
   const now = new Date(), start = new Date(event.start_date), end = new Date(event.end_date)
   const isActive = now >= start && now <= end
@@ -819,13 +821,13 @@ export function EventDetail() {
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       <div className="bg-gradient-to-br from-terra-500 to-amber-500 rounded-2xl p-5 text-white mb-5">
-        <div className="text-[10px] uppercase tracking-wider opacity-80 mb-1">{isActive ? '🔥 진행중' : '⏳ 종료'}</div>
+        <div className="text-[10px] uppercase tracking-wider opacity-80 mb-1">{isActive ? t('eventDetail.active') : t('eventDetail.ended')}</div>
         <h2 className="font-display text-xl font-bold tracking-tight mb-1">{event.title}</h2>
         {event.description && <div className="text-sm opacity-90 mb-2">{event.description}</div>}
         {event.reward && <div className="text-sm font-semibold">🎁 {event.reward}</div>}
       </div>
 
-      <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">참가작 ({submissions.length})</div>
+      <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">{t('eventDetail.submissions', { count: submissions.length })}</div>
       {submissions.length > 0 ? (
         <div className="grid grid-cols-2 gap-2.5">
           {submissions.map((sub, idx) => {
@@ -841,12 +843,12 @@ export function EventDetail() {
             )
           })}
         </div>
-      ) : <div className="text-center py-10 text-warm-400 text-sm">아직 참가작이 없어요</div>}
+      ) : <div className="text-center py-10 text-warm-400 text-sm">{t('eventDetail.noSubmissions')}</div>}
 
       {isActive && (
         <button onClick={() => navigate(`/community/event/${eventId}/submit`)}
           className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra mt-5">
-          🎨 참여하기
+          {t('eventDetail.participate')}
         </button>
       )}
     </div>

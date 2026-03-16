@@ -324,15 +324,15 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
         {editMode.type === 'add' && (
           <div className="flex items-center justify-between bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 rounded-xl px-3 py-2 mb-3">
             <span className="text-[12px] font-semibold text-terra-700 dark:text-terra-300">+ 옷 추가</span>
-            <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">취소</button>
+            <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">{t('common.cancel')}</button>
           </div>
         )}
         {editMode.type === 'edit_upper' && (
           <div className="flex items-center justify-between bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 rounded-xl px-3 py-2 mb-3">
             <span className="text-[12px] font-semibold text-terra-700 dark:text-terra-300">{upper[editMode.index]?.emoji} 수정 중</span>
             <div className="flex items-center gap-3">
-              <button onClick={() => { build.removeUpper(editMode.index); cancelEdit() }} className="text-[11px] text-red-500">삭제</button>
-              <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">취소</button>
+              <button onClick={() => { build.removeUpper(editMode.index); cancelEdit() }} className="text-[11px] text-red-500">{t('common.delete')}</button>
+              <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">{t('common.cancel')}</button>
             </div>
           </div>
         )}
@@ -341,7 +341,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
             <span className="text-[12px] font-semibold text-terra-700 dark:text-terra-300">
               {{ bottom: '👖 하의', shoes: '👞 신발', scarf: '🧣 목도리', hat: '🎩 모자' }[editMode.target]} 색상
             </span>
-            <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">취소</button>
+            <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">{t('common.cancel')}</button>
           </div>
         )}
 
@@ -488,7 +488,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               {editMode.type === 'edit_upper' ? '이 컬러로 수정' : isSimpleEdit ? '이 컬러로 선택' : '이 컬러로 추가'}
             </button>
             <button onClick={cancelEdit} className="px-5 py-3.5 bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 rounded-2xl font-medium text-sm active:scale-98">
-              취소
+              {t('common.cancel')}
             </button>
           </div>
         ) : (isEditing || tmpItem) && !tmpColor ? (
@@ -500,7 +500,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                editMode.type === 'edit_upper' ? '컬러를 선택해주세요' : ''}
             </div>
             <button onClick={cancelEdit} className="px-5 py-3.5 bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 rounded-2xl font-medium text-sm active:scale-98">
-              취소
+              {t('common.cancel')}
             </button>
           </div>
         ) : build.isComplete ? (
