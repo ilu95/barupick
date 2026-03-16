@@ -244,7 +244,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                   ? <div className="text-[9px] text-warm-400 dark:text-warm-500">수정을 원하시면 해당 부위를 탭해주세요</div>
                   : <div />}
                 <div className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-display flex-shrink-0 ${scoreColor}`}>
-                  {score > 0 ? `${score}점` : '--점'}
+                  {score > 0 ? t('common.score', { score }) : '--'}
                 </div>
               </div>
 
@@ -557,7 +557,7 @@ function StepFabric({ build }: { build: BH }) {
       <p className="text-sm text-warm-600 dark:text-warm-400 mb-4">각 부위의 소재를 골라 궁합을 확인하세요</p>
 
       <div className="flex gap-1.5 mb-5">
-        <button onClick={() => setSeasonFilter(null)} className={`px-3 py-1.5 rounded-full text-[11px] font-semibold ${!seasonFilter ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-600'}`}>전체</button>
+        <button onClick={() => setSeasonFilter(null)} className={`px-3 py-1.5 rounded-full text-[11px] font-semibold ${!seasonFilter ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-600'}`}>{t('common.all')}</button>
         {Object.entries(FABRIC_SEASONS).map(([key, s]) => (
           <button key={key} onClick={() => setSeasonFilter(seasonFilter === key ? null : key)}
             className={`px-3 py-1.5 rounded-full text-[11px] font-semibold ${seasonFilter === key ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-600'}`}>
