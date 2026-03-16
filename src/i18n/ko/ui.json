@@ -432,7 +432,41 @@
       "improve": "개선해볼까요?"
     },
     "showMannequin": "👤 마네킹 보기 ▼",
-    "hideMannequin": "👤 마네킹 접기 ▲"
+    "hideMannequin": "👤 마네킹 접기 ▲",
+    "maxLayerWarning": "상체는 최대 4겹까지 가능해요",
+    "duplicateWarning": "이미 추가된 아이템이에요",
+    "weather": {
+      "needOuter": "체감 {{feels}}°C예요. 겉옷이 필요한 날씨입니다.",
+      "feelsLike": "체감 {{feels}}°C예요.",
+      "tooThin": "이것만으로는 추울 수 있어요. 겉옷을 추가해보세요.",
+      "outerReady": "겉옷 준비 완료! 안에 한 겹 더 입으면 좋아요.",
+      "addLayer": "{{feels}}°C에는 한 겹 더 추천해요.",
+      "justRight": "이 정도면 적당해요! 👍",
+      "warm": "따뜻하게 입었네요! 🔥",
+      "suggestOuter": "겉옷을 추가하면 좋겠어요.",
+      "feelsTemp": "체감 {{feels}}°C"
+    },
+    "tapToEdit": "수정을 원하시면 해당 부위를 탭해주세요",
+    "upperBody": "상체",
+    "addItemPlease": "아이템을 추가해주세요",
+    "lowerBody": "하체·악세서리",
+    "showMannequinCollapse": "👤 마네킹 보기 ▽",
+    "collapse": "접기 △",
+    "addClothes": "+ 옷 추가",
+    "editing": "수정 중",
+    "editHint": "마네킹 옆 아이템을 탭해서 수정하거나<br/><b>+ 옷 추가</b>를 눌러주세요",
+    "initialPrompt": "오늘 뭐 입으세요?<br/>가장 먼저 떠오르는 아이템을 골라주세요",
+    "confirmEdit": "이 컬러로 수정",
+    "confirmSelect": "이 컬러로 선택",
+    "confirmAdd": "이 컬러로 추가",
+    "selectColor": "컬러를 선택해주세요",
+    "viewResults": "결과 보기 →",
+    "selectItem": "아이템을 선택해주세요",
+    "addMore": "+ 옷 추가하기",
+    "fabricDesc": "각 부위의 소재를 골라 궁합을 확인하세요",
+    "points": "점",
+    "alreadyGood": "이미 좋은 조합이에요!",
+    "feelsLabel": "체감"
   },
   "ootdRecord": {
     "situations": {
@@ -1259,7 +1293,9 @@
     "middleware": "미들웨어",
     "top": "상의",
     "bottom": "하의",
-    "shoes": "신발"
+    "shoes": "신발",
+    "scarf": "목도리",
+    "hat": "모자"
   },
   "evaluation": {
     "freeColor": "자유 배색",

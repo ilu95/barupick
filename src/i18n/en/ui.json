@@ -432,7 +432,41 @@
       "improve": "Room to improve?"
     },
     "showMannequin": "👤 Show mannequin ▼",
-    "hideMannequin": "👤 Hide mannequin ▲"
+    "hideMannequin": "👤 Hide mannequin ▲",
+    "maxLayerWarning": "Maximum 4 layers for upper body",
+    "duplicateWarning": "This item is already added",
+    "weather": {
+      "needOuter": "Feels like {{feels}}°C. You need an outer layer.",
+      "feelsLike": "Feels like {{feels}}°C.",
+      "tooThin": "This might be too thin. Try adding an outer layer.",
+      "outerReady": "Outer layer ready! Add one more layer underneath.",
+      "addLayer": "At {{feels}}°C, one more layer is recommended.",
+      "justRight": "Looks just right! 👍",
+      "warm": "Nice and warm! 🔥",
+      "suggestOuter": "Adding an outer layer would help.",
+      "feelsTemp": "Feels like {{feels}}°C"
+    },
+    "tapToEdit": "Tap a part to edit",
+    "upperBody": "Upper",
+    "addItemPlease": "Please add an item",
+    "lowerBody": "Lower & Acc.",
+    "showMannequinCollapse": "👤 Show mannequin ▽",
+    "collapse": "Collapse △",
+    "addClothes": "+ Add clothes",
+    "editing": "Editing",
+    "editHint": "Tap items next to the mannequin to edit, or press <b>+ Add clothes</b>",
+    "initialPrompt": "What are you wearing today?<br/>Pick the first item that comes to mind",
+    "confirmEdit": "Apply this color",
+    "confirmSelect": "Select this color",
+    "confirmAdd": "Add this color",
+    "selectColor": "Please select a color",
+    "viewResults": "View results →",
+    "selectItem": "Please select an item",
+    "addMore": "+ Add more",
+    "fabricDesc": "Select fabrics for each part to check compatibility",
+    "points": "pts",
+    "alreadyGood": "Already a great combo!",
+    "feelsLabel": "feels"
   },
   "ootdRecord": {
     "situations": {
@@ -1259,7 +1293,9 @@
     "middleware": "Middleware",
     "top": "Top",
     "bottom": "Bottom",
-    "shoes": "Shoes"
+    "shoes": "Shoes",
+    "scarf": "Scarf",
+    "hat": "Hat"
   },
   "evaluation": {
     "freeColor": "Free Color",
