@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Shirt, UserPlus, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -25,6 +26,7 @@ export default function Auth() {
 // ─── 로그인 ───
 function Login() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { login, socialLogin } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,14 +34,14 @@ function Login() {
   const [loading, setLoading] = useState(false)
 
   const handleLogin = async () => {
-    if (!email || !password) { setError('이메일과 비밀번호를 입력해주세요'); return }
+    if (!email || !password) { setError(t('auth.emailRequired')); return }
     setLoading(true)
     setError('')
     try {
       await login(email, password)
       navigate('/home', { replace: true })
     } catch (e: any) {
-      setError(e.message || '로그인에 실패했어요')
+      setError(e.message || t('auth.loginFailed'))
     } finally {
       setLoading(false)
     }
@@ -49,7 +51,7 @@ function Login() {
     try {
       await socialLogin(provider)
     } catch (e: any) {
-      const msg = e.message || ''; if (msg.includes('not enabled') || msg.includes('Unsupported provider')) { setError((provider === 'kakao' ? '카카오' : 'Google') + ' 로그인이 아직 설정되지 않았어요. 이메일로 로그인해주세요.') } else { setError('소셜 로그인 실패: ' + msg) }
+      const msg = e.message || ''; if (msg.includes('not enabled') || msg.includes('Unsupported provider')) { setError((provider === 'kakao' ? t('auth.kakaoLogin') : t('auth.googleLogin')) + ' ' + t('auth.loginFailed')) } else { setError(t('auth.loginFailed') + ': ' + msg) }
     }
   }
 
@@ -61,8 +63,8 @@ function Login() {
           <div className="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center mx-auto mb-4">
             <Shirt size={28} className="text-terra-600" />
           </div>
-          <h2 className="font-display text-2xl font-bold text-warm-900 tracking-tight">바루픽</h2>
-          <p className="text-sm text-warm-600 mt-1">커뮤니티에 참여하세요</p>
+          <h2 className="font-display text-2xl font-bold text-warm-900 tracking-tight">{t('header.home')}</h2>
+          <p className="text-sm text-warm-600 mt-1">{t('auth.switchToSignup')}</p>
         </div>
 
         {/* 소셜 로그인 */}
@@ -73,7 +75,7 @@ function Login() {
             style={{ background: '#FEE500', color: '#191919' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.58 2 11c0 2.84 1.87 5.33 4.69 6.75-.16.56-.6 2.05-.69 2.37-.11.4.15.39.31.28.13-.08 2.07-1.37 2.91-1.93.9.13 1.83.2 2.78.2 5.5 0 10-3.58 10-8s-4.5-8-10-8z" fill="#191919" /></svg>
-            카카오 로그인
+            {t('auth.kakaoLogin')}
           </button>
           <button
             onClick={() => handleSocial('google')}
@@ -85,14 +87,14 @@ function Login() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
-            Google 로그인
+            {t('auth.googleLogin')}
           </button>
         </div>
 
         {/* 구분선 */}
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1 h-px bg-warm-400" />
-          <span className="text-[11px] text-warm-500">또는 이메일로</span>
+          <span className="text-[11px] text-warm-500">{t('auth.email')}</span>
           <div className="flex-1 h-px bg-warm-400" />
         </div>
 
@@ -101,7 +103,7 @@ function Login() {
 
         {/* 이메일 로그인 */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">이메일</label>
+          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">{t('auth.email')}</label>
           <input
             type="email"
             value={email}
@@ -111,12 +113,12 @@ function Login() {
           />
         </div>
         <div className="mb-5">
-          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">비밀번호</label>
+          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">{t('auth.password')}</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="6자리 이상"
+            placeholder={t('auth.passwordMin')}
             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             className="w-full px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-500 focus:outline-none focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all"
           />
@@ -127,13 +129,13 @@ function Login() {
           disabled={loading}
           className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] active:scale-[0.98] transition-all shadow-terra mb-4 disabled:opacity-50"
         >
-          {loading ? '로그인 중...' : '이메일 로그인'}
+          {loading ? t('common.loading') : t('auth.loginButton')}
         </button>
 
         <div className="text-center text-sm text-warm-600">
-          계정이 없으신가요?{' '}
+          {t('auth.switchToSignup').split('?')[0]}?{' '}
           <button onClick={() => navigate('/auth/signup')} className="text-terra-600 font-semibold">
-            회원가입
+            {t('auth.signupButton')}
           </button>
         </div>
       </div>
@@ -144,6 +146,7 @@ function Login() {
 // ─── 회원가입 ───
 function Signup() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { signup, socialLogin } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -153,13 +156,13 @@ function Signup() {
   const [loading, setLoading] = useState(false)
 
   const handleSignup = async () => {
-    if (!email || !password || !nickname) { setError('모든 항목을 입력해주세요'); return }
-    if (password.length < 6) { setError('비밀번호는 6자리 이상이어야 합니다'); return }
-    if (nickname.length < 2 || nickname.length > 12) { setError('닉네임은 2~12자여야 합니다'); return }
-    if (!agreed) { setError('이용약관에 동의해주세요'); return }
+    if (!email || !password || !nickname) { setError(t('auth.emailRequired')); return }
+    if (password.length < 6) { setError(t('auth.passwordMin')); return }
+    if (nickname.length < 2 || nickname.length > 12) { setError(t('auth.nicknameRequired')); return }
+    if (!agreed) { setError(t('auth.agreement')); return }
 
     const forbidden = ['관리자', '운영자', 'admin', '바루픽', 'barupick', '바루사', 'barusa', '시스템', 'system', '테스트', 'test', '공지', 'notice']
-    if (forbidden.some(f => nickname.toLowerCase().includes(f))) { setError('사용할 수 없는 닉네임입니다'); return }
+    if (forbidden.some(f => nickname.toLowerCase().includes(f))) { setError(t('auth.nicknameRequired')); return }
 
     setLoading(true)
     setError('')
@@ -167,7 +170,7 @@ function Signup() {
       await signup(email, password, nickname)
       navigate('/home', { replace: true })
     } catch (e: any) {
-      setError(e.message || '회원가입에 실패했어요')
+      setError(e.message || t('auth.signupFailed'))
     } finally {
       setLoading(false)
     }
@@ -177,7 +180,7 @@ function Signup() {
     try {
       await socialLogin(provider)
     } catch (e: any) {
-      const msg = e.message || ''; if (msg.includes('not enabled') || msg.includes('Unsupported provider')) { setError((provider === 'kakao' ? '카카오' : 'Google') + ' 로그인이 아직 설정되지 않았어요. 이메일로 로그인해주세요.') } else { setError('소셜 로그인 실패: ' + msg) }
+      const msg = e.message || ''; if (msg.includes('not enabled') || msg.includes('Unsupported provider')) { setError((provider === 'kakao' ? t('auth.kakaoLogin') : t('auth.googleLogin')) + ' ' + t('auth.loginFailed')) } else { setError(t('auth.loginFailed') + ': ' + msg) }
     }
   }
 
@@ -189,8 +192,8 @@ function Signup() {
           <div className="w-16 h-16 rounded-full bg-terra-100 flex items-center justify-center mx-auto mb-4">
             <UserPlus size={28} className="text-terra-600" />
           </div>
-          <h2 className="font-display text-2xl font-bold text-warm-900 tracking-tight">회원가입</h2>
-          <p className="text-sm text-warm-600 mt-1">가입하고 코디를 공유해보세요</p>
+          <h2 className="font-display text-2xl font-bold text-warm-900 tracking-tight">{t('auth.signupTitle')}</h2>
+          <p className="text-sm text-warm-600 mt-1">{t('auth.switchToSignup')}</p>
         </div>
 
         {/* 소셜 가입 */}
@@ -201,7 +204,7 @@ function Signup() {
             style={{ background: '#FEE500', color: '#191919' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.58 2 11c0 2.84 1.87 5.33 4.69 6.75-.16.56-.6 2.05-.69 2.37-.11.4.15.39.31.28.13-.08 2.07-1.37 2.91-1.93.9.13 1.83.2 2.78.2 5.5 0 10-3.58 10-8s-4.5-8-10-8z" fill="#191919" /></svg>
-            카카오로 시작하기
+            {t('auth.kakaoLogin')}
           </button>
           <button
             onClick={() => handleSocial('google')}
@@ -213,14 +216,14 @@ function Signup() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
-            Google로 시작하기
+            {t('auth.googleLogin')}
           </button>
         </div>
 
         {/* 구분선 */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px bg-warm-400" />
-          <span className="text-[11px] text-warm-500">또는 이메일로</span>
+          <span className="text-[11px] text-warm-500">{t('auth.email')}</span>
           <div className="flex-1 h-px bg-warm-400" />
         </div>
 
@@ -229,12 +232,12 @@ function Signup() {
 
         {/* 닉네임 */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">닉네임</label>
+          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">{t('auth.nickname')}</label>
           <input
             type="text"
             value={nickname}
             onChange={(e) => setNickname(e.target.value.replace(/[^가-힣a-zA-Z0-9]/g, ''))}
-            placeholder="한글/영문/숫자 2~12자"
+            placeholder={t('auth.nicknameRequired')}
             maxLength={12}
             className="w-full px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-500 focus:outline-none focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all"
           />
@@ -242,7 +245,7 @@ function Signup() {
 
         {/* 이메일 */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">이메일</label>
+          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">{t('auth.email')}</label>
           <input
             type="email"
             value={email}
@@ -254,12 +257,12 @@ function Signup() {
 
         {/* 비밀번호 */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">비밀번호</label>
+          <label className="text-xs font-semibold text-warm-600 tracking-wide mb-1.5 block">{t('auth.password')}</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="6자리 이상"
+            placeholder={t('auth.passwordMin')}
             onKeyDown={(e) => e.key === 'Enter' && handleSignup()}
             className="w-full px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-500 focus:outline-none focus:border-terra-400 focus:ring-1 focus:ring-terra-400 transition-all"
           />
@@ -274,8 +277,8 @@ function Signup() {
             className="mt-0.5 w-4 h-4 rounded border-warm-400 text-terra-500 focus:ring-terra-400"
           />
           <span className="text-xs text-warm-600 leading-relaxed">
-            <button onClick={() => navigate('/terms')} className="text-terra-600 underline">이용약관</button> 및{' '}
-            <button onClick={() => navigate('/privacy')} className="text-terra-600 underline">개인정보처리방침</button>에 동의합니다.
+            <button onClick={() => navigate('/terms')} className="text-terra-600 underline">{t('settings.terms')}</button> {t('auth.agreement').includes('및') ? '및' : '&'}{' '}
+            <button onClick={() => navigate('/privacy')} className="text-terra-600 underline">{t('settings.privacy')}</button>
           </span>
         </label>
 
@@ -284,13 +287,13 @@ function Signup() {
           disabled={loading}
           className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] active:scale-[0.98] transition-all shadow-terra mb-4 disabled:opacity-50"
         >
-          {loading ? '가입 중...' : '회원가입'}
+          {loading ? t('common.loading') : t('auth.signupButton')}
         </button>
 
         <div className="text-center text-sm text-warm-600">
-          이미 계정이 있으신가요?{' '}
+          {t('auth.switchToLogin').split('?')[0]}?{' '}
           <button onClick={() => navigate('/auth/login')} className="text-terra-600 font-semibold">
-            로그인
+            {t('auth.loginButton')}
           </button>
         </div>
       </div>

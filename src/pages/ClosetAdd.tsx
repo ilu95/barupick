@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Camera, Edit3, ArrowLeft, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
@@ -81,6 +82,7 @@ function generateThumbnail(img) {
 
 export default function ClosetAdd() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [mode, setMode] = useState('select')
   const [selectedItem, setSelectedItem] = useState(null) // ALL_ITEMS 중 하나
   const [color, setColor] = useState(null)
@@ -145,7 +147,7 @@ export default function ClosetAdd() {
   // ─── 아이템 선택 (코디 만들기와 동일한 아이템 목록) ───
   const ItemSelector = () => (
     <div className="mb-5">
-      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. 아이템 종류</div>
+      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{t('closetAdd.step1')}</div>
       <div className="flex flex-wrap gap-2">
         {ALL_ITEMS.map(item => (
           <button key={item.id} onClick={() => setSelectedItem(item)} className={`px-3 py-2 rounded-full text-[12px] font-medium transition-all ${selectedItem?.id === item.id ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
@@ -159,11 +161,11 @@ export default function ClosetAdd() {
   // ─── 브랜드 + 상품명 ───
   const ItemInfo = ({ step }) => (
     <div className="mb-5">
-      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{step}. 아이템 정보 (선택)</div>
+      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{step}. {t('closetAdd.step3')}</div>
       <div className="flex flex-col gap-2.5">
-        <input type="text" placeholder="브랜드 (예: 폴로, 유니클로)" maxLength={30} value={brand} onChange={e => setBrand(e.target.value)}
+        <input type="text" placeholder={t('closetAdd.brandPlaceholder')} maxLength={30} value={brand} onChange={e => setBrand(e.target.value)}
           className="w-full px-4 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 focus:outline-none focus:border-terra-400 transition-all" />
-        <input type="text" placeholder="상품명 (예: 웨스턴 버튼다운 셔츠)" maxLength={40} value={itemName} onChange={e => setItemName(e.target.value)}
+        <input type="text" placeholder={t('closetAdd.namePlaceholder')} maxLength={40} value={itemName} onChange={e => setItemName(e.target.value)}
           className="w-full px-4 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 focus:outline-none focus:border-terra-400 transition-all" />
       </div>
     </div>
@@ -174,7 +176,7 @@ export default function ClosetAdd() {
       <div className="animate-screen-fade flex items-center justify-center py-32">
         <div className="text-center">
           <div className="text-4xl mb-3">✅</div>
-          <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">등록 완료!</div>
+          <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{t('common.done')}</div>
         </div>
       </div>
     )
@@ -183,16 +185,16 @@ export default function ClosetAdd() {
   if (mode === 'select') {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">아이템 등록</h2>
-        <p className="text-sm text-warm-600 dark:text-warm-400 mb-6">등록 방법을 선택해주세요</p>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('header.closetAdd')}</h2>
+        <p className="text-sm text-warm-600 dark:text-warm-400 mb-6">{t('closetAdd.step1')}</p>
         <div className="flex flex-col gap-3">
           <button onClick={() => setMode('photo')} className="w-full flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 text-left shadow-warm-sm active:scale-[0.98] transition-all">
             <div className="w-12 h-12 rounded-xl bg-terra-100 dark:bg-terra-900/30 flex items-center justify-center flex-shrink-0"><Camera size={24} className="text-terra-600 dark:text-terra-400" /></div>
-            <div><div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">사진으로 등록</div><div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">사진에서 색상을 자동 추출해요</div></div>
+            <div><div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('closetAdd.photoMode')}</div><div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('closetAdd.colorExtract')}</div></div>
           </button>
           <button onClick={() => setMode('manual')} className="w-full flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 text-left shadow-warm-sm active:scale-[0.98] transition-all">
             <div className="w-12 h-12 rounded-xl bg-warm-300 dark:bg-warm-700 flex items-center justify-center flex-shrink-0"><Edit3 size={24} className="text-warm-700 dark:text-warm-300" /></div>
-            <div><div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">직접 등록</div><div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">카테고리와 색상을 직접 선택해요</div></div>
+            <div><div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('closetAdd.manualMode')}</div><div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('closetAdd.step2')}</div></div>
           </button>
         </div>
       </div>
@@ -202,13 +204,13 @@ export default function ClosetAdd() {
   if (mode === 'photo') {
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
-        <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">사진으로 등록</h2>
+        <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('closetAdd.photoMode')}</h2>
 
         <ItemSelector />
 
         <div className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. 사진 촬영/업로드</div>
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. {t('common.photo')}</div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
           {photoData ? (
             <div className="relative w-full aspect-square max-w-[200px] mx-auto rounded-2xl overflow-hidden border border-warm-400 dark:border-warm-600 cursor-pointer" onClick={() => fileRef.current?.click()}>
@@ -218,15 +220,15 @@ export default function ClosetAdd() {
           ) : (
             <button onClick={() => fileRef.current?.click()} className="w-full aspect-[4/3] max-w-[250px] mx-auto rounded-2xl border-2 border-dashed border-warm-400 dark:border-warm-600 flex flex-col items-center justify-center bg-warm-100 dark:bg-warm-800 active:scale-[0.98] transition-all">
               <Camera size={32} className="text-warm-500 dark:text-warm-400 mb-2" />
-              <span className="text-sm text-warm-500 dark:text-warm-400">탭하여 사진 선택</span>
+              <span className="text-sm text-warm-500 dark:text-warm-400">{t('common.addPhoto')}</span>
             </button>
           )}
-          {extracting && <div className="text-center text-xs text-terra-600 dark:text-terra-400 mt-2 animate-pulse">색상 추출 중...</div>}
+          {extracting && <div className="text-center text-xs text-terra-600 dark:text-terra-400 mt-2 animate-pulse">{t('closetAdd.colorExtract')}</div>}
         </div>
 
         {candidates.length > 0 && (
           <div className="mb-5">
-            <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">3. 가장 비슷한 색상을 선택하세요</div>
+            <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">3. {t('closetAdd.step2')}</div>
             <div className="flex gap-2.5 flex-wrap mb-2">
               {candidates.map(ck => {
                 const c = COLORS_60[ck]; if (!c) return null
@@ -239,14 +241,14 @@ export default function ClosetAdd() {
                 )
               })}
             </div>
-            <button onClick={() => setMode('manual')} className="text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">원하는 색상이 없나요? 직접 선택 →</button>
+            <button onClick={() => setMode('manual')} className="text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">{t('closetAdd.manualMode')} →</button>
           </div>
         )}
 
         {color && <ItemInfo step={4} />}
 
         {selectedItem && color && (
-          <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">등록 완료</button>
+          <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('common.done')}</button>
         )}
       </div>
     )
@@ -254,15 +256,15 @@ export default function ClosetAdd() {
 
   return (
     <div className="animate-screen-enter px-5 pt-2 pb-10">
-      <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">직접 등록</h2>
+      <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('closetAdd.manualMode')}</h2>
 
       <ItemSelector />
 
       {selectedItem && (
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">
-            2. 색상 {color && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {COLORS_60[color]?.name}</span>}
+            2. {t('closetAdd.step2')} {color && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {COLORS_60[color]?.name}</span>}
           </div>
           <ColorPicker inline selected={color} onSelect={setColor} onClear={() => setColor(null)} />
         </div>
@@ -271,7 +273,7 @@ export default function ClosetAdd() {
       {selectedItem && color && <ItemInfo step={3} />}
 
       {selectedItem && color && (
-        <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">등록하기</button>
+        <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('common.done')}</button>
       )}
     </div>
   )

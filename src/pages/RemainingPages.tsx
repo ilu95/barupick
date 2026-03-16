@@ -16,10 +16,12 @@ import { supabase } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { profile } from '@/lib/profile'
+import { useTranslation } from 'react-i18next'
 
 // ─── 날씨 코디 ───
 export function Weather() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [weather, setWeather] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -53,13 +55,13 @@ export function Weather() {
   }
 
   const weatherEmojiLocal = (code: number) => code === 0 ? '☀️' : code <= 3 ? '⛅' : code <= 48 ? '🌫️' : code <= 67 ? '🌧️' : code <= 77 ? '❄️' : code <= 82 ? '🌧️' : '⛈️'
-  const weatherTextLocal = (code: number) => code === 0 ? '맑음' : code <= 3 ? '구름 조금' : code <= 48 ? '안개' : code <= 57 ? '이슬비' : code <= 67 ? '비' : code <= 77 ? '눈' : code <= 82 ? '소나기' : '뇌우'
+  const weatherTextLocal = (code: number) => code === 0 ? t('weather.clear') : code <= 3 ? t('weather.partlyCloudy') : code <= 48 ? t('weather.fog') : code <= 57 ? t('weather.drizzle') : code <= 67 ? t('weather.rain') : code <= 77 ? t('weather.snow') : code <= 82 ? t('weather.shower') : t('weather.thunderstorm')
 
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">날씨를 불러오는 중...</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('weather.loadingWeather')}</div>
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">오늘 뭐 입지?</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('weather.title')}</h2>
       {weather ? (() => {
         const advice = getAdvice(weather.feels)
         return (
@@ -71,13 +73,13 @@ export function Weather() {
                   <span className="text-4xl">{weatherEmojiLocal(weather.code)}</span>
                   <div>
                     <div className="font-display text-3xl font-bold text-warm-900 dark:text-warm-100">{weather.temp}°C</div>
-                    <div className="text-sm text-warm-600 dark:text-warm-400">체감 {weather.feels}°C · {weatherTextLocal(weather.code)}</div>
+                    <div className="text-sm text-warm-600 dark:text-warm-400">{t('weather.feelsLike', { temp: weather.feels })} · {weatherTextLocal(weather.code)}</div>
                   </div>
                 </div>
               </div>
               <div className="flex gap-4 text-xs text-warm-600 dark:text-warm-400">
-                <span className="flex items-center gap-1"><Droplets size={12} /> 습도 {weather.humidity}%</span>
-                <span className="flex items-center gap-1"><Wind size={12} /> 바람 {weather.wind}km/h</span>
+                <span className="flex items-center gap-1"><Droplets size={12} /> {t('weather.humidity', { pct: weather.humidity })}</span>
+                <span className="flex items-center gap-1"><Wind size={12} /> {t('weather.wind', { speed: weather.wind })}</span>
               </div>
             </div>
 
@@ -94,7 +96,7 @@ export function Weather() {
 
               {/* 추천 아이템 */}
               <div className="mb-4">
-                <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2">추천 아이템</div>
+                <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2">{t('weather.recommendItems')}</div>
                 <div className="flex flex-wrap gap-1.5">
                   {advice.items.map((item: string) => (
                     <span key={item} className="px-2.5 py-1.5 bg-warm-100 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-full text-xs font-medium">{item}</span>
@@ -104,7 +106,7 @@ export function Weather() {
 
               {/* 컬러 팁 */}
               <div className="bg-terra-50 dark:bg-terra-900/30 border border-terra-200 dark:border-terra-800 rounded-xl px-3.5 py-2.5">
-                <div className="text-xs font-semibold text-terra-700 dark:text-terra-400 mb-0.5">컬러 팁</div>
+                <div className="text-xs font-semibold text-terra-700 dark:text-terra-400 mb-0.5">{t('weather.colorTip')}</div>
                 <div className="text-xs text-terra-600 dark:text-terra-400">{advice.colorTip}</div>
               </div>
             </div>
@@ -114,15 +116,15 @@ export function Weather() {
               onClick={() => navigate('/home/recommend')}
               className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
             >
-              <Palette size={16} /> 이 날씨에 맞는 코디 추천받기
+              <Palette size={16} /> {t('weather.ctaButton')}
             </button>
           </>
         )
       })() : (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">📍</div>
-          <div className="text-sm text-warm-600 dark:text-warm-400 mb-1">위치 정보를 허용해주세요</div>
-          <div className="text-xs text-warm-500 dark:text-warm-500">날씨 기반으로 오늘의 코디를 추천해 드릴게요</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400 mb-1">{t('weather.noLocation')}</div>
+          <div className="text-xs text-warm-500 dark:text-warm-500">{t('weather.noLocationDesc')}</div>
         </div>
       )}
     </div>
@@ -132,13 +134,14 @@ export function Weather() {
 // ─── 스타일 퀴즈 ───
 export function Quiz() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<number[]>([])
   const questions = [
-    { q: '주말에 주로 뭘 하시나요?', a: ['카페 탐방 ☕', '운동/하이킹 🏃', '쇼핑/전시 🛍️', '집에서 휴식 🏠'] },
-    { q: '선호하는 컬러 톤은?', a: ['뉴트럴/베이지 계열', '네이비/차콜 계열', '파스텔/밝은 톤', '다크/무채색'] },
-    { q: '옷 고를 때 가장 중요한 건?', a: ['편안함', '세련됨', '개성', '가성비'] },
-    { q: '자주 신는 신발은?', a: ['스니커즈 👟', '로퍼/구두 👞', '부츠 🥾', '슬리퍼/샌들 🩴'] },
+    { q: t('quiz.q1'), a: [t('quiz.q1a1'), t('quiz.q1a2'), t('quiz.q1a3'), t('quiz.q1a4')] },
+    { q: t('quiz.q2'), a: [t('quiz.q2a1'), t('quiz.q2a2'), t('quiz.q2a3'), t('quiz.q2a4')] },
+    { q: t('quiz.q3'), a: [t('quiz.q3a1'), t('quiz.q3a2'), t('quiz.q3a3'), t('quiz.q3a4')] },
+    { q: t('quiz.q4'), a: [t('quiz.q4a1'), t('quiz.q4a2'), t('quiz.q4a3'), t('quiz.q4a4')] },
   ]
   const done = step >= questions.length
 
@@ -190,14 +193,14 @@ export function Quiz() {
                 className="w-full py-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-800 dark:text-warm-200 shadow-warm-sm active:scale-[0.98] transition-all hover:border-terra-300 text-left px-4">{a}</button>
             ))}
           </div>
-          {step > 0 && <button onClick={() => { setStep(step - 1); setAnswers(answers.slice(0, -1)) }} className="w-full text-center text-sm text-warm-500 mt-4 active:opacity-70">이전 질문</button>}
+          {step > 0 && <button onClick={() => { setStep(step - 1); setAnswers(answers.slice(0, -1)) }} className="w-full text-center text-sm text-warm-500 mt-4 active:opacity-70">{t('quiz.prevQuestion')}</button>}
         </>
       ) : (
         <div className="py-6">
           <div className="text-center mb-6">
             <div className="text-4xl mb-3">🎉</div>
-            <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 mb-1">분석 완료!</h2>
-            <p className="text-sm text-warm-600 dark:text-warm-400">당신에게 어울리는 스타일을 찾았어요</p>
+            <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 mb-1">{t('quiz.resultTitle')}</h2>
+            <p className="text-sm text-warm-600 dark:text-warm-400">{t('quiz.resultSubtitle')}</p>
           </div>
 
           {/* Top 3 스타일 결과 */}
@@ -244,7 +247,7 @@ export function Quiz() {
             })}
           </div>
 
-          <button onClick={() => { setStep(0); setAnswers([]) }} className="w-full text-center text-sm text-warm-500 dark:text-warm-400 py-2 active:opacity-70">다시 할래요</button>
+          <button onClick={() => { setStep(0); setAnswers([]) }} className="w-full text-center text-sm text-warm-500 dark:text-warm-400 py-2 active:opacity-70">{t('quiz.retake')}</button>
         </div>
       )}
     </div>
@@ -254,6 +257,7 @@ export function Quiz() {
 // ─── 소재 가이드 — 실전 궁합 체크 ───
 export function FabricGuide() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [slots, setSlots] = useState<(any | null)[]>([null, null])
   const [editingSlot, setEditingSlot] = useState<number | null>(null)
   const [editCat, setEditCat] = useState<string | null>(null)
@@ -268,7 +272,7 @@ export function FabricGuide() {
   const [seasonFilter, setSeasonFilter] = useState<string | null>(currentSeason)
 
   const filledSlots = slots.filter(Boolean)
-  const ratingLabels = { great: '추천', ok: '무난', bad: '비추' }
+  const ratingLabels = { great: t('fabricGuide.ratingGreat'), ok: t('fabricGuide.ratingOk'), bad: t('fabricGuide.ratingBad') }
   const ratingEmojis = { great: '✅', ok: '➖', bad: '⚠️' }
   const ratingStyles = {
     great: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400',
@@ -286,7 +290,7 @@ export function FabricGuide() {
         pairs.push({
           a: filled[i], b: filled[j],
           rating: compat?.rating || 'ok',
-          reason: compat?.reason || '특별한 궁합 규칙 없음 — 무난한 조합',
+          reason: compat?.reason || t('fabricGuide.noSpecialRule'),
         })
       }
     }
@@ -322,12 +326,12 @@ export function FabricGuide() {
 
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
-        <button onClick={() => { setEditingSlot(null); setEditCat(null) }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 돌아가기</button>
+        <button onClick={() => { setEditingSlot(null); setEditCat(null) }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.goBack')}</button>
 
         {!editCat ? (
           <>
-            <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 mb-1">어떤 부위인가요?</h2>
-            <p className="text-sm text-warm-600 dark:text-warm-400 mb-4">{editingSlot === 0 ? '입고 있는' : '함께 입을'} 아이템의 부위를 선택하세요</p>
+            <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 mb-1">{t('fabricGuide.whatPart')}</h2>
+            <p className="text-sm text-warm-600 dark:text-warm-400 mb-4">{editingSlot === 0 ? t('fabricGuide.wearingItem') : t('fabricGuide.pairItem')}</p>
             <div className="grid grid-cols-3 gap-2.5">
               {parts.map(part => (
                 <button key={part} onClick={() => setEditCat(part)} className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all">
@@ -339,11 +343,11 @@ export function FabricGuide() {
           </>
         ) : (
           <>
-            <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 mb-1">{(CATEGORY_NAMES as any)?.[editCat]} 아이템</h2>
-            <p className="text-sm text-warm-600 dark:text-warm-400 mb-3">소재를 선택하세요</p>
+            <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 mb-1">{(CATEGORY_NAMES as any)?.[editCat]}</h2>
+            <p className="text-sm text-warm-600 dark:text-warm-400 mb-3">{t('fabricGuide.selectMaterial')}</p>
 
             <div className="flex gap-1.5 mb-4 overflow-x-auto hide-scrollbar">
-              <button onClick={() => setSeasonFilter(null)} className={`px-3 py-1.5 rounded-full text-[11px] font-semibold flex-shrink-0 transition-all ${!seasonFilter ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400'}`}>전체</button>
+              <button onClick={() => setSeasonFilter(null)} className={`px-3 py-1.5 rounded-full text-[11px] font-semibold flex-shrink-0 transition-all ${!seasonFilter ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400'}`}>{t('fabricGuide.seasonAll')}</button>
               {Object.entries(FABRIC_SEASONS).map(([k, s]) => (
                 <button key={k} onClick={() => setSeasonFilter(seasonFilter === k ? null : k)} className={`px-3 py-1.5 rounded-full text-[11px] font-semibold flex-shrink-0 transition-all ${seasonFilter === k ? 'bg-terra-500 text-white' : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400'}`}>{s.emoji} {s.name}</button>
               ))}
@@ -360,10 +364,10 @@ export function FabricGuide() {
                   <div className="flex gap-0.5 flex-shrink-0">{item.seasons.map(s => <span key={s} className="text-[9px]">{FABRIC_SEASONS[s]?.emoji}</span>)}</div>
                 </button>
               ))}
-              {filtered.length === 0 && <div className="text-center py-8 text-sm text-warm-500 dark:text-warm-400">이 계절에 해당하는 아이템이 없어요</div>}
+              {filtered.length === 0 && <div className="text-center py-8 text-sm text-warm-500 dark:text-warm-400">{t('fabricGuide.noSeasonItems')}</div>}
             </div>
 
-            <button onClick={() => setEditCat(null)} className="w-full text-center text-sm text-warm-500 dark:text-warm-400 mt-4 active:opacity-70">← 다른 부위 선택</button>
+            <button onClick={() => setEditCat(null)} className="w-full text-center text-sm text-warm-500 dark:text-warm-400 mt-4 active:opacity-70">{t('fabricGuide.otherPart')}</button>
           </>
         )}
       </div>
@@ -373,8 +377,8 @@ export function FabricGuide() {
   // ─── 메인 화면: 슬롯 + 실시간 궁합 ───
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">소재 궁합 체크</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">입고 싶은 아이템을 선택하면 소재 궁합을 바로 알려드려요</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('fabricGuide.title')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('fabricGuide.subtitle')}</p>
 
       {/* 아이템 슬롯 */}
       <div className="flex flex-col gap-2.5 mb-5">
@@ -391,7 +395,7 @@ export function FabricGuide() {
             ) : (
               <button onClick={() => { setEditingSlot(idx); setEditCat(null) }} className="flex-1 flex items-center gap-3 bg-white dark:bg-warm-800 border-2 border-dashed border-warm-400 dark:border-warm-600 rounded-2xl px-4 py-4 text-left active:scale-[0.98] transition-all">
                 <span className="text-xl text-warm-400">+</span>
-                <span className="text-sm text-warm-500 dark:text-warm-400">{idx === 0 ? '입고 있는 아이템 선택' : '함께 입을 아이템 선택'}</span>
+                <span className="text-sm text-warm-500 dark:text-warm-400">{idx === 0 ? t('fabricGuide.wearingSlot') : t('fabricGuide.pairSlot')}</span>
               </button>
             )}
             {slot && slots.length > 2 && (
@@ -402,7 +406,7 @@ export function FabricGuide() {
 
         {slots.length < 6 && filledSlots.length >= 2 && (
           <button onClick={addSlot} className="w-full py-2.5 border border-dashed border-warm-400 dark:border-warm-600 rounded-xl text-xs text-warm-500 dark:text-warm-400 font-medium active:scale-[0.98] transition-all">
-            + 아이템 추가 (최대 6개)
+            {t('fabricGuide.addItem')}
           </button>
         )}
       </div>
@@ -410,7 +414,7 @@ export function FabricGuide() {
       {/* 실시간 궁합 결과 */}
       {allPairs.length > 0 && (
         <div className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">궁합 결과</div>
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('fabricGuide.compatResult')}</div>
           <div className="flex flex-col gap-2">
             {allPairs.map((pair, idx) => (
               <div key={idx} className={`flex items-start gap-2.5 border rounded-xl px-3.5 py-3 ${ratingStyles[pair.rating]}`}>
@@ -434,19 +438,18 @@ export function FabricGuide() {
       {filledSlots.length < 2 && (
         <div className="text-center py-6">
           <div className="text-3xl mb-3">👆</div>
-          <div className="text-sm text-warm-600 dark:text-warm-400 leading-relaxed">
-            2개 이상 아이템을 선택하면<br />소재 궁합을 바로 확인할 수 있어요
+          <div className="text-sm text-warm-600 dark:text-warm-400 leading-relaxed whitespace-pre-line">
+            {t('fabricGuide.guide2items')}
           </div>
-          <div className="text-xs text-warm-500 dark:text-warm-400 mt-3 leading-relaxed">
-            예) 데님 자켓 + 울 니트 → 추천 조합!<br />
-            실크 블라우스 + 플리스 → 격식 차이 충돌
+          <div className="text-xs text-warm-500 dark:text-warm-400 mt-3 leading-relaxed whitespace-pre-line">
+            {t('fabricGuide.guideExample')}
           </div>
         </div>
       )}
 
       {/* 전체 초기화 */}
       {filledSlots.length > 0 && (
-        <button onClick={() => setSlots([null, null])} className="w-full py-2.5 text-sm text-warm-500 dark:text-warm-400 text-center active:opacity-70">초기화</button>
+        <button onClick={() => setSlots([null, null])} className="w-full py-2.5 text-sm text-warm-500 dark:text-warm-400 text-center active:opacity-70">{t('common.reset')}</button>
       )}
     </div>
   )
@@ -455,6 +458,7 @@ export function FabricGuide() {
 // ─── 체형별 코디 4단계 ───
 export function BodyGuide() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const toast = useToast()
   const [step, setStep] = useState<'list' | 'quiz' | 'select' | 'result'>('list')
   const [quizStep, setQuizStep] = useState(0)
@@ -492,15 +496,15 @@ export function BodyGuide() {
   if (step === 'list') {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">체형별 코디 가이드</h2>
-        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">내 체형에 맞는 컬러 배치와 스타일링 팁을 확인하세요</p>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('bodyGuide.title')}</h2>
+        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('bodyGuide.subtitle')}</p>
 
         {savedType && BODY_GUIDE_DATA[savedType] && (
           <button onClick={() => { setResultType(savedType); setStep('result') }} className="w-full flex items-center gap-3 bg-terra-50 dark:bg-terra-900/30 border border-terra-200 dark:border-terra-800 rounded-2xl px-4 py-3.5 mb-4 text-left active:scale-[0.98] transition-all">
             <span className="text-2xl">{BODY_GUIDE_DATA[savedType].emoji}</span>
             <div className="flex-1">
-              <div className="text-sm font-semibold text-terra-700 dark:text-terra-400">내 체형: {BODY_GUIDE_DATA[savedType].name}</div>
-              <div className="text-[11px] text-warm-600 dark:text-warm-400">탭하여 가이드 보기</div>
+              <div className="text-sm font-semibold text-terra-700 dark:text-terra-400">{t('bodyGuide.myBodyType', { type: BODY_GUIDE_DATA[savedType].name })}</div>
+              <div className="text-[11px] text-warm-600 dark:text-warm-400">{t('bodyGuide.tapToView')}</div>
             </div>
             <ChevronRight size={16} className="text-terra-500" />
           </button>
@@ -508,14 +512,14 @@ export function BodyGuide() {
 
         <div className="flex gap-2.5 mb-5">
           <button onClick={() => { setQuizStep(0); setScores({}); setStep('quiz') }} className="flex-1 py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
-            체형 진단하기
+            {t('bodyGuide.diagnose')}
           </button>
           <button onClick={() => setStep('select')} className="flex-1 py-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
-            직접 선택
+            {t('bodyGuide.directSelect')}
           </button>
         </div>
 
-        <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-3">체형 유형</div>
+        <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-3">{t('bodyGuide.bodyTypes')}</div>
         <div className="flex flex-col gap-2.5">
           {bodyTypes.map(([key, data]: [string, any]) => (
             <button key={key} onClick={() => { setResultType(key); setStep('result') }} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 shadow-warm-sm text-left active:scale-[0.98] transition-all">
@@ -539,7 +543,7 @@ export function BodyGuide() {
 
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
-        <button onClick={() => { if (quizStep > 0) { setQuizStep(quizStep - 1) } else setStep('list') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {quizStep > 0 ? '이전 질문' : '뒤로'}</button>
+        <button onClick={() => { if (quizStep > 0) { setQuizStep(quizStep - 1) } else setStep('list') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {quizStep > 0 ? t('quiz.prevQuestion') : t('common.back')}</button>
 
         <div className="h-1.5 bg-warm-300 dark:bg-warm-700 rounded-full mb-5">
           <div className="h-full bg-terra-500 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
@@ -563,9 +567,9 @@ export function BodyGuide() {
   if (step === 'select') {
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
-        <button onClick={() => setStep('list')} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 뒤로</button>
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">체형 직접 선택</h2>
-        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">가장 비슷한 체형을 선택하세요</p>
+        <button onClick={() => setStep('list')} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('bodyGuide.directSelectTitle')}</h2>
+        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('bodyGuide.directSelectDesc')}</p>
 
         <div className="grid grid-cols-2 gap-2.5">
           {bodyTypes.map(([key, data]: [string, any]) => (
@@ -587,7 +591,7 @@ export function BodyGuide() {
 
   return (
     <div className="animate-screen-enter px-5 pt-2 pb-10">
-      <button onClick={() => setStep('list')} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> 목록으로</button>
+      <button onClick={() => setStep('list')} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('bodyGuide.backToList')}</button>
 
       {/* 헤더 */}
       <div className="text-center mb-5">
@@ -600,7 +604,7 @@ export function BodyGuide() {
       <div className="flex gap-2 justify-center mb-5">
         {(['male', 'female'] as const).map(g => (
           <button key={g} onClick={() => setGender(g)} className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${gender === g ? 'bg-terra-500 text-white shadow-terra' : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400'}`}>
-            {g === 'male' ? '👔 남성' : '👗 여성'}
+            {g === 'male' ? t('bodyGuide.male') : t('bodyGuide.female')}
           </button>
         ))}
       </div>
@@ -612,7 +616,7 @@ export function BodyGuide() {
 
       {/* 컬러 배치 규칙 */}
       <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm">
-        <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2">컬러 배치</div>
+        <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2">{t('bodyGuide.colorPlacement')}</div>
         <div className="text-sm text-warm-800 dark:text-warm-200 font-medium">{data.colorRules?.summary}</div>
         <div className="flex flex-wrap gap-2 mt-2.5">
           {Object.entries(data.colorRules || {}).filter(([k]) => k !== 'summary').map(([part, rule]) => (

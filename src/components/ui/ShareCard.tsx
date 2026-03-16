@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { X, Download, Share } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // ═══════════════════════════════════════════════════════
 // ShareCard v3 — 실제 앱 마네킹 SVG 사용
@@ -188,6 +189,7 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [generating, setGenerating] = useState(true)
+  const { t } = useTranslation()
 
   const generate = useCallback(async () => {
     const canvas = canvasRef.current; if (!canvas) return
@@ -215,7 +217,7 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
     try {
       const blob = await (await fetch(imageUrl)).blob()
       const file = new File([blob], 'barupick-coord.png', { type: 'image/png' })
-      await navigator.share({ files: [file], title: '바루픽 코디' })
+      await navigator.share({ files: [file], title: t('shareCard.shareTitle') })
     } catch { handleDownload() }
   }
 
@@ -236,7 +238,7 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
       // fallback: 새 탭에서 이미지 열기 (길게 눌러서 저장)
       const w = window.open()
       if (w) {
-        w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#000"><img src="${imageUrl}" style="max-width:100%;max-height:100vh;object-fit:contain"/><p style="position:fixed;bottom:20px;width:100%;text-align:center;color:#fff;font-size:14px;">이미지를 길게 눌러서 저장해주세요</p></body></html>`)
+        w.document.write(`<html><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#000"><img src="${imageUrl}" style="max-width:100%;max-height:100vh;object-fit:contain"/><p style="position:fixed;bottom:20px;width:100%;text-align:center;color:#fff;font-size:14px;">${t('shareCard.iosSaveHint')}</p></body></html>`)
       }
     } else {
       // Android/Desktop: 기존 download 방식
@@ -259,15 +261,15 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
               <div className="w-6 h-6 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin" />
             </div>
           ) : imageUrl ? (
-            <img src={imageUrl} alt="공유 카드" className="rounded-2xl shadow-2xl" style={{ width: 240, height: 300, objectFit: 'contain', background: '#000' }} />
+            <img src={imageUrl} alt={t('shareCard.shareTitle')} className="rounded-2xl shadow-2xl" style={{ width: 240, height: 300, objectFit: 'contain', background: '#000' }} />
           ) : (
-            <div className="text-white/50 text-sm py-20">생성 실패</div>
+            <div className="text-white/50 text-sm py-20">{t('common.generateFailed')}</div>
           )}
         </div>
         <div className="flex gap-2">
           <button onClick={handleShare} disabled={generating}
             className="flex-1 py-3.5 bg-white text-warm-900 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50">
-            <Share size={16} /> 공유하기
+            <Share size={16} /> {t('shareCard.shareButton')}
           </button>
           <button onClick={handleDownload} disabled={generating}
             className="py-3.5 px-5 bg-white/15 text-white rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50">

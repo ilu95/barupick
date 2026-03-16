@@ -4,11 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Eye, Heart, Bookmark, MessageSquare, Target, TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 export default function PostInsight() {
   const navigate = useNavigate()
   const { postId } = useParams<{ postId: string }>()
   const { user } = useAuth()
+  const { t } = useTranslation()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -76,8 +78,8 @@ export default function PostInsight() {
     finally { setLoading(false) }
   }
 
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">📊 분석 중...</div>
-  if (!data) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">게시물을 찾을 수 없어요</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">📊 {t('common.analyzing')}</div>
+  if (!data) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('postInsight.notFound')}</div>
 
   const { post, views, likes, saves, comments, likeRate, saveRate, myAvg, dayArr, daysOld, avgViewsPerDay } = data
   const maxDay = Math.max(1, ...dayArr.map((d: any) => d.likes + d.comments))
@@ -98,18 +100,18 @@ export default function PostInsight() {
           <img src={post.photo_urls[0]} className="w-14 h-[72px] rounded-xl object-cover flex-shrink-0" alt="" />
         )}
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-warm-900 truncate">{post.caption || '코디'}</div>
-          <div className="text-[10px] text-warm-500 mt-0.5">{daysOld}일째 · 하루 평균 {avgViewsPerDay}회 조회</div>
+          <div className="text-sm font-semibold text-warm-900 truncate">{post.caption || t('nav.coord')}</div>
+          <div className="text-[10px] text-warm-500 mt-0.5">{t('postInsight.daysOld', { count: daysOld })} · {t('postInsight.avgViewsPerDay', { count: avgViewsPerDay })}</div>
         </div>
       </div>
 
       {/* 핵심 지표 */}
       <div className="grid grid-cols-4 gap-2 mb-4">
         {[
-          { icon: <Eye size={14} />, val: views, label: '조회' },
-          { icon: <Heart size={14} />, val: likes, label: '좋아요' },
-          { icon: <Bookmark size={14} />, val: saves, label: '저장' },
-          { icon: <MessageSquare size={14} />, val: comments, label: '댓글' },
+          { icon: <Eye size={14} />, val: views, label: t('postInsight.views') },
+          { icon: <Heart size={14} />, val: likes, label: t('postInsight.likes') },
+          { icon: <Bookmark size={14} />, val: saves, label: t('postInsight.saves') },
+          { icon: <MessageSquare size={14} />, val: comments, label: t('postInsight.comments') },
         ].map(({ icon, val, label }) => (
           <div key={label} className="text-center bg-white border border-warm-400 rounded-xl py-2.5 shadow-warm-sm">
             <div className="flex justify-center text-terra-500 mb-1">{icon}</div>
@@ -122,17 +124,17 @@ export default function PostInsight() {
       {/* 참여율 */}
       <div className="bg-white border border-warm-300 rounded-2xl p-4 mb-4 shadow-warm-sm">
         <div className="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5">
-          <Target size={13} /> 참여율 분석
+          <Target size={13} /> {t('postInsight.engagementTitle')}
         </div>
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="bg-warm-50 rounded-xl p-3">
-            <div className="text-[10px] text-warm-500 mb-1">좋아요율</div>
+            <div className="text-[10px] text-warm-500 mb-1">{t('postInsight.likeRate')}</div>
             <div className={`text-xl font-bold ${likeRate && parseFloat(likeRate) >= 10 ? 'text-green-600' : 'text-warm-900'}`}>
               {likeRate ? likeRate + '%' : '—'}
             </div>
           </div>
           <div className="bg-warm-50 rounded-xl p-3">
-            <div className="text-[10px] text-warm-500 mb-1">저장률</div>
+            <div className="text-[10px] text-warm-500 mb-1">{t('postInsight.saveRate')}</div>
             <div className={`text-xl font-bold ${saveRate && parseFloat(saveRate) >= 5 ? 'text-green-600' : 'text-warm-900'}`}>
               {saveRate ? saveRate + '%' : '—'}
             </div>
@@ -140,11 +142,11 @@ export default function PostInsight() {
         </div>
 
         {/* 내 평균 비교 */}
-        <div className="text-[10px] text-warm-500 mb-2">내 게시물 평균과 비교</div>
+        <div className="text-[10px] text-warm-500 mb-2">{t('postInsight.compareAvg')}</div>
         {[
-          { label: '조회', val: views, avg: myAvg.views },
-          { label: '좋아요', val: likes, avg: myAvg.likes },
-          { label: '저장', val: saves, avg: myAvg.saves },
+          { label: t('postInsight.views'), val: views, avg: myAvg.views },
+          { label: t('postInsight.likes'), val: likes, avg: myAvg.likes },
+          { label: t('postInsight.saves'), val: saves, avg: myAvg.saves },
         ].map(({ label, val, avg }) => (
           <div key={label} className="flex items-center gap-2 py-1.5 text-xs">
             <span className="w-12 text-warm-500">{label}</span>
@@ -153,7 +155,7 @@ export default function PostInsight() {
             </div>
             <span className="w-8 text-right font-semibold text-warm-800">{val}</span>
             <CompareIcon val={val} avg={avg} />
-            <span className="w-12 text-warm-500 text-[10px]">평균 {avg}</span>
+            <span className="w-12 text-warm-500 text-[10px]">{t('postInsight.avgLabel', { count: avg })}</span>
           </div>
         ))}
       </div>
@@ -161,7 +163,7 @@ export default function PostInsight() {
       {/* 14일 트렌드 */}
       <div className="bg-white border border-warm-300 rounded-2xl p-4 mb-4 shadow-warm-sm">
         <div className="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5">
-          <BarChart3 size={13} /> 14일 트렌드
+          <BarChart3 size={13} /> {t('postInsight.trend14d')}
         </div>
         <div className="flex items-end gap-[3px] h-[80px]">
           {dayArr.map((day: any, idx: number) => {
@@ -180,8 +182,8 @@ export default function PostInsight() {
           })}
         </div>
         <div className="flex justify-center gap-4 mt-2">
-          <span className="flex items-center gap-1 text-[10px] text-warm-500"><span className="w-2.5 h-2.5 rounded-sm bg-terra-400" /> 좋아요</span>
-          <span className="flex items-center gap-1 text-[10px] text-warm-500"><span className="w-2.5 h-2.5 rounded-sm bg-blue-400" /> 댓글</span>
+          <span className="flex items-center gap-1 text-[10px] text-warm-500"><span className="w-2.5 h-2.5 rounded-sm bg-terra-400" /> {t('postInsight.likes')}</span>
+          <span className="flex items-center gap-1 text-[10px] text-warm-500"><span className="w-2.5 h-2.5 rounded-sm bg-blue-400" /> {t('postInsight.comments')}</span>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { useWardrobe } from '@/hooks/useWardrobe'
+import { useTranslation } from 'react-i18next'
 
 type PageMode = 'select' | 'recommend' | 'manual'
 
@@ -30,17 +31,11 @@ const SCAN_COLORS = [
   'pastel_pink', 'pastel_blue', 'pastel_green', 'lavender', 'mauve',
 ]
 
-const VERDICT_UI = {
-  strong_buy: { emoji: '🔥', label: '강력 추천!', bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-300 dark:border-green-700', text: 'text-green-700 dark:text-green-400' },
-  buy: { emoji: '👍', label: '좋은 선택', bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-300 dark:border-blue-700', text: 'text-blue-700 dark:text-blue-400' },
-  weak: { emoji: '🤔', label: '효과 적음', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-300 dark:border-amber-700', text: 'text-amber-700 dark:text-amber-400' },
-  skip: { emoji: '➖', label: '조합 없음', bg: 'bg-warm-50 dark:bg-warm-700', border: 'border-warm-300 dark:border-warm-600', text: 'text-warm-600 dark:text-warm-400' },
-}
-
 export default function PurchaseSimulate() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const wardrobe = useWardrobe()
+  const { t } = useTranslation()
 
   const presetCategory = searchParams.get('category') || null
   const presetColor = searchParams.get('color') || null
@@ -61,6 +56,13 @@ export default function PurchaseSimulate() {
   const [color, setColor] = useState<string | null>(presetColor)
   const [simResult, setSimResult] = useState<any>(null)
   const [manualAnalyzing, setManualAnalyzing] = useState(false)
+
+  const VERDICT_UI = {
+    strong_buy: { emoji: '🔥', label: t('purchaseSimulate.verdict.strongBuy'), bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-300 dark:border-green-700', text: 'text-green-700 dark:text-green-400' },
+    buy: { emoji: '👍', label: t('purchaseSimulate.verdict.buy'), bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-300 dark:border-blue-700', text: 'text-blue-700 dark:text-blue-400' },
+    weak: { emoji: '🤔', label: t('purchaseSimulate.verdict.weak'), bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-300 dark:border-amber-700', text: 'text-amber-700 dark:text-amber-400' },
+    skip: { emoji: '➖', label: t('purchaseSimulate.verdict.skip'), bg: 'bg-warm-50 dark:bg-warm-700', border: 'border-warm-300 dark:border-warm-600', text: 'text-warm-600 dark:text-warm-400' },
+  }
 
   // 옷장에 이미 있는 (카테고리, 색상) 쌍
   const existingPairs = useMemo(() => {
@@ -164,9 +166,9 @@ export default function PurchaseSimulate() {
       <div className="animate-screen-fade px-5 pt-2 pb-10">
         <div className="flex items-center gap-2 mb-1">
           <ShoppingBag size={20} className="text-amber-600 dark:text-amber-400" />
-          <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">뭘 사면 좋을까?</h2>
+          <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">{t('purchaseSimulate.title')}</h2>
         </div>
-        <p className="text-sm text-warm-500 dark:text-warm-400 mb-6">내 옷장을 분석해서 추천해드릴게요</p>
+        <p className="text-sm text-warm-500 dark:text-warm-400 mb-6">{t('purchaseSimulate.subtitle')}</p>
 
         <div className="flex flex-col gap-3">
           <button onClick={startRecommend} className="w-full bg-gradient-to-br from-amber-50 to-orange-50 dark:from-warm-800 dark:to-warm-700 border border-amber-300 dark:border-amber-700 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm">
@@ -174,8 +176,8 @@ export default function PurchaseSimulate() {
               <Sparkles size={22} className="text-amber-700 dark:text-amber-300" />
             </div>
             <div className="flex-1">
-              <div className="text-[15px] font-bold text-amber-800 dark:text-amber-200">옷장 분석해서 추천받기</div>
-              <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-0.5">아무것도 고르지 않아도 돼요</div>
+              <div className="text-[15px] font-bold text-amber-800 dark:text-amber-200">{t('purchaseSimulate.recommendMode')}</div>
+              <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-0.5">{t('purchaseSimulate.recommendModeDesc')}</div>
             </div>
             <ChevronRight size={16} className="text-amber-500" />
           </button>
@@ -185,8 +187,8 @@ export default function PurchaseSimulate() {
               <Target size={22} className="text-warm-600 dark:text-warm-400" />
             </div>
             <div className="flex-1">
-              <div className="text-[15px] font-bold text-warm-800 dark:text-warm-200">특정 아이템 궁합 확인하기</div>
-              <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-0.5">사고 싶은 옷의 색상을 직접 선택</div>
+              <div className="text-[15px] font-bold text-warm-800 dark:text-warm-200">{t('purchaseSimulate.manualMode')}</div>
+              <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-0.5">{t('purchaseSimulate.manualModeDesc')}</div>
             </div>
             <ChevronRight size={16} className="text-warm-400" />
           </button>
@@ -200,10 +202,10 @@ export default function PurchaseSimulate() {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
         <button onClick={() => setMode('select')} className="flex items-center gap-1 text-sm text-warm-500 dark:text-warm-400 mb-3 active:opacity-70">
-          <ArrowLeft size={16} /> 돌아가기
+          <ArrowLeft size={16} /> {t('common.goBack')}
         </button>
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">추천 결과</h2>
-        <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">옷장을 분석해서 효과 높은 순으로 정렬했어요</p>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('purchaseSimulate.resultTitle')}</h2>
+        <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">{t('purchaseSimulate.resultSubtitle')}</p>
 
         {recAnalyzing && (
           <div className="py-16 flex flex-col items-center">
@@ -218,15 +220,15 @@ export default function PurchaseSimulate() {
                 <span className="font-display text-sm font-bold text-warm-700 dark:text-warm-300">{recProgress}%</span>
               </div>
             </div>
-            <div className="text-sm text-warm-500 dark:text-warm-400">옷장과 궁합 분석 중...</div>
+            <div className="text-sm text-warm-500 dark:text-warm-400">{t('purchaseSimulate.analyzingCompat')}</div>
           </div>
         )}
 
         {!recAnalyzing && recResults.length === 0 && (
           <div className="text-center py-16">
             <div className="text-3xl mb-3">🤔</div>
-            <div className="text-sm text-warm-600 dark:text-warm-400">추천할 아이템을 찾지 못했어요</div>
-            <div className="text-[11px] text-warm-500 mt-1">옷장에 아이템을 더 등록해보세요</div>
+            <div className="text-sm text-warm-600 dark:text-warm-400">{t('purchaseSimulate.noRecommend')}</div>
+            <div className="text-[11px] text-warm-500 mt-1">{t('purchaseSimulate.noRecommendDesc')}</div>
           </div>
         )}
 
@@ -246,13 +248,13 @@ export default function PurchaseSimulate() {
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${v.bg} ${v.text}`}>{v.emoji} {v.label}</span>
                       </div>
                       <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">
-                        +{rec.comboDelta}개 코디 · 평균 {rec.avgScore}점 · 최고 {rec.bestScore}점
+                        {t('purchaseSimulate.comboDelta', { count: rec.comboDelta })} · {t('purchaseSimulate.avgScoreLabel', { score: rec.avgScore })} · {t('purchaseSimulate.bestScoreLabel', { score: rec.bestScore })}
                       </div>
                     </div>
                   </div>
                   {rec.verdict === 'strong_buy' || rec.verdict === 'buy' ? (
                     <button onClick={() => handleAddToWardrobe(rec.category, rec.color)} className="mt-3 w-full py-2.5 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.98] transition-all">
-                      <Plus size={14} /> 옷장에 추가
+                      <Plus size={14} /> {t('purchaseSimulate.addToCloset')}
                     </button>
                   ) : null}
                 </div>
@@ -268,18 +270,18 @@ export default function PurchaseSimulate() {
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       <button onClick={() => hasPreset ? navigate(-1) : setMode('select')} className="flex items-center gap-1 text-sm text-warm-500 dark:text-warm-400 mb-3 active:opacity-70">
-        <ArrowLeft size={16} /> 돌아가기
+        <ArrowLeft size={16} /> {t('common.goBack')}
       </button>
 
       <div className="flex items-center gap-2 mb-4">
         <Target size={20} className="text-warm-600 dark:text-warm-400" />
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">궁합 확인</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">{t('purchaseSimulate.compatCheck')}</h2>
       </div>
 
       {/* Step 1: 부위 */}
       {manualStep === 'category' && (
         <div className="animate-screen-fade">
-          <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">사고 싶은 옷의 종류를 선택하세요</p>
+          <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">{t('purchaseSimulate.selectCategory')}</p>
           <div className="flex flex-col gap-2.5">
             {CATEGORIES.map(cat => {
               const count = wardrobe.getItems(cat.key).length
@@ -289,7 +291,7 @@ export default function PurchaseSimulate() {
                   <span className="text-2xl">{cat.emoji}</span>
                   <div className="flex-1 text-left">
                     <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{cat.label}</div>
-                    <div className="text-[11px] text-warm-500 dark:text-warm-400">현재 {count}개</div>
+                    <div className="text-[11px] text-warm-500 dark:text-warm-400">{t('purchaseSimulate.currentCount', { count })}</div>
                   </div>
                   <ChevronRight size={16} className="text-warm-400" />
                 </button>
@@ -303,9 +305,9 @@ export default function PurchaseSimulate() {
       {manualStep === 'color' && (
         <div className="animate-screen-fade">
           <button onClick={() => setManualStep('category')} className="flex items-center gap-1 text-sm text-warm-500 mb-3 active:opacity-70">
-            <ArrowLeft size={16} /> 부위 다시 선택
+            <ArrowLeft size={16} /> {t('purchaseSimulate.reselectPart')}
           </button>
-          <p className="text-sm text-warm-500 dark:text-warm-400 mb-4">{CATEGORIES.find(c => c.key === category)?.label}의 색상을 선택하세요</p>
+          <p className="text-sm text-warm-500 dark:text-warm-400 mb-4">{t('purchaseSimulate.selectColor', { category: CATEGORIES.find(c => c.key === category)?.label })}</p>
           <ColorPicker onSelect={handleColor} selected={color} inline={true} />
         </div>
       )}
@@ -320,13 +322,13 @@ export default function PurchaseSimulate() {
               <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{COLORS_60[color]?.name || color}</div>
               <div className="text-[11px] text-warm-500 dark:text-warm-400">{CATEGORIES.find(c => c.key === category)?.label}</div>
             </div>
-            <button onClick={() => { setCategory(null); setColor(null); setSimResult(null); setManualStep('category') }} className="text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">다시 선택</button>
+            <button onClick={() => { setCategory(null); setColor(null); setSimResult(null); setManualStep('category') }} className="text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">{t('purchaseSimulate.reselect')}</button>
           </div>
 
           {manualAnalyzing && (
             <div className="flex flex-col items-center py-16">
               <div className="w-10 h-10 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin mb-4" />
-              <div className="text-sm text-warm-500">분석 중...</div>
+              <div className="text-sm text-warm-500">{t('common.analyzing')}</div>
             </div>
           )}
 
@@ -342,20 +344,20 @@ export default function PurchaseSimulate() {
                 <div className="grid grid-cols-3 gap-2.5 mb-5">
                   <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-3 text-center">
                     <div className="text-xl font-bold text-warm-900 dark:text-warm-100 font-display">+{simResult.comboDelta}</div>
-                    <div className="text-[10px] text-warm-500">새 코디 수</div>
+                    <div className="text-[10px] text-warm-500">{t('purchaseSimulate.newCombos')}</div>
                   </div>
                   <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-3 text-center">
                     <div className="text-xl font-bold text-warm-900 dark:text-warm-100 font-display">{simResult.bestScore}</div>
-                    <div className="text-[10px] text-warm-500">최고 점수</div>
+                    <div className="text-[10px] text-warm-500">{t('purchaseSimulate.bestScore')}</div>
                   </div>
                   <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-3 text-center">
                     <div className="text-xl font-bold text-warm-900 dark:text-warm-100 font-display">{simResult.avgScore}</div>
-                    <div className="text-[10px] text-warm-500">평균 점수</div>
+                    <div className="text-[10px] text-warm-500">{t('purchaseSimulate.avgScore')}</div>
                   </div>
                 </div>
                 {(simResult.verdict === 'strong_buy' || simResult.verdict === 'buy') && (
                   <button onClick={() => handleAddToWardrobe(category, color)} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra mb-3">
-                    <Plus size={16} /> 옷장에 추가
+                    <Plus size={16} /> {t('purchaseSimulate.addToCloset')}
                   </button>
                 )}
               </>

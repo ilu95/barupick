@@ -1,6 +1,6 @@
 // @ts-nocheck
 // ═══════════════════════════════════════════════════════
-// AllCombos.tsx — 내 옷장 전체 조합 리스트
+// AllCombos.tsx — {t('allCombos.title')} 리스트
 // 모든 조합을 점수와 함께 표시, 순위, 감점 이유, 원탭 기록
 // ═══════════════════════════════════════════════════════
 import { useState, useEffect, useMemo } from 'react'
@@ -14,6 +14,7 @@ import { profile } from '@/lib/profile'
 import { useWardrobe, getScorePercentile } from '@/hooks/useWardrobe'
 import { useQuickRecord } from '@/hooks/useQuickRecord'
 import { useWeather } from '@/hooks/useWeather'
+import { useTranslation } from 'react-i18next'
 
 type SortMode = 'score' | 'unworn' | 'minimal'
 type FilterMode = 'all' | 'with_outer' | 'no_outer' | string // string = specific item colorKey
@@ -31,16 +32,17 @@ interface ComboCard {
   lowestSub: { key: string; value: number; label: string } | null
 }
 
-const SUB_LABELS: Record<string, string> = {
-  goldilocks: '컬러 배치',
-  ratio: '색상 비율',
-  harmony: '색상 조화',
-  season: '계절감',
-  balance: '밸런스',
-  personal: '퍼스널 컬러',
+const SUB_LABEL_KEYS: Record<string, string> = {
+  goldilocks: 'allCombos.subScoreLabels.colorPlacement',
+  ratio: 'allCombos.subScoreLabels.colorRatio',
+  harmony: 'allCombos.subScoreLabels.colorHarmony',
+  season: 'allCombos.subScoreLabels.seasonal',
+  balance: 'allCombos.subScoreLabels.balance',
+  personal: 'allCombos.subScoreLabels.personalColor',
 }
 
 export default function AllCombos() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const wardrobe = useWardrobe()
   const { weather } = useWeather()
@@ -90,7 +92,7 @@ export default function AllCombos() {
             const entries = Object.entries(subs)
             entries.sort((a, b) => a[1] - b[1])
             if (entries[0]) {
-              lowestSub = { key: entries[0][0], value: Math.round(entries[0][1]), label: SUB_LABELS[entries[0][0]] || entries[0][0] }
+              lowestSub = { key: entries[0][0], value: Math.round(entries[0][1]), label: SUB_LABEL_KEYS[entries[0][0]] || entries[0][0] }
             }
           }
 
@@ -172,12 +174,12 @@ export default function AllCombos() {
   // ─── 날씨 코멘트 ───
   const weatherComment = useMemo(() => {
     if (!weather) return null
-    const t = weather.feels ?? weather.temp
-    if (t >= 28) return { emoji: '☀️', text: `${t}°C — 가볍게 입기 좋은 날이에요` }
-    if (t >= 20) return { emoji: '🌤', text: `${t}°C — 간절기 코디 좋아요` }
-    if (t >= 12) return { emoji: '🌥', text: `${t}°C — 자켓이나 가디건 추천해요` }
-    if (t >= 5) return { emoji: '🧥', text: `${t}°C — 아우터가 필요해요` }
-    return { emoji: '❄️', text: `${t}°C — 따뜻하게 레이어링하세요` }
+    const temp = weather.feels ?? weather.temp
+    if (temp >= 28) return { emoji: '☀️', text: `${temp}°C — 가볍게 입기 좋은 날이에요` }
+    if (temp >= 20) return { emoji: '🌤', text: `${temp}°C — 간절기 코디 좋아요` }
+    if (temp >= 12) return { emoji: '🌥', text: `${temp}°C — 자켓이나 가디건 추천해요` }
+    if (temp >= 5) return { emoji: '🧥', text: `${temp}°C — 아우터가 필요해요` }
+    return { emoji: '❄️', text: `${temp}°C — 따뜻하게 레이어링하세요` }
   }, [weather])
 
   // ─── 옷장 진단 (조합 부족 시) ───
@@ -239,7 +241,7 @@ export default function AllCombos() {
   if (analyzing) {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">내 옷장 전체 조합</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">{t('allCombos.title')}</h2>
         <div className="py-16 flex flex-col items-center">
           <div className="w-16 h-16 mx-auto mb-4 relative">
             <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
@@ -252,7 +254,7 @@ export default function AllCombos() {
               <span className="font-display text-sm font-bold text-warm-700 dark:text-warm-300">{progress}%</span>
             </div>
           </div>
-          <div className="text-sm text-warm-500 dark:text-warm-400">옷장 조합 분석 중...</div>
+          <div className="text-sm text-warm-500 dark:text-warm-400">{t('common.analyzing')}</div>
         </div>
       </div>
     )
@@ -262,7 +264,7 @@ export default function AllCombos() {
   if (diagnosis && combos.length === 0) {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">내 옷장 전체 조합</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">{t('allCombos.title')}</h2>
         <div className="bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-5 mb-5">
           <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 mb-3">현재 옷장 상태</div>
           {['top', 'bottom', 'shoes', 'outer', 'middleware'].map(cat => {
@@ -288,7 +290,7 @@ export default function AllCombos() {
           </div>
         )}
         <button onClick={() => navigate('/closet/add')} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
-          아이템 등록하기
+          {t('common.itemRegister')}
         </button>
       </div>
     )
@@ -297,7 +299,7 @@ export default function AllCombos() {
   // ─── 메인 렌더 ───
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">내 옷장 전체 조합</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('allCombos.title')}</h2>
 
       {/* 날씨 코멘트 (참고) */}
       {weatherComment && (
@@ -315,9 +317,9 @@ export default function AllCombos() {
           onChange={e => { setSort(e.target.value as SortMode); setShowCount(20) }}
           className="flex-1 py-2 px-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-xl text-[12px] font-medium text-warm-700 dark:text-warm-300 appearance-none"
         >
-          <option value="score">점수순</option>
-          <option value="unworn">최근 안 입은 순</option>
-          <option value="minimal">아이템 적은 순</option>
+          <option value="score">{t('allCombos.sortScore')}</option>
+          <option value="unworn">{t('allCombos.sortRecent')}</option>
+          <option value="minimal">{t('allCombos.sortFewer')}</option>
         </select>
 
         {/* 필터 */}
@@ -326,9 +328,9 @@ export default function AllCombos() {
           onChange={e => { setFilter(e.target.value); setShowCount(20) }}
           className="flex-1 py-2 px-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-xl text-[12px] font-medium text-warm-700 dark:text-warm-300 appearance-none"
         >
-          <option value="all">전체 {combos.length}개</option>
-          <option value="with_outer">아우터 포함</option>
-          <option value="no_outer">아우터 없이</option>
+          <option value="all">{t('allCombos.filterAll')} {combos.length}</option>
+          <option value="with_outer">{t('allCombos.filterOuter')}</option>
+          <option value="no_outer">{t('allCombos.filterNoOuter')}</option>
           {wardrobeColorItems.slice(0, 10).map(item => {
             const c = COLORS_60[item.color || item.colorKey]
             if (!c) return null
@@ -414,7 +416,7 @@ export default function AllCombos() {
               {/* 감점 이유 (75점 미만) */}
               {combo.lowestSub && (
                 <div className="px-4 pb-1">
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400">⚠️ {combo.lowestSub.label} 점수가 낮아요</span>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400">⚠️ {t(combo.lowestSub.label)}</span>
                 </div>
               )}
 
@@ -439,7 +441,7 @@ export default function AllCombos() {
               <div className="border-t border-warm-200 dark:border-warm-600 px-3 py-2.5 flex gap-2">
                 {isJustRecorded ? (
                   <div className="flex-1 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl text-center text-[11px] font-semibold text-green-600 dark:text-green-400 flex items-center justify-center gap-1">
-                    <Check size={14} /> 기록 완료!
+                    <Check size={14} /> {t('ootdRecord.saveComplete')}
                   </div>
                 ) : isDup ? (
                   <div className="flex-1 py-2 bg-warm-100 dark:bg-warm-700 rounded-xl text-center text-[11px] text-warm-500">
@@ -451,13 +453,13 @@ export default function AllCombos() {
                       onClick={() => handleRecordToday(combo.outfit)}
                       className="flex-1 py-2 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.97] transition-all"
                     >
-                      <Check size={13} /> 오늘 입었어요
+                      <Check size={13} /> {t('allCombos.woreToday')}
                     </button>
                     <button
                       onClick={() => { setDatePickerFor(key); setDatePickerValue('') }}
                       className="py-2 px-3 bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-xl text-[11px] font-medium text-warm-600 dark:text-warm-400 flex items-center gap-1 active:scale-[0.97] transition-all"
                     >
-                      <Calendar size={13} /> 날짜 선택
+                      <Calendar size={13} /> {t('allCombos.selectDate')}
                     </button>
                   </>
                 )}
@@ -484,7 +486,7 @@ export default function AllCombos() {
                     onClick={() => setDatePickerFor(null)}
                     className="py-2 px-2 text-warm-500 text-[11px]"
                   >
-                    취소
+                    {t('common.cancel')}
                   </button>
                 </div>
               )}

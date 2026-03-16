@@ -12,8 +12,11 @@ import ShareCard, { useShareCard } from '@/components/ui/ShareCard'
 import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 import { getScorePercentile } from '@/hooks/useWardrobe'
+import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 
 export default function OotdDetail() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { date } = useParams()
   const [searchParams] = useSearchParams()
@@ -49,17 +52,17 @@ export default function OotdDetail() {
 
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
   const dateObj = new Date(ry, rm - 1, rd)
-  const dateLabel = dateObj.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+  const dateLabel = dateObj.toLocaleDateString(getLocale(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
 
   const handleDelete = () => {
     modal.confirm({
-      title: '기록 삭제',
-      message: '이 기록을 삭제할까요? 되돌릴 수 없습니다.',
-      confirmLabel: '삭제',
+      title: t('ootdDetail.deleteRecord'),
+      message: t('ootdDetail.deleteConfirm'),
+      confirmLabel: t('common.delete'),
       variant: 'danger',
       onConfirm: () => {
         deleteRecord(record.id)
-        toast.success('기록을 삭제했어요')
+        toast.success(t('ootdDetail.deleteSuccess'))
         navigate('/closet', { replace: true })
       },
     })
@@ -113,7 +116,7 @@ export default function OotdDetail() {
           recs[ri].visibility = 'public'
           localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
         }
-        setShareMsg('커뮤니티에 다시 공유했어요!')
+        setShareMsg(t('ootdDetail.communityShareSuccess'))
       } else {
         const { data: inserted } = await supabase.from('posts').insert({
           user_id: userId,
@@ -139,7 +142,7 @@ export default function OotdDetail() {
             recs[ri].visibility = 'public'
             localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
           }
-          setShareMsg('커뮤니티에 공유했어요!')
+          setShareMsg(t('ootdDetail.communityShareSuccess'))
         }
       }
     } catch (e) {
@@ -264,13 +267,13 @@ export default function OotdDetail() {
           onClick={handleEdit}
           className="flex-1 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
         >
-          <Pencil size={14} /> 수정
+          <Pencil size={14} /> {t('ootdDetail.editRecord')}
         </button>
         <button
           onClick={handleDelete}
           className="flex-1 py-3 bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-2xl text-sm font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
         >
-          <Trash2 size={14} /> 삭제
+          <Trash2 size={14} /> {t('ootdDetail.deleteRecord')}
         </button>
       </div>
 
@@ -285,7 +288,7 @@ export default function OotdDetail() {
           }}
           className="w-full py-3 mb-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
         >
-          <Image size={16} /> 공유 카드 만들기
+          <Image size={16} /> {t('ootdDetail.shareCard')}
         </button>
       )}
 
@@ -300,7 +303,7 @@ export default function OotdDetail() {
         disabled={sharing}
         className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
       >
-        <Globe size={16} /> {sharing ? '공유 중...' : (record.postId && record.visibility !== 'private') ? '이미 공유됨' : '커뮤니티에 공유'}
+        <Globe size={16} /> {sharing ? '...' : (record.postId && record.visibility !== 'private') ? t('ootdDetail.communityShareSuccess') : t('ootdDetail.communityShare')}
       </button>
 
       {/* 공유 카드 모달 */}

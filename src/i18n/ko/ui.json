@@ -1,0 +1,914 @@
+{
+  "common": {
+    "loading": "불러오는 중...",
+    "analyzing": "분석 중...",
+    "loginRequired": "로그인이 필요합니다",
+    "confirm": "확인",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "close": "닫기",
+    "back": "뒤로",
+    "goBack": "돌아가기",
+    "next": "다음",
+    "previous": "이전",
+    "reset": "초기화",
+    "retry": "다시 시도",
+    "share": "공유하기",
+    "download": "다운로드",
+    "done": "완료",
+    "send": "보내기",
+    "search": "검색",
+    "all": "전체",
+    "user": "유저",
+    "justNow": "방금",
+    "minutesAgo": "{{count}}분 전",
+    "hoursAgo": "{{count}}시간 전",
+    "daysAgo": "{{count}}일 전",
+    "version": "버전",
+    "developer": "개발",
+    "developerName": "바루픽",
+    "undo": "되돌리기",
+    "selectColor": "색상 선택",
+    "recentColors": "최근 사용",
+    "colorCount": "{{count}}색",
+    "follow": "팔로우",
+    "following": "팔로잉 ✓",
+    "friend": "👫 친구",
+    "mutualFriend": "👫 서로 친구",
+    "blocked": "차단됨",
+    "unblock": "차단 해제",
+    "block": "차단하기",
+    "report": "신고",
+    "coord": "코디",
+    "followers": "팔로워",
+    "followingLabel": "팔로잉",
+    "public": "공개",
+    "friendOnly": "친구",
+    "private": "비공개",
+    "today": "오늘",
+    "yesterday": "어제",
+    "daysAgoShort": "{{count}}일 전",
+    "photo": "사진",
+    "mannequin": "마네킹",
+    "score": "{{score}}점",
+    "itemRegister": "아이템 등록하기",
+    "generateFailed": "생성 실패",
+    "addPhoto": "사진 추가"
+  },
+
+  "nav": {
+    "coord": "코디",
+    "closet": "옷장",
+    "record": "기록",
+    "community": "커뮤",
+    "shop": "샵"
+  },
+
+  "header": {
+    "home": "바루픽",
+    "closet": "옷장",
+    "closetAdd": "아이템 등록",
+    "closetCoord": "내 옷 코디",
+    "closetCombos": "전체 조합",
+    "closetSimulate": "뭘 사면 좋을까?",
+    "closetReport": "내 옷장 이야기",
+    "closetBest": "베스트 코디",
+    "closetToday": "오늘 뭐 입지?",
+    "record": "OOTD 기록",
+    "calendar": "코디 캘린더",
+    "community": "커뮤니티",
+    "communityPost": "코디 공유",
+    "shop": "샵",
+    "profile": "마이",
+    "profileEdit": "프로필 수정",
+    "settings": "설정",
+    "notifications": "알림",
+    "recommend": "코디 추천",
+    "build": "코디 만들기",
+    "weather": "날씨 코디",
+    "saved": "저장한 코디",
+    "quiz": "스타일 퀴즈",
+    "fabricGuide": "소재 가이드",
+    "bodyGuide": "체형별 코디",
+    "personalColor": "퍼스널컬러",
+    "personalColorLight": "빛 진단",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침",
+    "blockList": "차단 목록",
+    "devDiag": "연결 진단",
+    "myLevel": "내 레벨",
+    "myBadges": "배지 모음",
+    "colorRanking": "컬러 분석",
+    "colorPattern": "컬러 패턴",
+    "challenges": "챌린지",
+    "titleExam": "칭호 시험",
+    "myPosts": "내 게시물",
+    "insights": "인사이트",
+    "savedCoords": "저장한 코디",
+    "userDiscover": "유저 찾기",
+    "postInsight": "게시물 분석",
+    "eventDetail": "이벤트",
+    "eventSubmit": "이벤트 참여"
+  },
+
+  "onboarding": {
+    "slide1Title": "AI 컬러 코디",
+    "slide1Desc": "색상 조화 알고리즘이 최적의 코디를 추천해드려요",
+    "slide2Title": "OOTD 기록",
+    "slide2Desc": "매일의 코디를 기록하고 성장을 트래킹하세요",
+    "slide3Title": "스타일 커뮤니티",
+    "slide3Desc": "다른 유저의 코디를 구경하고 영감을 얻어보세요",
+    "slide4Title": "퍼스널컬러 & 체형",
+    "slide4Desc": "나만의 진단 결과로 맞춤 추천을 받아보세요",
+    "start": "시작하기",
+    "skip": "건너뛰기"
+  },
+
+  "home": {
+    "greetingMorning": "좋은 아침이에요",
+    "greetingAfternoon": "좋은 오후예요",
+    "greetingEvening": "좋은 저녁이에요",
+    "weatherCard": "오늘 날씨",
+    "feelsLike": "체감 {{temp}}°C",
+    "recentOotd": "최근 OOTD",
+    "noRecords": "아직 기록이 없어요",
+    "personalColorBanner": "퍼스널컬러를 설정하면 맞춤 추천을 받을 수 있어요",
+    "setupNow": "설정하기",
+    "wardrobeCombo": "내 옷장에서 코디 조합 보기",
+    "mainCta": {
+      "recommend": "코디 추천받기",
+      "build": "직접 만들기",
+      "weather": "날씨 코디",
+      "saved": "저장한 코디"
+    },
+    "guide": {
+      "fabricGuide": "소재 가이드",
+      "bodyGuide": "체형별 코디",
+      "quiz": "퀴즈"
+    }
+  },
+
+  "auth": {
+    "loginTitle": "로그인",
+    "signupTitle": "회원가입",
+    "email": "이메일",
+    "password": "비밀번호",
+    "passwordConfirm": "비밀번호 확인",
+    "nickname": "닉네임",
+    "loginButton": "로그인",
+    "signupButton": "회원가입",
+    "switchToSignup": "계정이 없으신가요? 회원가입",
+    "switchToLogin": "이미 계정이 있으신가요? 로그인",
+    "kakaoLogin": "카카오 로그인",
+    "googleLogin": "Google 로그인",
+    "agreement": "가입 시 이용약관 및 개인정보처리방침에 동의합니다",
+    "emailRequired": "이메일을 입력해주세요",
+    "emailInvalid": "올바른 이메일을 입력해주세요",
+    "passwordRequired": "비밀번호를 입력해주세요",
+    "passwordMin": "비밀번호는 6자 이상이어야 합니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "nicknameRequired": "닉네임을 입력해주세요",
+    "loginFailed": "로그인 실패",
+    "signupFailed": "회원가입 실패",
+    "signupSuccess": "가입 완료! 이메일을 확인해주세요",
+    "forgotPassword": "비밀번호를 잊으셨나요?"
+  },
+
+  "settings": {
+    "display": "디스플레이",
+    "language": "언어",
+    "languageDesc": "앱 표시 언어를 변경합니다",
+    "darkMode": "다크 모드",
+    "darkModeDesc": "눈의 피로를 줄여줍니다",
+    "hideCounts": "좋아요/저장 숫자 숨기기",
+    "hideCountsDesc": "내 게시물의 반응 수를 다른 사람에게 숨겨요",
+    "data": "데이터",
+    "autoSyncActive": "자동 동기화 활성",
+    "notSynced": "아직 동기화되지 않음",
+    "syncNow": "지금 동기화",
+    "syncNowDesc": "수동으로 서버와 동기화합니다",
+    "syncSuccess": "동기화 완료!",
+    "syncFailed": "동기화 실패: {{error}}",
+    "exportData": "데이터 내보내기",
+    "exportDataDesc": "OOTD 기록, 옷장, 저장한 코디를 JSON으로 다운로드",
+    "exportFailed": "내보내기 실패: {{error}}",
+    "feedback": "피드백 보내기",
+    "info": "정보",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침",
+    "account": "계정",
+    "logout": "로그아웃",
+    "deleteAccount": "계정 삭제",
+    "deleteAccountTitle": "계정 삭제",
+    "deleteAccountMessage": "정말 계정을 삭제하시겠어요?\n\n• 모든 코디 기록이 삭제됩니다\n• 커뮤니티 게시물이 삭제됩니다\n• 이 작업은 되돌릴 수 없습니다",
+    "deleteAccountContinue": "계속",
+    "deleteAccountConfirmTitle": "최종 확인",
+    "deleteAccountConfirmMessage": "확인을 위해 \"계정삭제\"를 입력해주세요.",
+    "deleteAccountPlaceholder": "계정삭제",
+    "deleteAccountValidation": "\"계정삭제\"를 정확히 입력해주세요",
+    "deleteAccountSuccess": "계정이 삭제되었어요. 이용해주셔서 감사합니다.",
+    "deleteAccountError": "계정 삭제 중 오류: {{error}}"
+  },
+
+  "feedbackModal": {
+    "title": "피드백 보내기",
+    "typeBug": "🐛 버그",
+    "typeFeature": "✨ 기능 요청",
+    "typeDesign": "🎨 디자인",
+    "typeOther": "💡 기타",
+    "placeholder": "의견을 자유롭게 작성해주세요 (최대 1000자)",
+    "typeRequired": "유형과 내용을 입력해주세요",
+    "sending": "보내는 중...",
+    "sendSuccess": "소중한 의견 감사합니다!",
+    "sendFailed": "전송 실패: {{error}}"
+  },
+
+  "closet": {
+    "myCloset": "내 옷장",
+    "coordRecord": "코디 기록",
+    "emptyCloset": "옷장이 비어있어요",
+    "addFirstItem": "첫 아이템을 등록해보세요",
+    "itemCount": "{{count}}개",
+    "deleteItem": "삭제하시겠어요?",
+    "deleteSuccess": "삭제되었어요",
+    "bestCoordTitle": "베스트 코디",
+    "sortByScore": "높은 점수순으로 정렬했어요"
+  },
+
+  "closetAdd": {
+    "photoMode": "사진으로 등록",
+    "manualMode": "직접 등록",
+    "step1": "카테고리 선택",
+    "step2": "색상 선택",
+    "step3": "정보 입력",
+    "brand": "브랜드",
+    "brandPlaceholder": "브랜드명 (선택)",
+    "name": "이름",
+    "namePlaceholder": "아이템 이름 (선택)",
+    "colorExtract": "사진에서 색상 추출 중..."
+  },
+
+  "closetCoord": {
+    "title": "내 옷 코디",
+    "subtitle": "옷장 아이템으로 코디를 확인해보세요",
+    "allCombos": "전체 조합 보기",
+    "allCombosDesc": "모든 가능한 조합을 점수순으로",
+    "whatToBuy": "뭘 사면 좋을까?",
+    "whatToBuyDesc": "새 아이템 추가 시 효과 시뮬레이션",
+    "wardrobeReport": "내 옷장 이야기",
+    "wardrobeReportDesc": "활약 아이템, 숨은 가능성, 컬러 밸런스"
+  },
+
+  "allCombos": {
+    "title": "내 옷장 전체 조합",
+    "sortScore": "점수순",
+    "sortRecent": "최근 안 입은 순",
+    "sortFewer": "아이템 적은 순",
+    "filterAll": "전체",
+    "filterOuter": "아우터 포함",
+    "filterNoOuter": "아우터 없이",
+    "woreToday": "오늘 입었어요",
+    "selectDate": "날짜 선택",
+    "subScoreLabels": {
+      "colorPlacement": "컬러 배치",
+      "colorRatio": "색상 비율",
+      "colorHarmony": "색상 조화",
+      "seasonal": "계절감",
+      "balance": "밸런스",
+      "personalColor": "퍼스널컬러",
+      "bodyFit": "체형 맞춤"
+    }
+  },
+
+  "todayCoord": {
+    "title": "오늘 뭐 입지?",
+    "subtitle": "내 옷장에서 AI가 골라준 코디",
+    "needMoreItems": "옷장에 아이템을 등록해주세요",
+    "needMoreItemsDesc": "상의, 하의, 신발이 각 1개 이상 필요해요",
+    "analyzingCloset": "옷장 분석 중...",
+    "noResults": "가능한 조합을 찾지 못했어요",
+    "noResultsDesc": "옷장에 다양한 색상의 아이템을 추가해보세요",
+    "viewOther": "🔄 다른 조합 보기",
+    "recordThis": "이걸로 기록하기",
+    "best": "BEST"
+  },
+
+  "recommend": {
+    "moodTitle": "어떤 분위기를 원하세요?",
+    "styleTitle": "스타일 선택",
+    "resultTitle": "추천 코디",
+    "resultSubtitle": "컬러 조합을 분석했어요",
+    "noResults": "조건에 맞는 조합을 찾지 못했어요",
+    "save": "저장",
+    "share": "공유",
+    "communityShare": "커뮤니티에 공유",
+    "saveSuccess": "코디가 저장되었어요",
+    "colorImprove": "이 색상을 바꾸면 점수가 올라요"
+  },
+
+  "build": {
+    "stepStyle": "스타일 선택",
+    "stepColor": "색상 선택",
+    "stepFabric": "소재 선택",
+    "scoreItems": {
+      "colorPlacement": "컬러 배치",
+      "colorRatio": "색상 비율",
+      "colorHarmony": "색상 조화",
+      "seasonal": "계절감",
+      "balance": "밸런스",
+      "personalColor": "퍼스널컬러",
+      "bodyFit": "체형 맞춤"
+    },
+    "saveCoord": "코디 저장",
+    "shareCoord": "공유하기"
+  },
+
+  "ootdRecord": {
+    "situations": {
+      "commute": "출근",
+      "date": "데이트",
+      "casual": "캐주얼",
+      "interview": "면접",
+      "travel": "여행",
+      "exercise": "운동"
+    },
+    "moods": {
+      "satisfied": "만족",
+      "okay": "그저그럭",
+      "regret": "아쉬움"
+    },
+    "visibility": {
+      "private": "비공개",
+      "friends": "친구",
+      "public": "전체"
+    },
+    "memoPlaceholder": "오늘 코디 한마디 (선택)",
+    "saveComplete": "기록 완료!",
+    "streakMessage": "{{count}}일 연속 기록 중!"
+  },
+
+  "ootdCalendar": {
+    "weekDays": ["일", "월", "화", "수", "목", "금", "토"],
+    "filterAll": "전체",
+    "filterPhoto": "사진",
+    "filterMannequin": "마네킹",
+    "sortNewest": "최신순",
+    "sortOldest": "오래된순",
+    "colorStreakWarning": "같은 색상을 연속으로 입고 있어요"
+  },
+
+  "ootdDetail": {
+    "editRecord": "수정",
+    "deleteRecord": "삭제",
+    "deleteConfirm": "이 기록을 삭제할까요?",
+    "deleteSuccess": "기록이 삭제되었어요",
+    "shareCard": "공유 카드",
+    "shareTitle": "바루픽 코디",
+    "communityShare": "커뮤니티에 공유",
+    "communityShareSuccess": "커뮤니티에 공유되었어요!"
+  },
+
+  "community": {
+    "tabs": {
+      "all": "전체",
+      "friends": "친구",
+      "ranking": "랭킹"
+    },
+    "sort": {
+      "latest": "최신순",
+      "popular": "인기순"
+    },
+    "content": {
+      "photo": "사진",
+      "mannequin": "마네킹"
+    },
+    "friendsTab": {
+      "empty": "아직 친구가 없어요",
+      "findUsers": "유저 찾기"
+    },
+    "ranking": {
+      "weekly": "주간",
+      "monthly": "월간",
+      "users": "유저",
+      "events": "이벤트"
+    },
+    "empty": "아직 게시물이 없어요"
+  },
+
+  "communityDetail": {
+    "like": "좋아요",
+    "unlikeLabel": "좋아요 취소",
+    "save": "저장",
+    "share": "공유",
+    "report": "신고",
+    "editPost": "수정",
+    "deletePost": "삭제",
+    "deleteConfirm": "이 게시물을 삭제할까요?",
+    "deleteSuccess": "게시물이 삭제되었어요",
+    "follow": "팔로우",
+    "instagramLink": "인스타그램",
+    "comments": "댓글",
+    "commentPlaceholder": "댓글 작성...",
+    "commentEmpty": "아직 댓글이 없어요",
+    "reportSuccess": "신고가 접수되었어요",
+    "likeSuccess": "좋아요!",
+    "saveSuccess": "저장되었어요"
+  },
+
+  "communityPost": {
+    "title": "코디 공유",
+    "caption": "캡션",
+    "captionPlaceholder": "코디에 대해 한마디 (선택)",
+    "photos": "사진",
+    "visibility": {
+      "public": "전체 공개",
+      "friends": "친구 공개"
+    },
+    "instagramToggle": "인스타그램 연동",
+    "posting": "게시 중...",
+    "postSuccess": "게시물이 공유되었어요!",
+    "postFailed": "게시 실패: {{error}}"
+  },
+
+  "profile": {
+    "stats": {
+      "coords": "코디",
+      "followers": "팔로워",
+      "following": "팔로잉",
+      "streak": "연속",
+      "badges": "배지",
+      "saved": "저장"
+    },
+    "sections": {
+      "growth": "성장",
+      "diagnosis": "나의 진단",
+      "settings": "설정"
+    },
+    "menu": {
+      "myLevel": "내 레벨",
+      "myBadges": "배지 모음",
+      "colorRanking": "컬러 분석",
+      "colorPattern": "컬러 패턴",
+      "challenges": "챌린지",
+      "titleExam": "칭호 시험",
+      "myPosts": "내 게시물",
+      "insights": "인사이트",
+      "savedCoords": "저장한 코디",
+      "personalColor": "퍼스널컬러",
+      "bodyType": "체형별 코디",
+      "settings": "설정",
+      "blockList": "차단 목록"
+    },
+    "edit": {
+      "title": "프로필 수정",
+      "nickname": "닉네임",
+      "nicknamePlaceholder": "닉네임을 입력하세요",
+      "bio": "한줄 소개",
+      "bioPlaceholder": "자기소개를 입력하세요",
+      "instagram": "인스타그램 ID",
+      "instagramPlaceholder": "@ 제외",
+      "avatar": "프로필 사진",
+      "saveSuccess": "프로필이 수정되었어요"
+    }
+  },
+
+  "profileSub": {
+    "myLevel": {
+      "title": "내 레벨",
+      "xpMethods": {
+        "record": "OOTD 기록",
+        "community": "커뮤니티 활동",
+        "streak": "연속 기록",
+        "quiz": "퀴즈 참여"
+      }
+    },
+    "myBadges": {
+      "title": "배지 모음",
+      "earned": "획득 완료",
+      "locked": "미획득"
+    },
+    "colorRanking": {
+      "title": "컬러 분석",
+      "warmCenter": "웜톤 중심",
+      "coolCenter": "쿨톤 중심",
+      "neutralBalance": "뉴트럴 균형",
+      "comfortZone": "컴포트존 확장"
+    },
+    "colorPattern": {
+      "title": "컬러 패턴"
+    },
+    "challenges": {
+      "title": "챌린지",
+      "weekly": "주간 챌린지"
+    },
+    "titleExam": {
+      "title": "칭호 시험",
+      "play": "퀴즈 풀기"
+    },
+    "myPosts": {
+      "title": "내 게시물",
+      "visibility": {
+        "public": "공개",
+        "friends": "친구",
+        "private": "비공개"
+      }
+    },
+    "insights": {
+      "title": "인사이트"
+    },
+    "savedCoords": {
+      "title": "저장한 코디"
+    }
+  },
+
+  "blockList": {
+    "title": "차단 목록",
+    "subtitle": "차단한 유저의 게시물은 표시되지 않아요",
+    "empty": "차단한 유저가 없어요",
+    "unblockConfirm": "@{{nickname}}님의 차단을 해제할까요?",
+    "unblockFailed": "차단 해제 실패: {{error}}"
+  },
+
+  "notifications": {
+    "title": "알림",
+    "clearAll": "모두 삭제",
+    "clearConfirm": "모든 알림을 삭제할까요?",
+    "empty": "새 알림이 없어요"
+  },
+
+  "followList": {
+    "followers": "팔로워",
+    "following": "팔로잉",
+    "noFollowers": "아직 팔로워가 없어요",
+    "noFollowing": "아직 팔로잉이 없어요"
+  },
+
+  "userDiscover": {
+    "searchPlaceholder": "닉네임 또는 인스타 ID로 검색",
+    "searchButton": "검색",
+    "searchMinLength": "2글자 이상 입력해주세요",
+    "searchError": "검색 중 오류가 발생했어요",
+    "noResults": "검색 결과가 없어요",
+    "searchResults": "검색 결과 {{count}}명",
+    "suggestedUsers": "추천 유저",
+    "noUsers": "아직 가입한 유저가 없어요"
+  },
+
+  "userProfile": {
+    "publicCoords": "공개 코디",
+    "noPublicCoords": "아직 공개 코디가 없어요",
+    "followCta": "팔로우하면 더 볼 수 있어요",
+    "followCtaDesc": "친구 전용 코디와 댓글을 확인할 수 있어요",
+    "blockedToast": "차단했어요",
+    "unblockedToast": "차단을 해제했어요"
+  },
+
+  "postInsight": {
+    "title": "게시물 분석",
+    "views": "조회",
+    "likes": "좋아요",
+    "saves": "저장",
+    "comments": "댓글",
+    "engagementTitle": "참여율 분석",
+    "likeRate": "좋아요율",
+    "saveRate": "저장률",
+    "compareAvg": "내 게시물 평균과 비교",
+    "avgLabel": "평균 {{count}}",
+    "trend14d": "14일 트렌드",
+    "daysOld": "{{count}}일째",
+    "avgViewsPerDay": "하루 평균 {{count}}회 조회",
+    "notFound": "게시물을 찾을 수 없어요"
+  },
+
+  "eventSubmit": {
+    "participationDone": "참여 완료!",
+    "waitResult": "결과 발표를 기다려주세요",
+    "warning": "얼굴이 보이지 않는 사진만 제출해주세요. 제출 후에는 수정/삭제가 불가합니다.",
+    "coordColors": "🎨 코디 색상",
+    "minColors": "최소 2색 이상 선택해주세요",
+    "wearPhoto": "📷 착용샷",
+    "required": "필수",
+    "wearPhotoDesc": "얼굴이 보이지 않도록 촬영해주세요 (최대 2장)",
+    "style": "👔 스타일",
+    "optional": "(선택)",
+    "instagramId": "📸 인스타그램 ID",
+    "instagramIdDesc": "당첨 시 연락을 위해 필요해요",
+    "instagramPlaceholder": "인스타그램 ID (@제외)",
+    "submitting": "제출 중...",
+    "submit": "🎨 참여하기",
+    "needColors": "색상 2개 이상",
+    "needPhoto": "착용샷 필수",
+    "needInstagram": "인스타 ID 필수",
+    "alreadySubmitted": "이미 이 이벤트에 참여했어요",
+    "submitFailed": "제출 실패: {{error}}"
+  },
+
+  "eventDetail": {
+    "active": "🔥 진행중",
+    "ended": "⏳ 종료",
+    "submissions": "참가작 ({{count}})",
+    "noSubmissions": "아직 참가작이 없어요",
+    "participate": "🎨 참여하기",
+    "notFound": "이벤트를 찾을 수 없어요"
+  },
+
+  "purchaseSimulate": {
+    "title": "뭘 사면 좋을까?",
+    "subtitle": "내 옷장을 분석해서 추천해드릴게요",
+    "recommendMode": "옷장 분석해서 추천받기",
+    "recommendModeDesc": "아무것도 고르지 않아도 돼요",
+    "manualMode": "특정 아이템 궁합 확인하기",
+    "manualModeDesc": "사고 싶은 옷의 색상을 직접 선택",
+    "resultTitle": "추천 결과",
+    "resultSubtitle": "옷장을 분석해서 효과 높은 순으로 정렬했어요",
+    "analyzingCompat": "옷장과 궁합 분석 중...",
+    "noRecommend": "추천할 아이템을 찾지 못했어요",
+    "noRecommendDesc": "옷장에 아이템을 더 등록해보세요",
+    "addToCloset": "옷장에 추가",
+    "compatCheck": "궁합 확인",
+    "selectCategory": "사고 싶은 옷의 종류를 선택하세요",
+    "currentCount": "현재 {{count}}개",
+    "reselectPart": "부위 다시 선택",
+    "selectColor": "{{category}}의 색상을 선택하세요",
+    "reselect": "다시 선택",
+    "newCombos": "새 코디 수",
+    "bestScore": "최고 점수",
+    "avgScore": "평균 점수",
+    "verdict": {
+      "strongBuy": "강력 추천!",
+      "buy": "좋은 선택",
+      "weak": "효과 적음",
+      "skip": "조합 없음"
+    },
+    "comboDelta": "+{{count}}개 코디",
+    "avgScoreLabel": "평균 {{score}}점",
+    "bestScoreLabel": "최고 {{score}}점"
+  },
+
+  "wardrobeReport": {
+    "title": "내 옷장 이야기",
+    "analyzingCloset": "옷장 분석 중...",
+    "needMoreItems": "옷장에 아이템을 3개 이상 등록해주세요",
+    "summary": "옷장에 {{items}}개 아이템, 총 {{combos}}개 코디 조합이 가능해요",
+    "mvpTitle": "가장 활약하는 아이템",
+    "mvpUsage": "{{count}}개 코디에 활용 ({{pct}}%)",
+    "hiddenTitle": "아직 가능성이 숨어있는 아이템",
+    "noCombo": "아직 어울리는 조합이 없어요",
+    "fewCombos": "코디 {{count}}개로 적어요",
+    "bestCombo": "베스트 조합: {{color}} {{category}} ({{score}}점)",
+    "colorBalance": "옷장 컬러 밸런스",
+    "warmCenter": "웜톤 중심",
+    "coolCenter": "쿨톤 중심",
+    "balancedCenter": "균형 잡힌 밸런스",
+    "warmPct": "웜톤 {{pct}}%",
+    "neutralPct": "뉴트럴 {{pct}}%",
+    "coolPct": "쿨톤 {{pct}}%",
+    "addCoolTip": "쿨톤(네이비, 스틸블루 등)을 추가하면 밸런스가 좋아져요",
+    "addWarmTip": "웜톤(베이지, 카멜 등)을 추가하면 밸런스가 좋아져요",
+    "viewAllCombos": "전체 조합 보기",
+    "checkPurchase": "뭘 사면 좋을지 확인하기"
+  },
+
+  "weather": {
+    "title": "오늘 뭐 입지?",
+    "loadingWeather": "날씨를 불러오는 중...",
+    "humidity": "습도 {{pct}}%",
+    "wind": "바람 {{speed}}km/h",
+    "feelsLike": "체감 {{temp}}°C",
+    "recommendItems": "추천 아이템",
+    "colorTip": "컬러 팁",
+    "ctaButton": "이 날씨에 맞는 코디 추천받기",
+    "noLocation": "위치 정보를 허용해주세요",
+    "noLocationDesc": "날씨 기반으로 오늘의 코디를 추천해 드릴게요",
+    "clear": "맑음",
+    "partlyCloudy": "구름 조금",
+    "fog": "안개",
+    "drizzle": "이슬비",
+    "rain": "비",
+    "snow": "눈",
+    "shower": "소나기",
+    "thunderstorm": "뇌우",
+    "advice": {
+      "hotSummer": {
+        "title": "한여름 코디",
+        "desc": "반팔 + 반바지 or 린넨 팬츠"
+      },
+      "earlySummer": {
+        "title": "초여름 코디",
+        "desc": "반팔 + 면바지 · 가벼운 원피스"
+      },
+      "midSeason": {
+        "title": "간절기 코디",
+        "desc": "긴팔 + 긴바지 · 가벼운 아우터"
+      },
+      "earlyFall": {
+        "title": "초가을 코디",
+        "desc": "자켓 or 가디건 + 긴바지"
+      },
+      "winter": {
+        "title": "겨울 코디",
+        "desc": "코트 + 니트 · 머플러 추천"
+      },
+      "deepWinter": {
+        "title": "한겨울 코디",
+        "desc": "패딩 + 기모 · 방한 필수"
+      },
+      "extreme": {
+        "title": "극한 방한",
+        "desc": "완전무장 · 노출 최소화"
+      }
+    }
+  },
+
+  "quiz": {
+    "q1": "주말에 주로 뭘 하시나요?",
+    "q1a1": "카페 탐방 ☕",
+    "q1a2": "운동/하이킹 🏃",
+    "q1a3": "쇼핑/전시 🛍️",
+    "q1a4": "집에서 휴식 🏠",
+    "q2": "선호하는 컬러 톤은?",
+    "q2a1": "뉴트럴/베이지 계열",
+    "q2a2": "네이비/차콜 계열",
+    "q2a3": "파스텔/밝은 톤",
+    "q2a4": "다크/무채색",
+    "q3": "옷 고를 때 가장 중요한 건?",
+    "q3a1": "편안함",
+    "q3a2": "세련됨",
+    "q3a3": "개성",
+    "q3a4": "가성비",
+    "q4": "자주 신는 신발은?",
+    "q4a1": "스니커즈 👟",
+    "q4a2": "로퍼/구두 👞",
+    "q4a3": "부츠 🥾",
+    "q4a4": "슬리퍼/샌들 🩴",
+    "resultTitle": "분석 완료!",
+    "resultSubtitle": "당신에게 어울리는 스타일을 찾았어요",
+    "prevQuestion": "이전 질문",
+    "retake": "다시 할래요"
+  },
+
+  "fabricGuide": {
+    "title": "소재 궁합 체크",
+    "subtitle": "입고 싶은 아이템을 선택하면 소재 궁합을 바로 알려드려요",
+    "whatPart": "어떤 부위인가요?",
+    "wearingItem": "입고 있는 아이템의 부위를 선택하세요",
+    "pairItem": "함께 입을 아이템의 부위를 선택하세요",
+    "selectMaterial": "소재를 선택하세요",
+    "seasonAll": "전체",
+    "noSeasonItems": "이 계절에 해당하는 아이템이 없어요",
+    "otherPart": "← 다른 부위 선택",
+    "wearingSlot": "입고 있는 아이템 선택",
+    "pairSlot": "함께 입을 아이템 선택",
+    "addItem": "+ 아이템 추가 (최대 6개)",
+    "compatResult": "궁합 결과",
+    "ratingGreat": "추천",
+    "ratingOk": "무난",
+    "ratingBad": "비추",
+    "noSpecialRule": "특별한 궁합 규칙 없음 — 무난한 조합",
+    "guide2items": "2개 이상 아이템을 선택하면\n소재 궁합을 바로 확인할 수 있어요",
+    "guideExample": "예) 데님 자켓 + 울 니트 → 추천 조합!\n실크 블라우스 + 플리스 → 격식 차이 충돌"
+  },
+
+  "bodyGuide": {
+    "title": "체형별 코디 가이드",
+    "subtitle": "내 체형에 맞는 컬러 배치와 스타일링 팁을 확인하세요",
+    "myBodyType": "내 체형: {{type}}",
+    "tapToView": "탭하여 가이드 보기",
+    "diagnose": "체형 진단하기",
+    "directSelect": "직접 선택",
+    "bodyTypes": "체형 유형",
+    "directSelectTitle": "체형 직접 선택",
+    "directSelectDesc": "가장 비슷한 체형을 선택하세요",
+    "backToList": "목록으로",
+    "male": "👔 남성",
+    "female": "👗 여성",
+    "colorPlacement": "컬러 배치",
+    "lightRule": "밝게",
+    "darkRule": "어둡게",
+    "anyRule": "자유",
+    "doTitle": "이렇게 입으세요",
+    "dontTitle": "피해주세요",
+    "saveBodyType": "내 체형으로 저장하기",
+    "saveSuccess": "체형이 저장되었어요! 코디 추천에 반영됩니다.",
+    "getRecommend": "이 체형으로 코디 추천받기"
+  },
+
+  "pcSelect": {
+    "title": "퍼스널컬러",
+    "currentSetting": "현재 설정: {{name}}",
+    "noSettingDesc": "퍼스널컬러를 설정하면 맞춤 추천을 받을 수 있어요",
+    "selfDiagnosis": "셀프 진단",
+    "selfDiagnosisDesc": "{{count}}개 질문으로 내 퍼스널컬러 찾기",
+    "lightDiagnosis": "빛 진단",
+    "lightDiagnosisDesc": "자연광에서 직접 비교하는 정밀 진단",
+    "directSelect": "직접 선택",
+    "directSelectDesc": "이미 알고 있다면 12계절 중 선택",
+    "prevQuestion": "이전 질문",
+    "saveAndApply": "이 퍼스널컬러 적용하기",
+    "select12Season": "12계절 퍼스널컬러 중 선택하세요"
+  },
+
+  "pcLight": {
+    "title": "빛 진단",
+    "guideTitle": "자연광 빛 진단",
+    "guideDesc": "자연광(햇빛) 아래에서 진행해야 정확한 결과를 얻을 수 있어요",
+    "startButton": "진단 시작",
+    "stepProgress": "{{current}} / {{total}}",
+    "resultTitle": "진단 결과",
+    "bestColors": "잘 어울리는 색상",
+    "worstColors": "피해야 할 색상",
+    "applyResult": "이 결과 적용하기"
+  },
+
+  "shop": {
+    "heroSubtitle": "프레피 & 올드머니 빈티지샵",
+    "devBadge": "바루픽 개발자가 운영중인 빈티지샵",
+    "viewOnInstagram": "📸 인스타그램에서 보기 →",
+    "visitStore": "BARUSA 스토어 방문하기",
+    "partnerTitle": "빈티지샵 입점 안내",
+    "partnerDesc": "바루픽에 샵을 등록하고 싶으신가요?\n입점 문의는 아래 버튼으로 연락주세요.",
+    "partnerCta": "입점 문의하기"
+  },
+
+  "terms": {
+    "title": "이용약관",
+    "article1Title": "제1조 (목적)",
+    "article1Content": "이 약관은 바루픽(이하 \"서비스\")의 이용 조건 및 절차를 규정합니다.",
+    "article2Title": "제2조 (서비스 내용)",
+    "article2Content": "서비스는 AI 기반 컬러 코디네이션 추천, OOTD 기록, 커뮤니티 기능을 제공합니다.",
+    "article3Title": "제3조 (이용자 의무)",
+    "article3Content": "이용자는 타인의 권리를 침해하거나 부적절한 콘텐츠를 게시해서는 안 됩니다.",
+    "article4Title": "제4조 (면책조항)",
+    "article4Content": "서비스에서 제공하는 코디 추천은 참고용이며, 서비스는 추천 결과에 대한 책임을 지지 않습니다."
+  },
+
+  "privacy": {
+    "title": "개인정보처리방침",
+    "section1Title": "1. 수집하는 개인정보",
+    "section1Content": "이메일, 닉네임, 프로필 사진(선택), 코디 기록",
+    "section2Title": "2. 수집 목적",
+    "section2Content": "서비스 제공, 커뮤니티 기능, 맞춤 추천",
+    "section3Title": "3. 보유 기간",
+    "section3Content": "회원 탈퇴 시 즉시 삭제",
+    "section4Title": "4. 제3자 제공",
+    "section4Content": "제3자에게 개인정보를 제공하지 않습니다.",
+    "section5Title": "5. 문의",
+    "section5Content": "barusa.official@gmail.com"
+  },
+
+  "devDiag": {
+    "title": "Supabase 연결 진단",
+    "subtitle": "개발DB (ywqaxxcv...) 연결 상태를 확인합니다",
+    "runAll": "전체 진단 실행",
+    "running": "테스트 실행 중...",
+    "fixTitle": "수정 방법",
+    "allPassed": "모든 테스트 통과!",
+    "allPassedDesc": "Supabase 연결이 정상입니다. Vercel 배포를 진행해도 됩니다."
+  },
+
+  "placeholder": {
+    "comingSoon": "이 화면은 곧 구현될 예정입니다"
+  },
+
+  "shareCard": {
+    "shareTitle": "바루픽 코디",
+    "shareButton": "공유하기",
+    "iosSaveHint": "이미지를 길게 눌러서 저장해주세요"
+  },
+
+  "colorPicker": {
+    "title": "색상 선택",
+    "reset": "초기화",
+    "closeLabel": "닫기"
+  },
+
+  "cropOverlay": {
+    "profilePhoto": "프로필 사진",
+    "photoCrop": "사진 크롭",
+    "pinchHint": "두 손가락으로 확대/축소 · 드래그로 위치 조정",
+    "cancel": "취소",
+    "done": "완료"
+  },
+
+  "imageEditor": {
+    "title": "사진 편집",
+    "cancel": "취소",
+    "done": "완료",
+    "loading": "로딩 중...",
+    "sticker": "😎 스티커",
+    "blur": "🔲 블러",
+    "fill": "⬛ 채우기",
+    "addSticker": "+ 스티커 추가",
+    "addBlur": "+ 블러 추가",
+    "addFill": "+ 채우기 추가",
+    "colorLabel": "색상:",
+    "touchHint": "터치: 선택 · 드래그: 이동 · 두 손가락: 크기/회전"
+  },
+
+  "modal": {
+    "defaultConfirm": "확인",
+    "defaultCancel": "취소"
+  }
+}

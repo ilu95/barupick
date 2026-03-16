@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink, Pencil } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
@@ -14,6 +15,7 @@ import { useToast } from '@/components/ui/Toast'
 
 export default function CommunityDetail() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { postId } = useParams<{ postId: string }>()
   const { user } = useAuth()
   const { isFollowing, isFriend, toggleFollow } = useSocial()
@@ -74,7 +76,7 @@ export default function CommunityDetail() {
       } else {
         await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
         if (post?.user_id !== user.id) {
-          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: '님이 코디에 ♡를 눌렀어요', p_related_id: postId }).catch(() => {})
+          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).catch(() => {})
         }
       }
     } catch { setLiked(was) }
@@ -91,17 +93,17 @@ export default function CommunityDetail() {
       const newSaved = saved.filter((s: any) => s.commPostId !== postId)
       localStorage.setItem('cs_saved', JSON.stringify(newSaved))
       setBookmarked(false)
-      toast.toast({ message: '저장 목록에서 제거했어요' })
+      toast.toast({ message: t('communityDetail.saveSuccess') })
       supabase.rpc('decrement_save_count', { p_post_id: postId }).catch(() => {})
       setPost((p: any) => p ? { ...p, save_count: Math.max(0, (p.save_count || 1) - 1) } : p)
     } else {
       // 저장
-      if (saved.length >= 50) { toast.error('저장 가능한 코디는 최대 50개입니다'); return }
-      const nick = post.profiles?.nickname || '유저'
+      if (saved.length >= 50) { toast.error(t('communityDetail.saveSuccess')); return }
+      const nick = post.profiles?.nickname || t('common.user')
       saved.unshift({
         id: 'comm_' + Date.now(),
         commPostId: postId,
-        name: '@' + nick + '의 코디',
+        name: '@' + nick,
         memo: post.caption || '',
         outfit: post.outfit || {},
         score: post.score || 0,
@@ -113,20 +115,20 @@ export default function CommunityDetail() {
       })
       localStorage.setItem('cs_saved', JSON.stringify(saved))
       setBookmarked(true)
-      toast.success('내 코디에 저장했어요! 💾')
+      toast.success(t('communityDetail.saveSuccess'))
       supabase.rpc('increment_save_count', { p_post_id: postId }).catch(() => {})
       setPost((p: any) => p ? { ...p, save_count: (p.save_count || 0) + 1 } : p)
       // 알림
       if (post.user_id && post.user_id !== user.id) {
-        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: '회원님의 코디를 저장했어요', p_related_id: postId }).catch(() => {})
+        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: t('communityDetail.saveSuccess'), p_related_id: postId }).catch(() => {})
       }
     }
   }
 
   // ── 공유 ──
   const handleShare = () => {
-    const title = post?.caption || post?.title || '바루픽 코디'
-    const text = `${post?.profiles?.nickname || '유저'}님의 코디 (${post?.score || 0}점)`
+    const title = post?.caption || post?.title || t('shareCard.shareTitle')
+    const text = `${post?.profiles?.nickname || t('common.user')} (${post?.score || 0}${t('common.score', { score: '' })})`
     navigator.share?.({ title, text, url: window.location.href }).catch(() => {})
   }
 
@@ -134,16 +136,16 @@ export default function CommunityDetail() {
   const handleReport = () => {
     if (!user || !postId) return
     modal.prompt({
-      title: '게시물 신고',
-      message: '신고 사유를 입력해주세요.',
-      placeholder: '신고 사유',
+      title: t('communityDetail.report'),
+      message: t('communityDetail.report'),
+      placeholder: t('communityDetail.report'),
       maxLength: 200,
       onConfirm: async (reason) => {
         try {
           const { error } = await supabase.from('reports').insert({ reporter_id: user.id, post_id: postId, reason })
-          if (error?.code === '23505') toast.toast({ message: '이미 신고한 게시물이에요' })
-          else if (error) toast.error('신고 실패')
-          else toast.success('신고가 접수되었어요 📋')
+          if (error?.code === '23505') toast.toast({ message: t('communityDetail.reportSuccess') })
+          else if (error) toast.error(t('communityDetail.report'))
+          else toast.success(t('communityDetail.reportSuccess'))
         } catch {}
       },
     })
@@ -194,9 +196,9 @@ export default function CommunityDetail() {
   const handleDeletePost = () => {
     if (!user || !post || post.user_id !== user.id) return
     modal.confirm({
-      title: '게시물 삭제',
-      message: '이 게시물을 커뮤니티에서 삭제할까요? 되돌릴 수 없습니다.',
-      confirmLabel: '삭제',
+      title: t('communityDetail.deletePost'),
+      message: t('communityDetail.deleteConfirm'),
+      confirmLabel: t('common.delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
@@ -207,9 +209,9 @@ export default function CommunityDetail() {
             const ri = recs.findIndex((r: any) => r.postId === postId)
             if (ri >= 0) { recs[ri].postId = null; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
           } catch {}
-          toast.success('게시물을 삭제했어요')
+          toast.success(t('communityDetail.deleteSuccess'))
           navigate('/community', { replace: true })
-        } catch { toast.error('삭제 실패') }
+        } catch { toast.error(t('communityDetail.deletePost')) }
       },
     })
   }
@@ -220,8 +222,8 @@ export default function CommunityDetail() {
     try {
       const { error } = await supabase.from('comments').insert({ post_id: postId, user_id: user.id, content: commentText.trim() })
       if (error) {
-        if (error.message?.includes('violates row-level')) toast.error('맞팔 친구의 게시물에만 댓글을 달 수 있어요')
-        else toast.error('댓글 작성 실패: ' + error.message)
+        if (error.message?.includes('violates row-level')) toast.error(t('communityDetail.commentEmpty'))
+        else toast.error(t('communityDetail.comments') + ': ' + error.message)
         return
       }
       setCommentText('')
@@ -230,40 +232,40 @@ export default function CommunityDetail() {
       // 알림
       if (post?.user_id && post.user_id !== user.id) {
         const preview = commentText.trim().slice(0, 30)
-        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'comment', p_message: '댓글을 남겼어요: ' + preview, p_related_id: postId }).catch(() => {})
+        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'comment', p_message: t('communityDetail.comments') + ': ' + preview, p_related_id: postId }).catch(() => {})
       }
-      toast.success('댓글이 등록되었어요 💬')
+      toast.success(t('communityDetail.comments'))
       loadPost()
-    } catch (e: any) { toast.error('오류: ' + e.message) }
+    } catch (e: any) { toast.error(e.message) }
   }
 
   // ── 댓글 삭제 ──
   const deleteComment = (commentId: string) => {
     modal.confirm({
-      title: '댓글 삭제',
-      message: '이 댓글을 삭제할까요?',
-      confirmLabel: '삭제',
+      title: t('communityDetail.comments'),
+      message: t('communityDetail.deleteConfirm'),
+      confirmLabel: t('common.delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
           await supabase.from('comments').delete().eq('id', commentId)
           setComments(prev => prev.filter(c => c.id !== commentId))
           setPost((p: any) => p ? { ...p, comments_count: Math.max(0, (p.comments_count || 1) - 1) } : p)
-          toast.success('댓글을 삭제했어요')
-        } catch { toast.error('삭제 실패') }
+          toast.success(t('communityDetail.deleteSuccess'))
+        } catch { toast.error(t('common.retry')) }
       },
     })
   }
 
   // ── 로딩/에러 상태 ──
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">불러오는 중...</div>
-  if (!post) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">게시물을 찾을 수 없어요</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('common.loading')}</div>
+  if (!post) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('communityDetail.deleteSuccess')}</div>
 
   const outfit = post.outfit || {}
   const outfitHex: Record<string, string> = {}
   Object.entries(outfit).forEach(([k, v]) => { if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string) })
   const hasPhoto = post.photo_urls && post.photo_urls.length > 0
-  const nick = post.profiles?.nickname || '유저'
+  const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
   const instaId = post.profiles?.instagram_id
   const styleName = post.style ? STYLE_GUIDE[post.style]?.name : null
@@ -277,7 +279,7 @@ export default function CommunityDetail() {
       {hasPhoto ? (
         <div className="mb-4 -mx-5">
           {post.photo_urls.length === 1 ? (
-            <img src={post.photo_urls[0]} className="w-full aspect-[4/5] object-cover" alt="코디" />
+            <img src={post.photo_urls[0]} className="w-full aspect-[4/5] object-cover" alt={t('common.coord')} />
           ) : (
             <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar px-5">
               {post.photo_urls.map((url: string, i: number) => (
@@ -297,7 +299,7 @@ export default function CommunityDetail() {
         {/* 좋아요 */}
         <button
           onClick={toggleLike}
-          aria-label={liked ? '좋아요 취소' : '좋아요'}
+          aria-label={liked ? t('communityDetail.unlikeLabel') : t('communityDetail.like')}
           className={`flex-1 py-2.5 rounded-xl border text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${
             liked ? 'border-red-300 text-red-500 bg-red-50' : 'border-warm-400 bg-white text-warm-800'
           }`}
@@ -309,18 +311,18 @@ export default function CommunityDetail() {
         {/* 저장 */}
         <button
           onClick={toggleBookmark}
-          aria-label={bookmarked ? '저장 취소' : '저장'}
+          aria-label={bookmarked ? t('communityDetail.save') : t('communityDetail.save')}
           className={`flex-1 py-2.5 rounded-xl border text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${
             bookmarked ? 'border-terra-300 text-terra-600 bg-terra-50' : 'border-warm-400 bg-white text-warm-800'
           }`}
         >
-          {bookmarked ? '🔖' : '📄'} 저장
+          {bookmarked ? '🔖' : '📄'} {t('communityDetail.save')}
         </button>
 
         {/* 공유 */}
         <button
           onClick={handleShare}
-          aria-label="공유"
+          aria-label={t('communityDetail.share')}
           className="py-2.5 px-4 rounded-xl border border-warm-400 bg-white text-warm-700 active:scale-[0.97] transition-all"
         >
           <Share size={16} />
@@ -330,7 +332,7 @@ export default function CommunityDetail() {
         {!isMe && user && (
           <button
             onClick={handleReport}
-            aria-label="신고"
+            aria-label={t('communityDetail.report')}
             className="py-2.5 px-3 rounded-xl border border-warm-400 bg-white text-warm-500 active:scale-[0.97] transition-all"
           >
             <Flag size={14} />
@@ -345,13 +347,13 @@ export default function CommunityDetail() {
             onClick={handleEditPost}
             className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
           >
-            <Pencil size={14} /> 수정
+            <Pencil size={14} /> {t('communityDetail.editPost')}
           </button>
           <button
             onClick={handleDeletePost}
             className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
           >
-            <Trash2 size={14} /> 삭제
+            <Trash2 size={14} /> {t('communityDetail.deletePost')}
           </button>
         </div>
       )}
@@ -368,7 +370,7 @@ export default function CommunityDetail() {
         {!isMe && user && (
           <button onClick={() => toggleFollow(post.user_id)}
             className={`px-3 py-1.5 rounded-full text-[11px] font-semibold active:scale-95 transition-all ${isFollowing(post.user_id) ? 'bg-warm-200 text-warm-700 border border-warm-400' : 'bg-terra-500 text-white shadow-terra'}`}>
-            {isFollowing(post.user_id) ? '팔로잉 ✓' : '팔로우'}
+            {isFollowing(post.user_id) ? t('common.following') : t('communityDetail.follow')}
           </button>
         )}
       </div>
@@ -382,7 +384,7 @@ export default function CommunityDetail() {
           <span className="text-lg">📸</span>
           <div className="flex-1 text-left">
             <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">@{instaId}</div>
-            <div className="text-[10px] text-warm-500">인스타 구경하러가기</div>
+            <div className="text-[10px] text-warm-500">{t('communityDetail.instagramLink')}</div>
           </div>
           <ExternalLink size={14} className="text-warm-500" />
         </button>
@@ -391,7 +393,7 @@ export default function CommunityDetail() {
       {/* ═══ 맞팔 유도 배너 (팔로잉 중이지만 맞팔 아닐 때) ═══ */}
       {!isMe && user && isFollowing(post.user_id) && !isFriend(post.user_id) && (
         <div className="bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl p-3 mb-4 text-center text-[11px] text-warm-600 dark:text-warm-400">
-          @{nick}님도 나를 팔로우하면 <span className="font-semibold text-green-700 dark:text-green-400">👫 친구</span>가 되어 댓글로 소통할 수 있어요
+          @{nick} <span className="font-semibold text-green-700 dark:text-green-400">{t('common.friend')}</span>
         </div>
       )}
 
@@ -403,10 +405,10 @@ export default function CommunityDetail() {
         >
           <div className="text-lg flex-shrink-0">✨</div>
           <div className="flex-1">
-            <div className="text-xs font-semibold text-warm-900 dark:text-warm-100">@{nick}님의 코디 더 보기</div>
-            <div className="text-[10px] text-warm-500 dark:text-warm-400">팔로우하면 새 코디 알림을 받을 수 있어요</div>
+            <div className="text-xs font-semibold text-warm-900 dark:text-warm-100">@{nick}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">{t('communityDetail.follow')}</div>
           </div>
-          <span className="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold flex-shrink-0">팔로우</span>
+          <span className="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold flex-shrink-0">{t('communityDetail.follow')}</span>
         </div>
       )}
 
@@ -414,7 +416,7 @@ export default function CommunityDetail() {
       {(post.caption || post.title) && <div className="text-sm text-warm-800 dark:text-warm-200 mb-3 leading-relaxed">{post.caption || post.title}</div>}
       <div className="flex flex-wrap gap-1.5 mb-4">
         {styleName && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-terra-100 text-terra-700">{styleName}</span>}
-        {post.score > 0 && <span className="font-display text-[11px] font-bold px-2.5 py-1 rounded-full bg-warm-900 text-white">{post.score}점</span>}
+        {post.score > 0 && <span className="font-display text-[11px] font-bold px-2.5 py-1 rounded-full bg-warm-900 text-white">{t('common.score', { score: post.score })}</span>}
       </div>
 
       {/* ═══ 컬러 정보 ═══ */}
@@ -441,15 +443,15 @@ export default function CommunityDetail() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
             <div className="text-base font-bold text-warm-900 dark:text-warm-100">{post.likes_count || 0}</div>
-            <div className="text-[9px] text-warm-500">좋아요</div>
+            <div className="text-[9px] text-warm-500">{t('communityDetail.like')}</div>
           </div>
           <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
             <div className="text-base font-bold text-warm-900 dark:text-warm-100">{post.view_count || 0}</div>
-            <div className="text-[9px] text-warm-500">조회</div>
+            <div className="text-[9px] text-warm-500">{t('postInsight.views')}</div>
           </div>
           <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
             <div className="text-base font-bold text-warm-900 dark:text-warm-100">{post.comments_count || comments.length}</div>
-            <div className="text-[9px] text-warm-500">댓글</div>
+            <div className="text-[9px] text-warm-500">{t('communityDetail.comments')}</div>
           </div>
         </div>
       )}
@@ -458,7 +460,7 @@ export default function CommunityDetail() {
       {isFriendsPost && (
         <div className="border-t border-warm-300 dark:border-warm-600 pt-4">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-700 dark:text-warm-300 mb-3">
-            <MessageCircle size={13} /> 댓글 <span className="text-warm-500 font-normal">{comments.length}</span>
+            <MessageCircle size={13} /> {t('communityDetail.comments')} <span className="text-warm-500 font-normal">{comments.length}</span>
           </div>
 
           {/* 댓글 목록 */}
@@ -485,7 +487,7 @@ export default function CommunityDetail() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold text-warm-900 dark:text-warm-100">@{c.profiles?.nickname || '유저'}</span>
+                        <span className="text-xs font-semibold text-warm-900 dark:text-warm-100">@{c.profiles?.nickname || t('common.user')}</span>
                         <span className="text-[10px] text-warm-400">{dateStr}</span>
                       </div>
                       <div className="text-sm text-warm-800 dark:text-warm-200 mt-0.5 leading-relaxed">{c.content}</div>
@@ -494,7 +496,7 @@ export default function CommunityDetail() {
                       <button
                         onClick={() => deleteComment(c.id)}
                         className="flex-shrink-0 mt-1 p-1 text-warm-400 hover:text-red-400 active:scale-90 transition-all"
-                        aria-label="댓글 삭제"
+                        aria-label={t('common.delete')}
                       >
                         <Trash2 size={12} />
                       </button>
@@ -505,7 +507,7 @@ export default function CommunityDetail() {
             </div>
           ) : (
             <div className="text-center py-6 text-warm-500 dark:text-warm-400 text-xs">
-              아직 댓글이 없어요. 첫 댓글을 남겨보세요!
+              {t('communityDetail.commentEmpty')}
             </div>
           )}
 
@@ -516,7 +518,7 @@ export default function CommunityDetail() {
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addComment()}
-                placeholder="댓글을 남겨보세요..."
+                placeholder={t('communityDetail.commentPlaceholder')}
                 maxLength={500}
                 className="flex-1 px-3 py-2.5 bg-warm-100 dark:bg-warm-700 border border-warm-400 dark:border-warm-600 rounded-xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-all"
               />
@@ -525,12 +527,12 @@ export default function CommunityDetail() {
                 disabled={!commentText.trim()}
                 className="px-4 py-2.5 bg-terra-500 text-white rounded-xl text-xs font-semibold active:scale-95 transition-all shadow-terra disabled:opacity-50"
               >
-                등록
+                {t('common.send')}
               </button>
             </div>
           ) : user && !isMe && !isFriend(post.user_id) ? (
             <div className="text-xs text-warm-500 dark:text-warm-400 text-center py-3 bg-warm-100 dark:bg-warm-800 rounded-xl">
-              맞팔 친구만 댓글을 작성할 수 있어요
+              {t('communityDetail.commentEmpty')}
             </div>
           ) : null}
         </div>

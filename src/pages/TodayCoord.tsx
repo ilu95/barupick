@@ -12,8 +12,10 @@ import { CATEGORY_NAMES } from '@/lib/categories'
 import { useTodayCoord, SITUATION_OPTIONS, type TodayCoordResult } from '@/hooks/useTodayCoord'
 import { useWeather } from '@/hooks/useWeather'
 import { getScorePercentile } from '@/hooks/useWardrobe'
+import { useTranslation } from 'react-i18next'
 
 export default function TodayCoord() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { weather } = useWeather()
   const today = useTodayCoord()
@@ -41,10 +43,10 @@ export default function TodayCoord() {
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center">
         <div className="py-16">
           <Shirt size={48} className="text-warm-400 mx-auto mb-4" />
-          <div className="text-base font-semibold text-warm-700 dark:text-warm-300 mb-2">옷장에 아이템을 등록해주세요</div>
-          <div className="text-sm text-warm-500 dark:text-warm-400 mb-6">상의, 하의, 신발이 각 1개 이상 필요해요</div>
+          <div className="text-base font-semibold text-warm-700 dark:text-warm-300 mb-2">{t('todayCoord.needMoreItems')}</div>
+          <div className="text-sm text-warm-500 dark:text-warm-400 mb-6">{t('todayCoord.needMoreItemsDesc')}</div>
           <button onClick={() => navigate('/closet/add')} className="px-6 py-3 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">
-            아이템 등록하기
+            {t('common.itemRegister')}
           </button>
         </div>
       </div>
@@ -54,8 +56,8 @@ export default function TodayCoord() {
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       {/* 타이틀 */}
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">오늘 뭐 입지?</h2>
-      <p className="text-sm text-warm-500 dark:text-warm-400 mb-4">내 옷장에서 AI가 골라준 코디</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('todayCoord.title')}</h2>
+      <p className="text-sm text-warm-500 dark:text-warm-400 mb-4">{t('todayCoord.subtitle')}</p>
 
       {/* 상황 필터 칩 */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-4 hide-scrollbar">
@@ -78,7 +80,7 @@ export default function TodayCoord() {
       {today.loading && (
         <div className="flex flex-col items-center py-16">
           <div className="w-10 h-10 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin mb-4" />
-          <div className="text-sm text-warm-500">옷장 분석 중...</div>
+          <div className="text-sm text-warm-500">{t('todayCoord.analyzingCloset')}</div>
         </div>
       )}
 
@@ -86,8 +88,8 @@ export default function TodayCoord() {
       {!today.loading && today.results.length === 0 && (
         <div className="text-center py-16">
           <div className="text-3xl mb-3">🤔</div>
-          <div className="text-sm text-warm-600 dark:text-warm-400 mb-2">가능한 조합을 찾지 못했어요</div>
-          <div className="text-xs text-warm-500 dark:text-warm-400">옷장에 다양한 색상의 아이템을 추가해보세요</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400 mb-2">{t('todayCoord.noResults')}</div>
+          <div className="text-xs text-warm-500 dark:text-warm-400">{t('todayCoord.noResultsDesc')}</div>
         </div>
       )}
 
@@ -133,7 +135,7 @@ export default function TodayCoord() {
             onClick={() => { setActiveIdx(0); today.generate(weather) }}
             className="w-full mt-4 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-700 dark:text-warm-300 active:scale-[0.98] transition-all"
           >
-            🔄 다른 조합 보기
+            {t('todayCoord.viewOther')}
           </button>
         </>
       )}
@@ -149,6 +151,7 @@ function CoordCard({ result, rank, total, navigate }: {
   total: number
   navigate: any
 }) {
+  const { t } = useTranslation()
   const outfitHex: Record<string, string> = {}
   Object.entries(result.outfit).forEach(([k, v]) => {
     if (v) { const c = COLORS_60[v]; if (c) outfitHex[k] = c.hex }
@@ -189,7 +192,7 @@ function CoordCard({ result, rank, total, navigate }: {
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-bold text-warm-500 dark:text-warm-400">{rank}/{total}</span>
-          {rank === 1 && <span className="text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">BEST</span>}
+          {rank === 1 && <span className="text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">{t('todayCoord.best')}</span>}
         </div>
         <div className="flex items-center gap-2">
           <span className={`font-display text-xl font-bold ${scoreColor} px-2.5 py-0.5 rounded-lg border`}>
@@ -243,7 +246,7 @@ function CoordCard({ result, rank, total, navigate }: {
           onClick={handleRecord}
           className="w-full py-3 bg-terra-500 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
         >
-          <Calendar size={16} /> 이걸로 기록하기
+          <Calendar size={16} /> {t('todayCoord.recordThis')}
         </button>
       </div>
     </div>

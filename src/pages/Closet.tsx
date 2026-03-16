@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Plus, Calendar, Star, ChevronLeft, ChevronRight, Shirt, Trash2, Wand2, ShoppingBag, BarChart3 } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useModal } from '@/components/ui/Modal'
@@ -11,6 +12,7 @@ type ClosetTab = 'wardrobe' | 'records'
 
 export default function Closet() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [tab, setTab] = useState<ClosetTab>('records')
 
   return (
@@ -26,13 +28,13 @@ export default function Closet() {
           className={`relative z-10 flex-1 py-2.5 text-[13px] font-semibold text-center rounded-lg transition-colors ${
             tab === 'wardrobe' ? 'text-warm-900' : 'text-warm-600'
           }`}
-        >내 옷장</button>
+        >{t('closet.myCloset')}</button>
         <button
           onClick={() => setTab('records')}
           className={`relative z-10 flex-1 py-2.5 text-[13px] font-semibold text-center rounded-lg transition-colors ${
             tab === 'records' ? 'text-warm-900' : 'text-warm-600'
           }`}
-        >코디 기록</button>
+        >{t('closet.coordRecord')}</button>
       </div>
 
       {tab === 'wardrobe' && <WardrobeTab navigate={navigate} />}
@@ -45,6 +47,7 @@ export default function Closet() {
 // 내 옷장 탭
 // ═══════════════════════════════════════
 function WardrobeTab({ navigate }: { navigate: any }) {
+  const { t } = useTranslation()
   const modal = useModal()
   const toast = useToast()
   const [items, setItems] = useState(() => {
@@ -66,12 +69,12 @@ function WardrobeTab({ navigate }: { navigate: any }) {
   const handleDelete = (id: string) => {
     const target = items.find((i: any) => i.id === id)
     if (!target) return
-    const displayName = target.name || COLORS_60[getColor(target)]?.name || '아이템'
+    const displayName = target.name || COLORS_60[getColor(target)]?.name || ''
 
     modal.confirm({
-      title: '아이템 삭제',
-      message: `"${displayName}"을(를) 삭제할까요?`,
-      confirmLabel: '삭제',
+      title: t('closet.deleteItem'),
+      message: `"${displayName}"`,
+      confirmLabel: t('common.delete'),
       variant: 'danger',
       onConfirm: () => {
         // 즉시 UI에서 제거
@@ -81,7 +84,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
 
         // 되돌리기 토스트 (5초)
         toast.toast({
-          message: `"${displayName}" 삭제됨`,
+          message: t('closet.deleteSuccess'),
           undoAction: () => {
             // 복원: 원래 위치에 다시 삽입
             const current = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
@@ -101,7 +104,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
   const renderItem = (item: any) => {
     const colorKey = getColor(item)
     const c = colorKey ? COLORS_60[colorKey] : null
-    const displayName = item.name || c?.name || colorKey || '알 수 없음'
+    const displayName = item.name || c?.name || colorKey || ''
     const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' }) : ''
 
     return (
@@ -130,8 +133,8 @@ function WardrobeTab({ navigate }: { navigate: any }) {
     return (
       <div className="text-center py-16">
         <Shirt size={40} className="text-warm-400 mx-auto mb-3" />
-        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">옷장이 비어있어요</div>
-        <button onClick={() => navigate('/closet/add')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">첫 아이템 등록하기</button>
+        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('closet.emptyCloset')}</div>
+        <button onClick={() => navigate('/closet/add')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">{t('closet.addFirstItem')}</button>
       </div>
     )
   }
@@ -141,10 +144,10 @@ function WardrobeTab({ navigate }: { navigate: any }) {
       {/* 내 옷으로 코디하기 CTA */}
       {hasTop && hasBottom ? (
         <button onClick={() => navigate('/closet/coord')} className="w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 mb-2 active:scale-[0.98] transition-all shadow-terra">
-          <Wand2 size={16} /> 내 옷으로 코디하기
+          <Wand2 size={16} /> {t('closetCoord.title')}
         </button>
       ) : (
-        <button disabled className="w-full py-3 bg-warm-400 dark:bg-warm-600 text-warm-600 dark:text-warm-400 rounded-2xl text-sm font-medium mb-2 cursor-not-allowed">내 옷으로 코디하기 (상의+하의 필요)</button>
+        <button disabled className="w-full py-3 bg-warm-400 dark:bg-warm-600 text-warm-600 dark:text-warm-400 rounded-2xl text-sm font-medium mb-2 cursor-not-allowed">{t('closetCoord.title')}</button>
       )}
 
       {/* 이 옷 사도 될까? + 활용도 분석 — 항상 표시, 아이템 부족 시 비활성화 */}
@@ -162,7 +165,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
                     : 'bg-warm-200 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-500 dark:text-warm-400 cursor-not-allowed'
                 }`}
               >
-                <ShoppingBag size={15} /> 사도 될까?
+                <ShoppingBag size={15} /> {t('closetCoord.whatToBuy')}
               </button>
               <button
                 onClick={() => enabled ? navigate('/closet/report') : null}
@@ -172,11 +175,11 @@ function WardrobeTab({ navigate }: { navigate: any }) {
                     : 'bg-warm-200 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-500 dark:text-warm-400 cursor-not-allowed'
                 }`}
               >
-                <BarChart3 size={15} /> 활용도 분석
+                <BarChart3 size={15} /> {t('closetCoord.wardrobeReport')}
               </button>
             </div>
             {!enabled && (
-              <div className="text-[10px] text-warm-500 dark:text-warm-400 text-center mb-3">아이템 {needed}개 더 등록하면 사용할 수 있어요</div>
+              <div className="text-[10px] text-warm-500 dark:text-warm-400 text-center mb-3">{t('closet.itemCount', { count: needed })}</div>
             )}
             {enabled && <div className="mb-3" />}
           </>
@@ -185,7 +188,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
 
       {/* 카테고리 필터 */}
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 hide-scrollbar">
-        <button onClick={() => setFilter('all')} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${filter === 'all' ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400 active:scale-95'}`}>전체 {items.length}</button>
+        <button onClick={() => setFilter('all')} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${filter === 'all' ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400 active:scale-95'}`}>{t('common.all')} {items.length}</button>
         {catOrder.map(cat => {
           const count = items.filter((i: any) => i.category === cat).length
           if (count === 0) return null
@@ -198,7 +201,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
       {/* 아이템 추가 버튼 */}
       <button onClick={() => navigate('/closet/add')} className="w-full bg-warm-200 dark:bg-warm-800 border-2 border-dashed border-warm-400 dark:border-warm-600 rounded-2xl py-4 text-center mb-4 active:scale-[0.98] transition-all">
         <div className="text-warm-500 text-lg mb-0.5">+</div>
-        <div className="text-xs text-warm-600 dark:text-warm-400 font-medium">아이템 추가</div>
+        <div className="text-xs text-warm-600 dark:text-warm-400 font-medium">{t('common.itemRegister')}</div>
       </button>
 
       {/* 아이템 목록 — 전체면 카테고리별 그룹, 필터면 플랫 */}
@@ -226,6 +229,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
 // 코디 기록 탭
 // ═══════════════════════════════════════
 function RecordsTab({ navigate }: { navigate: any }) {
+  const { t } = useTranslation()
   const { getRecords } = useOotd()
   const records = getRecords()
 
@@ -238,22 +242,21 @@ function RecordsTab({ navigate }: { navigate: any }) {
           className="bg-white border border-warm-400 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all"
         >
           <Calendar size={24} className="text-terra-500 mx-auto mb-2" />
-          <div className="text-[13px] font-semibold text-warm-900">코디 캘린더</div>
-          <div className="text-[10px] text-warm-500 mt-0.5">날짜별 기록 보기</div>
+          <div className="text-[13px] font-semibold text-warm-900">{t('header.calendar')}</div>
         </button>
         <button
           onClick={() => navigate('/closet/best')}
           className="bg-white border border-warm-400 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all"
         >
           <Star size={24} className="text-terra-500 mx-auto mb-2" />
-          <div className="text-[13px] font-semibold text-warm-900">베스트 코디</div>
-          <div className="text-[10px] text-warm-500 mt-0.5">높은 점수순</div>
+          <div className="text-[13px] font-semibold text-warm-900">{t('closet.bestCoordTitle')}</div>
+          <div className="text-[10px] text-warm-500 mt-0.5">{t('closet.sortByScore')}</div>
         </button>
       </div>
 
       {/* 최근 기록 리스트 */}
       <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3">
-        최근 기록 ({records.length})
+        {t('home.recentOotd')} ({records.length})
       </div>
 
       {records.length > 0 ? (
@@ -265,11 +268,11 @@ function RecordsTab({ navigate }: { navigate: any }) {
       ) : (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">📝</div>
-          <div className="text-sm text-warm-600 mb-4">아직 기록이 없어요</div>
+          <div className="text-sm text-warm-600 mb-4">{t('home.noRecords')}</div>
           <button
             onClick={() => navigate('/record')}
             className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra"
-          >첫 OOTD 기록하기</button>
+          >{t('header.record')}</button>
         </div>
       )}
     </div>
@@ -278,6 +281,7 @@ function RecordsTab({ navigate }: { navigate: any }) {
 
 // ─── 기록 카드 ───
 function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any }) {
+  const { t } = useTranslation()
   const outfitHex: Record<string, string> = {}
   Object.entries(record.colors || {}).forEach(([k, v]) => {
     if (v) { const c = COLORS_60[v]; if (c) outfitHex[k] = c.hex }
@@ -291,9 +295,9 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
     const todayMs = new Date(ty, tm - 1, td).getTime()
     const recMs = new Date(ry, rm - 1, rd).getTime()
     const diff = Math.floor((todayMs - recMs) / 86400000)
-    if (diff === 0) return '오늘'
-    if (diff === 1) return '어제'
-    if (diff < 7) return `${diff}일 전`
+    if (diff === 0) return t('common.today')
+    if (diff === 1) return t('common.yesterday')
+    if (diff < 7) return t('common.daysAgoShort', { count: diff })
     return new Date(ry, rm - 1, rd).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
   })()
 
@@ -309,7 +313,7 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
         <div className="px-2.5 py-2">
           <div className="flex items-center justify-between mb-0.5">
             <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
-            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{t('common.score', { score: record.score })}</span>
           </div>
           <div className="flex gap-0.5">
             {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
@@ -333,7 +337,7 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
       <div className="px-2.5 py-2">
         <div className="flex items-center justify-between mb-0.5">
           <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
-          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{t('common.score', { score: record.score })}</span>
         </div>
         <div className="flex gap-0.5">
           {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {

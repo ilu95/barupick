@@ -5,6 +5,7 @@ import { ArrowLeft, Check, Sparkles } from 'lucide-react'
 import { COLORS_60 } from '@/lib/colors'
 import { PERSONAL_COLOR_12 } from '@/lib/personalColor'
 import { profile } from '@/lib/profile'
+import { useTranslation } from 'react-i18next'
 
 // ─── 원본 빛 진단 데이터 (7단계 분기형) ───
 const PC_LIGHT_STEPS = {
@@ -46,6 +47,7 @@ function countIn(arr, val) { return arr.filter(v => v === val).length }
 
 export default function PcLight() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [mode, setMode] = useState('guide') // guide | step | project | result
   const [phase, setPhase] = useState('undertone') // undertone | value | chroma
   const [stepIndex, setStepIndex] = useState(0)
@@ -152,11 +154,11 @@ export default function PcLight() {
             <Sparkles size={32} className="text-terra-500" />
           </div>
           <h2 className="font-display text-2xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{pc?.name || result}</h2>
-          <p className="text-sm text-warm-600 dark:text-warm-400 leading-relaxed px-4">{pc?.description || '퍼스널컬러 진단이 완료되었어요'}</p>
+          <p className="text-sm text-warm-600 dark:text-warm-400 leading-relaxed px-4">{pc?.description || ''}</p>
         </div>
         {bestColors.length > 0 && (
           <div className="mb-6">
-            <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">베스트 컬러</div>
+            <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('pcLight.bestColors')}</div>
             <div className="flex flex-wrap gap-2 justify-center">
               {bestColors.map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30" style={{ background: c.hex }} /><span className="text-[10px] text-warm-600 dark:text-warm-400">{c.name}</span></div> : null })}
             </div>
@@ -164,15 +166,15 @@ export default function PcLight() {
         )}
         {pc?.worstColors && (
           <div className="mb-6">
-            <div className="text-xs font-semibold text-red-500 dark:text-red-400 tracking-widest uppercase mb-3">피해야 할 컬러</div>
+            <div className="text-xs font-semibold text-red-500 dark:text-red-400 tracking-widest uppercase mb-3">{t('pcLight.worstColors')}</div>
             <div className="flex flex-wrap gap-2 justify-center">
               {pc.worstColors.slice(0, 6).map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30 relative" style={{ background: c.hex }}><span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold drop-shadow">✕</span></div><span className="text-[10px] text-warm-600 dark:text-warm-400">{c.name}</span></div> : null })}
             </div>
           </div>
         )}
         <div className="flex flex-col gap-2.5">
-          <button onClick={() => { profile.setPersonalColor(result); navigate('/profile/personal-color', { replace: true }) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"><Check size={18} /> 이 결과로 설정하기</button>
-          <button onClick={startOver} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">다시 진단하기</button>
+          <button onClick={() => { profile.setPersonalColor(result); navigate('/profile/personal-color', { replace: true }) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"><Check size={18} /> {t('pcLight.applyResult')}</button>
+          <button onClick={startOver} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">{t('common.retry')}</button>
         </div>
         <div className="text-center text-[11px] text-warm-500 mt-4 leading-relaxed">이 진단은 간이 테스트예요. 정확한 진단은 전문가에게 받아보세요.</div>
       </div>
@@ -208,7 +210,7 @@ export default function PcLight() {
           {isUndertone && (
             <button onClick={() => { setMode('step'); handleAnswer('similar') }} className="w-full py-2.5 rounded-xl text-xs font-medium text-white/60 border border-white/20 active:scale-[0.98] transition-all">비슷해요 (구별이 어려워요)</button>
           )}
-          <button onClick={() => setMode('step')} className="w-full text-center text-xs text-white/40 mt-2 py-1 active:opacity-70">← 돌아가기</button>
+          <button onClick={() => setMode('step')} className="w-full text-center text-xs text-white/40 mt-2 py-1 active:opacity-70">← {t('common.goBack')}</button>
         </div>
       </div>
     )
@@ -224,12 +226,12 @@ export default function PcLight() {
 
     return (
       <div className="min-h-screen bg-[#111] text-white px-5 pt-4 pb-10">
-        {canBack && <button onClick={goBack} className="text-sm text-white/50 mb-3 active:opacity-70"><ArrowLeft size={14} className="inline mr-1" /> 이전 단계</button>}
+        {canBack && <button onClick={goBack} className="text-sm text-white/50 mb-3 active:opacity-70"><ArrowLeft size={14} className="inline mr-1" /> {t('common.previous')}</button>}
 
         <div className="h-1.5 bg-white/10 rounded-full mb-4"><div className="h-full bg-terra-500 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} /></div>
 
         <div className="text-xs text-white/40 font-semibold mb-1">{step.phase}</div>
-        <div className="text-lg font-bold mb-4">STEP {step.stepNum} / 7</div>
+        <div className="text-lg font-bold mb-4">{t('pcLight.stepProgress', { current: step.stepNum, total: 7 })}</div>
 
         {/* 미리보기 — 3등분 */}
         <div className="flex h-16 rounded-xl overflow-hidden mb-4">
@@ -251,7 +253,7 @@ export default function PcLight() {
           <div className="text-[11px] text-white/30 text-center mb-4">구별이 어려우면 "비슷해요"를 눌러도 됩니다</div>
         )}
 
-        <button onClick={() => setMode('project')} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all">빛 비추기 시작 →</button>
+        <button onClick={() => setMode('project')} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all">{t('pcLight.startButton')} →</button>
       </div>
     )
   }
@@ -259,10 +261,10 @@ export default function PcLight() {
   // ═══ 가이드 (시작 화면) ═══
   return (
     <div className="min-h-screen bg-[#111] text-white px-5 pt-4 pb-10">
-      <button onClick={() => navigate(-1)} className="text-sm text-white/50 mb-4 active:opacity-70"><ArrowLeft size={14} className="inline mr-1" /> 돌아가기</button>
+      <button onClick={() => navigate(-1)} className="text-sm text-white/50 mb-4 active:opacity-70"><ArrowLeft size={14} className="inline mr-1" /> {t('common.goBack')}</button>
 
-      <h2 className="text-xl font-bold mb-2">빛으로 퍼스널 컬러 찾기</h2>
-      <p className="text-sm text-white/50 mb-6">화면의 색광을 피부에 비추어 진단합니다 · 약 2~3분</p>
+      <h2 className="text-xl font-bold mb-2">{t('pcLight.guideTitle')}</h2>
+      <p className="text-sm text-white/50 mb-6">{t('pcLight.guideDesc')}</p>
 
       <div className="flex flex-col gap-4 mb-6">
         {[
@@ -299,7 +301,7 @@ export default function PcLight() {
         메이크업을 지운 상태가 정확합니다
       </div>
 
-      <button onClick={() => { startOver(); setMode('step') }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">준비 완료 →</button>
+      <button onClick={() => { startOver(); setMode('step') }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('pcLight.startButton')} →</button>
     </div>
   )
 }

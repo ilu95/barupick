@@ -1,0 +1,914 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "analyzing": "Analyzing...",
+    "loginRequired": "Please sign in",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "goBack": "Go back",
+    "next": "Next",
+    "previous": "Previous",
+    "reset": "Reset",
+    "retry": "Retry",
+    "share": "Share",
+    "download": "Download",
+    "done": "Done",
+    "send": "Send",
+    "search": "Search",
+    "all": "All",
+    "user": "User",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "version": "Version",
+    "developer": "Developer",
+    "developerName": "BaruPick",
+    "undo": "Undo",
+    "selectColor": "Select color",
+    "recentColors": "Recent",
+    "colorCount": "{{count}} colors",
+    "follow": "Follow",
+    "following": "Following ✓",
+    "friend": "👫 Friend",
+    "mutualFriend": "👫 Mutual friend",
+    "blocked": "Blocked",
+    "unblock": "Unblock",
+    "block": "Block",
+    "report": "Report",
+    "coord": "Coords",
+    "followers": "Followers",
+    "followingLabel": "Following",
+    "public": "Public",
+    "friendOnly": "Friends",
+    "private": "Private",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgoShort": "{{count}}d ago",
+    "photo": "Photo",
+    "mannequin": "Mannequin",
+    "score": "{{score}} pts",
+    "itemRegister": "Add item",
+    "generateFailed": "Generation failed",
+    "addPhoto": "Add photo"
+  },
+
+  "nav": {
+    "coord": "Coord",
+    "closet": "Closet",
+    "record": "Record",
+    "community": "Community",
+    "shop": "Shop"
+  },
+
+  "header": {
+    "home": "BaruPick",
+    "closet": "Closet",
+    "closetAdd": "Add Item",
+    "closetCoord": "My Coord Hub",
+    "closetCombos": "All Combos",
+    "closetSimulate": "What to Buy?",
+    "closetReport": "Wardrobe Story",
+    "closetBest": "Best Coords",
+    "closetToday": "Today's Outfit",
+    "record": "OOTD Record",
+    "calendar": "Coord Calendar",
+    "community": "Community",
+    "communityPost": "Share Coord",
+    "shop": "Shop",
+    "profile": "My Page",
+    "profileEdit": "Edit Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "recommend": "Coord Recommendation",
+    "build": "Build Coord",
+    "weather": "Weather Coord",
+    "saved": "Saved Coords",
+    "quiz": "Style Quiz",
+    "fabricGuide": "Fabric Guide",
+    "bodyGuide": "Body Type Guide",
+    "personalColor": "Personal Color",
+    "personalColorLight": "Light Diagnosis",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "blockList": "Block List",
+    "devDiag": "Connection Test",
+    "myLevel": "My Level",
+    "myBadges": "Badges",
+    "colorRanking": "Color Analysis",
+    "colorPattern": "Color Pattern",
+    "challenges": "Challenges",
+    "titleExam": "Title Exam",
+    "myPosts": "My Posts",
+    "insights": "Insights",
+    "savedCoords": "Saved Coords",
+    "userDiscover": "Find Users",
+    "postInsight": "Post Insight",
+    "eventDetail": "Event",
+    "eventSubmit": "Join Event"
+  },
+
+  "onboarding": {
+    "slide1Title": "AI Color Coordination",
+    "slide1Desc": "Our color harmony algorithm recommends the best outfits for you",
+    "slide2Title": "OOTD Recording",
+    "slide2Desc": "Log your daily outfits and track your style growth",
+    "slide3Title": "Style Community",
+    "slide3Desc": "Browse others' outfits and get inspired",
+    "slide4Title": "Personal Color & Body Type",
+    "slide4Desc": "Get personalized recommendations based on your diagnosis",
+    "start": "Get Started",
+    "skip": "Skip"
+  },
+
+  "home": {
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "weatherCard": "Today's Weather",
+    "feelsLike": "Feels like {{temp}}°C",
+    "recentOotd": "Recent OOTD",
+    "noRecords": "No records yet",
+    "personalColorBanner": "Set your personal color for personalized recommendations",
+    "setupNow": "Set up now",
+    "wardrobeCombo": "See outfit combos from your closet",
+    "mainCta": {
+      "recommend": "Get Recommendations",
+      "build": "Build Your Own",
+      "weather": "Weather Coord",
+      "saved": "Saved Coords"
+    },
+    "guide": {
+      "fabricGuide": "Fabric Guide",
+      "bodyGuide": "Body Type Guide",
+      "quiz": "Quiz"
+    }
+  },
+
+  "auth": {
+    "loginTitle": "Sign In",
+    "signupTitle": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "passwordConfirm": "Confirm Password",
+    "nickname": "Nickname",
+    "loginButton": "Sign In",
+    "signupButton": "Sign Up",
+    "switchToSignup": "Don't have an account? Sign Up",
+    "switchToLogin": "Already have an account? Sign In",
+    "kakaoLogin": "Continue with Kakao",
+    "googleLogin": "Continue with Google",
+    "agreement": "By signing up, you agree to our Terms of Service and Privacy Policy",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "nicknameRequired": "Nickname is required",
+    "loginFailed": "Sign in failed",
+    "signupFailed": "Sign up failed",
+    "signupSuccess": "Account created! Please check your email",
+    "forgotPassword": "Forgot your password?"
+  },
+
+  "settings": {
+    "display": "Display",
+    "language": "Language",
+    "languageDesc": "Change app display language",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Reduce eye strain",
+    "hideCounts": "Hide like/save counts",
+    "hideCountsDesc": "Hide reaction counts on your posts from others",
+    "data": "Data",
+    "autoSyncActive": "Auto sync active",
+    "notSynced": "Not yet synced",
+    "syncNow": "Sync now",
+    "syncNowDesc": "Manually sync with server",
+    "syncSuccess": "Sync complete!",
+    "syncFailed": "Sync failed: {{error}}",
+    "exportData": "Export data",
+    "exportDataDesc": "Download OOTD records, closet, and saved coords as JSON",
+    "exportFailed": "Export failed: {{error}}",
+    "feedback": "Send feedback",
+    "info": "Info",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "account": "Account",
+    "logout": "Sign Out",
+    "deleteAccount": "Delete Account",
+    "deleteAccountTitle": "Delete Account",
+    "deleteAccountMessage": "Are you sure you want to delete your account?\n\n• All coord records will be deleted\n• Community posts will be deleted\n• This action cannot be undone",
+    "deleteAccountContinue": "Continue",
+    "deleteAccountConfirmTitle": "Final Confirmation",
+    "deleteAccountConfirmMessage": "Type \"DELETE\" to confirm.",
+    "deleteAccountPlaceholder": "DELETE",
+    "deleteAccountValidation": "Please type \"DELETE\" exactly",
+    "deleteAccountSuccess": "Your account has been deleted. Thank you for using BaruPick.",
+    "deleteAccountError": "Error deleting account: {{error}}"
+  },
+
+  "feedbackModal": {
+    "title": "Send Feedback",
+    "typeBug": "🐛 Bug",
+    "typeFeature": "✨ Feature Request",
+    "typeDesign": "🎨 Design",
+    "typeOther": "💡 Other",
+    "placeholder": "Share your thoughts (max 1000 characters)",
+    "typeRequired": "Please select a type and write your feedback",
+    "sending": "Sending...",
+    "sendSuccess": "Thank you for your feedback!",
+    "sendFailed": "Send failed: {{error}}"
+  },
+
+  "closet": {
+    "myCloset": "My Closet",
+    "coordRecord": "Coord Records",
+    "emptyCloset": "Your closet is empty",
+    "addFirstItem": "Add your first item",
+    "itemCount": "{{count}} items",
+    "deleteItem": "Delete this item?",
+    "deleteSuccess": "Deleted",
+    "bestCoordTitle": "Best Coords",
+    "sortByScore": "Sorted by highest score"
+  },
+
+  "closetAdd": {
+    "photoMode": "Add by Photo",
+    "manualMode": "Add Manually",
+    "step1": "Select category",
+    "step2": "Select color",
+    "step3": "Enter details",
+    "brand": "Brand",
+    "brandPlaceholder": "Brand name (optional)",
+    "name": "Name",
+    "namePlaceholder": "Item name (optional)",
+    "colorExtract": "Extracting colors from photo..."
+  },
+
+  "closetCoord": {
+    "title": "My Coord Hub",
+    "subtitle": "Check outfits with your closet items",
+    "allCombos": "View All Combos",
+    "allCombosDesc": "All possible combos sorted by score",
+    "whatToBuy": "What Should I Buy?",
+    "whatToBuyDesc": "Simulate the effect of adding a new item",
+    "wardrobeReport": "My Wardrobe Story",
+    "wardrobeReportDesc": "Top items, hidden potential, color balance"
+  },
+
+  "allCombos": {
+    "title": "All Closet Combos",
+    "sortScore": "By Score",
+    "sortRecent": "Least Worn",
+    "sortFewer": "Fewer Items",
+    "filterAll": "All",
+    "filterOuter": "With Outer",
+    "filterNoOuter": "No Outer",
+    "woreToday": "Wore today",
+    "selectDate": "Select date",
+    "subScoreLabels": {
+      "colorPlacement": "Color Placement",
+      "colorRatio": "Color Ratio",
+      "colorHarmony": "Color Harmony",
+      "seasonal": "Seasonal Feel",
+      "balance": "Balance",
+      "personalColor": "Personal Color",
+      "bodyFit": "Body Fit"
+    }
+  },
+
+  "todayCoord": {
+    "title": "What to Wear Today?",
+    "subtitle": "AI picks from your closet",
+    "needMoreItems": "Please add items to your closet",
+    "needMoreItemsDesc": "You need at least 1 top, 1 bottom, and 1 pair of shoes",
+    "analyzingCloset": "Analyzing closet...",
+    "noResults": "No matching combos found",
+    "noResultsDesc": "Try adding items with more variety of colors",
+    "viewOther": "🔄 View other combos",
+    "recordThis": "Record this outfit",
+    "best": "BEST"
+  },
+
+  "recommend": {
+    "moodTitle": "What mood are you going for?",
+    "styleTitle": "Select Style",
+    "resultTitle": "Recommended Coords",
+    "resultSubtitle": "Color combinations analyzed",
+    "noResults": "No matching combos found for these criteria",
+    "save": "Save",
+    "share": "Share",
+    "communityShare": "Share to Community",
+    "saveSuccess": "Coord saved",
+    "colorImprove": "Changing this color would improve the score"
+  },
+
+  "build": {
+    "stepStyle": "Select Style",
+    "stepColor": "Select Colors",
+    "stepFabric": "Select Fabrics",
+    "scoreItems": {
+      "colorPlacement": "Color Placement",
+      "colorRatio": "Color Ratio",
+      "colorHarmony": "Color Harmony",
+      "seasonal": "Seasonal Feel",
+      "balance": "Balance",
+      "personalColor": "Personal Color",
+      "bodyFit": "Body Fit"
+    },
+    "saveCoord": "Save Coord",
+    "shareCoord": "Share"
+  },
+
+  "ootdRecord": {
+    "situations": {
+      "commute": "Work",
+      "date": "Date",
+      "casual": "Casual",
+      "interview": "Interview",
+      "travel": "Travel",
+      "exercise": "Workout"
+    },
+    "moods": {
+      "satisfied": "Satisfied",
+      "okay": "So-so",
+      "regret": "Could be better"
+    },
+    "visibility": {
+      "private": "Private",
+      "friends": "Friends",
+      "public": "Public"
+    },
+    "memoPlaceholder": "A note about today's outfit (optional)",
+    "saveComplete": "Recorded!",
+    "streakMessage": "{{count}}-day streak!"
+  },
+
+  "ootdCalendar": {
+    "weekDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "filterAll": "All",
+    "filterPhoto": "Photo",
+    "filterMannequin": "Mannequin",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "colorStreakWarning": "You've been wearing the same color in a row"
+  },
+
+  "ootdDetail": {
+    "editRecord": "Edit",
+    "deleteRecord": "Delete",
+    "deleteConfirm": "Delete this record?",
+    "deleteSuccess": "Record deleted",
+    "shareCard": "Share Card",
+    "shareTitle": "BaruPick Coord",
+    "communityShare": "Share to Community",
+    "communityShareSuccess": "Shared to community!"
+  },
+
+  "community": {
+    "tabs": {
+      "all": "All",
+      "friends": "Friends",
+      "ranking": "Ranking"
+    },
+    "sort": {
+      "latest": "Latest",
+      "popular": "Popular"
+    },
+    "content": {
+      "photo": "Photo",
+      "mannequin": "Mannequin"
+    },
+    "friendsTab": {
+      "empty": "No friends yet",
+      "findUsers": "Find users"
+    },
+    "ranking": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "users": "Users",
+      "events": "Events"
+    },
+    "empty": "No posts yet"
+  },
+
+  "communityDetail": {
+    "like": "Like",
+    "unlikeLabel": "Unlike",
+    "save": "Save",
+    "share": "Share",
+    "report": "Report",
+    "editPost": "Edit",
+    "deletePost": "Delete",
+    "deleteConfirm": "Delete this post?",
+    "deleteSuccess": "Post deleted",
+    "follow": "Follow",
+    "instagramLink": "Instagram",
+    "comments": "Comments",
+    "commentPlaceholder": "Write a comment...",
+    "commentEmpty": "No comments yet",
+    "reportSuccess": "Report submitted",
+    "likeSuccess": "Liked!",
+    "saveSuccess": "Saved"
+  },
+
+  "communityPost": {
+    "title": "Share Coord",
+    "caption": "Caption",
+    "captionPlaceholder": "Say something about your coord (optional)",
+    "photos": "Photos",
+    "visibility": {
+      "public": "Public",
+      "friends": "Friends only"
+    },
+    "instagramToggle": "Link Instagram",
+    "posting": "Posting...",
+    "postSuccess": "Post shared!",
+    "postFailed": "Post failed: {{error}}"
+  },
+
+  "profile": {
+    "stats": {
+      "coords": "Coords",
+      "followers": "Followers",
+      "following": "Following",
+      "streak": "Streak",
+      "badges": "Badges",
+      "saved": "Saved"
+    },
+    "sections": {
+      "growth": "Growth",
+      "diagnosis": "My Diagnosis",
+      "settings": "Settings"
+    },
+    "menu": {
+      "myLevel": "My Level",
+      "myBadges": "Badges",
+      "colorRanking": "Color Analysis",
+      "colorPattern": "Color Pattern",
+      "challenges": "Challenges",
+      "titleExam": "Title Exam",
+      "myPosts": "My Posts",
+      "insights": "Insights",
+      "savedCoords": "Saved Coords",
+      "personalColor": "Personal Color",
+      "bodyType": "Body Type Guide",
+      "settings": "Settings",
+      "blockList": "Block List"
+    },
+    "edit": {
+      "title": "Edit Profile",
+      "nickname": "Nickname",
+      "nicknamePlaceholder": "Enter nickname",
+      "bio": "Bio",
+      "bioPlaceholder": "Write a short bio",
+      "instagram": "Instagram ID",
+      "instagramPlaceholder": "Without @",
+      "avatar": "Profile Photo",
+      "saveSuccess": "Profile updated"
+    }
+  },
+
+  "profileSub": {
+    "myLevel": {
+      "title": "My Level",
+      "xpMethods": {
+        "record": "OOTD Recording",
+        "community": "Community Activity",
+        "streak": "Consecutive Records",
+        "quiz": "Quiz Participation"
+      }
+    },
+    "myBadges": {
+      "title": "Badges",
+      "earned": "Earned",
+      "locked": "Locked"
+    },
+    "colorRanking": {
+      "title": "Color Analysis",
+      "warmCenter": "Warm-tone focused",
+      "coolCenter": "Cool-tone focused",
+      "neutralBalance": "Neutral balance",
+      "comfortZone": "Expand comfort zone"
+    },
+    "colorPattern": {
+      "title": "Color Pattern"
+    },
+    "challenges": {
+      "title": "Challenges",
+      "weekly": "Weekly Challenge"
+    },
+    "titleExam": {
+      "title": "Title Exam",
+      "play": "Take the Quiz"
+    },
+    "myPosts": {
+      "title": "My Posts",
+      "visibility": {
+        "public": "Public",
+        "friends": "Friends",
+        "private": "Private"
+      }
+    },
+    "insights": {
+      "title": "Insights"
+    },
+    "savedCoords": {
+      "title": "Saved Coords"
+    }
+  },
+
+  "blockList": {
+    "title": "Block List",
+    "subtitle": "Posts from blocked users won't appear",
+    "empty": "No blocked users",
+    "unblockConfirm": "Unblock @{{nickname}}?",
+    "unblockFailed": "Unblock failed: {{error}}"
+  },
+
+  "notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear all",
+    "clearConfirm": "Clear all notifications?",
+    "empty": "No new notifications"
+  },
+
+  "followList": {
+    "followers": "Followers",
+    "following": "Following",
+    "noFollowers": "No followers yet",
+    "noFollowing": "Not following anyone yet"
+  },
+
+  "userDiscover": {
+    "searchPlaceholder": "Search by nickname or Instagram ID",
+    "searchButton": "Search",
+    "searchMinLength": "Enter at least 2 characters",
+    "searchError": "An error occurred while searching",
+    "noResults": "No results found",
+    "searchResults": "{{count}} results",
+    "suggestedUsers": "Suggested Users",
+    "noUsers": "No users yet"
+  },
+
+  "userProfile": {
+    "publicCoords": "Public Coords",
+    "noPublicCoords": "No public coords yet",
+    "followCta": "Follow to see more",
+    "followCtaDesc": "Access friend-only coords and comments",
+    "blockedToast": "User blocked",
+    "unblockedToast": "User unblocked"
+  },
+
+  "postInsight": {
+    "title": "Post Insight",
+    "views": "Views",
+    "likes": "Likes",
+    "saves": "Saves",
+    "comments": "Comments",
+    "engagementTitle": "Engagement Analysis",
+    "likeRate": "Like Rate",
+    "saveRate": "Save Rate",
+    "compareAvg": "Compared to your average",
+    "avgLabel": "Avg {{count}}",
+    "trend14d": "14-day Trend",
+    "daysOld": "Day {{count}}",
+    "avgViewsPerDay": "Avg {{count}} views/day",
+    "notFound": "Post not found"
+  },
+
+  "eventSubmit": {
+    "participationDone": "Submitted!",
+    "waitResult": "Please wait for the results",
+    "warning": "Only submit photos without visible faces. Submissions cannot be edited or deleted.",
+    "coordColors": "🎨 Outfit Colors",
+    "minColors": "Select at least 2 colors",
+    "wearPhoto": "📷 Outfit Photo",
+    "required": "Required",
+    "wearPhotoDesc": "Make sure your face is not visible (max 2 photos)",
+    "style": "👔 Style",
+    "optional": "(Optional)",
+    "instagramId": "📸 Instagram ID",
+    "instagramIdDesc": "Needed for contacting winners",
+    "instagramPlaceholder": "Instagram ID (without @)",
+    "submitting": "Submitting...",
+    "submit": "🎨 Submit",
+    "needColors": "2+ colors needed",
+    "needPhoto": "Photo required",
+    "needInstagram": "Instagram ID required",
+    "alreadySubmitted": "You already joined this event",
+    "submitFailed": "Submission failed: {{error}}"
+  },
+
+  "eventDetail": {
+    "active": "🔥 Active",
+    "ended": "⏳ Ended",
+    "submissions": "Submissions ({{count}})",
+    "noSubmissions": "No submissions yet",
+    "participate": "🎨 Join Event",
+    "notFound": "Event not found"
+  },
+
+  "purchaseSimulate": {
+    "title": "What Should I Buy?",
+    "subtitle": "We'll analyze your closet and recommend",
+    "recommendMode": "Get AI Recommendations",
+    "recommendModeDesc": "No need to choose anything",
+    "manualMode": "Check Specific Item Compatibility",
+    "manualModeDesc": "Pick the color of the item you want to buy",
+    "resultTitle": "Recommendations",
+    "resultSubtitle": "Sorted by effectiveness based on your closet",
+    "analyzingCompat": "Analyzing compatibility...",
+    "noRecommend": "No recommendations found",
+    "noRecommendDesc": "Try adding more items to your closet",
+    "addToCloset": "Add to Closet",
+    "compatCheck": "Compatibility Check",
+    "selectCategory": "Select the type of item you want to buy",
+    "currentCount": "Currently {{count}}",
+    "reselectPart": "Change category",
+    "selectColor": "Select the color for {{category}}",
+    "reselect": "Choose again",
+    "newCombos": "New Combos",
+    "bestScore": "Best Score",
+    "avgScore": "Avg Score",
+    "verdict": {
+      "strongBuy": "Highly Recommended!",
+      "buy": "Good Choice",
+      "weak": "Low Impact",
+      "skip": "No Combos"
+    },
+    "comboDelta": "+{{count}} combos",
+    "avgScoreLabel": "Avg {{score}} pts",
+    "bestScoreLabel": "Best {{score}} pts"
+  },
+
+  "wardrobeReport": {
+    "title": "My Wardrobe Story",
+    "analyzingCloset": "Analyzing closet...",
+    "needMoreItems": "Please add at least 3 items to your closet",
+    "summary": "{{items}} items in closet, {{combos}} possible combos",
+    "mvpTitle": "Most Versatile Items",
+    "mvpUsage": "Used in {{count}} combos ({{pct}}%)",
+    "hiddenTitle": "Items with Hidden Potential",
+    "noCombo": "No matching combos yet",
+    "fewCombos": "Only {{count}} combos — quite few",
+    "bestCombo": "Best pair: {{color}} {{category}} ({{score}} pts)",
+    "colorBalance": "Wardrobe Color Balance",
+    "warmCenter": "Warm-tone focused",
+    "coolCenter": "Cool-tone focused",
+    "balancedCenter": "Well-balanced",
+    "warmPct": "Warm {{pct}}%",
+    "neutralPct": "Neutral {{pct}}%",
+    "coolPct": "Cool {{pct}}%",
+    "addCoolTip": "Adding cool tones (navy, steel blue, etc.) would improve the balance",
+    "addWarmTip": "Adding warm tones (beige, camel, etc.) would improve the balance",
+    "viewAllCombos": "View All Combos",
+    "checkPurchase": "Check what to buy"
+  },
+
+  "weather": {
+    "title": "What to Wear Today?",
+    "loadingWeather": "Loading weather...",
+    "humidity": "Humidity {{pct}}%",
+    "wind": "Wind {{speed}}km/h",
+    "feelsLike": "Feels like {{temp}}°C",
+    "recommendItems": "Recommended Items",
+    "colorTip": "Color Tip",
+    "ctaButton": "Get weather-based coord recommendations",
+    "noLocation": "Please allow location access",
+    "noLocationDesc": "We'll recommend outfits based on the weather",
+    "clear": "Clear",
+    "partlyCloudy": "Partly cloudy",
+    "fog": "Foggy",
+    "drizzle": "Drizzle",
+    "rain": "Rain",
+    "snow": "Snow",
+    "shower": "Shower",
+    "thunderstorm": "Thunderstorm",
+    "advice": {
+      "hotSummer": {
+        "title": "Hot Summer Outfit",
+        "desc": "T-shirt + shorts or linen pants"
+      },
+      "earlySummer": {
+        "title": "Early Summer Outfit",
+        "desc": "T-shirt + cotton pants or light dress"
+      },
+      "midSeason": {
+        "title": "Transitional Outfit",
+        "desc": "Long sleeve + pants and a light jacket"
+      },
+      "earlyFall": {
+        "title": "Early Fall Outfit",
+        "desc": "Jacket or cardigan + long pants"
+      },
+      "winter": {
+        "title": "Winter Outfit",
+        "desc": "Coat + knit sweater and scarf"
+      },
+      "deepWinter": {
+        "title": "Deep Winter Outfit",
+        "desc": "Puffer + fleece-lined layers"
+      },
+      "extreme": {
+        "title": "Extreme Cold",
+        "desc": "Full layers — minimize exposed skin"
+      }
+    }
+  },
+
+  "quiz": {
+    "q1": "What do you usually do on weekends?",
+    "q1a1": "Cafe hopping ☕",
+    "q1a2": "Sports/Hiking 🏃",
+    "q1a3": "Shopping/Exhibitions 🛍️",
+    "q1a4": "Relaxing at home 🏠",
+    "q2": "Preferred color tone?",
+    "q2a1": "Neutral/Beige tones",
+    "q2a2": "Navy/Charcoal tones",
+    "q2a3": "Pastel/Bright tones",
+    "q2a4": "Dark/Achromatic",
+    "q3": "Most important when choosing clothes?",
+    "q3a1": "Comfort",
+    "q3a2": "Sophistication",
+    "q3a3": "Uniqueness",
+    "q3a4": "Value for money",
+    "q4": "Go-to shoes?",
+    "q4a1": "Sneakers 👟",
+    "q4a2": "Loafers/Dress shoes 👞",
+    "q4a3": "Boots 🥾",
+    "q4a4": "Sandals/Slides 🩴",
+    "resultTitle": "Analysis Complete!",
+    "resultSubtitle": "We found styles that suit you",
+    "prevQuestion": "Previous question",
+    "retake": "Take again"
+  },
+
+  "fabricGuide": {
+    "title": "Fabric Compatibility Check",
+    "subtitle": "Select items and we'll show you how well they pair",
+    "whatPart": "Which body part?",
+    "wearingItem": "Select the category of the item you're wearing",
+    "pairItem": "Select the category of the item to pair with",
+    "selectMaterial": "Select a fabric",
+    "seasonAll": "All",
+    "noSeasonItems": "No items for this season",
+    "otherPart": "← Choose another category",
+    "wearingSlot": "Select item you're wearing",
+    "pairSlot": "Select item to pair with",
+    "addItem": "+ Add item (max 6)",
+    "compatResult": "Compatibility Result",
+    "ratingGreat": "Recommended",
+    "ratingOk": "Neutral",
+    "ratingBad": "Not recommended",
+    "noSpecialRule": "No specific compatibility rule — a neutral pairing",
+    "guide2items": "Select 2 or more items to\ncheck fabric compatibility",
+    "guideExample": "e.g.) Denim jacket + Wool knit → Recommended!\nSilk blouse + Fleece → Formality clash"
+  },
+
+  "bodyGuide": {
+    "title": "Body Type Style Guide",
+    "subtitle": "Find the right color placement and styling tips for your body type",
+    "myBodyType": "My body type: {{type}}",
+    "tapToView": "Tap to view guide",
+    "diagnose": "Take Body Type Quiz",
+    "directSelect": "Select Directly",
+    "bodyTypes": "Body Types",
+    "directSelectTitle": "Select Body Type",
+    "directSelectDesc": "Choose the one closest to yours",
+    "backToList": "Back to list",
+    "male": "👔 Male",
+    "female": "👗 Female",
+    "colorPlacement": "Color Placement",
+    "lightRule": "Light",
+    "darkRule": "Dark",
+    "anyRule": "Any",
+    "doTitle": "Do's",
+    "dontTitle": "Don'ts",
+    "saveBodyType": "Save as my body type",
+    "saveSuccess": "Body type saved! It will be reflected in recommendations.",
+    "getRecommend": "Get recommendations for this body type"
+  },
+
+  "pcSelect": {
+    "title": "Personal Color",
+    "currentSetting": "Current: {{name}}",
+    "noSettingDesc": "Set your personal color for personalized recommendations",
+    "selfDiagnosis": "Self Diagnosis",
+    "selfDiagnosisDesc": "Find your personal color with {{count}} questions",
+    "lightDiagnosis": "Light Diagnosis",
+    "lightDiagnosisDesc": "Precise diagnosis under natural light",
+    "directSelect": "Select Directly",
+    "directSelectDesc": "Choose from 12 seasonal types if you already know",
+    "prevQuestion": "Previous question",
+    "saveAndApply": "Apply this personal color",
+    "select12Season": "Choose from the 12 seasonal personal colors"
+  },
+
+  "pcLight": {
+    "title": "Light Diagnosis",
+    "guideTitle": "Natural Light Diagnosis",
+    "guideDesc": "For accurate results, please do this under natural sunlight",
+    "startButton": "Start Diagnosis",
+    "stepProgress": "{{current}} / {{total}}",
+    "resultTitle": "Diagnosis Result",
+    "bestColors": "Best Colors",
+    "worstColors": "Colors to Avoid",
+    "applyResult": "Apply this result"
+  },
+
+  "shop": {
+    "heroSubtitle": "Preppy & Old Money Vintage Shop",
+    "devBadge": "Vintage shop by the BaruPick developer",
+    "viewOnInstagram": "📸 View on Instagram →",
+    "visitStore": "Visit BARUSA Store",
+    "partnerTitle": "Shop Partnership",
+    "partnerDesc": "Want to list your shop on BaruPick?\nContact us below.",
+    "partnerCta": "Contact Us"
+  },
+
+  "terms": {
+    "title": "Terms of Service",
+    "article1Title": "Article 1 (Purpose)",
+    "article1Content": "These terms govern the conditions and procedures for using BaruPick (the \"Service\").",
+    "article2Title": "Article 2 (Service Description)",
+    "article2Content": "The Service provides AI-based color coordination recommendations, OOTD recording, and community features.",
+    "article3Title": "Article 3 (User Obligations)",
+    "article3Content": "Users shall not infringe upon the rights of others or post inappropriate content.",
+    "article4Title": "Article 4 (Disclaimer)",
+    "article4Content": "Coordination recommendations are for reference only. The Service is not responsible for the results of recommendations."
+  },
+
+  "privacy": {
+    "title": "Privacy Policy",
+    "section1Title": "1. Personal Information Collected",
+    "section1Content": "Email, nickname, profile photo (optional), coord records",
+    "section2Title": "2. Purpose of Collection",
+    "section2Content": "Service provision, community features, personalized recommendations",
+    "section3Title": "3. Retention Period",
+    "section3Content": "Deleted immediately upon account deletion",
+    "section4Title": "4. Third-Party Sharing",
+    "section4Content": "We do not share personal information with third parties.",
+    "section5Title": "5. Contact",
+    "section5Content": "barusa.official@gmail.com"
+  },
+
+  "devDiag": {
+    "title": "Supabase Connection Test",
+    "subtitle": "Check connection status of dev DB (ywqaxxcv...)",
+    "runAll": "Run All Tests",
+    "running": "Running tests...",
+    "fixTitle": "How to Fix",
+    "allPassed": "All tests passed!",
+    "allPassedDesc": "Supabase connection is working. Ready for Vercel deployment."
+  },
+
+  "placeholder": {
+    "comingSoon": "This screen is coming soon"
+  },
+
+  "shareCard": {
+    "shareTitle": "BaruPick Coord",
+    "shareButton": "Share",
+    "iosSaveHint": "Long press the image to save"
+  },
+
+  "colorPicker": {
+    "title": "Select Color",
+    "reset": "Reset",
+    "closeLabel": "Close"
+  },
+
+  "cropOverlay": {
+    "profilePhoto": "Profile Photo",
+    "photoCrop": "Crop Photo",
+    "pinchHint": "Pinch to zoom · Drag to position",
+    "cancel": "Cancel",
+    "done": "Done"
+  },
+
+  "imageEditor": {
+    "title": "Edit Photo",
+    "cancel": "Cancel",
+    "done": "Done",
+    "loading": "Loading...",
+    "sticker": "😎 Sticker",
+    "blur": "🔲 Blur",
+    "fill": "⬛ Fill",
+    "addSticker": "+ Add sticker",
+    "addBlur": "+ Add blur",
+    "addFill": "+ Add fill",
+    "colorLabel": "Color:",
+    "touchHint": "Tap: Select · Drag: Move · Pinch: Resize/Rotate"
+  },
+
+  "modal": {
+    "defaultConfirm": "OK",
+    "defaultCancel": "Cancel"
+  }
+}

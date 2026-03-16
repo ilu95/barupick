@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { X, Smile, Square, CircleDot, Plus, Trash2, RotateCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const STICKERS = ['😎','🌟','⭐','❤️','🔥','🎀','🌸','☁️','🐱','🐶','👑','🎭','🦋','🍀','✨','💎','🌈','🎵']
 const FILL_COLORS = ['#000000','#FFFFFF','#C2785C','#6B9E76','#5B8DB8','#D4915E','#8B5CF6','#EC4899']
@@ -19,6 +20,7 @@ interface ImageEditorProps {
 }
 
 export default function ImageEditor({ src, onSave, onCancel, cropMode = false }: ImageEditorProps) {
+  const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement | null>(null)
@@ -350,14 +352,14 @@ export default function ImageEditor({ src, onSave, onCancel, cropMode = false }:
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
       {/* 헤더 */}
       <div className="flex items-center px-4 py-3 flex-shrink-0" style={{ paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))' }}>
-        <button onClick={onCancel} className="text-white text-sm px-3 py-1.5 border border-white/30 rounded-lg">취소</button>
-        <span className="flex-1 text-center text-white text-[15px] font-semibold">사진 편집</span>
-        <button onClick={handleSave} className="text-white text-sm px-3 py-1.5 bg-terra-500 rounded-lg font-semibold">완료</button>
+        <button onClick={onCancel} className="text-white text-sm px-3 py-1.5 border border-white/30 rounded-lg">{t('imageEditor.cancel')}</button>
+        <span className="flex-1 text-center text-white text-[15px] font-semibold">{t('imageEditor.title')}</span>
+        <button onClick={handleSave} className="text-white text-sm px-3 py-1.5 bg-terra-500 rounded-lg font-semibold">{t('imageEditor.done')}</button>
       </div>
 
       {/* 캔버스 영역 */}
       <div ref={wrapRef} className="flex-1 relative flex items-center justify-center overflow-hidden">
-        {!loaded && <div className="text-white/50 text-sm animate-pulse">로딩 중...</div>}
+        {!loaded && <div className="text-white/50 text-sm animate-pulse">{t('imageEditor.loading')}</div>}
         <canvas
           ref={canvasRef}
           width={canvasSize.w}
@@ -371,9 +373,9 @@ export default function ImageEditor({ src, onSave, onCancel, cropMode = false }:
         {/* 도구 탭 */}
         <div className="flex gap-1.5 mb-2.5">
           {[
-            { id: 'sticker', label: '😎 스티커' },
-            { id: 'blur', label: '🔲 블러' },
-            { id: 'fill', label: '⬛ 채우기' },
+            { id: 'sticker', label: t('imageEditor.sticker') },
+            { id: 'blur', label: t('imageEditor.blur') },
+            { id: 'fill', label: t('imageEditor.fill') },
           ].map(t => (
             <button key={t.id} onClick={() => { setTool(t.id as any); setActiveItem(-1) }}
               className={`flex-1 py-2 rounded-xl text-xs font-semibold border-[1.5px] transition-all ${
@@ -399,7 +401,7 @@ export default function ImageEditor({ src, onSave, onCancel, cropMode = false }:
         {/* 채우기 색상 */}
         {tool === 'fill' && (
           <div className="flex gap-1.5 items-center mb-2">
-            <span className="text-white/50 text-[11px] mr-1">색상:</span>
+            <span className="text-white/50 text-[11px] mr-1">{t('imageEditor.colorLabel')}</span>
             {FILL_COLORS.map(c => (
               <button key={c} onClick={() => setFillColor(c)}
                 className="w-7 h-7 rounded-full border-2 transition-all"
@@ -411,11 +413,11 @@ export default function ImageEditor({ src, onSave, onCancel, cropMode = false }:
 
         {/* 추가 버튼 */}
         <button onClick={addItem} className="w-full py-2.5 rounded-xl bg-terra-500 text-white font-semibold text-[13px]">
-          + {tool === 'sticker' ? '스티커' : tool === 'blur' ? '블러' : '채우기'} 추가
+          {tool === 'sticker' ? t('imageEditor.addSticker') : tool === 'blur' ? t('imageEditor.addBlur') : t('imageEditor.addFill')}
         </button>
 
         <div className="text-center mt-2 text-[11px] text-white/40">
-          터치: 선택 · 드래그: 이동 · 두 손가락: 크기/회전
+          {t('imageEditor.touchHint')}
         </div>
       </div>
     </div>

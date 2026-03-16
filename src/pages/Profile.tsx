@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BarChart3, Award, Palette, ScanLine, GraduationCap, Target, FileText, ShieldOff, SlidersHorizontal, Share, ChevronRight, Pencil, Camera, User, ScanFace, Trophy, Settings, LogOut, LogIn } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useModal } from '@/components/ui/Modal'
@@ -14,6 +15,7 @@ import CropOverlay from '@/components/ui/CropOverlay'
 
 export default function Profile() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { user, profile: authProfile, logout, updateProfile } = useAuth()
   const modal = useModal()
   const toast = useToast()
@@ -75,15 +77,15 @@ export default function Profile() {
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
       await updateProfile({ avatar_url: urlData.publicUrl + '?t=' + Date.now() })
     } catch (err: any) {
-      toast.error('아바타 변경 실패: ' + (err.message || ''))
+      toast.error(err.message || '')
     }
   }
 
   const handleEditField = (field: 'nickname' | 'bio' | 'instagram_id') => {
     if (!user) return
 
-    const labels: Record<string, string> = { nickname: '닉네임', bio: '소개글', instagram_id: '인스타그램 ID' }
-    const placeholders: Record<string, string> = { nickname: '2~12자 닉네임', bio: '나를 소개해보세요', instagram_id: '@없이 입력' }
+    const labels: Record<string, string> = { nickname: t('profile.edit.nickname'), bio: t('profile.edit.bio'), instagram_id: t('profile.edit.instagram') }
+    const placeholders: Record<string, string> = { nickname: t('profile.edit.nicknamePlaceholder'), bio: t('profile.edit.bioPlaceholder'), instagram_id: t('profile.edit.instagramPlaceholder') }
     const maxLengths: Record<string, number> = { nickname: 12, bio: 100, instagram_id: 30 }
     const current = (authProfile as any)?.[field] || ''
 
@@ -91,15 +93,15 @@ export default function Profile() {
 
     const validate = (value: string): string | null => {
       if (field === 'nickname') {
-        if (value.length < 2) return '2자 이상 입력해주세요'
-        if (value.length > 12) return '12자 이하로 입력해주세요'
-        if (forbidden.some(f => value.toLowerCase().includes(f))) return '사용할 수 없는 닉네임입니다'
+        if (value.length < 2) return t('auth.nicknameRequired')
+        if (value.length > 12) return t('auth.nicknameRequired')
+        if (forbidden.some(f => value.toLowerCase().includes(f))) return t('auth.nicknameRequired')
       }
       return null
     }
 
     modal.prompt({
-      title: `${labels[field]} 수정`,
+      title: `${labels[field]} ${t('common.edit')}`,
       placeholder: placeholders[field],
       defaultValue: current,
       maxLength: maxLengths[field],
@@ -107,15 +109,15 @@ export default function Profile() {
       onConfirm: async (value) => {
         try {
           await updateProfile({ [field]: value || null })
-          toast.success(`${labels[field]}을(를) 수정했어요`)
+          toast.success(t('profile.edit.saveSuccess'))
         } catch (err: any) {
-          toast.error('수정 실패: ' + (err.message || ''))
+          toast.error(err.message || '')
         }
       },
     })
   }
 
-  const nickname = authProfile?.nickname || '스타일 입문자'
+  const nickname = authProfile?.nickname || ''
   const avatarUrl = authProfile?.avatar_url || ''
   const bio = authProfile?.bio || ''
 
@@ -154,11 +156,11 @@ export default function Profile() {
         </div>
         {user ? (
           <button onClick={logout} className="px-4 py-2 rounded-full border border-warm-400 bg-white text-xs font-medium text-warm-700 active:scale-95 transition-all">
-            로그아웃
+            {t('settings.logout')}
           </button>
         ) : (
           <button onClick={() => navigate('/auth/login')} className="px-4 py-2 rounded-full bg-terra-500 text-white text-xs font-medium active:scale-95 transition-all shadow-terra">
-            로그인
+            {t('auth.loginButton')}
           </button>
         )}
       </div>
@@ -169,7 +171,7 @@ export default function Profile() {
           {bio ? (
             <div className="text-sm text-warm-700 leading-relaxed">{bio}</div>
           ) : (
-            <div className="text-sm text-warm-500 italic">탭하여 소개글을 작성해보세요</div>
+            <div className="text-sm text-warm-500 italic">{t('profile.edit.bioPlaceholder')}</div>
           )}
         </div>
       )}
@@ -185,10 +187,10 @@ export default function Profile() {
             {authProfile?.instagram_id ? (
               <>
                 <div className="text-sm font-medium text-warm-900 dark:text-white">@{authProfile.instagram_id}</div>
-                <div className="text-[10px] text-warm-500">탭하여 수정</div>
+                <div className="text-[10px] text-warm-500">{t('common.edit')}</div>
               </>
             ) : (
-              <div className="text-sm text-warm-500">인스타그램 ID를 등록해보세요</div>
+              <div className="text-sm text-warm-500">{t('profile.edit.instagram')}</div>
             )}
           </div>
           <ChevronRight size={16} className="text-warm-500" />
@@ -201,35 +203,35 @@ export default function Profile() {
           <div className="grid grid-cols-3 gap-2.5 mb-4">
             <div onClick={() => navigate('/profile/posts')} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
               <div className="font-display text-xl font-bold text-terra-500">{totalRecords}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">코디</div>
+              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{t('profile.stats.coords')}</div>
             </div>
             <div onClick={() => navigate(`/user/${user.id}/followers`)} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
               <div className="font-display text-xl font-bold text-terra-500">{followerCount}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">팔로워</div>
+              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{t('profile.stats.followers')}</div>
             </div>
             <div onClick={() => navigate(`/user/${user.id}/following`)} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
               <div className="font-display text-xl font-bold text-terra-500">{followingCount}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">팔로잉</div>
+              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{t('profile.stats.following')}</div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2.5 mb-6">
             <div className="bg-warm-100 border border-warm-300 rounded-xl py-2.5 text-center">
               <div className="font-display text-sm font-bold text-warm-700">{streak}</div>
-              <div className="text-[9px] text-warm-500 mt-0.5">🔥 연속</div>
+              <div className="text-[9px] text-warm-500 mt-0.5">🔥 {t('profile.stats.streak')}</div>
             </div>
             <div onClick={() => navigate('/profile/badges')} className="bg-warm-100 border border-warm-300 rounded-xl py-2.5 text-center cursor-pointer">
               <div className="font-display text-sm font-bold text-warm-700">{earnedBadges}</div>
-              <div className="text-[9px] text-warm-500 mt-0.5">🏅 배지</div>
+              <div className="text-[9px] text-warm-500 mt-0.5">🏅 {t('profile.stats.badges')}</div>
             </div>
             <div className="bg-warm-100 border border-warm-300 rounded-xl py-2.5 text-center">
               <div className="font-display text-sm font-bold text-warm-700">{savedCount}</div>
-              <div className="text-[9px] text-warm-500 mt-0.5">💾 저장</div>
+              <div className="text-[9px] text-warm-500 mt-0.5">💾 {t('profile.stats.saved')}</div>
             </div>
           </div>
         </>
       ) : (
         <div className="grid grid-cols-4 gap-2 mb-6">
-          {[['코디 기록', totalRecords], ['연속 기록', streak], ['배지', earnedBadges], ['저장 코디', savedCount]].map(([label, val]) => (
+          {[[t('profile.stats.coords'), totalRecords], [t('profile.stats.streak'), streak], [t('profile.stats.badges'), earnedBadges], [t('profile.stats.saved'), savedCount]].map(([label, val]) => (
             <div key={label as string} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm">
               <div className="font-display text-xl font-bold text-terra-500">{val}</div>
               <div className="text-[10px] text-warm-600 font-medium mt-0.5">{label}</div>
@@ -239,43 +241,43 @@ export default function Profile() {
       )}
 
       {/* 성장 섹션 */}
-      <MenuSection icon={<Trophy size={14} />} title="성장">
-        <MenuItem icon={<BarChart3 size={18} />} label="내 레벨 상세" badge={`Lv.${lv.level} · ${lv.progress}%`} onClick={() => navigate('/profile/level')} />
-        <MenuItem icon={<Award size={18} />} label="배지 컬렉션" badge={`${earnedBadges}/${badges.length}`} onClick={() => navigate('/profile/badges')} />
-        <MenuItem icon={<Palette size={18} />} label="컬러 랭킹" onClick={() => navigate('/profile/color-ranking')} />
-        <MenuItem icon={<ScanLine size={18} />} label="색상 패턴 분석" badge="DNA" badgeVariant="muted" onClick={() => navigate('/profile/color-pattern')} />
-        <MenuItem icon={<GraduationCap size={18} />} label="칭호 시험" onClick={() => navigate('/profile/title-exam')} />
-        <MenuItem icon={<Target size={18} />} label="주간 챌린지" onClick={() => navigate('/profile/challenges')} last />
+      <MenuSection icon={<Trophy size={14} />} title={t('profile.sections.growth')}>
+        <MenuItem icon={<BarChart3 size={18} />} label={t('profile.menu.myLevel')} badge={`Lv.${lv.level} · ${lv.progress}%`} onClick={() => navigate('/profile/level')} />
+        <MenuItem icon={<Award size={18} />} label={t('profile.menu.myBadges')} badge={`${earnedBadges}/${badges.length}`} onClick={() => navigate('/profile/badges')} />
+        <MenuItem icon={<Palette size={18} />} label={t('profile.menu.colorRanking')} onClick={() => navigate('/profile/color-ranking')} />
+        <MenuItem icon={<ScanLine size={18} />} label={t('profile.menu.colorPattern')} badge="DNA" badgeVariant="muted" onClick={() => navigate('/profile/color-pattern')} />
+        <MenuItem icon={<GraduationCap size={18} />} label={t('profile.menu.titleExam')} onClick={() => navigate('/profile/title-exam')} />
+        <MenuItem icon={<Target size={18} />} label={t('profile.menu.challenges')} onClick={() => navigate('/profile/challenges')} last />
       </MenuSection>
 
       {/* 나의 진단 */}
-      <MenuSection icon={<ScanFace size={14} />} title="나의 진단">
+      <MenuSection icon={<ScanFace size={14} />} title={t('profile.sections.diagnosis')}>
         {(() => {
           const pcKey = profileLib.getPersonalColor()
           const pcData = pcKey ? (PERSONAL_COLOR_12 as any)[pcKey] : null
-          const pcLabel = pcData ? pcData.name : '미설정'
+          const pcLabel = pcData ? pcData.name : ''
 
           const btKey = profileLib.getBodyType()
           const btData = btKey ? (BODY_GUIDE_DATA as any)[btKey] : null
-          const btLabel = btData ? btData.name : '미설정'
+          const btLabel = btData ? btData.name : ''
 
           return (
             <>
-              <MenuItem icon={<Palette size={18} />} label="퍼스널컬러" badge={pcLabel} badgeVariant={pcData ? undefined : 'muted'} onClick={() => navigate('/profile/personal-color')} />
-              <MenuItem icon={<BarChart3 size={18} />} label="체형 진단" badge={btLabel} badgeVariant={btData ? undefined : 'muted'} onClick={() => navigate('/home/body')} last />
+              <MenuItem icon={<Palette size={18} />} label={t('profile.menu.personalColor')} badge={pcLabel} badgeVariant={pcData ? undefined : 'muted'} onClick={() => navigate('/profile/personal-color')} />
+              <MenuItem icon={<BarChart3 size={18} />} label={t('profile.menu.bodyType')} badge={btLabel} badgeVariant={btData ? undefined : 'muted'} onClick={() => navigate('/home/body')} last />
             </>
           )
         })()}
       </MenuSection>
 
       {/* 관리/설정 */}
-      <MenuSection icon={<Settings size={14} />} title="설정">
-        {user && <MenuItem icon={<FileText size={18} />} label="내 게시물" onClick={() => navigate('/profile/posts')} />}
-        {user && <MenuItem icon={<BarChart3 size={18} />} label="인사이트" badge="📊 NEW" onClick={() => navigate('/profile/insights')} />}
-        {user && <MenuItem icon={<ShieldOff size={18} />} label="차단 목록" onClick={() => navigate('/profile/block-list')} />}
-        <MenuItem icon={<SlidersHorizontal size={18} />} label="설정" onClick={() => navigate('/profile/settings')} />
-        <MenuItem icon={<Share size={18} />} label="앱 공유하기" onClick={() => {
-          navigator.share?.({ title: '바루픽', text: 'AI 컬러 코디 추천 앱', url: 'https://barupick.vercel.app' }).catch(() => {})
+      <MenuSection icon={<Settings size={14} />} title={t('profile.sections.settings')}>
+        {user && <MenuItem icon={<FileText size={18} />} label={t('profile.menu.myPosts')} onClick={() => navigate('/profile/posts')} />}
+        {user && <MenuItem icon={<BarChart3 size={18} />} label={t('profile.menu.insights')} badge="📊 NEW" onClick={() => navigate('/profile/insights')} />}
+        {user && <MenuItem icon={<ShieldOff size={18} />} label={t('profile.menu.blockList')} onClick={() => navigate('/profile/block-list')} />}
+        <MenuItem icon={<SlidersHorizontal size={18} />} label={t('profile.menu.settings')} onClick={() => navigate('/profile/settings')} />
+        <MenuItem icon={<Share size={18} />} label={t('common.share')} onClick={() => {
+          navigator.share?.({ title: t('header.home'), text: 'AI', url: 'https://barupick.vercel.app' }).catch(() => {})
         }} last />
       </MenuSection>
 
@@ -284,7 +286,7 @@ export default function Profile() {
         <CropOverlay
           src={avatarEditSrc}
           shape="circle"
-          title="프로필 사진"
+          title={t('profile.edit.avatar')}
           outputSize={400}
           onDone={handleAvatarSave}
           onCancel={() => setAvatarEditSrc(null)}

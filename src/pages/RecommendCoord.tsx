@@ -12,6 +12,7 @@ import { profile } from '@/lib/profile'
 import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
 import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
 import { useToast } from '@/components/ui/Toast'
+import { useTranslation } from 'react-i18next'
 
 // ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 ───
 function getPickedPartLabel(partKey: string, pickedItems: string[]): string {
@@ -49,9 +50,10 @@ type RecHook = ReturnType<typeof useRecommend>
 // Step 1: 무드 선택
 // ═══════════════════════════════════════
 function StepMood({ rec }: { rec: RecHook }) {
+  const { t } = useTranslation()
   return (
     <div className="animate-screen-fade">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">어떤 분위기를 원하세요?</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('recommend.moodTitle')}</h2>
       <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">무드를 선택하면 해당 스타일의 코디를 추천해 드려요.</p>
 
       <div className="grid grid-cols-2 gap-2.5 mb-5">
@@ -76,15 +78,16 @@ function StepMood({ rec }: { rec: RecHook }) {
 // Step 2: 스타일 선택
 // ═══════════════════════════════════════
 function StepStyle({ rec }: { rec: RecHook }) {
+  const { t } = useTranslation()
   const group = rec.state.mood ? MOOD_GROUPS[rec.state.mood] : null
   if (!group) return null
   return (
     <div className="animate-screen-enter">
       <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 뒤로
+        <ArrowLeft size={16} /> {t('common.back')}
       </button>
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{group.icon} {group.name}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">스타일을 선택하세요.</p>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('recommend.styleTitle')}</p>
       <div className="flex flex-col gap-2.5 mb-5">
         {group.styles.map((s: string) => {
           const sd = STYLE_GUIDE[s]
@@ -114,6 +117,7 @@ function StepStyle({ rec }: { rec: RecHook }) {
 // Step 3: 아이템 선택 (꼭 입고 싶은 옷)
 // ═══════════════════════════════════════
 function StepPick({ rec }: { rec: RecHook }) {
+  const { t } = useTranslation()
   const picked = rec.state.pickedItems
   const info = itemsToLayerInfo(picked)
 
@@ -127,7 +131,7 @@ function StepPick({ rec }: { rec: RecHook }) {
   return (
     <div className="animate-screen-enter">
       <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 뒤로
+        <ArrowLeft size={16} /> {t('common.back')}
       </button>
 
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">
@@ -205,6 +209,7 @@ function StepPick({ rec }: { rec: RecHook }) {
 // Step 4: 결과 리스트
 // ═══════════════════════════════════════
 function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
+  const { t } = useTranslation()
   const toast = useToast()
   const [showItemPicker, setShowItemPicker] = useState(false)
   const [pinPart, setPinPart] = useState<string | null>(null)
@@ -218,11 +223,11 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
   return (
     <div className="animate-screen-enter">
       <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 뒤로
+        <ArrowLeft size={16} /> {t('common.back')}
       </button>
 
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">
-        추천 코디 {results.length}개
+        {t('recommend.resultTitle')} {results.length}
       </h2>
 
       {/* ─── 현재 조건 칩 ─── */}
@@ -284,7 +289,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
               )
             })}
           </div>
-          <button onClick={() => setShowItemPicker(false)} className="w-full mt-2 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">닫기</button>
+          <button onClick={() => setShowItemPicker(false)} className="w-full mt-2 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">{t('common.close')}</button>
         </div>
       )}
 
@@ -326,7 +331,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
             onClear={() => rec.clearPin(pinPart)}
           />
           <div className="flex gap-2 mt-2">
-            <button onClick={() => setPinPart(null)} className="flex-1 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">닫기</button>
+            <button onClick={() => setPinPart(null)} className="flex-1 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">{t('common.close')}</button>
             {Object.keys(pinned).length > 0 && (
               <button onClick={() => { rec.clearAllPins(); setPinPart(null) }} className="text-[11px] text-red-500 py-1">전체 해제</button>
             )}
@@ -373,7 +378,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {results.length === 0 && (
         <div className="text-center py-16">
           <div className="text-3xl mb-3">🤔</div>
-          <div className="text-sm text-warm-600 dark:text-warm-400">추천 결과가 없어요. 조건을 바꿔보세요.</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400">{t('recommend.noResults')}</div>
         </div>
       )}
     </div>
@@ -384,6 +389,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
 // Step 5: 상세 보기
 // ═══════════════════════════════════════
 function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
+  const { t } = useTranslation()
   const toast = useToast()
   const combo = rec.state.results[rec.state.detailIdx]
   const [saveModal, setSaveModal] = useState(false)
@@ -392,7 +398,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const [editingPart, setEditingPart] = useState<string | null>(null)
   const [editedOutfit, setEditedOutfit] = useState<Record<string, string> | null>(null)
 
-  if (!combo) return <div className="text-center py-16 text-warm-500 dark:text-warm-400">결과를 불러올 수 없어요</div>
+  if (!combo) return <div className="text-center py-16 text-warm-500 dark:text-warm-400">{t('recommend.noResults')}</div>
 
   const currentOutfit = editedOutfit || combo.outfit
   const outfitHex = outfitToHex(currentOutfit)
@@ -410,13 +416,13 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const offset = circumference * (1 - finalScore / 100)
 
   const scoreItems = evalResult ? [
-    { label: '컬러 배치', value: evalResult.goldilocks, max: 33, desc: '인접 부위 연결' },
-    { label: '색상 비율', value: evalResult.ratio, max: 17, desc: '주색·보조색 밸런스' },
-    { label: '색상 조화', value: evalResult.harmony, max: 17, desc: '전체 조화' },
-    { label: '계절감', value: evalResult.season, max: 8, desc: '컬러 온도' },
-    { label: '밸런스', value: evalResult.balance, max: 8, desc: '명도·채도 균형' },
-    ...(evalResult.hasPersonalColor ? [{ label: '퍼스널컬러', value: evalResult.personal, max: 17, desc: '얼굴 근처 컬러' }] : []),
-    ...(evalResult.hasBodyFit ? [{ label: '체형 맞춤', value: evalResult.bodyFit, max: 8, desc: '체형별 컬러 배치' }] : []),
+    { label: t('build.scoreItems.colorPlacement'), value: evalResult.goldilocks, max: 33, desc: '' },
+    { label: t('build.scoreItems.colorRatio'), value: evalResult.ratio, max: 17, desc: '' },
+    { label: t('build.scoreItems.colorHarmony'), value: evalResult.harmony, max: 17, desc: '' },
+    { label: t('build.scoreItems.seasonal'), value: evalResult.season, max: 8, desc: '' },
+    { label: t('build.scoreItems.balance'), value: evalResult.balance, max: 8, desc: '' },
+    ...(evalResult.hasPersonalColor ? [{ label: t('build.scoreItems.personalColor'), value: evalResult.personal, max: 17, desc: '' }] : []),
+    ...(evalResult.hasBodyFit ? [{ label: t('build.scoreItems.bodyFit'), value: evalResult.bodyFit, max: 8, desc: '' }] : []),
   ] : []
 
   const handleSave = () => {
@@ -428,7 +434,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
     setSaveModal(false)
     setSaveName('')
     trackSave('recommend', finalScore)
-    toast.success('저장했어요!')
+    toast.success(t('recommend.saveSuccess'))
   }
 
   return (
@@ -512,15 +518,15 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       <div className="flex flex-col gap-2.5 mb-5">
         <button onClick={() => { setSaveName(combo.name); setSaveModal(true) }}
           className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
-          <Bookmark size={18} /> 이 코디 저장하기
+          <Bookmark size={18} /> {t('recommend.save')}
         </button>
-        <button onClick={() => { navigator.share?.({ title: '바루픽 코디', text: combo?.name + ' ' + finalScore + '점', url: 'https://barupick.vercel.app' }).catch(() => {}) }}
+        <button onClick={() => { navigator.share?.({ title: t('ootdDetail.shareTitle'), text: combo?.name + ' ' + t('common.score', { score: finalScore }), url: 'https://barupick.vercel.app' }).catch(() => {}) }}
           className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
-          <Share size={16} /> 이 조합 공유하기
+          <Share size={16} /> {t('recommend.share')}
         </button>
         <button onClick={() => { localStorage.setItem('_pending_post_outfit', JSON.stringify(combo.outfit)); window.location.href = '/community/post' }}
           className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
-          <Users size={16} /> 커뮤니티에 공유
+          <Users size={16} /> {t('recommend.communityShare')}
         </button>
       </div>
 
@@ -528,13 +534,13 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {saveModal && (
         <div className="fixed inset-0 z-[300] bg-black/50 flex items-center justify-center px-8" onClick={() => setSaveModal(false)}>
           <div className="bg-white dark:bg-warm-800 rounded-2xl p-5 w-full max-w-sm shadow-warm-lg" onClick={e => e.stopPropagation()}>
-            <div className="text-lg font-bold text-warm-900 dark:text-warm-100 mb-3">코디 저장</div>
+            <div className="text-lg font-bold text-warm-900 dark:text-warm-100 mb-3">{t('recommend.save')}</div>
             <input type="text" value={saveName} onChange={e => setSaveName(e.target.value)} maxLength={30} autoFocus
               placeholder="코디 이름을 입력하세요"
               className="w-full px-4 py-3 bg-warm-100 dark:bg-warm-700 border border-warm-400 dark:border-warm-600 rounded-xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 focus:outline-none focus:border-terra-400 mb-4" />
             <div className="flex gap-2">
-              <button onClick={() => setSaveModal(false)} className="flex-1 py-2.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-xl text-sm font-medium active:scale-[0.98]">취소</button>
-              <button onClick={handleSave} className="flex-1 py-2.5 bg-terra-500 text-white rounded-xl text-sm font-semibold active:scale-[0.98] shadow-terra">저장</button>
+              <button onClick={() => setSaveModal(false)} className="flex-1 py-2.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-xl text-sm font-medium active:scale-[0.98]">{t('common.cancel')}</button>
+              <button onClick={handleSave} className="flex-1 py-2.5 bg-terra-500 text-white rounded-xl text-sm font-semibold active:scale-[0.98] shadow-terra">{t('common.save')}</button>
             </div>
           </div>
         </div>
@@ -543,7 +549,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {/* 색상 개선 */}
       <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
         <div className="flex items-center gap-1.5 text-sm font-bold text-warm-900 dark:text-warm-100 mb-1">
-          <Palette size={16} className="text-terra-500" /> 색상 개선하기
+          <Palette size={16} className="text-terra-500" /> {t('recommend.colorImprove')}
         </div>
         <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">부위를 탭하면 색상을 교체할 수 있어요</div>
         <div className="flex gap-2 flex-wrap justify-center py-1 pb-2">

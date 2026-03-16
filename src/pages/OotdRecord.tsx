@@ -11,6 +11,7 @@ import { ITEMS_CATALOG } from '@/lib/styles'
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
 import { trackOotdRecord } from '@/lib/analytics'
+import { useTranslation } from 'react-i18next'
 
 function itemToSlot(itemId: string): string | null {
   const item = ITEMS_CATALOG.find(i => i.id === itemId)
@@ -31,17 +32,18 @@ function slotToDefaultItem(slot: string): string | null {
   return null
 }
 
-const SITUATIONS = ['출근', '데이트', '캐주얼', '면접', '여행', '운동']
-const MOODS = [
-  { emoji: '😊', text: '만족' },
-  { emoji: '😐', text: '그저그럭' },
-  { emoji: '😕', text: '아쉬움' },
-]
+const SITUATION_KEYS = ['commute', 'date', 'casual', 'interview', 'travel', 'exercise'] as const
+const MOOD_KEYS = [
+  { emoji: '😊', key: 'satisfied' },
+  { emoji: '😐', key: 'okay' },
+  { emoji: '😕', key: 'regret' },
+] as const
 
 // 어떤 패널이 열려있는지
 type OpenPanel = null | 'clothes' | 'accessory' | 'bottom' | 'shoes'
 
 export default function OotdRecord() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { profile } = useAuth()
   const ootd = useOotd()
@@ -176,8 +178,7 @@ export default function OotdRecord() {
     let streakMsg = ''
     try {
       const records = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-      if (records.length >= 7) streakMsg = `${records.length}일째 기록 중!`
-      else if (records.length >= 3) streakMsg = `${records.length}일 연속 기록!`
+      if (records.length >= 3) streakMsg = t('ootdRecord.streakMessage', { count: records.length })
     } catch {}
     return (
       <div className="animate-screen-fade flex items-center justify-center py-28">
@@ -191,7 +192,7 @@ export default function OotdRecord() {
           <div className="w-20 h-20 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-4 animate-score-count">
             <Check size={36} className="text-sage" />
           </div>
-          <div className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 mb-1">기록 완료!</div>
+          <div className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 mb-1">{t('ootdRecord.saveComplete')}</div>
           <div className="text-sm text-warm-600 dark:text-warm-400">오늘의 코디가 저장되었어요</div>
           {streakMsg && (
             <div className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-terra-50 border border-terra-200 rounded-full text-[13px] font-semibold text-terra-600 animate-pop-in">{streakMsg}</div>
@@ -440,7 +441,7 @@ export default function OotdRecord() {
 
       {/* 메모 */}
       <div className="mb-3">
-        <input type="text" placeholder="💬 한줄 메모 (선택)" maxLength={100}
+        <input type="text" placeholder={`💬 ${t('ootdRecord.memoPlaceholder')}`} maxLength={100}
           value={ootd.memo} onChange={e => ootd.setMemo(e.target.value)}
           className="w-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl px-3 py-2.5 text-xs text-warm-900 dark:text-warm-100 placeholder-warm-400 outline-none focus:border-terra-400 transition-all" />
       </div>
@@ -449,12 +450,15 @@ export default function OotdRecord() {
       <div className="mb-3">
         <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">📍 상황</div>
         <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1">
-          {SITUATIONS.map(s => (
-            <button key={s} onClick={() => { setCustomSit(false); ootd.setSituation(ootd.situation === s ? null : s) }}
+          {SITUATION_KEYS.map(key => {
+            const label = t(`ootdRecord.situations.${key}`)
+            return (
+            <button key={key} onClick={() => { setCustomSit(false); ootd.setSituation(ootd.situation === label ? null : label) }}
               className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                ootd.situation === s ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-              }`}>{s}</button>
-          ))}
+                ootd.situation === label ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+              }`}>{label}</button>
+            )
+          })}
           <button onClick={() => { setCustomSit(!customSit); ootd.setSituation(null) }}
             className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
               customSit ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
@@ -471,10 +475,11 @@ export default function OotdRecord() {
       <div className="mb-3">
         <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">기분</div>
         <div className="flex gap-1.5">
-          {MOODS.map(m => {
-            const val = m.emoji + ' ' + m.text
+          {MOOD_KEYS.map(m => {
+            const text = t(`ootdRecord.moods.${m.key}`)
+            const val = m.emoji + ' ' + text
             return (
-              <button key={val} onClick={() => ootd.setMood(ootd.mood === val ? null : val)}
+              <button key={m.key} onClick={() => ootd.setMood(ootd.mood === val ? null : val)}
                 className={`flex-1 py-2 rounded-xl text-[11px] font-medium text-center transition-all ${
                   ootd.mood === val ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
                 }`}>{val}</button>
@@ -488,9 +493,9 @@ export default function OotdRecord() {
         <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">공개 범위</div>
         <div className="flex gap-1.5">
           {[
-            { key: 'private', icon: <Lock size={11} />, label: '비공개' },
-            { key: 'friends', icon: <Users size={11} />, label: '친구' },
-            { key: 'public', icon: <Globe size={11} />, label: '전체' },
+            { key: 'private', icon: <Lock size={11} />, label: t('ootdRecord.visibility.private') },
+            { key: 'friends', icon: <Users size={11} />, label: t('ootdRecord.visibility.friends') },
+            { key: 'public', icon: <Globe size={11} />, label: t('ootdRecord.visibility.public') },
           ].map(v => (
             <button key={v.key} onClick={() => ootd.setVisibility(v.key as any)}
               className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all ${
@@ -530,7 +535,7 @@ export default function OotdRecord() {
       {/* CTA */}
       <button onClick={handleSave}
         className={`w-full py-3.5 ${isReady && !ootd.needsPhoto ? 'bg-terra-500 shadow-terra active:scale-[0.98]' : 'bg-warm-400 dark:bg-warm-600 opacity-60 cursor-not-allowed'} text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all mb-2`}>
-        <Check size={16} /> {ootd.editId ? '수정 완료' : '기록하기'}
+        <Check size={16} /> {ootd.editId ? t('common.done') : t('common.save')}
       </button>
 
       <button onClick={() => navigate('/closet')}

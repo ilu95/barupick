@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Search, Plus, SlidersHorizontal } from 'lucide-react'
 import FeedCard from '@/components/community/FeedCard'
 import { useCommunity, type CommTab, type SortMode, type ContentFilter, type FriendsMode, type RankingMode } from '@/hooks/useCommunity'
@@ -8,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export default function Community() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { user } = useAuth()
   const comm = useCommunity()
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -33,7 +35,7 @@ export default function Community() {
   }, [comm.loading, comm.hasMore])
 
   // 탭 버튼
-  const tabs: [CommTab, string][] = [['all', '전체'], ['friends', '친구'], ['ranking', '랭킹']]
+  const tabs: [CommTab, string][] = [['all', t('community.tabs.all')], ['friends', t('community.tabs.friends')], ['ranking', t('community.tabs.ranking')]]
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
@@ -97,26 +99,26 @@ export default function Community() {
       {comm.error && !comm.loading && comm.posts.length === 0 && (
         <div className="text-center py-10">
           <div className="text-4xl mb-3">⚠️</div>
-          <div className="text-sm text-warm-600 mb-3">로딩 실패</div>
+          <div className="text-sm text-warm-600 mb-3">{t('common.retry')}</div>
           <button
             onClick={() => comm.loadPosts(true)}
             className="px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all"
           >
-            다시 시도
+            {t('common.retry')}
           </button>
         </div>
       )}
 
       {/* 끝 */}
       {!comm.hasMore && comm.posts.length > 0 && !comm.loading && (
-        <div className="text-center py-3 text-warm-500 text-xs mt-2">모든 코디를 불러왔어요</div>
+        <div className="text-center py-3 text-warm-500 text-xs mt-2">{t('community.empty')}</div>
       )}
 
       {/* FAB — 글쓰기 */}
       {user && (
         <button
           onClick={() => navigate('/community/post')}
-          aria-label="코디 공유하기"
+          aria-label={t('communityPost.title')}
           className="fixed right-[max(20px,calc((100vw-480px)/2+20px))] bottom-[calc(80px+env(safe-area-inset-bottom,0px))] z-[180] w-14 h-14 rounded-full bg-terra-500 text-white flex items-center justify-center shadow-terra active:scale-90 transition-transform"
         >
           <Plus size={26} strokeWidth={2.5} />
@@ -128,11 +130,12 @@ export default function Community() {
 
 // ─── 전체 탭 필터 ───
 function AllTabFilters({ comm }: { comm: ReturnType<typeof useCommunity> }) {
+  const { t } = useTranslation()
   const [showStyles, setShowStyles] = useState(false)
-  const sorts: [SortMode, string][] = [['latest', '최신순'], ['popular', '인기순']]
-  const cFilters: [ContentFilter, string][] = [['photo', '📷 사진'], ['mannequin', '👤 마네킹']]
+  const sorts: [SortMode, string][] = [['latest', t('community.sort.latest')], ['popular', t('community.sort.popular')]]
+  const cFilters: [ContentFilter, string][] = [['photo', '📷 ' + t('community.content.photo')], ['mannequin', '👤 ' + t('community.content.mannequin')]]
   const styleChips: [string, string][] = [
-    ['all', '전체'],
+    ['all', t('community.tabs.all')],
     ...Object.entries(STYLE_GUIDE).map(([k, v]) => [k, v.name.replace(/ 룩$/, '')] as [string, string])
   ]
 
@@ -186,7 +189,7 @@ function AllTabFilters({ comm }: { comm: ReturnType<typeof useCommunity> }) {
           }`}
         >
           <SlidersHorizontal size={11} />
-          {activeStyleLabel || '스타일'}
+          {activeStyleLabel || t('recommend.styleTitle')}
         </button>
       </div>
 
@@ -218,22 +221,24 @@ function AllTabFilters({ comm }: { comm: ReturnType<typeof useCommunity> }) {
 
 // ─── 친구 탭 컨텐츠 ───
 function FriendsTabContent({ comm, user, navigate }: { comm: ReturnType<typeof useCommunity>, user: any, navigate: any }) {
+  const { t } = useTranslation()
+
   if (!user) {
     return (
       <div className="text-center py-16">
         <div className="text-4xl mb-3">👫</div>
-        <div className="text-sm text-warm-600 mb-4">로그인하면 친구 코디를 볼 수 있어요</div>
+        <div className="text-sm text-warm-600 mb-4">{t('common.loginRequired')}</div>
         <button
           onClick={() => navigate('/auth/login')}
           className="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra"
         >
-          로그인하기
+          {t('auth.loginButton')}
         </button>
       </div>
     )
   }
 
-  const modes: [FriendsMode, string][] = [['mutual', '서로 팔로우'], ['following', '팔로잉']]
+  const modes: [FriendsMode, string][] = [['mutual', t('common.mutualFriend')], ['following', t('common.followingLabel')]]
   const followCount = comm.myFollows.size
 
   return (
@@ -255,22 +260,22 @@ function FriendsTabContent({ comm, user, navigate }: { comm: ReturnType<typeof u
       {followCount === 0 && (
         <div className="bg-gradient-to-b from-terra-50 to-warm-100 border border-terra-200 rounded-2xl p-6 text-center mb-4">
           <div className="text-3xl mb-3">🔍</div>
-          <div className="text-sm font-bold text-warm-900 mb-1.5">친구를 찾아보세요!</div>
+          <div className="text-sm font-bold text-warm-900 mb-1.5">{t('community.friendsTab.findUsers')}</div>
           <div className="text-xs text-warm-600 mb-4 leading-relaxed">
-            다른 유저를 팔로우하면<br />이 탭에서 친구들의 코디를 볼 수 있어요
+            {t('community.friendsTab.empty')}
           </div>
           <div className="flex flex-col gap-2">
             <button
               onClick={() => navigate('/community/discover')}
               className="px-6 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra"
             >
-              👤 유저 검색하기
+              {t('community.friendsTab.findUsers')}
             </button>
             <button
               onClick={() => { comm.setRankingMode('user'); comm.switchTab('ranking') }}
               className="px-6 py-2 bg-white text-warm-700 border border-warm-400 rounded-full text-xs font-medium active:scale-95 transition-all"
             >
-              🏆 랭킹에서 인기 유저 찾기
+              {t('community.ranking.users')}
             </button>
           </div>
         </div>
@@ -280,14 +285,14 @@ function FriendsTabContent({ comm, user, navigate }: { comm: ReturnType<typeof u
         <div className="bg-terra-50 border border-terra-200 rounded-2xl p-4 mb-4 flex items-center gap-3">
           <div className="text-2xl flex-shrink-0">💡</div>
           <div className="flex-1">
-            <div className="text-xs font-semibold text-warm-800 mb-0.5">더 많은 코디를 발견하세요</div>
-            <div className="text-[11px] text-warm-600">더 많은 유저를 팔로우하면 다양한 스타일을 볼 수 있어요</div>
+            <div className="text-xs font-semibold text-warm-800 mb-0.5">{t('community.friendsTab.findUsers')}</div>
+            <div className="text-[11px] text-warm-600">{t('community.friendsTab.empty')}</div>
           </div>
           <button
             onClick={() => navigate('/community/discover')}
             className="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0"
           >
-            탐색
+            {t('common.search')}
           </button>
         </div>
       )}
@@ -297,7 +302,8 @@ function FriendsTabContent({ comm, user, navigate }: { comm: ReturnType<typeof u
 
 // ─── 랭킹 탭 ───
 function RankingTabContent({ comm }: { comm: ReturnType<typeof useCommunity> }) {
-  const modes: [RankingMode, string][] = [['weekly', '주간'], ['monthly', '월간'], ['user', '유저'], ['event', '이벤트']]
+  const { t } = useTranslation()
+  const modes: [RankingMode, string][] = [['weekly', t('community.ranking.weekly')], ['monthly', t('community.ranking.monthly')], ['user', t('community.ranking.users')], ['event', t('community.ranking.events')]]
 
   return (
     <div className="flex gap-1.5 mb-4">
@@ -318,11 +324,10 @@ function RankingTabContent({ comm }: { comm: ReturnType<typeof useCommunity> }) 
 
 // ─── 빈 상태 ───
 function EmptyState({ tab, friendsMode, navigate }: { tab: CommTab, friendsMode: FriendsMode, navigate: any }) {
+  const { t } = useTranslation()
   const msg = tab === 'friends'
-    ? (friendsMode === 'mutual'
-      ? '서로 팔로우한 친구의 코디가 없어요'
-      : '팔로잉한 유저의 코디가 없어요')
-    : '아직 코디가 없어요'
+    ? t('community.friendsTab.empty')
+    : t('community.empty')
   const emoji = tab === 'friends' ? '👫' : '🎨'
 
   return (
@@ -334,7 +339,7 @@ function EmptyState({ tab, friendsMode, navigate }: { tab: CommTab, friendsMode:
           onClick={() => navigate('/community/discover')}
           className="mt-4 px-5 py-2 bg-terra-500 text-white rounded-full text-xs font-semibold active:scale-95 transition-all shadow-terra"
         >
-          유저 검색하기
+          {t('community.friendsTab.findUsers')}
         </button>
       )}
     </div>

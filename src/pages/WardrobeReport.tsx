@@ -9,10 +9,12 @@ import { BarChart3, ShoppingBag, Shirt, Sparkles } from 'lucide-react'
 import { COLORS_60 } from '@/lib/colors'
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { useWardrobe } from '@/hooks/useWardrobe'
+import { useTranslation } from 'react-i18next'
 
 export default function WardrobeReport() {
   const navigate = useNavigate()
   const wardrobe = useWardrobe()
+  const { t } = useTranslation()
   const [analyzing, setAnalyzing] = useState(true)
   const [progress, setProgress] = useState(0)
   const [itemStats, setItemStats] = useState([])
@@ -85,7 +87,7 @@ export default function WardrobeReport() {
   if (analyzing) {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">내 옷장 이야기</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-6">{t('wardrobeReport.title')}</h2>
         <div className="py-16 flex flex-col items-center">
           <div className="w-16 h-16 mx-auto mb-4 relative">
             <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
@@ -98,7 +100,7 @@ export default function WardrobeReport() {
               <span className="font-display text-sm font-bold text-warm-700 dark:text-warm-300">{progress}%</span>
             </div>
           </div>
-          <div className="text-sm text-warm-500">옷장 분석 중...</div>
+          <div className="text-sm text-warm-500">{t('wardrobeReport.analyzingCloset')}</div>
         </div>
       </div>
     )
@@ -108,8 +110,8 @@ export default function WardrobeReport() {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10 text-center py-20">
         <div className="text-3xl mb-3">👕</div>
-        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">옷장에 아이템을 3개 이상 등록해주세요</div>
-        <button onClick={() => navigate('/closet/add')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all">아이템 등록하기</button>
+        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('wardrobeReport.needMoreItems')}</div>
+        <button onClick={() => navigate('/closet/add')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all">{t('common.itemRegister')}</button>
       </div>
     )
   }
@@ -118,16 +120,16 @@ export default function WardrobeReport() {
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       <div className="flex items-center gap-2 mb-1">
         <BarChart3 size={20} className="text-warm-700 dark:text-warm-300" />
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">내 옷장 이야기</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">{t('wardrobeReport.title')}</h2>
       </div>
       <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">
-        옷장에 {wardrobe.items.length}개 아이템, 총 {totalCombos}개 코디 조합이 가능해요
+        {t('wardrobeReport.summary', { items: wardrobe.items.length, combos: totalCombos })}
       </p>
 
       {/* ─── 가장 활약하는 아이템 ─── */}
       {mvpItems.length > 0 && (
         <div className="mb-6">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">가장 활약하는 아이템</div>
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('wardrobeReport.mvpTitle')}</div>
           <div className="flex flex-col gap-2">
             {mvpItems.map((stat, idx) => {
               const c = COLORS_60[stat.item.color || stat.item.colorKey]
@@ -139,7 +141,7 @@ export default function WardrobeReport() {
                   <div className="w-9 h-9 rounded-lg border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
                   <div className="flex-1">
                     <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{c?.name || '?'} {catLabel}</div>
-                    <div className="text-[11px] text-warm-500 dark:text-warm-400">{stat.inCombos}개 코디에 활용 ({pct}%)</div>
+                    <div className="text-[11px] text-warm-500 dark:text-warm-400">{t('wardrobeReport.mvpUsage', { count: stat.inCombos, pct })}</div>
                   </div>
                 </div>
               )
@@ -151,7 +153,7 @@ export default function WardrobeReport() {
       {/* ─── 아직 가능성이 숨어있는 아이템 ─── */}
       {(hiddenPotential.length > 0 || noComboItems.length > 0) && (
         <div className="mb-6">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">아직 가능성이 숨어있는 아이템</div>
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('wardrobeReport.hiddenTitle')}</div>
           <div className="flex flex-col gap-2">
             {[...hiddenPotential, ...noComboItems].slice(0, 5).map(stat => {
               const c = COLORS_60[stat.item.color || stat.item.colorKey]
@@ -163,13 +165,13 @@ export default function WardrobeReport() {
                     <div className="flex-1">
                       <div className="text-sm font-medium text-warm-800 dark:text-warm-200">{c?.name || '?'} {catLabel}</div>
                       <div className="text-[11px] text-warm-500 dark:text-warm-400">
-                        {stat.inCombos === 0 ? '아직 어울리는 조합이 없어요' : `코디 ${stat.inCombos}개로 적어요`}
+                        {stat.inCombos === 0 ? t('wardrobeReport.noCombo') : t('wardrobeReport.fewCombos', { count: stat.inCombos })}
                       </div>
                     </div>
                   </div>
                   {stat.bestPartner && (
                     <div className="mt-2 pl-12 text-[11px] text-warm-600 dark:text-warm-400">
-                      베스트 조합: {COLORS_60[stat.bestPartner.color]?.name || '?'} {(CATEGORY_NAMES)[stat.bestPartner.category] || ''} ({stat.bestPartner.score}점)
+                      {t('wardrobeReport.bestCombo', { color: COLORS_60[stat.bestPartner.color]?.name || '?', category: (CATEGORY_NAMES)[stat.bestPartner.category] || '', score: stat.bestPartner.score })}
                     </div>
                   )}
                 </div>
@@ -181,12 +183,12 @@ export default function WardrobeReport() {
 
       {/* ─── 옷장 컬러 밸런스 ─── */}
       <div className="mb-6">
-        <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">옷장 컬러 밸런스</div>
+        <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('wardrobeReport.colorBalance')}</div>
         <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 shadow-warm-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-lg">{colorBalance.bias === 'warm' ? '🔥' : colorBalance.bias === 'cool' ? '❄️' : '⚖️'}</span>
             <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">
-              {colorBalance.bias === 'warm' ? '웜톤 중심' : colorBalance.bias === 'cool' ? '쿨톤 중심' : '균형 잡힌 밸런스'}
+              {colorBalance.bias === 'warm' ? t('wardrobeReport.warmCenter') : colorBalance.bias === 'cool' ? t('wardrobeReport.coolCenter') : t('wardrobeReport.balancedCenter')}
             </span>
           </div>
 
@@ -197,21 +199,21 @@ export default function WardrobeReport() {
             {colorBalance.coolPct > 0 && <div className="bg-blue-400 rounded-r-full" style={{ width: `${colorBalance.coolPct}%` }} />}
           </div>
           <div className="flex justify-between text-[10px] text-warm-500 dark:text-warm-400">
-            <span>웜톤 {colorBalance.warmPct}%</span>
-            <span>뉴트럴 {colorBalance.neutralPct}%</span>
-            <span>쿨톤 {colorBalance.coolPct}%</span>
+            <span>{t('wardrobeReport.warmPct', { pct: colorBalance.warmPct })}</span>
+            <span>{t('wardrobeReport.neutralPct', { pct: colorBalance.neutralPct })}</span>
+            <span>{t('wardrobeReport.coolPct', { pct: colorBalance.coolPct })}</span>
           </div>
 
           {colorBalance.bias === 'warm' && colorBalance.coolPct < 20 && (
             <div className="mt-3 text-[11px] text-warm-600 dark:text-warm-400">
               <Sparkles size={12} className="inline text-terra-500 mr-1" />
-              쿨톤(네이비, 스틸블루 등)을 추가하면 밸런스가 좋아져요
+              {t('wardrobeReport.addCoolTip')}
             </div>
           )}
           {colorBalance.bias === 'cool' && colorBalance.warmPct < 20 && (
             <div className="mt-3 text-[11px] text-warm-600 dark:text-warm-400">
               <Sparkles size={12} className="inline text-terra-500 mr-1" />
-              웜톤(베이지, 카멜 등)을 추가하면 밸런스가 좋아져요
+              {t('wardrobeReport.addWarmTip')}
             </div>
           )}
         </div>
@@ -220,10 +222,10 @@ export default function WardrobeReport() {
       {/* ─── 다음 스텝 ─── */}
       <div className="flex flex-col gap-2.5">
         <button onClick={() => navigate('/closet/combos')} className="w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
-          <Shirt size={16} /> 전체 조합 보기
+          <Shirt size={16} /> {t('wardrobeReport.viewAllCombos')}
         </button>
         <button onClick={() => navigate('/closet/simulate')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl font-medium text-sm text-warm-700 dark:text-warm-300 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
-          <ShoppingBag size={16} /> 뭘 사면 좋을지 확인하기
+          <ShoppingBag size={16} /> {t('wardrobeReport.checkPurchase')}
         </button>
       </div>
     </div>

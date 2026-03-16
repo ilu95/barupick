@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Image, Globe, Users, Lock, Camera, Check } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import CropOverlay from '@/components/ui/CropOverlay'
@@ -11,6 +12,7 @@ import { useToast } from '@/components/ui/Toast'
 
 export default function CommunityPost() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { user, profile } = useAuth()
   const toast = useToast()
   const [caption, setCaption] = useState('')
@@ -39,9 +41,9 @@ export default function CommunityPost() {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
         <div className="text-4xl mb-3">🔐</div>
-        <div className="text-sm text-warm-600 mb-4">로그인 후 공유할 수 있어요</div>
+        <div className="text-sm text-warm-600 mb-4">{t('common.loginRequired')}</div>
         <button onClick={() => navigate('/auth/login')} className="px-5 py-2 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">
-          로그인하기
+          {t('auth.loginButton')}
         </button>
       </div>
     )
@@ -96,7 +98,7 @@ export default function CommunityPost() {
       setDone(true)
       setTimeout(() => navigate('/community', { replace: true }), 1500)
     } catch (e: any) {
-      toast.error('공유 실패: ' + (e.message || ''))
+      toast.error(t('communityPost.postFailed', { error: e.message || '' }))
     } finally {
       setPosting(false)
     }
@@ -109,7 +111,7 @@ export default function CommunityPost() {
           <div className="w-16 h-16 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-4">
             <Check size={32} className="text-sage" />
           </div>
-          <div className="font-display text-lg font-bold text-warm-900">커뮤니티에 공유했어요!</div>
+          <div className="font-display text-lg font-bold text-warm-900">{t('communityPost.postSuccess')}</div>
         </div>
       </div>
     )
@@ -117,7 +119,7 @@ export default function CommunityPost() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">커뮤니티에 공유</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('communityPost.title')}</h2>
 
       {/* 마네킹 미리보기 */}
       {hasOutfit && (
@@ -128,11 +130,11 @@ export default function CommunityPost() {
 
       {/* 캡션 */}
       <div className="mb-4">
-        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block">캡션</label>
+        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block">{t('communityPost.caption')}</label>
         <textarea
           value={caption}
           onChange={e => setCaption(e.target.value)}
-          placeholder="오늘의 코디를 소개해보세요"
+          placeholder={t('communityPost.captionPlaceholder')}
           maxLength={200}
           className="w-full h-24 px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-500 focus:outline-none focus:border-terra-400 resize-none"
         />
@@ -142,7 +144,7 @@ export default function CommunityPost() {
       {/* 사진 */}
       <div className="mb-4">
         <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block flex items-center gap-1">
-          <Image size={12} /> 사진 <span className="text-warm-400 normal-case tracking-normal">(선택, 최대 4장)</span>
+          <Image size={12} /> {t('communityPost.photos')} <span className="text-warm-400 normal-case tracking-normal">(max 4)</span>
         </label>
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
           {photos.map((p, i) => (
@@ -163,11 +165,11 @@ export default function CommunityPost() {
 
       {/* 공개 범위 */}
       <div className="mb-4">
-        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block">공개 범위</label>
+        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block">{t('communityPost.visibility.public')}</label>
         <div className="flex gap-2">
           {[
-            { key: 'public', icon: <Globe size={13} />, label: '전체 공개' },
-            { key: 'friends', icon: <Users size={13} />, label: '친구 공개' },
+            { key: 'public', icon: <Globe size={13} />, label: t('communityPost.visibility.public') },
+            { key: 'friends', icon: <Users size={13} />, label: t('communityPost.visibility.friends') },
           ].map(v => (
             <button
               key={v.key}
@@ -184,7 +186,7 @@ export default function CommunityPost() {
       {profile?.instagram_id && (
         <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl px-4 py-3 mb-5">
           <div>
-            <div className="text-sm font-medium text-warm-900">📸 인스타그램 표시</div>
+            <div className="text-sm font-medium text-warm-900">{t('communityPost.instagramToggle')}</div>
             <div className="text-[10px] text-warm-500">@{profile.instagram_id}</div>
           </div>
           <button
@@ -202,7 +204,7 @@ export default function CommunityPost() {
         disabled={posting}
         className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra disabled:opacity-50"
       >
-        {posting ? '공유 중...' : '🌐 커뮤니티에 공유하기'}
+        {posting ? t('communityPost.posting') : t('common.share')}
       </button>
 
       {/* 4:5 크롭 UI */}

@@ -5,6 +5,8 @@ import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { STYLE_GUIDE } from '@/lib/styles'
 import type { CommunityPost } from '@/hooks/useCommunity'
+import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 
 interface Props {
   post: CommunityPost
@@ -13,27 +15,28 @@ interface Props {
   showComments?: boolean
 }
 
-function timeAgo(dt: string): string {
+function timeAgo(dt: string, t: (key: string, opts?: any) => string): string {
   if (!dt) return ''
   const diff = (Date.now() - new Date(dt).getTime()) / 1000
-  if (diff < 60) return '방금'
-  if (diff < 3600) return Math.floor(diff / 60) + '분 전'
-  if (diff < 86400) return Math.floor(diff / 3600) + '시간 전'
-  if (diff < 604800) return Math.floor(diff / 86400) + '일 전'
+  if (diff < 60) return t('common.justNow')
+  if (diff < 3600) return t('common.minutesAgo', { count: Math.floor(diff / 60) })
+  if (diff < 86400) return t('common.hoursAgo', { count: Math.floor(diff / 3600) })
+  if (diff < 604800) return t('common.daysAgo', { count: Math.floor(diff / 86400) })
   const d = new Date(dt)
   return (d.getMonth() + 1) + '/' + d.getDate()
 }
 
 function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const outfit = post.outfit || {}
   const hasPhoto = post.photo_urls && post.photo_urls.length > 0
   const photoUrl = hasPhoto ? post.photo_urls![0] : null
-  const nick = post.profiles?.nickname || '유저'
+  const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
   const styleName = post.style ? (STYLE_GUIDE[post.style]?.name?.replace(/ 룩$/, '') || post.style) : ''
   const title = post.caption || post.title || ''
-  const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) : ''
+  const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' }) : ''
 
   // outfit의 hex 변환 (마네킹용)
   const outfitHex: Record<string, string> = {}
@@ -58,7 +61,7 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
             src={photoUrl!}
             loading="lazy"
             className="w-full h-full object-cover"
-            alt={title || '코디'}
+            alt={title || t('nav.coord')}
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none'
             }}
@@ -103,7 +106,7 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
               e.stopPropagation()
               onLike(post.id)
             }}
-            aria-label={isLiked ? '좋아요 취소' : '좋아요'}
+            aria-label={isLiked ? t('communityDetail.unlikeLabel') : t('communityDetail.like')}
             className="flex items-center gap-0.5 text-[11px] active:scale-110 transition-transform"
           >
             <Heart

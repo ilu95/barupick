@@ -5,6 +5,7 @@
 // ================================================================
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BarChart3, Award, Palette, Target, GraduationCap, ScanLine, Star, ChevronRight, FileText, TrendingUp, Eye, Heart, Bookmark, ArrowLeft, Check, Gift, Trophy, Sparkles, ShoppingBag } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60, hcl } from '@/lib/colors'
@@ -18,6 +19,7 @@ import { profile } from '@/lib/profile'
 
 // ─── 내 레벨 ───
 export function MyLevel() {
+  const { t } = useTranslation()
   // @ts-ignore
   const lv = gamification.getLevel ? gamification.getLevel() : { level: 1, name: '입문자', progress: 0, currentXp: 0, nextXp: 100 }
   const circumference = 2 * Math.PI * 52
@@ -36,12 +38,12 @@ export function MyLevel() {
             <span className="text-xs text-warm-600">{lv.name}</span>
           </div>
         </div>
-        <div className="text-sm text-warm-600">경험치 {lv.currentXp || 0} / {lv.nextXp || 100}</div>
+        <div className="text-sm text-warm-600">XP {lv.currentXp || 0} / {lv.nextXp || 100}</div>
         <div className="h-2 bg-warm-300 rounded-full mt-2 max-w-[200px] mx-auto"><div className="h-full bg-terra-500 rounded-full transition-all" style={{ width: `${lv.progress}%` }} /></div>
       </div>
       <div className="bg-white border border-warm-400 rounded-2xl p-4 shadow-warm-sm">
-        <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">경험치 획득 방법</div>
-        {[['OOTD 기록', '+20 XP'], ['코디 만들기', '+15 XP'], ['커뮤니티 공유', '+25 XP'], ['좋아요 받기', '+5 XP'], ['배지 획득', '+50 XP']].map(([label, xp]) => (
+        <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">XP</div>
+        {[[t('profileSub.myLevel.xpMethods.record'), '+20 XP'], [t('common.coord'), '+15 XP'], [t('profileSub.myLevel.xpMethods.community'), '+25 XP'], [t('communityDetail.like'), '+5 XP'], [t('profile.stats.badges'), '+50 XP']].map(([label, xp]) => (
           <div key={label} className="flex items-center justify-between py-2.5 border-b border-warm-300 last:border-0">
             <span className="text-sm text-warm-800">{label}</span>
             <span className="text-xs font-semibold text-terra-600">{xp}</span>
@@ -54,24 +56,25 @@ export function MyLevel() {
 
 // ─── 배지 컬렉션 ───
 export function MyBadges() {
+  const { t } = useTranslation()
   // @ts-ignore
   const badges = gamification.getBadges ? gamification.getBadges() : []
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">배지 컬렉션</h2>
-      <p className="text-sm text-warm-600 mb-5">{badges.filter((b: any) => b.earned).length}/{badges.length}개 획득</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('profileSub.myBadges.title')}</h2>
+      <p className="text-sm text-warm-600 mb-5">{badges.filter((b: any) => b.earned).length}/{badges.length} {t('profileSub.myBadges.earned')}</p>
       <div className="grid grid-cols-3 gap-2.5">
         {badges.map((badge: any) => (
           <div key={badge.id} className={`bg-white border rounded-2xl p-4 text-center shadow-warm-sm ${badge.earned ? 'border-terra-300' : 'border-warm-400 opacity-50'}`}>
             <div className="text-3xl mb-2">{badge.icon || '🏅'}</div>
             <div className="text-[12px] font-semibold text-warm-900">{badge.name}</div>
             <div className="text-[10px] text-warm-500 mt-0.5">{badge.description}</div>
-            {badge.earned && <div className="text-[9px] text-terra-600 font-medium mt-1">획득 ✓</div>}
+            {badge.earned && <div className="text-[9px] text-terra-600 font-medium mt-1">{t('profileSub.myBadges.earned')} ✓</div>}
           </div>
         ))}
       </div>
-      {badges.length === 0 && <div className="text-center py-16"><Award size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">OOTD를 기록하면 배지를 획득할 수 있어요</div></div>}
+      {badges.length === 0 && <div className="text-center py-16"><Award size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">{t('profileSub.myBadges.locked')}</div></div>}
     </div>
   )
 }
@@ -79,6 +82,7 @@ export function MyBadges() {
 // ─── 컬러 랭킹 + 컴포트 존 확장 ───
 export function ColorRanking() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const records = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('sp_ootd_records') || '[]') } catch { return [] }
   }, [])
@@ -113,7 +117,7 @@ export function ColorRanking() {
     return warm > cool * 1.5 ? 'warm' : cool > warm * 1.5 ? 'cool' : 'neutral'
   }, [wardrobeColors])
 
-  const tempLabel = tempBias === 'warm' ? '웜톤 중심' : tempBias === 'cool' ? '쿨톤 중심' : '뉴트럴 균형'
+  const tempLabel = tempBias === 'warm' ? t('profileSub.colorRanking.warmCenter') : tempBias === 'cool' ? t('profileSub.colorRanking.coolCenter') : t('profileSub.colorRanking.neutralBalance')
 
   // ─── 컴포트 존 확장 제안 ───
   const expansionSuggestions = useMemo(() => {
@@ -178,15 +182,15 @@ export function ColorRanking() {
 
       // reason 생성
       let reason = ''
-      if (minDist >= 15 && minDist <= 40) reason = '기존 색상과 톤이 비슷해 안전한 변화'
-      else if (minDist > 40 && minDist <= 80) reason = '새로운 색감이지만 조화도가 높아요'
-      else if (minDist > 80) reason = '과감한 변화, 포인트로 활용 가능'
+      if (minDist >= 15 && minDist <= 40) reason = t('profileSub.colorRanking.comfortZone')
+      else if (minDist > 40 && minDist <= 80) reason = t('profileSub.colorRanking.comfortZone')
+      else if (minDist > 80) reason = t('profileSub.colorRanking.comfortZone')
 
       // 같은 색온도면 보너스
       if (tempBias === 'warm' && ['cognac', 'terracotta', 'rust', 'camel', 'mustard', 'olive', 'brick', 'sienna', 'tan'].includes(candidate)) {
-        reason = '웜톤 유지하면서 새로운 색감'
+        reason = t('profileSub.colorRanking.warmCenter')
       } else if (tempBias === 'cool' && ['lavender', 'mint', 'powder_blue', 'teal', 'steel_blue', 'sage'].includes(candidate)) {
-        reason = '쿨톤 유지하면서 새로운 색감'
+        reason = t('profileSub.colorRanking.coolCenter')
       }
 
       return { colorKey: candidate, avgCompat, novelty, finalScore, reason }
@@ -197,8 +201,8 @@ export function ColorRanking() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">컬러 랭킹</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">내가 가장 많이 입은 색상</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('profileSub.colorRanking.title')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('header.colorRanking')}</p>
 
       {/* 색온도 프로필 */}
       {wardrobeColors.size >= 3 && (
@@ -206,7 +210,7 @@ export function ColorRanking() {
           <div className="text-lg">{tempBias === 'warm' ? '🔥' : tempBias === 'cool' ? '❄️' : '⚖️'}</div>
           <div>
             <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{tempLabel}</div>
-            <div className="text-[11px] text-warm-500 dark:text-warm-400">옷장 {wardrobeColors.size}개 색상 기준</div>
+            <div className="text-[11px] text-warm-500 dark:text-warm-400">{t('closet.myCloset')} {wardrobeColors.size}</div>
           </div>
         </div>
       )}
@@ -224,21 +228,21 @@ export function ColorRanking() {
                 <div className="flex-1"><div className="text-sm font-medium text-warm-900 dark:text-warm-100">{c.name}</div>
                   <div className="h-1.5 bg-warm-300 dark:bg-warm-600 rounded-full mt-1"><div className="h-full bg-terra-500 rounded-full" style={{ width: `${(count / maxCount) * 100}%` }} /></div>
                 </div>
-                <span className="text-xs font-semibold text-warm-600 dark:text-warm-400">{count}회</span>
+                <span className="text-xs font-semibold text-warm-600 dark:text-warm-400">{count}</span>
               </div>
             )
           })}
         </div>
-      ) : <div className="text-center py-16"><Palette size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">OOTD를 기록하면 컬러 랭킹을 볼 수 있어요</div></div>}
+      ) : <div className="text-center py-16"><Palette size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">{t('profileSub.colorRanking.title')}</div></div>}
 
       {/* ─── 컴포트 존 확장 제안 ─── */}
       {expansionSuggestions.length > 0 && (
         <div className="mt-8">
           <div className="flex items-center gap-1.5 mb-3">
             <Sparkles size={16} className="text-terra-500" />
-            <h3 className="text-sm font-bold text-warm-900 dark:text-warm-100">새로운 시도 추천</h3>
+            <h3 className="text-sm font-bold text-warm-900 dark:text-warm-100">{t('profileSub.colorRanking.comfortZone')}</h3>
           </div>
-          <p className="text-[11px] text-warm-500 dark:text-warm-400 mb-4">기존 옷장과 잘 어울리지만 아직 시도하지 않은 색상</p>
+          <p className="text-[11px] text-warm-500 dark:text-warm-400 mb-4">{t('profileSub.colorRanking.comfortZone')}</p>
 
           <div className="flex flex-col gap-2.5">
             {expansionSuggestions.map((sug, idx) => {
@@ -251,7 +255,7 @@ export function ColorRanking() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">{c.name}</span>
-                        <span className="text-[10px] font-bold bg-terra-100 dark:bg-terra-900/30 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">조화도 {sug.avgCompat}점</span>
+                        <span className="text-[10px] font-bold bg-terra-100 dark:bg-terra-900/30 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">{t('common.score', { score: sug.avgCompat })}</span>
                       </div>
                       <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{sug.reason}</div>
                     </div>
@@ -260,7 +264,7 @@ export function ColorRanking() {
                     onClick={() => navigate(`/closet/simulate?color=${sug.colorKey}`)}
                     className="w-full py-2.5 bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-xl text-[12px] font-medium text-warm-700 dark:text-warm-300 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
                   >
-                    <ShoppingBag size={13} /> 이 색으로 시뮬레이션
+                    <ShoppingBag size={13} /> {t('purchaseSimulate.compatCheck')}
                   </button>
                 </div>
               )
@@ -274,11 +278,12 @@ export function ColorRanking() {
 
 // ─── 색상 패턴 분석 ───
 export function ColorPattern() {
+  const { t } = useTranslation()
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">색상 패턴 분석</h2>
-      <p className="text-sm text-warm-600 mb-5">내 컬러 DNA를 분석합니다</p>
-      <div className="text-center py-12"><ScanLine size={48} className="text-terra-500 mx-auto mb-4" /><div className="text-sm text-warm-600">10개 이상 기록하면 분석을 시작할 수 있어요</div></div>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('profileSub.colorPattern.title')}</h2>
+      <p className="text-sm text-warm-600 mb-5">{t('header.colorPattern')}</p>
+      <div className="text-center py-12"><ScanLine size={48} className="text-terra-500 mx-auto mb-4" /><div className="text-sm text-warm-600">{t('profileSub.colorPattern.title')}</div></div>
     </div>
   )
 }
@@ -286,6 +291,7 @@ export function ColorPattern() {
 // ─── 주간 챌린지 ───
 export function Challenges() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [challenges, setChallenges] = useState<any[]>([])
   const [claimedMsg, setClaimedMsg] = useState('')
 
@@ -301,7 +307,7 @@ export function Challenges() {
     if (!ch.completed || ch.claimed) return
     const ok = gamification.claimChallenge(ch.cKey)
     if (ok) {
-      setClaimedMsg(`${ch.name} 보상 획득! +${20}XP`)
+      setClaimedMsg(`${ch.name} +${20}XP`)
       // XP 추가
       try {
         const gd = JSON.parse(localStorage.getItem('sp_gamification') || '{}')
@@ -317,8 +323,8 @@ export function Challenges() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">주간 챌린지</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-2">{completedCount}/{challenges.length}개 완료</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('profileSub.challenges.weekly')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-2">{completedCount}/{challenges.length} {t('common.done')}</p>
 
       {claimedMsg && (
         <div className="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-2.5 text-sm font-medium text-green-700 dark:text-green-400 animate-screen-fade">
@@ -329,7 +335,7 @@ export function Challenges() {
       {/* 전체 진행률 */}
       <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
         <div className="flex justify-between text-xs text-warm-600 dark:text-warm-400 mb-2">
-          <span>이번 주 진행률</span>
+          <span>{t('profileSub.challenges.weekly')}</span>
           <span className="font-display font-bold">{completedCount}/{challenges.length}</span>
         </div>
         <div className="h-2.5 bg-warm-200 dark:bg-warm-700 rounded-full overflow-hidden">
@@ -360,11 +366,11 @@ export function Challenges() {
                 {/* 보상 버튼 */}
                 {ch.completed && !ch.claimed && (
                   <button onClick={() => handleClaim(ch)} className="w-full py-2.5 bg-terra-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all shadow-terra">
-                    <Gift size={14} /> 보상 받기 (+20 XP)
+                    <Gift size={14} /> +20 XP
                   </button>
                 )}
                 {ch.claimed && (
-                  <div className="text-center text-[11px] text-green-600 dark:text-green-400 font-medium py-1">✓ 보상 수령 완료</div>
+                  <div className="text-center text-[11px] text-green-600 dark:text-green-400 font-medium py-1">✓ {t('common.done')}</div>
                 )}
               </div>
             )
@@ -373,12 +379,12 @@ export function Challenges() {
       ) : (
         <div className="text-center py-16">
           <Target size={40} className="text-warm-400 mx-auto mb-3" />
-          <div className="text-sm text-warm-600 dark:text-warm-400">이번 주 챌린지를 불러올 수 없어요</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400">{t('profileSub.challenges.title')}</div>
         </div>
       )}
 
       <button onClick={() => navigate('/record')} className="w-full py-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 mt-5 active:scale-[0.98] transition-all">
-        OOTD 기록하러 가기
+        {t('header.record')}
       </button>
     </div>
   )
@@ -387,6 +393,7 @@ export function Challenges() {
 // ─── 칭호 시험 ───
 export function TitleExam() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [step, setStep] = useState<'list' | 'play' | 'result'>('list')
   const [examId, setExamId] = useState<string | null>(null)
   const [qStep, setQStep] = useState(0)
@@ -428,8 +435,8 @@ export function TitleExam() {
   if (step === 'list') {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">칭호 시험</h2>
-        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">컬러 지식을 테스트하고 칭호를 획득하세요</p>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('profileSub.titleExam.title')}</h2>
+        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('profileSub.titleExam.play')}</p>
 
         <div className="flex flex-col gap-2.5">
           {exams.map((exam) => {
@@ -442,10 +449,10 @@ export function TitleExam() {
                   </div>
                   <div className="flex-1">
                     <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{exam.name}</div>
-                    <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{exam.desc} · {exam.questions.length}문제 · {exam.minScore}점 이상 합격</div>
+                    <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{exam.desc} · {exam.questions.length} · {exam.minScore}+</div>
                     {prev && (
                       <div className={`text-[10px] font-medium mt-1 ${prev.passed ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                        {prev.passed ? `✓ 합격 (${prev.score}/${exam.questions.length})` : `✕ 불합격 (${prev.score}/${exam.questions.length}) — 재도전 가능`}
+                        {prev.passed ? `✓ (${prev.score}/${exam.questions.length})` : `✕ (${prev.score}/${exam.questions.length})`}
                       </div>
                     )}
                   </div>
@@ -469,7 +476,7 @@ export function TitleExam() {
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
         <button onClick={() => setStep('list')} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-          <ArrowLeft size={16} /> 시험 목록
+          <ArrowLeft size={16} /> {t('common.back')}
         </button>
 
         <div className="flex items-center justify-between mb-4">
@@ -505,9 +512,9 @@ export function TitleExam() {
     <div className="animate-screen-enter px-5 pt-2 pb-10">
       <div className="text-center py-8">
         <div className="text-5xl mb-4">{passed ? '🎉' : '😅'}</div>
-        <h2 className="font-display text-2xl font-bold text-warm-900 dark:text-warm-100 mb-2">{passed ? '합격!' : '아쉬워요'}</h2>
+        <h2 className="font-display text-2xl font-bold text-warm-900 dark:text-warm-100 mb-2">{passed ? '🎉' : '😅'}</h2>
         <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">
-          {exam.questions.length}문제 중 {score}문제 정답 {passed ? `— ${exam.name} 칭호 획득!` : `— ${exam.minScore}문제 이상 맞아야 합격`}
+          {exam.questions.length} / {score} {passed ? `— ${exam.name}` : `— ${exam.minScore}+`}
         </p>
 
         {/* 점수 원형 */}
@@ -525,7 +532,7 @@ export function TitleExam() {
 
         {/* 문제별 정답 확인 */}
         <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm text-left">
-          <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-3">문제별 결과</div>
+          <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-3">{t('profileSub.titleExam.title')}</div>
           {exam.questions.map((q, i) => {
             const correct = answers[i] === q.ans
             return (
@@ -534,7 +541,7 @@ export function TitleExam() {
                 <div className="flex-1 min-w-0">
                   <div className="text-[12px] text-warm-800 dark:text-warm-200 leading-relaxed">{q.q}</div>
                   {!correct && (
-                    <div className="text-[11px] text-green-600 dark:text-green-400 mt-0.5">정답: {q.opts[q.ans]}</div>
+                    <div className="text-[11px] text-green-600 dark:text-green-400 mt-0.5">{q.opts[q.ans]}</div>
                   )}
                 </div>
               </div>
@@ -544,10 +551,10 @@ export function TitleExam() {
 
         <div className="flex gap-2.5">
           <button onClick={() => setStep('list')} className="flex-1 py-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
-            목록으로
+            {t('common.back')}
           </button>
           <button onClick={() => startExam(exam.id)} className="flex-1 py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
-            다시 도전
+            {t('common.retry')}
           </button>
         </div>
       </div>
@@ -558,6 +565,7 @@ export function TitleExam() {
 // ─── 내 게시물 ───
 export function MyPosts() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -581,17 +589,17 @@ export function MyPosts() {
     } catch { return [] }
   }, [posts])
 
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">불러오는 중...</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('common.loading')}</div>
 
   const publicPosts = posts.filter(p => p.visibility === 'public')
   const friendsPosts = posts.filter(p => p.visibility === 'friends')
   const privatePosts = posts.filter(p => p.visibility === 'private')
 
   const tabs = [
-    { key: 'all', label: `전체 (${posts.length + ootdRecords.length})` },
-    { key: 'public', label: `전체 공개 (${publicPosts.length})` },
-    { key: 'friends', label: `친구 (${friendsPosts.length})` },
-    { key: 'private', label: `비공개 (${privatePosts.length + ootdRecords.length})` },
+    { key: 'all', label: `${t('common.all')} (${posts.length + ootdRecords.length})` },
+    { key: 'public', label: `${t('profileSub.myPosts.visibility.public')} (${publicPosts.length})` },
+    { key: 'friends', label: `${t('profileSub.myPosts.visibility.friends')} (${friendsPosts.length})` },
+    { key: 'private', label: `${t('profileSub.myPosts.visibility.private')} (${privatePosts.length + ootdRecords.length})` },
   ]
 
   const getFiltered = () => {
@@ -604,23 +612,23 @@ export function MyPosts() {
   const { posts: filteredPosts, records: filteredRecords } = getFiltered()
 
   const visibilityBadge = (v: string) => {
-    if (v === 'public') return <span className="text-[8px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded-full font-bold">공개</span>
-    if (v === 'friends') return <span className="text-[8px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-bold">친구</span>
-    return <span className="text-[8px] bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 px-1.5 py-0.5 rounded-full font-bold">비공개</span>
+    if (v === 'public') return <span className="text-[8px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded-full font-bold">{t('profileSub.myPosts.visibility.public')}</span>
+    if (v === 'friends') return <span className="text-[8px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-bold">{t('profileSub.myPosts.visibility.friends')}</span>
+    return <span className="text-[8px] bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 px-1.5 py-0.5 rounded-full font-bold">{t('profileSub.myPosts.visibility.private')}</span>
   }
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-3">내 게시물</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-3">{t('profileSub.myPosts.title')}</h2>
 
       {/* 탭 */}
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 hide-scrollbar">
-        {tabs.map(t => (
-          <button key={t.key} onClick={() => setActiveTab(t.key as any)}
+        {tabs.map(tb => (
+          <button key={tb.key} onClick={() => setActiveTab(tb.key as any)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
-              activeTab === t.key ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+              activeTab === tb.key ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
             }`}
-          >{t.label}</button>
+          >{tb.label}</button>
         ))}
       </div>
 
@@ -646,7 +654,7 @@ export function MyPosts() {
       {/* 비공개 OOTD 기록 (커뮤니티 미공유) */}
       {filteredRecords.length > 0 && (activeTab === 'all' || activeTab === 'private') && (
         <>
-          <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2 mt-2">비공개 기록 ({filteredRecords.length})</div>
+          <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2 mt-2">{t('profileSub.myPosts.visibility.private')} ({filteredRecords.length})</div>
           <div className="grid grid-cols-3 gap-1.5">
             {filteredRecords.map((r: any, idx: number) => {
               const outfitHex: Record<string, string> = {}
@@ -656,7 +664,7 @@ export function MyPosts() {
                   {r.photos?.[0] ? <img src={r.photos[0]} className="w-full h-full object-cover" alt="" />
                   : <div className="w-full h-full flex items-center justify-center"><MannequinSVG outfit={outfitHex} size={50} /></div>}
                   <div className="absolute top-0.5 left-0.5">{visibilityBadge('private')}</div>
-                  <div className="absolute bottom-0.5 right-0.5 text-[9px] font-bold text-white bg-black/40 px-1.5 py-0.5 rounded-full">{r.score}점</div>
+                  <div className="absolute bottom-0.5 right-0.5 text-[9px] font-bold text-white bg-black/40 px-1.5 py-0.5 rounded-full">{t('common.score', { score: r.score })}</div>
                 </button>
               )
             })}
@@ -665,7 +673,7 @@ export function MyPosts() {
       )}
 
       {filteredPosts.length === 0 && filteredRecords.length === 0 && (
-        <div className="text-center py-16"><FileText size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">아직 게시물이 없어요</div></div>
+        <div className="text-center py-16"><FileText size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">{t('community.empty')}</div></div>
       )}
     </div>
   )
@@ -674,6 +682,7 @@ export function MyPosts() {
 // ─── 인사이트 ───
 export function Insights() {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const [stats, setStats] = useState({ views: 0, likes: 0, saves: 0 })
 
   useEffect(() => {
@@ -692,9 +701,9 @@ export function Insights() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">인사이트</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('profileSub.insights.title')}</h2>
       <div className="grid grid-cols-3 gap-2.5 mb-6">
-        {[['조회', stats.views, <Eye size={20} />], ['좋아요', stats.likes, <Heart size={20} />], ['저장', stats.saves, <Bookmark size={20} />]].map(([label, val, icon]) => (
+        {[[t('postInsight.views'), stats.views, <Eye size={20} />], [t('communityDetail.like'), stats.likes, <Heart size={20} />], [t('communityDetail.save'), stats.saves, <Bookmark size={20} />]].map(([label, val, icon]) => (
           <div key={label as string} className="bg-white border border-warm-400 rounded-2xl py-4 text-center shadow-warm-sm">
             <div className="text-terra-500 flex justify-center mb-1">{icon as any}</div>
             <div className="font-display text-xl font-bold text-warm-900">{val as number}</div>
@@ -709,13 +718,14 @@ export function Insights() {
 // ─── 저장한 코디 ───
 export function SavedCoords() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const saved = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('cs_saved') || '[]') } catch { return [] }
   }, [])
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">저장한 코디 ({saved.length})</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('profileSub.savedCoords.title')} ({saved.length})</h2>
       {saved.length > 0 ? (
         <div className="flex flex-col gap-2.5">
           {saved.map((item: any, idx: number) => {
@@ -727,8 +737,8 @@ export function SavedCoords() {
               <div key={idx} className="flex items-center gap-3 bg-white border border-warm-400 rounded-2xl p-3 shadow-warm-sm">
                 <MannequinSVG outfit={outfitHex} size={60} />
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-warm-900">{item.name || `코디 #${idx + 1}`}</div>
-                  {item.score && <div className="text-xs text-terra-600 font-medium mt-0.5">{item.score}점</div>}
+                  <div className="text-sm font-semibold text-warm-900">{item.name || `#${idx + 1}`}</div>
+                  {item.score && <div className="text-xs text-terra-600 font-medium mt-0.5">{t('common.score', { score: item.score })}</div>}
                   <div className="flex gap-1 mt-1">{Object.values(item.outfit || item.colors || {}).filter(Boolean).slice(0, 5).map((ck, i) => {
                     const c = COLORS_60[ck as string]; return c ? <div key={i} className="w-3 h-3 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
                   })}</div>
@@ -737,7 +747,7 @@ export function SavedCoords() {
             )
           })}
         </div>
-      ) : <div className="text-center py-16"><Star size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">저장한 코디가 없어요</div></div>}
+      ) : <div className="text-center py-16"><Star size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">{t('profileSub.savedCoords.title')}</div></div>}
     </div>
   )
 }

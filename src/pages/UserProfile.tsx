@@ -7,12 +7,14 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
 import { useToast } from '@/components/ui/Toast'
+import { useTranslation } from 'react-i18next'
 
 interface ProfileData {
   id: string; nickname: string | null; avatar_url: string | null; bio: string | null; instagram_id: string | null
 }
 
 export default function UserProfile() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { userId } = useParams<{ userId: string }>()
   const { user } = useAuth()
@@ -60,7 +62,7 @@ export default function UserProfile() {
 
   if (!userId) return null
 
-  const nick = profile?.nickname || '유저'
+  const nick = profile?.nickname || t('common.user')
   const avatar = profile?.avatar_url
   const bio = profile?.bio
   const insta = profile?.instagram_id
@@ -83,11 +85,11 @@ export default function UserProfile() {
               onClick={async () => {
                 const blocked = await toggleBlock(userId)
                 setMenuOpen(false)
-                toast.success(blocked ? '차단했어요' : '차단을 해제했어요')
+                toast.success(blocked ? t('userProfile.blockedToast') : t('userProfile.unblockedToast'))
               }}
               className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 active:bg-warm-100 rounded-lg w-full text-left"
             >
-              <ShieldOff size={14} /> 차단하기
+              <ShieldOff size={14} /> {t('common.block')}
             </button>
           </div>
         )}
@@ -102,7 +104,7 @@ export default function UserProfile() {
 
         <div className="text-lg font-bold text-warm-900">@{nick}</div>
         {bio && <div className="text-xs text-warm-500 mt-1 px-8">{bio}</div>}
-        {mutual && !isMe && <div className="text-[11px] text-green-600 font-medium mt-1">👫 서로 친구</div>}
+        {mutual && !isMe && <div className="text-[11px] text-green-600 font-medium mt-1">{t('common.mutualFriend')}</div>}
         {insta && (
           <button
             onClick={() => window.open(`https://instagram.com/${insta}`, '_blank')}
@@ -116,15 +118,15 @@ export default function UserProfile() {
         <div className="flex justify-center gap-5 mt-4 mb-3">
           <div className="text-center">
             <div className="font-display text-lg font-bold text-warm-900">{posts.length}</div>
-            <div className="text-[10px] text-warm-500">코디</div>
+            <div className="text-[10px] text-warm-500">{t('common.coord')}</div>
           </div>
           <div className="text-center cursor-pointer" onClick={() => navigate(`/user/${userId}/followers`)}>
             <div className="font-display text-lg font-bold text-warm-900">{followers}</div>
-            <div className="text-[10px] text-warm-500">팔로워</div>
+            <div className="text-[10px] text-warm-500">{t('common.followers')}</div>
           </div>
           <div className="text-center cursor-pointer" onClick={() => navigate(`/user/${userId}/following`)}>
             <div className="font-display text-lg font-bold text-warm-900">{following}</div>
-            <div className="text-[10px] text-warm-500">팔로잉</div>
+            <div className="text-[10px] text-warm-500">{t('common.followingLabel')}</div>
           </div>
         </div>
 
@@ -138,7 +140,7 @@ export default function UserProfile() {
               : 'bg-terra-500 text-white shadow-terra'
             }`}
           >
-            {mutual ? '👫 친구' : following_ ? '팔로잉 ✓' : '팔로우'}
+            {mutual ? t('common.friend') : following_ ? t('common.following') : t('common.follow')}
           </button>
         )}
       </div>
@@ -148,22 +150,22 @@ export default function UserProfile() {
         <div className="bg-gradient-to-r from-terra-50 to-warm-100 border border-terra-200 rounded-2xl p-4 mb-3 flex items-center gap-3">
           <div className="text-2xl flex-shrink-0">🔓</div>
           <div className="flex-1">
-            <div className="text-xs font-semibold text-warm-800 mb-0.5">팔로우하면 더 볼 수 있어요</div>
-            <div className="text-[11px] text-warm-500">친구 전용 코디와 댓글을 확인할 수 있어요</div>
+            <div className="text-xs font-semibold text-warm-800 mb-0.5">{t('userProfile.followCta')}</div>
+            <div className="text-[11px] text-warm-500">{t('userProfile.followCtaDesc')}</div>
           </div>
           <button onClick={() => toggleFollow(userId)} className="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 flex-shrink-0 shadow-terra">
-            팔로우
+            {t('common.follow')}
           </button>
         </div>
       )}
 
       {/* 로딩 */}
-      {loading && <div className="text-center py-10 text-warm-400 text-sm">불러오는 중...</div>}
+      {loading && <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>}
 
       {/* 코디 그리드 */}
       {!loading && posts.length > 0 && (
         <div className="border-t border-warm-300 pt-4 mt-2">
-          <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">공개 코디</div>
+          <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">{t('userProfile.publicCoords')}</div>
           <div className="grid grid-cols-3 gap-1.5">
             {posts.map(post => {
               const outfit = post.outfit || {}
@@ -194,7 +196,7 @@ export default function UserProfile() {
       )}
 
       {!loading && posts.length === 0 && (
-        <div className="text-center py-10 text-warm-400 text-sm">아직 공개 코디가 없어요</div>
+        <div className="text-center py-10 text-warm-400 text-sm">{t('userProfile.noPublicCoords')}</div>
       )}
     </div>
   )

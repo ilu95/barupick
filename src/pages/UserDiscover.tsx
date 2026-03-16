@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
 import { useToast } from '@/components/ui/Toast'
+import { useTranslation } from 'react-i18next'
 
 interface UserRow {
   id: string
@@ -14,6 +15,7 @@ interface UserRow {
 }
 
 export default function UserDiscover() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { isFollowing, isFriend, toggleFollow } = useSocial()
@@ -48,7 +50,7 @@ export default function UserDiscover() {
 
   const doSearch = async () => {
     const q = query.trim()
-    if (q.length < 2) { toast.error('2글자 이상 입력해주세요'); return }
+    if (q.length < 2) { toast.error(t('userDiscover.searchMinLength')); return }
     setSearching(true)
     try {
       const { data } = await supabase.from('profiles')
@@ -58,7 +60,7 @@ export default function UserDiscover() {
       setResults(data || [])
     } catch (e) {
       console.error('Search error:', e)
-      toast.error('검색 중 오류가 발생했어요')
+      toast.error(t('userDiscover.searchError'))
     } finally {
       setSearching(false)
     }
@@ -70,7 +72,7 @@ export default function UserDiscover() {
       <div className="relative mb-5">
         <input
           type="text"
-          placeholder="닉네임 또는 인스타 ID로 검색"
+          placeholder={t('userDiscover.searchPlaceholder')}
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && doSearch()}
@@ -82,7 +84,7 @@ export default function UserDiscover() {
           disabled={searching}
           className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-terra-500 text-white text-[11px] font-semibold rounded-xl active:scale-95 transition-all"
         >
-          {searching ? '...' : '검색'}
+          {searching ? '...' : t('userDiscover.searchButton')}
         </button>
       </div>
 
@@ -90,11 +92,11 @@ export default function UserDiscover() {
       {results !== null && (
         <div className="mb-5">
           {results.length === 0 ? (
-            <div className="text-center py-6 text-warm-400 text-sm">검색 결과가 없어요</div>
+            <div className="text-center py-6 text-warm-400 text-sm">{t('userDiscover.noResults')}</div>
           ) : (
             <>
               <div className="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-2 px-1">
-                <Search size={12} /> 검색 결과 {results.length}명
+                <Search size={12} /> {t('userDiscover.searchResults', { count: results.length })}
               </div>
               {results.map(u => (
                 <UserRow key={u.id} user={u} isFollowing={isFollowing(u.id)} isFriend={isFriend(u.id)} onFollow={() => toggleFollow(u.id)} onProfile={() => navigate(`/user/${u.id}`)} isMe={u.id === user?.id} />
@@ -108,13 +110,13 @@ export default function UserDiscover() {
       {results === null && (
         <div>
           {suggested === null ? (
-            <div className="text-center py-10 text-warm-400 text-sm">불러오는 중...</div>
+            <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>
           ) : suggested.length === 0 ? (
-            <div className="text-center py-10 text-warm-400 text-sm">아직 가입한 유저가 없어요</div>
+            <div className="text-center py-10 text-warm-400 text-sm">{t('userDiscover.noUsers')}</div>
           ) : (
             <>
               <div className="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-3 px-1">
-                <Sparkles size={12} /> 추천 유저
+                <Sparkles size={12} /> {t('userDiscover.suggestedUsers')}
               </div>
               {suggested.map(u => (
                 <UserRow key={u.id} user={u} isFollowing={isFollowing(u.id)} isFriend={isFriend(u.id)} onFollow={() => toggleFollow(u.id)} onProfile={() => navigate(`/user/${u.id}`)} isMe={u.id === user?.id} />
@@ -130,6 +132,7 @@ export default function UserDiscover() {
 function UserRow({ user: u, isFollowing, isFriend: isMutual, onFollow, onProfile, isMe }: {
   user: UserRow, isFollowing: boolean, isFriend: boolean, onFollow: () => void, onProfile: () => void, isMe: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center gap-3 py-3 border-b border-warm-300">
       <div onClick={onProfile} className="flex-shrink-0 cursor-pointer">
@@ -142,9 +145,9 @@ function UserRow({ user: u, isFollowing, isFriend: isMutual, onFollow, onProfile
         )}
       </div>
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onProfile}>
-        <div className="text-sm font-semibold text-warm-900 truncate">@{u.nickname || '유저'}</div>
+        <div className="text-sm font-semibold text-warm-900 truncate">@{u.nickname || t('common.user')}</div>
         {u.instagram_id && <div className="text-[11px] text-warm-500">📸 {u.instagram_id}</div>}
-        {isMutual && <div className="text-[10px] text-green-600 font-medium">👫 서로 친구</div>}
+        {isMutual && <div className="text-[10px] text-green-600 font-medium">{t('common.mutualFriend')}</div>}
       </div>
       {!isMe && (
         <button
@@ -155,7 +158,7 @@ function UserRow({ user: u, isFollowing, isFriend: isMutual, onFollow, onProfile
             : 'bg-terra-500 text-white shadow-terra'
           }`}
         >
-          {isMutual ? '👫 친구' : isFollowing ? '팔로잉 ✓' : '팔로우'}
+          {isMutual ? t('common.friend') : isFollowing ? t('common.following') : t('common.follow')}
         </button>
       )}
     </div>

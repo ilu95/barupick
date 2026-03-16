@@ -5,12 +5,14 @@
 // ═══════════════════════════════════════════════════════
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Shirt, ShoppingBag, BarChart3, ChevronRight, Plus } from 'lucide-react'
 import { COLORS_60 } from '@/lib/colors'
 import { CATEGORY_NAMES } from '@/lib/categories'
 
 export default function ClosetCoord() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const items = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('sp_wardrobe') || '[]') } catch { return [] }
@@ -36,9 +38,9 @@ export default function ClosetCoord() {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
         <div className="text-4xl mb-3">👕</div>
-        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">옷장에 아이템을 먼저 등록해주세요</div>
+        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('closet.emptyCloset')}</div>
         <button onClick={() => navigate('/closet/add')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">
-          아이템 등록하기
+          {t('common.itemRegister')}
         </button>
       </div>
     )
@@ -46,8 +48,8 @@ export default function ClosetCoord() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">내 옷 코디</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">옷장에 있는 아이템을 활용해보세요</p>
+      <h2 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('closetCoord.title')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('closetCoord.subtitle')}</p>
 
       {/* ═══ 기능 카드 ═══ */}
       <div className="flex flex-col gap-2.5 mb-6">
@@ -64,9 +66,9 @@ export default function ClosetCoord() {
             <Shirt size={22} className={hasEnough ? 'text-amber-700 dark:text-amber-300' : 'text-warm-500'} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className={`text-[15px] font-bold tracking-tight ${hasEnough ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>전체 조합 보기</div>
+            <div className={`text-[15px] font-bold tracking-tight ${hasEnough ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>{t('closetCoord.allCombos')}</div>
             <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-0.5">
-              {hasEnough ? '내 옷으로 가능한 모든 코디 + 점수 + 기록' : `아이템 ${needed}개 더 등록하면 사용 가능`}
+              {hasEnough ? t('closetCoord.allCombosDesc') : t('closet.itemCount', { count: needed })}
             </div>
           </div>
           <ChevronRight size={16} className={hasEnough ? 'text-amber-500' : 'text-warm-400'} />
@@ -83,8 +85,8 @@ export default function ClosetCoord() {
             }`}
           >
             <ShoppingBag size={20} className={hasEnough ? 'text-amber-600 dark:text-amber-400 mb-2' : 'text-warm-400 mb-2'} />
-            <div className={`text-[13px] font-semibold ${hasEnough ? 'text-warm-900 dark:text-warm-100' : 'text-warm-600 dark:text-warm-400'}`}>뭘 사면 좋을까?</div>
-            <div className="text-[10px] text-warm-500 dark:text-warm-400 mt-0.5">{hasEnough ? '구매 추천 + 궁합 분석' : '아이템 등록 필요'}</div>
+            <div className={`text-[13px] font-semibold ${hasEnough ? 'text-warm-900 dark:text-warm-100' : 'text-warm-600 dark:text-warm-400'}`}>{t('closetCoord.whatToBuy')}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400 mt-0.5">{hasEnough ? t('closetCoord.whatToBuyDesc') : t('closet.itemCount', { count: needed })}</div>
           </button>
           <button
             onClick={() => hasEnough ? navigate('/closet/report') : navigate('/closet/add')}
@@ -95,8 +97,8 @@ export default function ClosetCoord() {
             }`}
           >
             <BarChart3 size={20} className={hasEnough ? 'text-warm-600 dark:text-warm-400 mb-2' : 'text-warm-400 mb-2'} />
-            <div className={`text-[13px] font-semibold ${hasEnough ? 'text-warm-900 dark:text-warm-100' : 'text-warm-600 dark:text-warm-400'}`}>내 옷장 이야기</div>
-            <div className="text-[10px] text-warm-500 dark:text-warm-400 mt-0.5">{hasEnough ? '활용도 + 컬러 밸런스' : '아이템 등록 필요'}</div>
+            <div className={`text-[13px] font-semibold ${hasEnough ? 'text-warm-900 dark:text-warm-100' : 'text-warm-600 dark:text-warm-400'}`}>{t('closetCoord.wardrobeReport')}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400 mt-0.5">{hasEnough ? t('closetCoord.wardrobeReportDesc') : t('closet.itemCount', { count: needed })}</div>
           </button>
         </div>
       </div>
@@ -105,7 +107,7 @@ export default function ClosetCoord() {
       <div className="h-px bg-warm-300 dark:bg-warm-600 mb-5" />
 
       {/* ═══ 옷장 아이템 요약 ═══ */}
-      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">내 옷장 아이템</div>
+      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{t('closet.myCloset')}</div>
       <div className="p-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl mb-4 shadow-warm-sm">
         {catOrder.map(cat => {
           const arr = byCat[cat] || []
@@ -117,7 +119,7 @@ export default function ClosetCoord() {
                 {arr.length > 0 ? arr.slice(0, 4).map((it, i) => {
                   const c = COLORS_60[it.color]
                   return c ? <span key={i} className="inline-block w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: c.hex }} /> : null
-                }) : <span className="text-warm-500 dark:text-warm-400">없음</span>}
+                }) : <span className="text-warm-500 dark:text-warm-400">-</span>}
                 {arr.length > 4 && <span className="text-[11px] text-warm-600 dark:text-warm-400">+{arr.length - 4}</span>}
               </span>
             </div>
@@ -126,7 +128,7 @@ export default function ClosetCoord() {
       </div>
 
       <button onClick={() => navigate('/closet/add')} className="w-full py-3 bg-warm-100 dark:bg-warm-700 border border-dashed border-warm-400 dark:border-warm-500 rounded-2xl text-sm font-medium text-warm-600 dark:text-warm-400 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
-        <Plus size={16} /> 아이템 추가
+        <Plus size={16} /> {t('common.itemRegister')}
       </button>
     </div>
   )

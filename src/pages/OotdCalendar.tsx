@@ -4,8 +4,10 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
 import { COLORS_60 } from '@/lib/colors'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import { useTranslation } from 'react-i18next'
 
 export default function OotdCalendar() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { getRecords } = useOotd()
   const [month, setMonth] = useState(() => {
@@ -92,7 +94,7 @@ export default function OotdCalendar() {
 
       {/* 요일 헤더 */}
       <div className="grid grid-cols-7 gap-1 mb-1">
-        {['일', '월', '화', '수', '목', '금', '토'].map((d, i) => (
+        {(t('ootdCalendar.weekDays', { returnObjects: true }) as string[]).map((d, i) => (
           <div key={d} className={`text-center text-[11px] font-semibold py-1 ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-warm-500'}`}>
             {d}
           </div>
@@ -190,13 +192,13 @@ export default function OotdCalendar() {
             {(['all', 'photo', 'mannequin'] as const).map(f => (
               <button key={f} onClick={() => setTypeFilter(f)}
                 className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${typeFilter === f ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-600 dark:text-warm-300 active:scale-95'}`}>
-                {f === 'all' ? '전체' : f === 'photo' ? '📷 사진' : '👤 마네킹'}
+                {f === 'all' ? t('ootdCalendar.filterAll') : f === 'photo' ? `📷 ${t('ootdCalendar.filterPhoto')}` : `👤 ${t('ootdCalendar.filterMannequin')}`}
               </button>
             ))}
             <div className="flex-1" />
             <button onClick={() => setSortOrder(s => s === 'newest' ? 'oldest' : 'newest')}
               className="px-3 py-1.5 rounded-full text-[11px] font-medium bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-600 dark:text-warm-300 active:scale-95 transition-all">
-              {sortOrder === 'newest' ? '최신순 ↓' : '오래된순 ↑'}
+              {sortOrder === 'newest' ? `${t('ootdCalendar.sortNewest')} ↓` : `${t('ootdCalendar.sortOldest')} ↑`}
             </button>
           </div>
 
@@ -209,7 +211,7 @@ export default function OotdCalendar() {
 
           {filteredRecords.length === 0 && (
             <div className="text-center py-8 text-sm text-warm-500 dark:text-warm-400">
-              {typeFilter === 'photo' ? '사진이 있는 기록이 없어요' : '마네킹만 있는 기록이 없어요'}
+              {typeFilter === 'photo' ? t('ootdCalendar.filterPhoto') : t('ootdCalendar.filterMannequin')}
             </div>
           )}
         </div>
@@ -220,13 +222,15 @@ export default function OotdCalendar() {
 
 // ─── 캘린더용 기록 카드 (Closet RecordCard 기반, 날짜 표시 변경) ───
 function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate: any }) {
+  const { t } = useTranslation()
   const outfitHex: Record<string, string> = {}
   Object.entries(record.colors || {}).forEach(([k, v]) => {
     if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
   })
 
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
-  const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][new Date(ry, rm - 1, rd).getDay()]
+  const weekDays = t('ootdCalendar.weekDays', { returnObjects: true }) as string[]
+  const dayOfWeek = weekDays[new Date(ry, rm - 1, rd).getDay()]
   const dateLabel = `${rm}/${rd} ${dayOfWeek}`
 
   const hasPhoto = record.photos && record.photos.length > 0
