@@ -219,7 +219,7 @@ export default function OotdRecord() {
         <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl text-sm">
           <span>{ootd.weatherData.code === 0 ? '☀️' : ootd.weatherData.code <= 3 ? '⛅' : ootd.weatherData.code <= 67 ? '🌧️' : '❄️'}</span>
           <span className="text-warm-800 dark:text-warm-200">{ootd.weatherData.temp}°C</span>
-          <span className="text-warm-500 text-xs">체감 {ootd.weatherData.feels}°C</span>
+          <span className="text-warm-500 text-xs">{t('weather.feelsLike', { temp: ootd.weatherData.feels })}</span>
         </div>
       )}
 
@@ -415,7 +415,7 @@ export default function OotdRecord() {
       {/* 사진 */}
       <div className="mb-3">
         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">
-          📷 사진 {ootd.visibility === 'public' && <span className="text-red-500 normal-case tracking-normal">(전체 공개 시 필수)</span>}
+          📷 {t('common.photo')} {ootd.visibility === 'public' && <span className="text-red-500 normal-case tracking-normal">(전체 공개 시 필수)</span>}
           {ootd.photos.length > 0 && <span className="ml-auto text-warm-400 normal-case tracking-normal">{ootd.photos.length}/4</span>}
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
