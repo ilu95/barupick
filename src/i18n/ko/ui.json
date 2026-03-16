@@ -120,7 +120,9 @@
     "slide4Title": "퍼스널컬러 & 체형",
     "slide4Desc": "나만의 진단 결과로 맞춤 추천을 받아보세요",
     "start": "시작하기",
-    "skip": "건너뛰기"
+    "skip": "건너뛰기",
+    "langSelectTitle": "언어 선택",
+    "langSelectDesc": "사용할 언어를 선택해주세요"
   },
   "home": {
     "greetingMorning": "좋은 아침이에요",

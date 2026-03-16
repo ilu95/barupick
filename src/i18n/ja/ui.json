@@ -120,7 +120,9 @@
     "slide4Title": "パーソナルカラー＆体型",
     "slide4Desc": "あなただけの診断結果でカスタム提案を受けましょう",
     "start": "はじめる",
-    "skip": "スキップ"
+    "skip": "スキップ",
+    "langSelectTitle": "言語選択",
+    "langSelectDesc": "使用する言語を選択してください"
   },
   "home": {
     "greetingMorning": "おはようございます",
