@@ -7,8 +7,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ShoppingBag, ArrowLeft, Plus, ChevronRight, Sparkles, Target } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
-import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
+import { COLORS_60, getColorName } from '@/lib/colors'
+
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
 
@@ -102,7 +102,7 @@ export default function PurchaseSimulate() {
           const sim = wardrobe.simulatePurchase(cand.category, cand.color)
           if (sim.comboDelta > 0) {
             const catLabel = t(CATEGORIES.find(c => c.key === cand.category)?.labelKey || '') || cand.category
-            const colorName = COLORS_60[cand.color]?.name || cand.color
+            const colorName = getColorName(cand.color)
             results.push({
               ...sim, category: cand.category, color: cand.color,
               catLabel, colorName,
@@ -152,7 +152,7 @@ export default function PurchaseSimulate() {
   const handleAddToWardrobe = (cat: string, col: string) => {
     try {
       const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
-      items.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), category: cat, color: col, colorKey: col, name: COLORS_60[col]?.name || '', createdAt: new Date().toISOString() })
+      items.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), category: cat, color: col, colorKey: col, name: getColorName(col), createdAt: new Date().toISOString() })
       if (items.length > 200) items.length = 200
       localStorage.setItem('sp_wardrobe', JSON.stringify(items))
       wardrobe.refresh()
@@ -319,7 +319,7 @@ export default function PurchaseSimulate() {
           <div className="flex items-center gap-3 bg-warm-100 dark:bg-warm-700 rounded-2xl px-4 py-3 mb-5">
             <div className="w-10 h-10 rounded-xl border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: color ? COLORS_60[color]?.hex || '#ddd' : '#ddd' }} />
             <div className="flex-1">
-              <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{COLORS_60[color]?.name || color}</div>
+              <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{getColorName(color)}</div>
               <div className="text-[11px] text-warm-500 dark:text-warm-400">{t(CATEGORIES.find(c => c.key === category)?.labelKey || '')}</div>
             </div>
             <button onClick={() => { setCategory(null); setColor(null); setSimResult(null); setManualStep('category') }} className="text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">{t('purchaseSimulate.reselect')}</button>

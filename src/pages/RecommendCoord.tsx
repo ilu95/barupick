@@ -19,11 +19,11 @@ function getPickedPartLabel(partKey: string, pickedItems: string[], t?: any): st
   for (const id of pickedItems) {
     const item = ITEMS_CATALOG.find(i => i.id === id)
     if (!item) continue
-    if (partKey === 'outer' && item.outerType) return item.label
-    if (partKey === 'middleware' && item.midType) return item.label
-    if (partKey === 'scarf' && item.slot === 'scarf') return item.label
-    if (partKey === 'hat' && item.slot === 'hat') return item.label
-    if (partKey === 'top' && !item.outerType && !item.midType && !item.slot) return item.label
+    if (partKey === 'outer' && item.outerType) return t ? t('categories:itemsCatalog.' + item.id) : item.label
+    if (partKey === 'middleware' && item.midType) return t ? t('categories:itemsCatalog.' + item.id) : item.label
+    if (partKey === 'scarf' && item.slot === 'scarf') return t ? t('categories:itemsCatalog.' + item.id) : item.label
+    if (partKey === 'hat' && item.slot === 'hat') return t ? t('categories:itemsCatalog.' + item.id) : item.label
+    if (partKey === 'top' && !item.outerType && !item.midType && !item.slot) return t ? t('categories:itemsCatalog.' + item.id) : item.label
   }
   const fallbackKeys: Record<string, string> = { top: 'recommend.partTop', bottom: 'recommend.partBottom', shoes: 'recommend.partShoes', outer: 'recommend.partOuter', middleware: 'recommend.partMiddleware', scarf: 'recommend.partScarf', hat: 'recommend.partHat' }
   if (t && fallbackKeys[partKey]) return t(fallbackKeys[partKey])
@@ -62,8 +62,8 @@ function StepMood({ rec }: { rec: RecHook }) {
           <button key={key} onClick={() => rec.selectMood(key)}
             className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 text-center shadow-warm-sm active:scale-[0.97] transition-all">
             <div className="text-2xl mb-2">{group.icon}</div>
-            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{group.name}</div>
-            <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-1 leading-snug">{group.description}</div>
+            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t('styles:moodGroups.' + key + '.name')}</div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-1 leading-snug">{t('styles:moodGroups.' + key + '.description')}</div>
           </button>
         ))}
       </div>
@@ -87,7 +87,7 @@ function StepStyle({ rec }: { rec: RecHook }) {
       <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
         <ArrowLeft size={16} /> {t('common.back')}
       </button>
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{group.icon} {group.name}</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{group.icon} {t('styles:moodGroups.' + rec.state.mood + '.name')}</h2>
       <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('recommend.styleTitle')}</p>
       <div className="flex flex-col gap-2.5 mb-5">
         {group.styles.map((s: string) => {
@@ -98,8 +98,8 @@ function StepStyle({ rec }: { rec: RecHook }) {
               className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 text-left shadow-warm-sm active:scale-[0.98] transition-all">
               <span className="text-xl flex-shrink-0">{icon}</span>
               <div className="flex-1 min-w-0">
-                <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{sd?.name || s}</div>
-                <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{sd?.subtitle || ''}</div>
+                <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('styles:guide.' + s + '.name')}</div>
+                <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('styles:guide.' + s + '.subtitle')}</div>
               </div>
               <ChevronRight size={16} className="text-warm-500 flex-shrink-0" />
             </button>
@@ -165,7 +165,7 @@ function StepPick({ rec }: { rec: RecHook }) {
                   : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
               }`}>
               <span className="text-xl">{item.emoji}</span>
-              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{item.label}</span>
+              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
             </button>
           )
         })}
@@ -184,7 +184,7 @@ function StepPick({ rec }: { rec: RecHook }) {
                   : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
               }`}>
               <span className="text-xl">{item.emoji}</span>
-              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{item.label}</span>
+              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
             </button>
           )
         })}
@@ -193,7 +193,7 @@ function StepPick({ rec }: { rec: RecHook }) {
       {/* 선택된 구성 요약 */}
       {picked.length > 0 && (
         <div className="mb-4 text-center text-xs text-warm-600 dark:text-warm-400">
-          {picked.map(id => ITEMS_CATALOG.find(i => i.id === id)?.label).filter(Boolean).join(' + ')} {t('recommend.plusBasics')}
+          {picked.map(id => t('categories:itemsCatalog.' + id)).filter(Boolean).join(' + ')} {t('recommend.plusBasics')}
         </div>
       )}
 
@@ -240,7 +240,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
           return (
             <button key={id} onClick={() => rec.toggleItemInResults(id)}
               className="flex items-center gap-1 bg-terra-50 dark:bg-terra-900/30 border border-terra-300 dark:border-terra-700 rounded-full px-2.5 py-1 text-[11px] font-semibold text-terra-700 dark:text-terra-400 active:scale-95">
-              {item.emoji} {item.label} <X size={10} />
+              {item.emoji} {t('categories:itemsCatalog.' + item.id)} <X size={10} />
             </button>
           )
         })}
@@ -249,7 +249,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
         {Object.entries(pinned).map(([part, colorKey]) => {
           const c = COLORS_60[colorKey]
           if (!c) return null
-          const partName = (CATEGORY_NAMES as any)?.[part] || part
+          const partName = t('categories:names.' + part)
           return (
             <button key={part} onClick={() => rec.clearPin(part)}
               className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-semibold text-warm-700 dark:text-warm-300 active:scale-95">
@@ -285,7 +285,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
                     sel ? 'bg-terra-100 dark:bg-terra-900/30 border-terra-400 border-[1.5px]' : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
                   }`}>
                   <span className="text-base">{item.emoji}</span>
-                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{item.label}</span>
+                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
                 </button>
               )
             })}
@@ -305,11 +305,11 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
                 for (const id of picked) {
                   const item = ITEMS_CATALOG.find(i => i.id === id)
                   if (!item) continue
-                  if (pk === 'outer' && item.outerType) return item.label
-                  if (pk === 'middleware' && item.midType) return item.label
-                  if (pk === 'scarf' && item.slot === 'scarf') return item.label
-                  if (pk === 'hat' && item.slot === 'hat') return item.label
-                  if (pk === 'top' && !item.outerType && !item.midType && !item.slot) return item.label
+                  if (pk === 'outer' && item.outerType) return t('categories:itemsCatalog.' + item.id)
+                  if (pk === 'middleware' && item.midType) return t('categories:itemsCatalog.' + item.id)
+                  if (pk === 'scarf' && item.slot === 'scarf') return t('categories:itemsCatalog.' + item.id)
+                  if (pk === 'hat' && item.slot === 'hat') return t('categories:itemsCatalog.' + item.id)
+                  if (pk === 'top' && !item.outerType && !item.midType && !item.slot) return t('categories:itemsCatalog.' + item.id)
                 }
                 const fallbackKeys: Record<string, string> = { top: 'recommend.partTop', bottom: 'recommend.partBottom', shoes: 'recommend.partShoes', outer: 'recommend.partOuter', middleware: 'recommend.partMiddleware', scarf: 'recommend.partScarf', hat: 'recommend.partHat' }
                 return fallbackKeys[pk] ? t(fallbackKeys[pk]) : pk
@@ -487,8 +487,8 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {/* 배색 이론 태그 */}
       {evalResult?.theory && evalResult.theory.length > 0 && (
         <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-          {evalResult.theory.map((t: string, i: number) => (
-            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{t}</span>
+          {evalResult.theory.map((tag: string, i: number) => (
+            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{tag}</span>
           ))}
         </div>
       )}

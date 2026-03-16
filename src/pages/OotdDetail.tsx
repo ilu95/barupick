@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, Trash2, Share, Globe, Calendar, Tag, Smile, Cloud, ArrowLeft, Image } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
+
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
 import { useModal } from '@/components/ui/Modal'
@@ -227,7 +227,7 @@ export default function OotdDetail() {
               return (
                 <div key={part} className="flex items-center gap-1.5 text-xs">
                   <span className="w-3.5 h-3.5 rounded border border-warm-400" style={{ background: c.hex }} />
-                  <span className="text-warm-500 w-7">{(CATEGORY_NAMES as any)?.[part] || part}</span>
+                  <span className="text-warm-500 w-7">{t('categories:names.' + part)}</span>
                   <span className="text-warm-800">{c.name}</span>
                 </div>
               )

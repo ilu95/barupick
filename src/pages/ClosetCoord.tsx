@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Shirt, ShoppingBag, BarChart3, ChevronRight, Plus } from 'lucide-react'
 import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
 
 export default function ClosetCoord() {
   const navigate = useNavigate()
@@ -117,7 +116,7 @@ export default function ClosetCoord() {
           return (
             <div key={cat} className="flex items-center gap-2 py-1 text-[13px]">
               <span>{arr.length > 0 ? '✅' : '➖'}</span>
-              <span className="w-[60px] font-semibold text-warm-900 dark:text-warm-100">{(CATEGORY_NAMES)[cat] || cat}</span>
+              <span className="w-[60px] font-semibold text-warm-900 dark:text-warm-100">{t('categories:names.' + cat)}</span>
               <span className="flex gap-1 items-center">
                 {arr.length > 0 ? arr.slice(0, 4).map((it, i) => {
                   const c = COLORS_60[it.color]

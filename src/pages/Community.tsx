@@ -136,11 +136,11 @@ function AllTabFilters({ comm }: { comm: ReturnType<typeof useCommunity> }) {
   const cFilters: [ContentFilter, string][] = [['photo', '📷 ' + t('community.content.photo')], ['mannequin', '👤 ' + t('community.content.mannequin')]]
   const styleChips: [string, string][] = [
     ['all', t('community.tabs.all')],
-    ...Object.entries(STYLE_GUIDE).map(([k, v]) => [k, v.name.replace(/ 룩$/, '')] as [string, string])
+    ...Object.entries(STYLE_GUIDE).map(([k, v]) => [k, t('styles:guide.' + k + '.name')] as [string, string])
   ]
 
   const activeStyleLabel = comm.styleFilter
-    ? (STYLE_GUIDE[comm.styleFilter]?.name?.replace(/ 룩$/, '') || comm.styleFilter)
+    ? t('styles:guide.' + comm.styleFilter + '.name')
     : null
 
   return (

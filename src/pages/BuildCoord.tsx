@@ -45,11 +45,11 @@ function StepStyle({ build }: { build: BH }) {
   return (
     <div className="animate-screen-fade">
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('build.stepStyle')}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">스타일에 맞는 컬러를 추천해 드려요. 건너뛰기도 가능합니다.</p>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('build.styleDesc')}</p>
 
       {Object.entries(MOOD_GROUPS).map(([key, group]) => (
         <div key={key} className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-wide mb-2.5">{group.icon} {group.name}</div>
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-wide mb-2.5">{group.icon} {t('styles:moodGroups.' + key + '.name')}</div>
           <div className="flex flex-wrap gap-2">
             {group.styles.map((s: string) => {
               const sd = STYLE_GUIDE[s]
@@ -57,7 +57,7 @@ function StepStyle({ build }: { build: BH }) {
               return (
                 <button key={s} onClick={() => build.selectStyle(s)}
                   className="px-4 py-2.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-800 dark:text-warm-200 shadow-warm-sm active:scale-[0.97] transition-all">
-                  {icon} {sd?.name || s}
+                  {icon} {t('styles:guide.' + s + '.name')}
                 </button>
               )
             })}
@@ -70,8 +70,8 @@ function StepStyle({ build }: { build: BH }) {
         <div className="flex items-center gap-2.5">
           <Scissors size={18} className="text-warm-600" />
           <div>
-            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">소재도 함께 고르기</div>
-            <div className="text-[11px] text-warm-600 dark:text-warm-400">부위별 색상 선택 후 소재를 골라 궁합 체크</div>
+            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t('build.fabricToggle')}</div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400">{t('build.fabricToggleDesc')}</div>
           </div>
         </div>
         <button onClick={() => build.update({ fabricMode: !build.state.fabricMode })} role="switch" aria-checked={build.state.fabricMode}
@@ -81,7 +81,7 @@ function StepStyle({ build }: { build: BH }) {
       </div>
 
       <button onClick={() => build.selectStyle(null)} className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
-        스타일 없이 시작 →
+        {t('build.startWithoutStyle')}
       </button>
     </div>
   )
@@ -339,7 +339,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
         {editMode.type === 'edit_simple' && (
           <div className="flex items-center justify-between bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 rounded-xl px-3 py-2 mb-3">
             <span className="text-[12px] font-semibold text-terra-700 dark:text-terra-300">
-              {{ bottom: '👖 하의', shoes: '👞 신발', scarf: '🧣 목도리', hat: '🎩 모자' }[editMode.target]} 색상
+              {t('build.simpleEditColor', { part: t('categories:names.' + editMode.target) })}
             </span>
             <button onClick={cancelEdit} className="text-[11px] text-terra-600 underline">{t('common.cancel')}</button>
           </div>
@@ -348,7 +348,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
         {/* 아이템 그리드 — 새로 추가할 때만 (편집 시에는 바로 컬러 피커) */}
         {(editMode.type === 'add' || (editMode.type === 'idle' && upper.length === 0)) && !tmpItem && (
           <>
-            <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">아이템</div>
+            <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('build.items')}</div>
             <div className="grid grid-cols-4 gap-1.5 mb-4">
               {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
                 const used = usedItemIds.has(item.id)
@@ -360,7 +360,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                       selected ? 'bg-terra-100 dark:bg-terra-900/30 border-terra-400 border-1.5' : used ? 'opacity-30 border border-warm-200' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
                     }`}>
                     <span className="text-lg">{item.emoji}</span>
-                    <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{item.label}</span>
+                    <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
                   </button>
                 )
               })}
@@ -373,10 +373,10 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           <>
             <div className="flex items-center justify-between mb-2">
               <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400">
-                {tmpItem ? `${ITEMS_CATALOG.find(i => i.id === tmpItem)?.label || ''} 컬러` :
-                 isSimpleEdit ? `${{ bottom: '👖 하의', shoes: '👞 신발', scarf: '🧣 목도리', hat: '🎩 모자' }[editMode.target]} 컬러` :
-                 editMode.type === 'edit_upper' ? `${ITEMS_CATALOG.find(i => i.id === upper[editMode.index]?.itemId)?.label || ''} 컬러 변경` :
-                 '컬러'}
+                {tmpItem ? t('build.itemColor', { item: t('categories:itemsCatalog.' + tmpItem) }) :
+                 isSimpleEdit ? t('build.simpleEditColor', { part: t('categories:names.' + editMode.target) }) :
+                 editMode.type === 'edit_upper' ? t('build.itemColorChange', { item: t('categories:itemsCatalog.' + upper[editMode.index]?.itemId) }) :
+                 t('build.colorLabel')}
               </div>
               {(tmpItem || (editMode.type === 'edit_upper' && !tmpItem)) && (
                 <button onClick={() => {
@@ -385,7 +385,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                   // edit_upper에서는 아이템 변경 모드로 전환
                   build.setEditMode({ type: 'add' })
                 }}
-                  className="text-[10px] text-warm-500 dark:text-warm-400 underline">아이템 변경</button>
+                  className="text-[10px] text-warm-500 dark:text-warm-400 underline">{t('build.changeItem')}</button>
               )}
             </div>
 
@@ -393,11 +393,11 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
             {recommendations.length > 0 && (
               <>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">추천 색상</div>
+                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">{t('build.recommendedColors')}</div>
                   {recommendations.some(r => r.badges?.pc || r.badges?.body) && (
                     <div className="flex items-center gap-2 text-[9px] text-warm-400">
-                      {recommendations.some(r => r.badges?.pc) && <span>👤 퍼스널컬러</span>}
-                      {recommendations.some(r => r.badges?.body) && <span>📐 체형</span>}
+                      {recommendations.some(r => r.badges?.pc) && <span>{'👤 ' + t('build.personalColorBadge')}</span>}
+                      {recommendations.some(r => r.badges?.body) && <span>{'📐 ' + t('build.bodyTypeBadge')}</span>}
                     </div>
                   )}
                 </div>
@@ -427,7 +427,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               </>
             )}
 
-            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{recommendations.length > 0 ? '전체 색상' : '색상'}</div>
+            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{recommendations.length > 0 ? t('build.allColors') : t('build.colors')}</div>
             <ColorPicker
               inline
               selected={tmpColor || (editMode.type === 'edit_upper' ? upper[editMode.index]?.colorKey : editMode.type === 'edit_simple' ? build.state[editMode.target + 'Color'] : null) || null}
@@ -444,21 +444,21 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 mb-4 text-[13px] text-blue-800 dark:text-blue-300">
                 💡 {(() => {
                   const missing = []
-                  if (!build.state.bottomColor) missing.push('하의')
-                  if (!build.state.shoesColor) missing.push('신발')
-                  return missing.length > 0 ? `${missing.join(', ')}까지 선택하면 결과를 볼 수 있어요` : '결과를 볼 수 있어요'
+                  if (!build.state.bottomColor) missing.push(t('categories:names.bottom'))
+                  if (!build.state.shoesColor) missing.push(t('categories:names.shoes'))
+                  return missing.length > 0 ? t('build.missingParts', { parts: missing.join(', ') }) : t('build.readyToSee')
                 })()}
                 <div className="flex gap-2 mt-2 justify-center">
                   {!build.state.bottomColor && (
                     <button onClick={() => startEdit({ type: 'edit_simple', target: 'bottom' })}
                       className="px-3 py-1.5 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded-lg text-[11px] font-semibold active:scale-95">
-                      👖 하의 선택
+                      {t('build.selectBottom')}
                     </button>
                   )}
                   {!build.state.shoesColor && (
                     <button onClick={() => startEdit({ type: 'edit_simple', target: 'shoes' })}
                       className="px-3 py-1.5 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded-lg text-[11px] font-semibold active:scale-95">
-                      👞 신발 선택
+                      {t('build.selectShoes')}
                     </button>
                   )}
                 </div>
@@ -637,7 +637,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   ].filter(item => item.value > 0) : []
 
   const handleSave = () => {
-    const name = build.state.style || '코디'
+    const name = build.state.style || t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now() })
     if (saved.length > 100) saved.length = 100
@@ -649,17 +649,17 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const handleShare = () => { navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
   const handleCommunityShare = () => { localStorage.setItem("_pending_post_outfit", JSON.stringify(outfit)); navigate("/community/post") }
 
-  const scoreGrade = score >= 90 ? { label: '완벽한 조합!', emoji: '🏆', color: 'text-amber-600' }
-    : score >= 80 ? { label: '훌륭한 코디!', emoji: '✨', color: 'text-terra-600' }
-    : score >= 65 ? { label: '좋은 조합이에요', emoji: '👍', color: 'text-sage' }
-    : score >= 50 ? { label: '나쁘지 않아요', emoji: '🙂', color: 'text-warm-600' }
-    : { label: '개선해볼까요?', emoji: '💪', color: 'text-warm-500' }
+  const scoreGrade = score >= 90 ? { label: t('build.scoreGrade.perfect'), emoji: '🏆', color: 'text-amber-600' }
+    : score >= 80 ? { label: t('build.scoreGrade.great'), emoji: '✨', color: 'text-terra-600' }
+    : score >= 65 ? { label: t('build.scoreGrade.good'), emoji: '👍', color: 'text-sage' }
+    : score >= 50 ? { label: t('build.scoreGrade.okay'), emoji: '🙂', color: 'text-warm-600' }
+    : { label: t('build.scoreGrade.improve'), emoji: '💪', color: 'text-warm-500' }
   const isHighScore = score >= 80
 
   return (
     <div className="animate-screen-enter">
       <button onClick={() => build.setVizCollapsed(!build.vizCollapsed)} className="w-full text-center text-xs text-warm-600 py-2 mb-2 active:opacity-70">
-        {build.vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲'}
+        {build.vizCollapsed ? t('build.showMannequin') : t('build.hideMannequin')}
       </button>
       {!build.vizCollapsed && (
         <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
@@ -694,7 +694,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       {/* 점수 분해도 */}
       {scoreItems.length > 0 && (
         <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm">
-          <div className="text-xs font-semibold text-warm-500 uppercase tracking-widest mb-3">점수 분석</div>
+          <div className="text-xs font-semibold text-warm-500 uppercase tracking-widest mb-3">{t('build.scoreAnalysis')}</div>
           <div className="flex flex-col gap-2">
             {scoreItems.map(item => (
               <div key={item.label} className="flex items-center gap-2">
@@ -715,7 +715,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       {/* 색상 칩 */}
       <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
         <div className="flex items-center gap-1.5 text-sm font-bold text-warm-900 dark:text-warm-100 mb-3">
-          <Palette size={16} className="text-terra-500" /> 코디 색상
+          <Palette size={16} className="text-terra-500" /> {t('build.coordColors')}
         </div>
         <div className="flex gap-2 flex-wrap justify-center py-1">
           {filledParts.map(([cat, colorKey]) => {
@@ -732,7 +732,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       </div>
 
       <button onClick={() => build.goBack()} className="w-full py-3 border border-terra-400 dark:border-terra-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-2">
-        <Edit3 size={16} /> 컬러 수정하기
+        <Edit3 size={16} /> {t('build.editColors')}
       </button>
       <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-3">
         <Bookmark size={18} /> {t('build.saveCoord')}
@@ -742,13 +742,13 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
           <Share size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{t('build.shareCoord')}</span>
         </button>
         <button onClick={handleCommunityShare} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm">
-          <Users size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">커뮤니티</span>
+          <Users size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{t('build.communityBtn')}</span>
         </button>
         <button onClick={() => build.pushStep('improve')} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm">
-          <RefreshCw size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">비슷한 코디</span>
+          <RefreshCw size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{t('build.similarCoords')}</span>
         </button>
       </div>
-      <button onClick={() => navigate('/home')} className="w-full py-2 text-sm text-warm-600 text-center active:opacity-70 mb-6">처음으로 돌아가기</button>
+      <button onClick={() => navigate('/home')} className="w-full py-2 text-sm text-warm-600 text-center active:opacity-70 mb-6">{t('build.goHome')}</button>
     </div>
   )
 }
@@ -784,10 +784,10 @@ function StepImprove({ build }: { build: BH }) {
   return (
     <div className="animate-screen-enter">
       <button onClick={build.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 결과로
+        <ArrowLeft size={16} /> {t('build.backToResult')}
       </button>
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">비슷한 코디</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">현재 코디에서 색상을 하나씩 바꿔봤어요</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('build.similarTitle')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('build.similarDesc')}</p>
 
       {topImprovements.length > 0 ? (
         <div className="flex flex-col gap-2.5">

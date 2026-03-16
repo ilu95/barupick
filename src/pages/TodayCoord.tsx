@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Shirt, Calendar } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
-import { useTodayCoord, SITUATION_OPTIONS, type TodayCoordResult } from '@/hooks/useTodayCoord'
+
+import { useTodayCoord, getSituationOptions, type TodayCoordResult } from '@/hooks/useTodayCoord'
 import { useWeather } from '@/hooks/useWeather'
 import { getScorePercentile } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
@@ -61,7 +61,7 @@ export default function TodayCoord() {
 
       {/* 상황 필터 칩 */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-4 hide-scrollbar">
-        {SITUATION_OPTIONS.map(opt => (
+        {getSituationOptions().map(opt => (
           <button
             key={opt.key}
             onClick={() => handleSituation(opt.key)}
@@ -216,7 +216,7 @@ function CoordCard({ result, rank, total, navigate }: {
             return (
               <div key={part} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
-                <span className="text-warm-500 dark:text-warm-400 w-10">{(CATEGORY_NAMES as any)?.[part] || part}</span>
+                <span className="text-warm-500 dark:text-warm-400 w-10">{t('categories:names.' + part)}</span>
                 <span className="text-warm-800 dark:text-warm-200 font-medium">{c.name}</span>
               </div>
             )

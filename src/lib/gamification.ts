@@ -5,6 +5,7 @@
 // ================================================================
 
 import { profile } from './profile'
+import i18n from '@/i18n'
 
 
 export const gamification = {
@@ -95,13 +96,13 @@ export const gamification = {
     },
 
     LEVELS: [
-        { level: 1, name: '코디 입문자', minExp: 0, icon: 'sprout' },
-        { level: 2, name: '코디 탐험가', minExp: 50, icon: 'leaf' },
-        { level: 3, name: '코디 수집가', minExp: 150, icon: 'tree-pine' },
-        { level: 4, name: '스타일 연구가', minExp: 300, icon: 'compass' },
-        { level: 5, name: '코디 달인', minExp: 500, icon: 'star' },
-        { level: 6, name: '컬러 마스터', minExp: 800, icon: 'palette' },
-        { level: 7, name: '스타일 마스터', minExp: 1200, icon: 'crown' }
+        { level: 1, get name() { return i18n.t('gamification.levels.1') }, minExp: 0, icon: 'sprout' },
+        { level: 2, get name() { return i18n.t('gamification.levels.2') }, minExp: 50, icon: 'leaf' },
+        { level: 3, get name() { return i18n.t('gamification.levels.3') }, minExp: 150, icon: 'tree-pine' },
+        { level: 4, get name() { return i18n.t('gamification.levels.4') }, minExp: 300, icon: 'compass' },
+        { level: 5, get name() { return i18n.t('gamification.levels.5') }, minExp: 500, icon: 'star' },
+        { level: 6, get name() { return i18n.t('gamification.levels.6') }, minExp: 800, icon: 'palette' },
+        { level: 7, get name() { return i18n.t('gamification.levels.7') }, minExp: 1200, icon: 'crown' }
     ],
 
     getLevel() {
@@ -118,21 +119,21 @@ export const gamification = {
     getBadges() {
         const d = this._getData();
         return [
-            { id:'first_step', lucide:'sprout', name:'첫 발걸음', desc:'첫 번째 OOTD 기록', earned: d.records.length >= 1, progress: Math.min(1, d.records.length), max: 1 },
-            { id:'recorder', lucide:'camera', name:'기록왕', desc:'OOTD 10번 기록', earned: d.records.length >= 10, progress: Math.min(10, d.records.length), max: 10 },
-            { id:'streak3', lucide:'flame', name:'3일 연속', desc:'3일 연속 기록 달성', earned: d.streak >= 3, progress: Math.min(3, d.streak), max: 3 },
-            { id:'streak7', lucide:'zap', name:'7일 연속', desc:'7일 연속 기록 달성', earned: d.streak >= 7, progress: Math.min(7, d.streak), max: 7 },
-            { id:'streak30', lucide:'rocket', name:'30일 연속', desc:'30일 연속 기록!', earned: d.streak >= 30, progress: Math.min(30, d.streak), max: 30 },
-            { id:'closet_start', lucide:'archive', name:'옷장 시작', desc:'옷장에 첫 아이템 등록', earned: d.closetCount >= 1, progress: Math.min(1, d.closetCount), max: 1 },
-            { id:'closet10', lucide:'layers', name:'옷장 컬렉터', desc:'옷장에 10개 이상', earned: d.closetCount >= 10, progress: Math.min(10, d.closetCount), max: 10 },
-            { id:'saver', lucide:'bookmark', name:'코디 수집가', desc:'코디 5개 이상 저장', earned: d.savedCount >= 5, progress: Math.min(5, d.savedCount), max: 5 },
-            { id:'photo_lover', lucide:'image', name:'사진 기록가', desc:'사진 포함 기록 5회', earned: d.photoRecords >= 5, progress: Math.min(5, d.photoRecords), max: 5 },
-            { id:'color_variety', lucide:'palette', name:'컬러 탐험가', desc:'10가지 이상 컬러 사용', earned: d.usedColors.size >= 10, progress: Math.min(10, d.usedColors.size), max: 10 },
-            { id:'quiz_master', lucide:'brain', name:'패션 박사', desc:'패션 퀴즈 완료', earned: d.quizDone, progress: d.quizDone ? 1 : 0, max: 1 },
-            { id:'pc_diagnosed', lucide:'scan-face', name:'퍼스널컬러', desc:'퍼스널컬러 진단 완료', earned: !!d.pcType, progress: d.pcType ? 1 : 0, max: 1 },
-            { id:'title_holder', lucide:'graduation-cap', name:'칭호 보유자', desc:'칭호 시험 1회 통과', earned: d.titleResults.length >= 1, progress: Math.min(1, d.titleResults.length), max: 1 },
-            { id:'challenger', lucide:'target', name:'챌린저', desc:'챌린지 3회 완료', earned: d.challengesDone >= 3, progress: Math.min(3, d.challengesDone), max: 3 },
-            { id:'master100', lucide:'crown', name:'스타일 마스터', desc:'OOTD 100번 기록', earned: d.records.length >= 100, progress: Math.min(100, d.records.length), max: 100 },
+            { id:'first_step', lucide:'sprout', get name() { return i18n.t('gamification.badges.first_step.name') }, get desc() { return i18n.t('gamification.badges.first_step.desc') }, earned: d.records.length >= 1, progress: Math.min(1, d.records.length), max: 1 },
+            { id:'recorder', lucide:'camera', get name() { return i18n.t('gamification.badges.recorder.name') }, get desc() { return i18n.t('gamification.badges.recorder.desc') }, earned: d.records.length >= 10, progress: Math.min(10, d.records.length), max: 10 },
+            { id:'streak3', lucide:'flame', get name() { return i18n.t('gamification.badges.streak3.name') }, get desc() { return i18n.t('gamification.badges.streak3.desc') }, earned: d.streak >= 3, progress: Math.min(3, d.streak), max: 3 },
+            { id:'streak7', lucide:'zap', get name() { return i18n.t('gamification.badges.streak7.name') }, get desc() { return i18n.t('gamification.badges.streak7.desc') }, earned: d.streak >= 7, progress: Math.min(7, d.streak), max: 7 },
+            { id:'streak30', lucide:'rocket', get name() { return i18n.t('gamification.badges.streak30.name') }, get desc() { return i18n.t('gamification.badges.streak30.desc') }, earned: d.streak >= 30, progress: Math.min(30, d.streak), max: 30 },
+            { id:'closet_start', lucide:'archive', get name() { return i18n.t('gamification.badges.closet_start.name') }, get desc() { return i18n.t('gamification.badges.closet_start.desc') }, earned: d.closetCount >= 1, progress: Math.min(1, d.closetCount), max: 1 },
+            { id:'closet10', lucide:'layers', get name() { return i18n.t('gamification.badges.closet10.name') }, get desc() { return i18n.t('gamification.badges.closet10.desc') }, earned: d.closetCount >= 10, progress: Math.min(10, d.closetCount), max: 10 },
+            { id:'saver', lucide:'bookmark', get name() { return i18n.t('gamification.badges.saver.name') }, get desc() { return i18n.t('gamification.badges.saver.desc') }, earned: d.savedCount >= 5, progress: Math.min(5, d.savedCount), max: 5 },
+            { id:'photo_lover', lucide:'image', get name() { return i18n.t('gamification.badges.photo_lover.name') }, get desc() { return i18n.t('gamification.badges.photo_lover.desc') }, earned: d.photoRecords >= 5, progress: Math.min(5, d.photoRecords), max: 5 },
+            { id:'color_variety', lucide:'palette', get name() { return i18n.t('gamification.badges.color_variety.name') }, get desc() { return i18n.t('gamification.badges.color_variety.desc') }, earned: d.usedColors.size >= 10, progress: Math.min(10, d.usedColors.size), max: 10 },
+            { id:'quiz_master', lucide:'brain', get name() { return i18n.t('gamification.badges.quiz_master.name') }, get desc() { return i18n.t('gamification.badges.quiz_master.desc') }, earned: d.quizDone, progress: d.quizDone ? 1 : 0, max: 1 },
+            { id:'pc_diagnosed', lucide:'scan-face', get name() { return i18n.t('gamification.badges.pc_diagnosed.name') }, get desc() { return i18n.t('gamification.badges.pc_diagnosed.desc') }, earned: !!d.pcType, progress: d.pcType ? 1 : 0, max: 1 },
+            { id:'title_holder', lucide:'graduation-cap', get name() { return i18n.t('gamification.badges.title_holder.name') }, get desc() { return i18n.t('gamification.badges.title_holder.desc') }, earned: d.titleResults.length >= 1, progress: Math.min(1, d.titleResults.length), max: 1 },
+            { id:'challenger', lucide:'target', get name() { return i18n.t('gamification.badges.challenger.name') }, get desc() { return i18n.t('gamification.badges.challenger.desc') }, earned: d.challengesDone >= 3, progress: Math.min(3, d.challengesDone), max: 3 },
+            { id:'master100', lucide:'crown', get name() { return i18n.t('gamification.badges.master100.name') }, get desc() { return i18n.t('gamification.badges.master100.desc') }, earned: d.records.length >= 100, progress: Math.min(100, d.records.length), max: 100 },
         ];
     },
 
@@ -166,14 +167,14 @@ export const gamification = {
 
     // === 챌린지 시스템 ===
     CHALLENGE_TEMPLATES: [
-        { id:'pastel_3', type:'color_group', name:'파스텔 위크', desc:'파스텔 컬러 코디 3회 기록', icon:'🎨', target:3, colorGroup:'pastel' },
-        { id:'dark_3', type:'color_group', name:'다크 무드', desc:'다크톤 코디 3회 기록', icon:'🌙', target:3, colorGroup:'dark' },
-        { id:'mono_2', type:'mono', name:'모노톤 챌린지', desc:'단색 계열 코디 2회', icon:'⬛', target:2 },
-        { id:'photo_5', type:'photo', name:'포토제닉', desc:'사진 포함 기록 5회', icon:'📸', target:5 },
-        { id:'streak_5', type:'streak', name:'5일 연속 기록', desc:'5일 연속으로 OOTD 기록', icon:'🔥', target:5 },
-        { id:'variety_7', type:'variety', name:'컬러풀 위크', desc:'7가지 이상 다른 컬러 사용', icon:'🌈', target:7 },
-        { id:'earth_3', type:'color_group', name:'어스톤 위크', desc:'어스톤 코디 3회 기록', icon:'🍂', target:3, colorGroup:'earth' },
-        { id:'record_7', type:'records', name:'주간 기록왕', desc:'이번 주 7일 모두 기록', icon:'📅', target:7 },
+        { id:'pastel_3', type:'color_group', get name() { return i18n.t('gamification.challenges.pastel_3.name') }, get desc() { return i18n.t('gamification.challenges.pastel_3.desc') }, icon:'🎨', target:3, colorGroup:'pastel' },
+        { id:'dark_3', type:'color_group', get name() { return i18n.t('gamification.challenges.dark_3.name') }, get desc() { return i18n.t('gamification.challenges.dark_3.desc') }, icon:'🌙', target:3, colorGroup:'dark' },
+        { id:'mono_2', type:'mono', get name() { return i18n.t('gamification.challenges.mono_2.name') }, get desc() { return i18n.t('gamification.challenges.mono_2.desc') }, icon:'⬛', target:2 },
+        { id:'photo_5', type:'photo', get name() { return i18n.t('gamification.challenges.photo_5.name') }, get desc() { return i18n.t('gamification.challenges.photo_5.desc') }, icon:'📸', target:5 },
+        { id:'streak_5', type:'streak', get name() { return i18n.t('gamification.challenges.streak_5.name') }, get desc() { return i18n.t('gamification.challenges.streak_5.desc') }, icon:'🔥', target:5 },
+        { id:'variety_7', type:'variety', get name() { return i18n.t('gamification.challenges.variety_7.name') }, get desc() { return i18n.t('gamification.challenges.variety_7.desc') }, icon:'🌈', target:7 },
+        { id:'earth_3', type:'color_group', get name() { return i18n.t('gamification.challenges.earth_3.name') }, get desc() { return i18n.t('gamification.challenges.earth_3.desc') }, icon:'🍂', target:3, colorGroup:'earth' },
+        { id:'record_7', type:'records', get name() { return i18n.t('gamification.challenges.record_7.name') }, get desc() { return i18n.t('gamification.challenges.record_7.desc') }, icon:'📅', target:7 },
     ],
 
     getWeeklyChallenges() {
@@ -248,21 +249,21 @@ export const gamification = {
 
     // === 칭호 시험 ===
     TITLE_EXAMS: [
-        { id:'beginner', name:'초급 코디네이터', desc:'기본 색상 조합 이해', icon:'🥉', minScore:3, questions:[
+        { id:'beginner', get name() { return i18n.t('gamification.titleExams.beginner.name') }, get desc() { return i18n.t('gamification.titleExams.beginner.desc') }, icon:'🥉', minScore:3, questions:[
             { q:'네이비와 가장 잘 어울리는 하의 색상은?', opts:['베이지','네온그린','핫핑크','보라'], ans:0 },
             { q:'올블랙 코디에서 포인트를 줄 수 있는 아이템 색상은?', opts:['블랙','차콜','카멜','다크그레이'], ans:2 },
             { q:'무채색끼리의 조합에서 피해야 할 것은?', opts:['명도 차이 주기','비슷한 톤 반복','소재 변화','액세서리 활용'], ans:1 },
             { q:'데님과 가장 조화로운 상의 색상은?', opts:['화이트','네온핑크','라임','마젠타'], ans:0 },
             { q:'아이보리 상의에 어울리는 하의 조합은?', opts:['카키','네온옐로','핫핑크','라임그린'], ans:0 },
         ]},
-        { id:'intermediate', name:'중급 코디네이터', desc:'컬러 하모니 이론 활용', icon:'🥈', minScore:4, questions:[
+        { id:'intermediate', get name() { return i18n.t('gamification.titleExams.intermediate.name') }, get desc() { return i18n.t('gamification.titleExams.intermediate.desc') }, icon:'🥈', minScore:4, questions:[
             { q:'유사색 조합(Analogous)의 특징은?', opts:['강한 대비','부드러운 조화','무채색 중심','보색 활용'], ans:1 },
             { q:'쿨톤에 해당하지 않는 색상은?', opts:['로즈핑크','라벤더','카멜','파우더블루'], ans:2 },
             { q:'봄 웜톤에 가장 어울리는 조합은?', opts:['코랄+아이보리','버건디+네이비','블랙+차콜','와인+다크퍼플'], ans:0 },
             { q:'3색 코디에서 비율의 황금 법칙은?', opts:['33:33:33','60:30:10','50:30:20','70:20:10'], ans:1 },
             { q:'보색 대비를 부드럽게 만드는 방법은?', opts:['채도를 낮추기','더 강한 색 추가','패턴 사용','레이어 추가'], ans:0 },
         ]},
-        { id:'advanced', name:'고급 코디네이터', desc:'전문 스타일링 감각', icon:'🥇', minScore:4, questions:[
+        { id:'advanced', get name() { return i18n.t('gamification.titleExams.advanced.name') }, get desc() { return i18n.t('gamification.titleExams.advanced.desc') }, icon:'🥇', minScore:4, questions:[
             { q:'톤온톤(Tone-on-Tone) 코디의 핵심은?', opts:['같은 색의 명도 변화','보색 대비','무채색만 사용','패턴 믹스'], ans:0 },
             { q:'웜톤이 쿨톤 컬러를 활용하려면?', opts:['피부에서 먼 하의에 배치','얼굴 근처 상의에 배치','전신에 사용','사용하지 않기'], ans:0 },
             { q:'캡슐 워드로브의 컬러 구성 원칙은?', opts:['비비드 컬러 중심','베이직 70%+포인트 30%','모든 계절 컬러 포함','트렌드 컬러만'], ans:1 },

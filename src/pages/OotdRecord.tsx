@@ -273,7 +273,7 @@ export default function OotdRecord() {
                     : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
                   }`}>
                   <span className="text-lg">{item.emoji}</span>
-                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{item.label}</span>
+                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
                 </button>
               )
             })}
@@ -285,7 +285,7 @@ export default function OotdRecord() {
       {openPanel === 'clothes' && pendingItem && (
         <div className="mb-3 animate-screen-fade">
           <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">
-            {t('ootdRecord.selectColorFor', { item: ITEMS_CATALOG.find(i => i.id === pendingItem)?.label })}
+            {t('ootdRecord.selectColorFor', { item: t('categories:itemsCatalog.' + pendingItem) })}
           </div>
           <ColorPicker
             inline
@@ -309,7 +309,7 @@ export default function OotdRecord() {
                     : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
                   }`}>
                   <span className="text-lg">{item.emoji}</span>
-                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{item.label}</span>
+                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
                 </button>
               )
             })}
@@ -321,7 +321,7 @@ export default function OotdRecord() {
       {openPanel === 'accessory' && pendingItem && (
         <div className="mb-3 animate-screen-fade">
           <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">
-            {t('ootdRecord.colorOf', { item: ITEMS_CATALOG.find(i => i.id === pendingItem)?.label })}
+            {t('ootdRecord.colorOf', { item: t('categories:itemsCatalog.' + pendingItem) })}
           </div>
           <ColorPicker inline selected={null}
             onSelect={(k) => { const slot = itemToSlot(pendingItem); if (slot) handleColorDone(slot, k) }} />
@@ -360,7 +360,7 @@ export default function OotdRecord() {
               <div key={id} className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
                 {color && <span className="w-4 h-4 rounded border border-warm-200" style={{ background: color.hex }} />}
                 <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">
-                  {item.label}{color ? ` ${color.name}` : ''}
+                  {t('categories:itemsCatalog.' + id)}{color ? ` ${color.name}` : ''}
                 </span>
                 {!color && <button onClick={() => { setOpenPanel('clothes'); setPendingItem(id) }}
                   className="text-[9px] text-terra-500 font-bold">{t('ootdRecord.color')}</button>}

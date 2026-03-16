@@ -4,10 +4,11 @@
 // 옷장 아이템 기반으로 3개 코디를 생성
 // ═══════════════════════════════════════════════════════
 import { useState, useCallback } from 'react'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import { getLayerAdvice, type WeatherData } from '@/hooks/useWeather'
+import i18n from '@/i18n'
 
 // ─── 상황별 색상 가중치 ───
 
@@ -23,37 +24,39 @@ const SITUATION_WEIGHTS: Record<Situation, SituationWeight> = {
   daily: {
     bonusColors: [],
     penaltyColors: [],
-    impressionLabel: '편안하고 자연스러운 느낌',
+    get impressionLabel() { return i18n.t('todayCoord.impression.daily') },
   },
   interview: {
     bonusColors: ['navy', 'charcoal', 'white', 'lightgray', 'gray', 'black', 'cream'],
     penaltyColors: ['red', 'yellow', 'orange', 'pink', 'hotpink', 'coral'],
-    impressionLabel: '차분하고 신뢰감 있는 느낌',
+    get impressionLabel() { return i18n.t('todayCoord.impression.interview') },
   },
   date: {
     bonusColors: ['beige', 'cream', 'softpink', 'lightblue', 'olive', 'camel', 'ivory', 'lavender', 'peach'],
     penaltyColors: [],
-    impressionLabel: '따뜻하고 부드러운 느낌',
+    get impressionLabel() { return i18n.t('todayCoord.impression.date') },
   },
   workout: {
     bonusColors: ['black', 'gray', 'navy', 'white', 'charcoal'],
     penaltyColors: ['beige', 'cream', 'ivory', 'camel'],
-    impressionLabel: '활동적이고 역동적인 느낌',
+    get impressionLabel() { return i18n.t('todayCoord.impression.workout') },
   },
   travel: {
     bonusColors: ['olive', 'khaki', 'beige', 'brown', 'navy', 'camel', 'tan', 'taupe'],
     penaltyColors: ['white', 'ivory', 'cream'],
-    impressionLabel: '실용적이고 편안한 느낌',
+    get impressionLabel() { return i18n.t('todayCoord.impression.travel') },
   },
 }
 
-export const SITUATION_OPTIONS: { key: Situation; label: string; emoji: string }[] = [
-  { key: 'daily', label: '일상', emoji: '☕' },
-  { key: 'interview', label: '출근·면접', emoji: '💼' },
-  { key: 'date', label: '데이트', emoji: '💕' },
-  { key: 'workout', label: '운동', emoji: '🏃' },
-  { key: 'travel', label: '여행', emoji: '✈️' },
-]
+export function getSituationOptions(): { key: Situation; label: string; emoji: string }[] {
+  return [
+    { key: 'daily', label: i18n.t('todayCoord.situation.daily'), emoji: '☕' },
+    { key: 'interview', label: i18n.t('todayCoord.situation.interview'), emoji: '💼' },
+    { key: 'date', label: i18n.t('todayCoord.situation.date'), emoji: '💕' },
+    { key: 'workout', label: i18n.t('todayCoord.situation.workout'), emoji: '🏃' },
+    { key: 'travel', label: i18n.t('todayCoord.situation.travel'), emoji: '✈️' },
+  ]
+}
 
 // ─── 코디 결과 타입 ───
 
@@ -203,14 +206,15 @@ export function useTodayCoord() {
           // 색상 이론 감지
           try {
             const theories = evaluationSystem.detectTheory(combo.outfit)
-            if (theories?.length > 0) reasons.push(`🎨 ${theories[0]} 배색`)
+            if (theories?.length > 0) reasons.push(`🎨 ${theories[0]}`)
+
           } catch {}
 
           // 최근 미착용
           const outfitColors = Object.values(combo.outfit)
           const unusedItem = outfitColors.find(c => !recentColors.has(c))
           if (unusedItem && COLORS_60[unusedItem]) {
-            reasons.push(`✨ ${COLORS_60[unusedItem].name} 활용`)
+            reasons.push(`✨ ${getColorName(unusedItem)}`)
           }
 
           return {

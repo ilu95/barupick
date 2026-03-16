@@ -5,13 +5,14 @@
 // ⚠️ 추천 결과가 기존과 동일하게 나와야 합니다.
 // ================================================================
 
-import { COLORS_60, COLORS, hcl, H, Cv, L, hex, temp, COLOR_FAMILIES, WARM_SET, COOL_SET, getHueDiff, isNeutralColor, getToneGroup, getColorTemperature, PASTEL_COLORS, EARTH_TONE_COLORS, CLASSIC_COMBOS, AVOID_COMBOS } from './colors'
+import { COLORS_60, COLORS, hcl, H, Cv, L, hex, temp, COLOR_FAMILIES, WARM_SET, COOL_SET, getHueDiff, isNeutralColor, getToneGroup, getColorTemperature, PASTEL_COLORS, EARTH_TONE_COLORS, CLASSIC_COMBOS, AVOID_COMBOS, getColorName } from './colors'
 import { STYLE_MOODS } from './styleMoods'
 import { STYLE_GUIDE, LAYER_LEVELS } from './styles'
 import { PERSONAL_COLOR_12, FACE_NEAR_ITEMS } from './personalColor'
 import { BODY_GUIDE_DATA } from './bodyType'
 import { evaluationSystem } from './evaluation'
 import { profile } from './profile'
+import i18n from '@/i18n'
 
 
 const STW = {
@@ -989,15 +990,11 @@ function generateOutfitsLayered(style, count, layerType) {
 }
 
 
-export const TECH_TAG_MAP = {
-    monochrome: '모노크롬', tone_on_tone: '톤온톤', gradient: '그라데이션',
-    tone_in_tone: '톤인톤', one_point: '원포인트', complementary: '보색대비',
-    analogous: '유사색', split_complementary: '분할보색', color_blocking: '컬러블로킹',
-    light_dark_contrast: '명암대비', neutral_accent: '뉴트럴악센트',
-    all_neutral: '올뉴트럴', ratio_211: '2:1:1비율', sandwich: '샌드위치'
-};
+export function techTagName(key: string): string {
+    return i18n.t(`colorTheory.${key}`) || key
+}
 
-export const COMBO_NAMES = {
+const COMBO_NAMES_KO = {
     preppy: ['캠퍼스', '클래식', '서머', '어텀', '뉴잉글랜드', '아이비', '시크', '홀리데이', '보스턴', '모던', '소프트', '볼드', '코지', '프레시', '리치', '스포티', '내추럴', '윈터', '프렙', '엘레강스'],
     ivy: ['클래식', '캠퍼스', '트래드', '브리티시', '어텀', '모던', '시크', '코지', '웜', '내추럴', '쿨', '소프트', '스마트', '빈티지', '프레시', '리치', '볼드', '셋업', '어반', '럭스'],
     dandy: ['클래식', '모던', '셋업', '시크', '소프트', '웜', '쿨', '어텀', '내추럴', '럭스', '빈티지', '스마트', '볼드', '리치', '코지', '프레시', '어반', '폴', '윈터', '나이트'],
@@ -1020,20 +1017,48 @@ export const COMBO_NAMES = {
     genderless: ['플루이드', '뉴트럴', '프리', '오픈', '블랭크', '소프트', '페이드', '라이트', '퓨어', '에센스', '클린', '이지', '모던', '스무드', '밸런스', '미스트', '실크', '파스텔', '클래식', '엘레강스']
 };
 
+const COMBO_NAMES_EN = {
+    preppy: ['Campus', 'Classic', 'Summer', 'Autumn', 'New England', 'Ivy', 'Chic', 'Holiday', 'Boston', 'Modern', 'Soft', 'Bold', 'Cozy', 'Fresh', 'Rich', 'Sporty', 'Natural', 'Winter', 'Prep', 'Elegance'],
+    ivy: ['Classic', 'Campus', 'Trad', 'British', 'Autumn', 'Modern', 'Chic', 'Cozy', 'Warm', 'Natural', 'Cool', 'Soft', 'Smart', 'Vintage', 'Fresh', 'Rich', 'Bold', 'Setup', 'Urban', 'Luxe'],
+    dandy: ['Classic', 'Modern', 'Setup', 'Chic', 'Soft', 'Warm', 'Cool', 'Autumn', 'Natural', 'Luxe', 'Vintage', 'Smart', 'Bold', 'Rich', 'Cozy', 'Fresh', 'Urban', 'Fall', 'Winter', 'Night'],
+    oldmoney: ['Classic', 'Chic', 'Luxe', 'Modern', 'Casual', 'Soft', 'Warm', 'Cool', 'Natural', 'Cozy', 'Autumn', 'Smart', 'Bold', 'Rich', 'Urban', 'Fall', 'Vintage', 'Setup', 'Winter', 'Night'],
+    ralphlook: ['Classic', 'Summer', 'Autumn', 'Prep', 'Casual', 'Modern', 'Chic', 'Sporty', 'Soft', 'Cozy', 'Warm', 'Cool', 'Bold', 'Rich', 'Natural', 'Urban', 'Vintage', 'Fresh', 'Setup', 'Luxe'],
+    minimal: ['Classic', 'Modern', 'Soft', 'Cool', 'Warm', 'Chic', 'Cozy', 'Urban', 'Natural', 'Luxe', 'Vintage', 'Smart', 'Bold', 'Fresh', 'Autumn', 'Mono', 'Setup', 'Fall', 'Winter', 'Night'],
+    casual: ['Daily', 'Weekend', 'Relaxed', 'Easy', 'Comfy', 'Smart', 'Bright', 'Clean', 'Cool', 'Warm', 'Natural', 'Spring', 'Summer', 'Autumn', 'Winter', 'Playful', 'Sense', 'Toned', 'Modern', 'Fresh'],
+    cityboy: ['City', 'Urban', 'Bridge', 'Neutral', 'Pastel', 'Natural', 'Clean', 'Soft', 'Mist', 'Faded', 'Light', 'Cool', 'Smooth', 'Easy', 'Fresh', 'Style', 'Modern', 'Casual', 'Day', 'Street'],
+    normcore: ['Normal', 'Basic', 'Plain', 'Easy', 'Simple', 'Clean', 'Mood', 'Flat', 'Standard', 'Default', 'Blank', 'Peace', 'Still', 'Pure', 'Natural', 'Origin', 'Neutral', 'Balance', 'Mono', 'Classic'],
+    athleisure: ['Active', 'Sporty', 'Running', 'Workout', 'Relaxed', 'Training', 'Modern', 'Clean', 'Dynamic', 'Flex', 'Energy', 'Easy', 'Free', 'Grip', 'Cool', 'Track', 'Cozy', 'Refresh', 'Flow', 'Style'],
+    amekaji: ['Vintage', 'Classic', 'Denim', 'Western', 'Work', 'Rustic', 'Original', 'Old School', 'Cowboy', 'Tommy', 'Leather', 'Corduroy', 'Camping', 'Retro', 'Serge', 'Natural', 'Heritage', 'Indigo', 'Brown', 'Cozy'],
+    workwear: ['Walker', 'Builder', 'Coverall', 'Utility', 'Canvas', 'Tough', 'Solid', 'Forge', 'Ground', 'Heavy', 'Digging', 'Urban', 'Classic', 'Rustic', 'Natural', 'Modern', 'Cozy', 'Warm', 'Cool', 'Real'],
+    military: ['Military', 'Commander', 'Patrol', 'Camo', 'Officer', 'Utility', 'Ranger', 'Scout', 'Force', 'Shield', 'Green', 'Soldier', 'Alpha', 'Defense', 'Mission', 'Tactical', 'Supply', 'Cozy', 'Warm', 'Classic'],
+    british: ['Classic', 'Tweed', 'Country', 'Edinburgh', 'London', 'Carlisle', 'Check', 'Heritage', 'Manor', 'Wood', 'Forest', 'Castle', 'Royal', 'Olive', 'Green', 'Washington', 'Cozy', 'Warm', 'Natural', 'Rich'],
+    gorpcore: ['Trail', 'Summit', 'Camp', 'Ridge', 'Valley', 'Hiking', 'Alpine', 'Outdoor', 'Forest', 'Sierra', 'Stone', 'Eco', 'Natural', 'Free', 'Grip', 'Urban', 'Modern', 'Cozy', 'Warm', 'Active'],
+    street: ['Urban', 'Block', 'Crew', 'Wave', 'Graffiti', 'Kicks', 'Rebel', 'Stone', 'One', 'Flow', 'Beat', 'Style', 'Punk', 'Board', 'Lit', 'Fresh', 'Loud', 'Smash', 'Vibe', 'Free'],
+    grunge: ['Grunge', 'Nirvana', 'Alice', 'Seattle', 'Blur', 'Distortion', 'Riff', 'Amp', 'Punk', 'Dark', 'Rebel', 'Raw', 'Vintage', 'Wasted', 'Moss', 'Rock', 'Couch', 'Cobalt', 'Shadow', 'Rust'],
+    contemporary: ['Modern', 'Urban', 'Structure', 'Decon', 'Art', 'Gallery', 'Space', 'Edge', 'Volume', 'Line', 'Angle', 'Form', 'Minimal', 'Inter', 'Neo', 'Archi', 'Pure', 'Sense', 'Cool', 'Chic'],
+    techwear: ['Blackout', 'Cyber', 'Shadow', 'Neo', 'Ghost', 'Stealth', 'Dark', 'Night', 'Code', 'Matrix', 'Glitch', 'Vector', 'Onyx', 'Volt', 'Graphite', 'Carbon', 'Logic', 'Spec', 'Flux', 'Core'],
+    genderless: ['Fluid', 'Neutral', 'Free', 'Open', 'Blank', 'Soft', 'Faded', 'Light', 'Pure', 'Essence', 'Clean', 'Easy', 'Modern', 'Smooth', 'Balance', 'Mist', 'Silk', 'Pastel', 'Classic', 'Elegance']
+};
+
+export function getComboNames(): Record<string, string[]> {
+    return i18n.language === 'ko' ? COMBO_NAMES_KO : COMBO_NAMES_EN;
+}
+
 export function generateTip(o, style, layerType) {
     const ld = LAYER_DEFS[layerType];
     const pk = ld.partKeys;
     const firstBody = pk[0];
-    const firstColor = COLORS_60[o[firstBody]]?.name || o[firstBody];
-    const topColor = COLORS_60[o.top]?.name || o.top || '';
-    const tn = TECH_TAG_MAP[o.technique] || o.technique;
+    const firstColor = getColorName(o[firstBody]);
+    const topColor = getColorName(o.top) || '';
+    const tn = techTagName(o.technique) || o.technique;
 
+    const styleName = i18n.t('styles:guide.' + style + '.name', { defaultValue: STYLE_MOODS[style]?.nameKo || style });
     const tips = [
-        firstColor + '과(와) ' + topColor + '의 ' + tn + ' 조합으로 세련된 룩',
-        tn + ' 연출로 완성하는 ' + (STYLE_MOODS[style]?.nameKo || style) + ' 스타일',
-        firstColor + ' 위주의 배색으로 분위기 있는 코디 완성',
-        topColor + '을(를) 포인트로 활용한 감각적인 스타일링',
-        pk.length + '부위 레이어드로 깊이감 있는 ' + tn + ' 코디',
+        i18n.t('recommend.tips.tip1', { color1: firstColor, color2: topColor, technique: tn }),
+        i18n.t('recommend.tips.tip2', { technique: tn, style: styleName }),
+        i18n.t('recommend.tips.tip3', { color: firstColor }),
+        i18n.t('recommend.tips.tip4', { color: topColor }),
+        i18n.t('recommend.tips.tip5', { count: pk.length, technique: tn }),
     ];
     return tips[Math.floor(Math.random() * tips.length)];
 }
@@ -1171,7 +1196,8 @@ export function genOneLayeredPinnedRelaxed(style, layerType, pinned) {
 
 // Convert raw outfits to combo format
 export function outfitsToComboFormat(outfits, style, layerType) {
-    var names = COMBO_NAMES[style] || COMBO_NAMES.casual;
+    var cn = getComboNames();
+    var names = cn[style] || cn.casual;
     var ld = LAYER_DEFS[layerType];
     return outfits.map(function (o, i) {
         var outfit = {};
@@ -1182,9 +1208,9 @@ export function outfitsToComboFormat(outfits, style, layerType) {
         var finalScore = evalResult ? evalResult.total : (o.score ? o.score.total : 0);
         return {
             id: style + '_' + layerType + '_' + String(i + 1).padStart(2, '0'),
-            name: (names[i % names.length] || ('스타일 ' + (i + 1))) + ' ' + (STYLE_MOODS[style]?.nameKo || style),
+            name: (names[i % names.length] || (i18n.t('recommend.stylePrefix') + ' ' + (i + 1))) + ' ' + i18n.t('styles:guide.' + style + '.name', { defaultValue: STYLE_MOODS[style]?.nameKo || style }),
             outfit: outfit,
-            tags: [TECH_TAG_MAP[o.technique] || o.technique],
+            tags: [techTagName(o.technique) || o.technique],
             tip: generateTip(o, style, layerType),
             score: finalScore,
             evalResult: evalResult || null,

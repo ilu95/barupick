@@ -70,7 +70,7 @@ export function getScorePercentile(score: number): { percentile: number; label: 
     const percentile = Math.round((below / scores.length) * 100)
     const topPct = 100 - percentile
 
-    if (topPct <= 50) return { percentile: topPct, label: `상위 ${topPct}%` }
+    if (topPct <= 50) return { percentile: topPct, label: `Top ${topPct}%` }
     return null  // 하위 50%는 표시 안 함
   } catch {
     return null
