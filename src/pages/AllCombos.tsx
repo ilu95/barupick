@@ -374,7 +374,7 @@ export default function AllCombos() {
                     combo.score >= 85 ? 'text-green-600 dark:text-green-400' :
                     combo.score >= 70 ? 'text-warm-800 dark:text-warm-200' :
                     'text-warm-500 dark:text-warm-400'
-                  }`}>{combo.score}점</span>
+                  }`}>{t('common.score', { score: combo.score })}</span>
                   {pct && <span className="text-[9px] font-semibold bg-terra-100 text-terra-600 dark:bg-terra-900/30 dark:text-terra-400 px-1.5 py-0.5 rounded-full">{pct.label}</span>}
                 </div>
               </div>

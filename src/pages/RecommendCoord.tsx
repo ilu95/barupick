@@ -359,7 +359,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`font-display text-lg font-bold ${
                     combo.score >= 85 ? 'text-green-600 dark:text-green-400' : combo.score >= 70 ? 'text-warm-800 dark:text-warm-200' : 'text-warm-500'
-                  }`}>{combo.score}점</span>
+                  }`}>{t('common.score', { score: combo.score })}</span>
                   {combo.tags?.[0] && <span className="text-[9px] bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 px-1.5 py-0.5 rounded-full">{combo.tags[0]}</span>}
                 </div>
                 <div className="flex gap-1">

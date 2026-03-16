@@ -196,7 +196,7 @@ function CoordCard({ result, rank, total, navigate }: {
         </div>
         <div className="flex items-center gap-2">
           <span className={`font-display text-xl font-bold ${scoreColor} px-2.5 py-0.5 rounded-lg border`}>
-            {result.adjustedScore}점
+            {t('common.score', { score: result.adjustedScore })}
           </span>
           {pct && (
             <span className="text-[10px] font-semibold bg-terra-100 text-terra-600 dark:bg-terra-900/30 dark:text-terra-400 px-2 py-0.5 rounded-full">{pct.label}</span>

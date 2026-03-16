@@ -134,7 +134,7 @@ export default function OotdCalendar() {
                 </div>
               )}
               {hasRecords && bestRecord && (
-                <div className="text-[7px] font-bold text-terra-600 dark:text-terra-400 mt-[1px]">{bestRecord.score}점</div>
+                <div className="text-[7px] font-bold text-terra-600 dark:text-terra-400 mt-[1px]">{t('common.score', { score: bestRecord.score })}</div>
               )}
 
               {day.records.length > 1 && (
@@ -245,7 +245,7 @@ function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate
         <div className="px-2.5 py-2">
           <div className="flex items-center justify-between mb-0.5">
             <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
-            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{t('common.score', { score: record.score })}</span>
           </div>
           <div className="flex gap-0.5">
             {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
@@ -269,7 +269,7 @@ function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate
       <div className="px-2.5 py-2">
         <div className="flex items-center justify-between mb-0.5">
           <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
-          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{t('common.score', { score: record.score })}</span>
         </div>
         <div className="flex gap-0.5">
           {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {

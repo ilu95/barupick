@@ -179,7 +179,7 @@ export default function OotdDetail() {
                   <MannequinSVG outfit={hex} size={60} />
                 )}
                 <div className="flex-1">
-                  <span className="font-display text-sm font-bold text-terra-600">{r.score}점</span>
+                  <span className="font-display text-sm font-bold text-terra-600">{t('common.score', { score: r.score })}</span>
                   {r.situation && <span className="text-[11px] text-warm-600 ml-2">{r.situation}</span>}
                   {r.memo && <div className="text-[11px] text-warm-500 truncate mt-0.5">{r.memo}</div>}
                 </div>

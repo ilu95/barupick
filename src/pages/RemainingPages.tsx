@@ -858,6 +858,7 @@ export function EventDetail() {
 // ─── 퍼스널컬러 선택 ───
 export function PcSelect() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const current = profile.getPersonalColor()
   const currentData = current ? (PERSONAL_COLOR_12 as any)[current] : null
   const [mode, setMode] = useState<'menu' | 'quiz' | 'result' | 'select'>('menu')
@@ -905,11 +906,11 @@ export function PcSelect() {
   if (mode === 'menu') {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">퍼스널컬러</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('pcSelect.title')}</h2>
 
         {currentData && (
           <div className="bg-terra-100 dark:bg-terra-900/30 border border-terra-200 dark:border-terra-800 rounded-2xl p-4 mb-5">
-            <div className="text-sm font-semibold text-terra-700 dark:text-terra-400 mb-0.5">현재 설정: {currentData.name}</div>
+            <div className="text-sm font-semibold text-terra-700 dark:text-terra-400 mb-0.5">{t('pcSelect.currentSetting', { name: currentData.name })}</div>
             <div className="text-[11px] text-warm-600 dark:text-warm-400">{currentData.description || ''}</div>
             {currentData.bestColors && (
               <div className="flex gap-1 mt-2">
@@ -921,7 +922,7 @@ export function PcSelect() {
           </div>
         )}
 
-        {!currentData && <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">퍼스널컬러를 설정하면 맞춤 추천을 받을 수 있어요</p>}
+        {!currentData && <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('pcSelect.noSettingDesc')}</p>}
 
         <div className="flex flex-col gap-3 mb-5">
           <button onClick={() => { setQuizStep(0); setScores({}); setMode('quiz') }} className="w-full flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 text-left shadow-warm-sm active:scale-[0.98] transition-all">
@@ -929,8 +930,8 @@ export function PcSelect() {
               <HelpCircle size={24} className="text-terra-600 dark:text-terra-400" />
             </div>
             <div>
-              <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">셀프 진단</div>
-              <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{questions.length}개 질문으로 내 퍼스널컬러 찾기</div>
+              <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('pcSelect.selfDiagnosis')}</div>
+              <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('pcSelect.selfDiagnosisDesc', { count: questions.length })}</div>
             </div>
           </button>
 
@@ -939,8 +940,8 @@ export function PcSelect() {
               <span className="text-2xl">💡</span>
             </div>
             <div>
-              <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">빛 진단</div>
-              <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">자연광에서 직접 비교하는 정밀 진단</div>
+              <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('pcSelect.lightDiagnosis')}</div>
+              <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('pcSelect.lightDiagnosisDesc')}</div>
             </div>
           </button>
 
@@ -949,8 +950,8 @@ export function PcSelect() {
               <Palette size={24} className="text-warm-700 dark:text-warm-300" />
             </div>
             <div>
-              <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">직접 선택</div>
-              <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">이미 알고 있다면 12계절 중 선택</div>
+              <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('pcSelect.directSelect')}</div>
+              <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('pcSelect.directSelectDesc')}</div>
             </div>
           </button>
         </div>
@@ -967,7 +968,7 @@ export function PcSelect() {
     return (
       <div className="animate-screen-enter px-5 pt-2 pb-10">
         <button onClick={() => { if (quizStep > 0) setQuizStep(quizStep - 1); else setMode('menu') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-          <ArrowLeft size={16} /> {quizStep > 0 ? '이전 질문' : '뒤로'}
+          <ArrowLeft size={16} /> {quizStep > 0 ? t('pcSelect.prevQuestion') : t('common.back')}
         </button>
 
         <div className="h-1.5 bg-warm-300 dark:bg-warm-700 rounded-full mb-5">
@@ -1010,7 +1011,7 @@ export function PcSelect() {
         {/* 추천 컬러 팔레트 */}
         {(displayData?.bestColors || displayData?.colors) && (
           <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm">
-            <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-3">추천 컬러</div>
+            <div className="text-xs font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-3">{t('pcLight.bestColors')}</div>
             <div className="flex gap-2 flex-wrap">
               {(displayData.bestColors || displayData.colors || []).slice(0, 10).map((ck: string) => {
                 const c = COLORS_60[ck]
