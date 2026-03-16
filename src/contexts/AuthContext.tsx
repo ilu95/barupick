@@ -158,35 +158,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // ── OAuth 플로우 (skipBrowserRedirect로 에러 사전 감지) ──
-    const redirectTo = isNative
-      ? 'https://barupick.vercel.app/auth/callback.html'
-      : window.location.origin + '/auth/callback'
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo,
-        skipBrowserRedirect: true,
-      }
-    })
-
-    if (error) throw error
-    if (!data?.url) throw new Error('OAuth URL을 생성할 수 없습니다')
-
+    // ── 기존 OAuth 플로우 (웹 + fallback) ──
     if (isNative) {
-      try {
-        const cap = (window as any).Capacitor
-        if (cap?.Plugins?.Browser) {
-          await cap.Plugins.Browser.open({ url: data.url, presentationStyle: 'popover' })
-        } else {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: 'https://barupick.vercel.app/auth/callback.html',
+          skipBrowserRedirect: true,
+        }
+      })
+      if (error) throw error
+      if (data?.url) {
+        try {
+          const cap = (window as any).Capacitor
+          if (cap?.Plugins?.Browser) {
+            await cap.Plugins.Browser.open({ url: data.url, presentationStyle: 'popover' })
+          } else {
+            window.location.href = data.url
+          }
+        } catch {
           window.location.href = data.url
         }
-      } catch {
-        window.location.href = data.url
       }
     } else {
-      window.location.href = data.url
+      // 웹: Supabase 자동 리다이렉트 (작동 확인된 방식)
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + '/home',
+        }
+      })
+      if (error) throw error
     }
   }
 
