@@ -565,11 +565,56 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
             )
           })}
         </div>
-        {editingPart && (
+        {editingPart && (() => {
+          const scoredColors = Object.keys(COLORS_60)
+            .filter(k => k !== currentOutfit[editingPart])
+            .map(k => {
+              try {
+                const testOutfit = { ...currentOutfit, [editingPart]: k }
+                const pc = profile.getPersonalColor()
+                const newScore = evaluationSystem.evaluate(testOutfit, pc).total
+                return { key: k, delta: Math.round(newScore - finalScore) }
+              } catch { return { key: k, delta: 0 } }
+            })
+            .sort((a, b) => b.delta - a.delta)
+          const topColors = scoredColors.slice(0, 10)
+
+          return (
           <div className="mt-2 animate-screen-fade">
             <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">
               {getPickedPartLabel(editingPart, rec.state.pickedItems)} 색상 변경
             </div>
+
+            {/* 추천 색상 */}
+            {topColors.length > 0 && (
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">추천 색상</div>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5 mb-3">
+                  {topColors.map(rec => {
+                    const c = COLORS_60[rec.key]
+                    if (!c) return null
+                    const light = c.hcl[2] > 55
+                    return (
+                      <button key={rec.key} onClick={() => {
+                          setEditedOutfit(prev => ({ ...(prev || combo.outfit), [editingPart]: rec.key }))
+                        }}
+                        className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90 ${
+                          currentOutfit[editingPart] === rec.key ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
+                        }`}
+                        style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
+                        {c.name}
+                        {rec.delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{rec.delta}</span>}
+                        {rec.delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{rec.delta}</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+
+            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{topColors.length > 0 ? '전체 색상' : '색상'}</div>
             <ColorPicker
               inline
               selected={currentOutfit[editingPart]}
@@ -595,7 +640,8 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
               </div>
             )}
           </div>
-        )}
+          )
+        })()}
       </div>
 
       {/* 뒤로 */}
