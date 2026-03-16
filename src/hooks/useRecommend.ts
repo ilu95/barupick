@@ -125,9 +125,11 @@ export function useRecommend() {
   }, [searchParams])
 
   const pushStep = useCallback((next: RecStep) => {
-    setHistory(prev => [...prev, step])
-    setStep(next)
-  }, [step])
+    setStep(prev => {
+      setHistory(h => [...h, prev])
+      return next
+    })
+  }, [])
 
   const goBack = useCallback(() => {
     setHistory(prev => {

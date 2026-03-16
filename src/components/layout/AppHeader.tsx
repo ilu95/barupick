@@ -58,6 +58,9 @@ const HIDDEN_ROUTES = ['/onboarding', '/pc-light']
 // 뒤로가기 시 홈으로 보낼 최상위 탭 경로
 const ROOT_PATHS = ['/', '/home', '/closet', '/record', '/community', '/shop', '/profile']
 
+// 내부 단계 네비게이션이 있는 워크플로우 경로 — 헤더에 홈 버튼 표시
+const WORKFLOW_PATHS = ['/home/build', '/home/build/improve', '/home/evaluate', '/home/recommend', '/closet/coord', '/community/post']
+
 function resolveTitleKey(pathname: string): string {
   // 1. 정확한 매핑
   if (TITLE_KEYS[pathname]) return TITLE_KEYS[pathname]
@@ -82,11 +85,14 @@ export default function AppHeader() {
 
   // 최상위 탭이 아니면 항상 뒤로가기 표시
   const isRootTab = ROOT_PATHS.includes(pathname)
+  const isWorkflow = WORKFLOW_PATHS.includes(pathname)
   const showBack = !isRootTab
 
   const handleBack = () => {
-    // history에 이전 페이지가 있으면 뒤로, 없으면 홈으로
-    if (window.history.state?.idx > 0) {
+    if (isWorkflow) {
+      // 워크플로우 페이지: 항상 홈으로 이동
+      navigate('/home', { replace: true })
+    } else if (window.history.state?.idx > 0) {
       navigate(-1)
     } else {
       navigate('/home', { replace: true })
@@ -101,14 +107,14 @@ export default function AppHeader() {
         paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))',
       }}
     >
-      {/* 뒤로가기 */}
+      {/* 뒤로가기 / 홈 */}
       {showBack && (
         <button
           onClick={handleBack}
-          aria-label={t('common.back')}
+          aria-label={isWorkflow ? t('header.home') : t('common.back')}
           className="w-9 h-9 rounded-full bg-white/80 dark:bg-warm-800/80 flex items-center justify-center shadow-warm-sm active:scale-90 transition-transform"
         >
-          <ChevronLeft size={20} strokeWidth={2.5} />
+          {isWorkflow ? <Home size={18} strokeWidth={2} /> : <ChevronLeft size={20} strokeWidth={2.5} />}
         </button>
       )}
 
