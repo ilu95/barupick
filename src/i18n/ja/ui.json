@@ -173,7 +173,13 @@
     "signupFailed": "登録失敗",
     "signupSuccess": "登録完了！メールをご確認ください",
     "forgotPassword": "パスワードをお忘れですか？",
-    "and": "および"
+    "and": "および",
+    "providerNotEnabled": "現在このログイン方法は準備中です。\nメールまたは他のSNSログインをご利用ください。",
+    "callbackFailed": "ログイン処理中に問題が発生しました。\nもう一度お試しください。",
+    "accessDenied": "ログインがキャンセルされました。",
+    "loggingIn": "ログイン中...",
+    "backToLogin": "ログインに戻る",
+    "kakaoPrivateRelay": "iCloudプライベートリレーを使用している場合、\n設定→iCloud→プライベートリレーをオフにしてから再試行してください。"
   },
   "settings": {
     "display": "ディスプレイ",

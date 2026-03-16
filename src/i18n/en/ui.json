@@ -173,7 +173,13 @@
     "signupFailed": "Sign up failed",
     "signupSuccess": "Account created! Please check your email",
     "forgotPassword": "Forgot your password?",
-    "and": "&"
+    "and": "&",
+    "providerNotEnabled": "This login method is currently unavailable.\nPlease use email or another social login.",
+    "callbackFailed": "Something went wrong during login.\nPlease try again.",
+    "accessDenied": "Login was cancelled.",
+    "loggingIn": "Logging in...",
+    "backToLogin": "Back to login",
+    "kakaoPrivateRelay": "If you're using iCloud Private Relay,\ngo to Settings → iCloud → Private Relay and turn it off, then try again."
   },
   "settings": {
     "display": "Display",
