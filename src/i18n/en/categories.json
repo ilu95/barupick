@@ -184,6 +184,8 @@
     "shirt": "Shirt",
     "tshirt": "T-Shirt",
     "scarf": "Scarf",
-    "hat": "Hat"
+    "hat": "Hat",
+    "bottom": "Bottom",
+    "shoes": "Shoes"
   }
 }

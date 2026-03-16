@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, Check, ShoppingBag } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
@@ -334,7 +334,7 @@ export default function AllCombos() {
           {wardrobeColorItems.slice(0, 10).map(item => {
             const c = COLORS_60[item.color || item.colorKey]
             if (!c) return null
-            return <option key={item.id} value={item.color || item.colorKey}>{t('allCombos.includes', { name: c.name })}</option>
+            return <option key={item.id} value={item.color || item.colorKey}>{t('allCombos.includes', { name: getColorName(item.color || item.colorKey) })}</option>
           })}
         </select>
       </div>
@@ -392,7 +392,7 @@ export default function AllCombos() {
                       <div key={part} className="flex items-center gap-1.5 text-[11px]">
                         <span className="w-3.5 h-3.5 rounded border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
                         <span className="text-warm-500 dark:text-warm-400 w-8">{t('categories:names.' + part).slice(0, 2)}</span>
-                        <span className="text-warm-800 dark:text-warm-200 font-medium">{c.name}</span>
+                        <span className="text-warm-800 dark:text-warm-200 font-medium">{getColorName(colorKey)}</span>
                       </div>
                     )
                   })}
@@ -428,7 +428,7 @@ export default function AllCombos() {
                     return (
                       <div key={i} className="text-[10px] text-warm-600 dark:text-warm-400 flex items-center gap-1">
                         <span>{imp.icon || '💡'}</span>
-                        <span>{t('allCombos.improveSuggestion', { part: t('categories:names.' + imp.item).slice(0, 2), color: newC?.name || imp.newColor, score: imp.newScore })}</span>
+                        <span>{t('allCombos.improveSuggestion', { part: t('categories:names.' + imp.item).slice(0, 2), color: getColorName(imp.newColor), score: imp.newScore })}</span>
                         {newC && <span className="w-2.5 h-2.5 rounded inline-block border border-warm-300" style={{ background: newC.hex }} />}
                       </div>
                     )

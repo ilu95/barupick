@@ -10,6 +10,7 @@ import { CATEGORY_NAMES } from '@/lib/categories'
 import { PERSONAL_COLOR_12 } from '@/lib/personalColor'
 import { BODY_GUIDE_DATA } from '@/lib/bodyType'
 import { profile } from '@/lib/profile'
+import i18n from '@/i18n'
 import { evaluationSystem } from '@/lib/evaluation'
 import { calculateHarmonyV6 } from '@/lib/recommend'
 
@@ -69,11 +70,11 @@ export function getSlotKey(idx: number, total: number, layer: { outerness: numbe
 export function getSlotLabel(idx: number, total: number, layer: { outerness: number; itemId: string }): string {
   const slot = getSlotKey(idx, total, layer)
   if (total === 1) {
-    if (slot === 'outer') return '바깥'
-    if (slot === 'middleware') return '중간'
+    if (slot === 'outer') return i18n.t('build.slot.outer')
+    if (slot === 'middleware') return i18n.t('build.slot.middleware')
     return ''
   }
-  const LABELS: Record<string, string> = { outer: '바깥', middleware: '중간', top: '안쪽', inner: '안쪽(속)', hidden: '' }
+  const LABELS: Record<string, string> = { outer: i18n.t('build.slot.outer'), middleware: i18n.t('build.slot.middleware'), top: i18n.t('build.slot.top'), inner: i18n.t('build.slot.inner'), hidden: '' }
   return LABELS[slot] || ''
 }
 
@@ -338,7 +339,7 @@ export function useBuild(mode: BuildMode = 'coord') {
       if (isFaceNear && bestColors.length > 0) {
         bestColors.forEach(k => {
           const bm = checkBodyMatch(bodyRule, k)
-          recs.push({ key: k, score: 100 + (bm ? 15 : 0), reason: bm ? '퍼스널컬러 + 체형' : '퍼스널컬러', badges: { pc: true, body: bm } })
+          recs.push({ key: k, score: 100 + (bm ? 15 : 0), reason: bm ? i18n.t('build.reason.pcAndBody') : i18n.t('build.reason.pc'), badges: { pc: true, body: bm } })
           seen.add(k)
         })
       }
@@ -347,7 +348,7 @@ export function useBuild(mode: BuildMode = 'coord') {
         Object.keys(COLORS_60).forEach(k => {
           if (seen.has(k) || avoidColors.includes(k)) return
           const bm = checkBodyMatch(bodyRule, k)
-          if (bm) { recs.push({ key: k, score: 80 + (COMMON_WARDROBE[k] || 0), reason: '체형 보완', badges: { pc: false, body: true } }); seen.add(k) }
+          if (bm) { recs.push({ key: k, score: 80 + (COMMON_WARDROBE[k] || 0), reason: i18n.t('build.reason.body'), badges: { pc: false, body: true } }); seen.add(k) }
         })
       }
 
@@ -359,7 +360,7 @@ export function useBuild(mode: BuildMode = 'coord') {
             if (seen.has(k) || avoidColors.includes(k) || !COLORS_60[k]) return
             const bm = checkBodyMatch(bodyRule, k)
             const pcm = isFaceNear && bestColors.includes(k)
-            recs.push({ key: k, score: 70 + (pcm ? 15 : 0) + (bm ? 10 : 0) + (COMMON_WARDROBE[k] || 0), reason: '스타일 추천', badges: { pc: pcm, body: bm } })
+            recs.push({ key: k, score: 70 + (pcm ? 15 : 0) + (bm ? 10 : 0) + (COMMON_WARDROBE[k] || 0), reason: i18n.t('build.reason.style'), badges: { pc: pcm, body: bm } })
             seen.add(k)
           })
         }
@@ -368,7 +369,7 @@ export function useBuild(mode: BuildMode = 'coord') {
       Object.entries(COMMON_WARDROBE).forEach(([k, v]) => {
         if (seen.has(k) || avoidColors.includes(k)) return
         const bm = checkBodyMatch(bodyRule, k)
-        recs.push({ key: k, score: v + (bm ? 10 : 0), reason: '기본 아이템', badges: { pc: false, body: bm } })
+        recs.push({ key: k, score: v + (bm ? 10 : 0), reason: i18n.t('build.reason.basic'), badges: { pc: false, body: bm } })
         seen.add(k)
       })
 
@@ -390,7 +391,7 @@ export function useBuild(mode: BuildMode = 'coord') {
       if (pcAvoid) avgScore -= 20
       if (bm) avgScore += 10
       avgScore += (COMMON_WARDROBE[targetKey] || 0) * 0.3
-      const reason = pcMatch && bm ? '퍼스널컬러 + 체형' : pcMatch ? '퍼스널컬러' : bm ? '체형 보완' : '컬러 조화'
+      const reason = pcMatch && bm ? i18n.t('build.reason.pcAndBody') : pcMatch ? i18n.t('build.reason.pc') : bm ? i18n.t('build.reason.body') : i18n.t('build.reason.harmony')
       recs.push({ key: targetKey, score: avgScore, reason, badges: { pc: pcMatch, body: bm } })
     })
     return recs.sort((a, b) => b.score - a.score).slice(0, 20)

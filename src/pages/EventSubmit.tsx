@@ -5,7 +5,7 @@ import { Camera, Check, AlertTriangle } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import CropOverlay from '@/components/ui/CropOverlay'
 import ColorPicker from '@/components/ui/ColorPicker'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { STYLE_GUIDE } from '@/lib/styles'
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { supabase } from '@/lib/supabase'
@@ -157,7 +157,7 @@ export default function EventSubmit() {
                 {!c && <span className="text-warm-400 text-xs">+</span>}
               </div>
               <div className={`text-[11px] font-semibold ${c ? 'text-terra-600' : 'text-warm-500'}`}>
-                {c ? c.name : (CATEGORY_NAMES as any)[part]}
+                {c ? getColorName(colors[part]) : t('categories:names.' + part)}
               </div>
               {c && (
                 <span onClick={(e) => { e.stopPropagation(); setColors(prev => ({ ...prev, [part]: null })) }}
@@ -203,7 +203,7 @@ export default function EventSubmit() {
         {Object.entries(STYLE_GUIDE).map(([k, v]) => (
           <button key={k} onClick={() => setStyle(style === k ? null : k)}
             className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${style === k ? 'bg-warm-800 text-white' : 'bg-warm-100 text-warm-600 active:scale-95'}`}>
-            {v.name.replace(/ 룩$/, '')}
+            {t('styles:guide.' + k + '.name').replace(/ 룩$/, '').replace(/ Look$/, '')}
           </button>
         ))}
       </div>

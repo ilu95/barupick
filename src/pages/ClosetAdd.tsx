@@ -7,11 +7,11 @@ import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { ITEMS_CATALOG } from '@/lib/styles'
 
-// ITEMS_CATALOG + 하의/신발 통합 목록
+// ITEMS_CATALOG + bottom/shoes combined list
 const ALL_ITEMS = [
   ...ITEMS_CATALOG,
-  { id: 'bottom', emoji: '👖', label: '하의', slot: 'bottom' },
-  { id: 'shoes',  emoji: '👞', label: '신발', slot: 'shoes' },
+  { id: 'bottom', emoji: '👖', slot: 'bottom' },
+  { id: 'shoes',  emoji: '👞', slot: 'shoes' },
 ]
 
 // 아이템 id → 저장용 category 매핑
@@ -110,7 +110,7 @@ export default function ClosetAdd() {
         itemType: selectedItem.id,
         color, colorKey: color,
         brand: brand.trim() || null,
-        name: itemName.trim() || selectedItem.label,
+        name: itemName.trim() || t('categories:itemsCatalog.' + selectedItem.id),
         photoThumb: photoThumb || null,
         createdAt: new Date().toISOString(),
       })
@@ -151,7 +151,7 @@ export default function ClosetAdd() {
       <div className="flex flex-wrap gap-2">
         {ALL_ITEMS.map(item => (
           <button key={item.id} onClick={() => setSelectedItem(item)} className={`px-3 py-2 rounded-full text-[12px] font-medium transition-all ${selectedItem?.id === item.id ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
-            {item.emoji} {item.label}
+            {item.emoji} {t('categories:itemsCatalog.' + item.id)}
           </button>
         ))}
       </div>
@@ -236,7 +236,7 @@ export default function ClosetAdd() {
                 return (
                   <button key={ck} onClick={() => setColor(ck)} className={`flex flex-col items-center gap-1 transition-all active:scale-90 ${sel ? 'scale-105' : ''}`}>
                     <div className={`w-12 h-12 rounded-xl border-2 ${sel ? 'border-terra-500 ring-2 ring-terra-300' : 'border-warm-400 dark:border-warm-600'}`} style={{ background: c.hex }} />
-                    <span className="text-[10px] text-warm-600 dark:text-warm-400 font-medium">{c.name}</span>
+                    <span className="text-[10px] text-warm-600 dark:text-warm-400 font-medium">{getColorName(ck)}</span>
                   </button>
                 )
               })}

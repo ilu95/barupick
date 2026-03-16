@@ -466,7 +466,21 @@
     "fabricDesc": "각 부위의 소재를 골라 궁합을 확인하세요",
     "points": "점",
     "alreadyGood": "이미 좋은 조합이에요!",
-    "feelsLabel": "체감"
+    "feelsLabel": "체감",
+    "slot": {
+      "outer": "바깥",
+      "middleware": "중간",
+      "top": "안쪽",
+      "inner": "안쪽(속)"
+    },
+    "reason": {
+      "pcAndBody": "퍼스널컬러 + 체형",
+      "pc": "퍼스널컬러",
+      "body": "체형 보완",
+      "style": "스타일 추천",
+      "basic": "기본 아이템",
+      "harmony": "컬러 조화"
+    }
   },
   "ootdRecord": {
     "situations": {
@@ -663,6 +677,12 @@
       "instagramPlaceholder": "@ 제외",
       "avatar": "프로필 사진",
       "saveSuccess": "프로필이 수정되었어요"
+    },
+    "fitLabel": {
+      "pcAndBody": "퍼스널 컬러 + 체형 보완 적용하기",
+      "pcOnly": "퍼스널 컬러 적용하기",
+      "bodyOnly": "체형 보완 적용하기",
+      "setup": "맞춤 설정하기"
     }
   },
   "profileSub": {

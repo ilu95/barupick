@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { COLORS_60, COLOR_TABS } from '@/lib/colors'
+import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { useTranslation } from 'react-i18next'
 
 interface Props {
@@ -76,7 +76,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
                     selected === k ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
                   }`}
                   style={{ background: c.hex, border: needsBorder ? '1px solid #ddd' : '1px solid rgba(0,0,0,0.06)' }}
-                  title={c.name}
+                  title={getColorName(k)}
                 />
               )
             })}
@@ -98,7 +98,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
             <div key={k} className="relative">
               <button
                 onClick={() => handleSelect(k)}
-                aria-label={c.name}
+                aria-label={getColorName(k)}
                 className={`w-full aspect-square rounded-xl flex items-center justify-center text-[8px] font-semibold leading-tight transition-all active:scale-90 ${
                   isSelected ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
                 }`}
@@ -108,7 +108,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
                   color: isLight ? '#1C1917' : '#ffffff',
                 }}
               >
-                <span className="text-center px-0.5">{breakName(c.name)}</span>
+                <span className="text-center px-0.5">{breakName(getColorName(k))}</span>
               </button>
               {delta !== 0 && (
                 <span className={`absolute -top-2 -right-2 text-[9px] font-bold px-1 py-0.5 rounded-full pointer-events-none ${
