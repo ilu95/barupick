@@ -880,7 +880,7 @@ export function PcSelect() {
       // 결과 계산 — 원본 answerPCQuiz 로직 포팅
       const s = newScores
       const isWarm = (s.warm || 0) > (s.cool || 0)
-      let season = isWarm
+      const season = isWarm
         ? ((s.spring || 0) > (s.autumn || 0) ? 'spring' : 'autumn')
         : ((s.summer || 0) > (s.winter || 0) ? 'summer' : 'winter')
 

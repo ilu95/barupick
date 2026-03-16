@@ -648,7 +648,7 @@ export const evaluationSystem = {
         const neutralKeys = ['white', 'ivory', 'beige', 'lightgray', 'gray', 'charcoal', 'black', 'cream', 'taupe', 'silver'];
 
         let warmCount = 0, coolCount = 0, neutralTempCount = 0;
-        let chromaticItems = [], neutralItems = [];
+        const chromaticItems = [], neutralItems = [];
         let totalL = 0, lValues = [];
 
         items.forEach(([item, colorKey]) => {
@@ -904,7 +904,7 @@ export const evaluationSystem = {
 // ============================================================
 // 퍼스널 컬러 빛 진단 데이터
 // ============================================================
-var PC_LIGHT_STEPS = {
+const PC_LIGHT_STEPS = {
     undertone: [
         { stepNum: 1, phase: "언더톤 진단", instruction: "같은 핑크인데 톤만 달라요\n피부가 깨끗해 보이는 쪽은?", tip: "💡 익숙한 쪽이 아니라 피부가 예뻐 보이는 쪽을 고르세요", leftColor: "#FFA898", rightColor: "#F8A0C0", leftDesc: "웜 핑크", rightDesc: "쿨 핑크", leftValue: "warm", rightValue: "cool" },
         { stepNum: 2, phase: "언더톤 진단", instruction: "같은 초록인데 톤만 달라요\n피부가 깨끗해 보이는 쪽은?", tip: "💡 색이 예쁜 쪽이 아니라 '내 피부'가 예뻐 보이는 쪽!", leftColor: "#B8E080", rightColor: "#80E0C0", leftDesc: "웜 그린", rightDesc: "쿨 그린", leftValue: "warm", rightValue: "cool" },
@@ -929,7 +929,7 @@ var PC_LIGHT_STEPS = {
 };
 
 // 빛 진단 결과 → PERSONAL_COLOR_12 매핑
-var PC_LIGHT_RESULT_MAP = {
+const PC_LIGHT_RESULT_MAP = {
     'warm_light_clear': 'spring_bright',
     'warm_light_muted': 'spring_light',
     'warm_deep_clear': 'autumn_true',

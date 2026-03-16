@@ -88,7 +88,7 @@ function pickWithLSpread(pool, n) {
 
 function pickShoe(style, ctx) {
     const pool = STYLE_MOODS[style].shoes;
-    const ok = pool.filter(s => { let c = ctx.filter(x => x === s).length; return c < 2 });
+    const ok = pool.filter(s => { const c = ctx.filter(x => x === s).length; return c < 2 });
     return pick(ok.length ? ok : pool);
 }
 
@@ -132,7 +132,7 @@ const TECHNIQUES = {
             const m = STYLE_MOODS[style], all = [...m.darks, ...m.mids, ...m.lights, ...m.pastels];
             const fams = Object.keys(COLOR_FAMILIES).filter(f => { const p = COLOR_FAMILIES[f].filter(c => all.includes(c)); return p.length >= 3 });
             if (!fams.length) return null;
-            let pool = COLOR_FAMILIES[pick(fams)].filter(c => all.includes(c)).sort((a, b) => L(a) - L(b));
+            const pool = COLOR_FAMILIES[pick(fams)].filter(c => all.includes(c)).sort((a, b) => L(a) - L(b));
             if (pool.length < 3 || L(pool[pool.length - 1]) - L(pool[0]) < 25) return null;
             const colors = pick4Spread(pool);
             return assignPos(colors.sort((a, b) => L(a) - L(b)), pickShoe(style, colors));
@@ -767,7 +767,7 @@ function scoreCriticGeneric(o, style, layerType, pinnedKeys) {
     const ptPerColor = Math.floor(20 / n);
     let f5 = 0;
     ld.partKeys.forEach(function (k) {
-        var c = o[k]; if (!c) return;
+        const c = o[k]; if (!c) return;
         if (pSet.has(k)) { f5 += ptPerColor; }
         else { f5 += sp.has(c) ? ptPerColor : -1; }
     });
@@ -1069,12 +1069,12 @@ export function generateTip(o, style, layerType) {
 
 // Get available colors for a specific part+style
 export function getAvailableColors(style, partKey) {
-    var sm = STYLE_MOODS[style];
+    const sm = STYLE_MOODS[style];
     if (!sm) return [];
     if (partKey === 'shoes') return sm.shoes || [];
-    var pool = [].concat(sm.darks, sm.mids, sm.lights, sm.pastels, sm.accents);
+    const pool = [].concat(sm.darks, sm.mids, sm.lights, sm.pastels, sm.accents);
     // Remove duplicates
-    var seen = {};
+    const seen = {};
     return pool.filter(function (c) { if (seen[c]) return false; seen[c] = true; return true; });
 }
 
@@ -1082,27 +1082,27 @@ export function getAvailableColors(style, partKey) {
 export function genOneLayeredPinned(style, layerType, pinned) {
     layerType = layerType || 'basic';
     pinned = pinned || {};
-    var ld = LAYER_DEFS[layerType];
-    var pinKeys = Object.keys(pinned);
+    const ld = LAYER_DEFS[layerType];
+    const pinKeys = Object.keys(pinned);
 
-    for (var a = 0; a < 40; a++) {
+    for (let a = 0; a < 40; a++) {
         // 1) Generate base 4-part outfit
-        var tn = pickTech(style);
-        var base = TECHNIQUES[tn].compose(style);
+        const tn = pickTech(style);
+        const base = TECHNIQUES[tn].compose(style);
         if (!base || !base.outer || !base.top || !base.bottom || !base.shoes) continue;
         if (!COLORS[base.outer] || !COLORS[base.top] || !COLORS[base.bottom] || !COLORS[base.shoes]) continue;
 
         // 2) Adapt to target layer
-        var adapted = adaptToLayer(Object.assign({}, base, { technique: tn }), layerType, style);
+        const adapted = adaptToLayer(Object.assign({}, base, { technique: tn }), layerType, style);
 
         // 3) Apply pins — overwrite pinned parts
-        for (var pk in pinned) {
+        for (const pk in pinned) {
             adapted[pk] = pinned[pk];
         }
 
         // 4) Validate all colors exist
-        var allValid = true;
-        for (var k = 0; k < ld.partKeys.length; k++) {
+        let allValid = true;
+        for (let k = 0; k < ld.partKeys.length; k++) {
             if (!adapted[ld.partKeys[k]] || !COLORS[adapted[ld.partKeys[k]]]) { allValid = false; break; }
         }
         if (!allValid) continue;
@@ -1113,7 +1113,7 @@ export function genOneLayeredPinned(style, layerType, pinned) {
         }
 
         // 6) Critic score
-        var sc = scoreCriticGeneric(adapted, style, layerType, pinned);
+        const sc = scoreCriticGeneric(adapted, style, layerType, pinned);
         if (sc.total >= (pinKeys.length > 0 ? 40 : 50)) {
             return Object.assign({}, adapted, { technique: tn, score: sc });
         }
@@ -1125,29 +1125,29 @@ export function genOneLayeredPinned(style, layerType, pinned) {
 export function generateOutfitsWithPins(style, count, layerType, pinned) {
     layerType = layerType || 'basic';
     pinned = pinned || {};
-    var ld = LAYER_DEFS[layerType];
-    var outfits = [], seen = new Set(), osCount = {};
-    var att = 0, mx = count * 20;
-    var pinKeys = Object.keys(pinned);
-    var minScore = pinKeys.length > 0 ? 40 : 50;
+    const ld = LAYER_DEFS[layerType];
+    const outfits = [], seen = new Set(), osCount = {};
+    let att = 0, mx = count * 20;
+    const pinKeys = Object.keys(pinned);
+    const minScore = pinKeys.length > 0 ? 40 : 50;
 
     while (outfits.length < count && att < mx) {
         att++;
         var o = genOneLayeredPinned(style, layerType, pinned);
         if (!o) continue;
 
-        var key = ld.partKeys.map(function (k) { return o[k]; }).join('/');
+        const key = ld.partKeys.map(function (k) { return o[k]; }).join('/');
         if (seen.has(key)) continue;
 
         // Cluster limit
-        var outermost = o[ld.bodyKeys[0]];
-        var osk = outermost + '_' + o.shoes;
+        const outermost = o[ld.bodyKeys[0]];
+        const osk = outermost + '_' + o.shoes;
         osCount[osk] = (osCount[osk] || 0) + 1;
         if (osCount[osk] > 6) continue;
 
         // No 3 identical
         var cc = {};
-        ld.partKeys.forEach(function (k) { var c = o[k]; cc[c] = (cc[c] || 0) + 1; });
+        ld.partKeys.forEach(function (k) { const c = o[k]; cc[c] = (cc[c] || 0) + 1; });
         if (Object.values(cc).some(function (v) { return v >= 3; })) continue;
 
         seen.add(key);
@@ -1161,7 +1161,7 @@ export function generateOutfitsWithPins(style, count, layerType, pinned) {
             att++;
             var o2 = genOneLayeredPinnedRelaxed(style, layerType, pinned);
             if (!o2) continue;
-            var key2 = ld.partKeys.map(function (k) { return o2[k]; }).join('/');
+            const key2 = ld.partKeys.map(function (k) { return o2[k]; }).join('/');
             if (seen.has(key2)) continue;
             seen.add(key2);
             outfits.push(o2);
@@ -1173,20 +1173,20 @@ export function generateOutfitsWithPins(style, count, layerType, pinned) {
 
 // 스타일 필터 완전 해제 버전
 export function genOneLayeredPinnedRelaxed(style, layerType, pinned) {
-    var ld = LAYER_DEFS[layerType];
-    for (var a = 0; a < 60; a++) {
-        var tn = pickTech(style);
-        var base = TECHNIQUES[tn].compose(style);
+    const ld = LAYER_DEFS[layerType];
+    for (let a = 0; a < 60; a++) {
+        const tn = pickTech(style);
+        const base = TECHNIQUES[tn].compose(style);
         if (!base || !base.outer || !base.top || !base.bottom || !base.shoes) continue;
         if (!COLORS[base.outer] || !COLORS[base.top] || !COLORS[base.bottom] || !COLORS[base.shoes]) continue;
-        var adapted = adaptToLayer(Object.assign({}, base, { technique: tn }), layerType, style);
-        for (var pk in pinned) { adapted[pk] = pinned[pk]; }
-        var allValid = true;
-        for (var k = 0; k < ld.partKeys.length; k++) {
+        const adapted = adaptToLayer(Object.assign({}, base, { technique: tn }), layerType, style);
+        for (const pk in pinned) { adapted[pk] = pinned[pk]; }
+        let allValid = true;
+        for (let k = 0; k < ld.partKeys.length; k++) {
             if (!adapted[ld.partKeys[k]] || !COLORS[adapted[ld.partKeys[k]]]) { allValid = false; break; }
         }
         if (!allValid) continue;
-        var sc = scoreCriticGeneric(adapted, style, layerType, pinned);
+        const sc = scoreCriticGeneric(adapted, style, layerType, pinned);
         if (sc.total >= 20) {
             return Object.assign({}, adapted, { technique: tn, score: sc });
         }
@@ -1196,16 +1196,16 @@ export function genOneLayeredPinnedRelaxed(style, layerType, pinned) {
 
 // Convert raw outfits to combo format
 export function outfitsToComboFormat(outfits, style, layerType) {
-    var cn = getComboNames();
-    var names = cn[style] || cn.casual;
-    var ld = LAYER_DEFS[layerType];
+    const cn = getComboNames();
+    const names = cn[style] || cn.casual;
+    const ld = LAYER_DEFS[layerType];
     return outfits.map(function (o, i) {
-        var outfit = {};
+        const outfit = {};
         ld.partKeys.forEach(function (k) { outfit[k] = o[k]; });
         // evaluationSystem 점수로 통일 (카드/상세 동일)
-        var pc = profile.getPersonalColor();
-        var evalResult = evaluationSystem.evaluate(outfit, pc);
-        var finalScore = evalResult ? evalResult.total : (o.score ? o.score.total : 0);
+        const pc = profile.getPersonalColor();
+        const evalResult = evaluationSystem.evaluate(outfit, pc);
+        const finalScore = evalResult ? evalResult.total : (o.score ? o.score.total : 0);
         return {
             id: style + '_' + layerType + '_' + String(i + 1).padStart(2, '0'),
             name: (names[i % names.length] || (i18n.t('recommend.stylePrefix') + ' ' + (i + 1))) + ' ' + i18n.t('styles:guide.' + style + '.name', { defaultValue: STYLE_MOODS[style]?.nameKo || style }),
@@ -1222,7 +1222,7 @@ export function outfitsToComboFormat(outfits, style, layerType) {
 export function getDynamicCombos(style, layerType, count, pinned) {
     count = count || 48;
     pinned = pinned || {};
-    var outfits = generateOutfitsWithPins(style, count, layerType, pinned);
+    const outfits = generateOutfitsWithPins(style, count, layerType, pinned);
     return outfitsToComboFormat(outfits, style, layerType);
 }
 
@@ -1274,8 +1274,8 @@ export function calculateHarmonyV6(baseKey, targetKey) {
     const [h2, c2, l2] = target.hcl;
 
     let score = 0;
-    let reasons = [];
-    let penalties = [];
+    const reasons = [];
+    const penalties = [];
 
     const tone1 = getToneGroup(h1, c1, l1);
     const tone2 = getToneGroup(h2, c2, l2);

@@ -217,8 +217,8 @@ export const BODY_QUIZ_QUESTIONS = [
 ];
 
 function outfitToHex(outfit) {
-    var result = {};
-    for (var part in outfit) {
+    const result = {};
+    for (const part in outfit) {
         if (COLORS_60[outfit[part]]) {
             result[part] = COLORS_60[outfit[part]].hex;
         } else {
