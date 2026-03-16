@@ -1,0 +1,1436 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "analyzing": "分析中...",
+    "loginRequired": "ログインが必要です",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "close": "閉じる",
+    "back": "戻る",
+    "goBack": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "reset": "リセット",
+    "retry": "再試行",
+    "share": "シェア",
+    "download": "ダウンロード",
+    "done": "完了",
+    "send": "送信",
+    "search": "検索",
+    "all": "すべて",
+    "user": "ユーザー",
+    "justNow": "たった今",
+    "minutesAgo": "{{count}}分前",
+    "hoursAgo": "{{count}}時間前",
+    "daysAgo": "{{count}}日前",
+    "version": "バージョン",
+    "developer": "開発",
+    "developerName": "BaruPick",
+    "undo": "元に戻す",
+    "selectColor": "カラーを選択",
+    "recentColors": "最近使用",
+    "colorCount": "{{count}}色",
+    "follow": "フォロー",
+    "following": "フォロー中 ✓",
+    "friend": "👫 友達",
+    "mutualFriend": "👫 相互フォロー",
+    "blocked": "ブロック済み",
+    "unblock": "ブロック解除",
+    "block": "ブロック",
+    "report": "通報",
+    "coord": "コーデ",
+    "followers": "フォロワー",
+    "followingLabel": "フォロー中",
+    "public": "公開",
+    "friendOnly": "友達",
+    "private": "非公開",
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgoShort": "{{count}}日前",
+    "photo": "写真",
+    "mannequin": "マネキン",
+    "score": "{{score}}点",
+    "itemRegister": "アイテム登録",
+    "generateFailed": "生成失敗",
+    "addPhoto": "写真を追加"
+  },
+  "nav": {
+    "coord": "コーデ",
+    "closet": "クローゼット",
+    "record": "記録",
+    "community": "コミュ",
+    "shop": "ショップ"
+  },
+  "header": {
+    "home": "BaruPick",
+    "closet": "クローゼット",
+    "closetAdd": "アイテム登録",
+    "closetCoord": "手持ちでコーデ",
+    "closetCombos": "全組み合わせ",
+    "closetSimulate": "何を買えばいい？",
+    "closetReport": "クローゼットレポート",
+    "closetBest": "ベストコーデ",
+    "closetToday": "今日何着る？",
+    "record": "OOTD記録",
+    "calendar": "コーデカレンダー",
+    "community": "コミュニティ",
+    "communityPost": "コーデシェア",
+    "shop": "ショップ",
+    "profile": "マイ",
+    "profileEdit": "プロフィール編集",
+    "settings": "設定",
+    "notifications": "通知",
+    "recommend": "コーデ提案",
+    "build": "コーデを作る",
+    "weather": "天気コーデ",
+    "saved": "保存したコーデ",
+    "quiz": "スタイルクイズ",
+    "fabricGuide": "素材ガイド",
+    "bodyGuide": "体型別コーデ",
+    "personalColor": "パーソナルカラー",
+    "personalColorLight": "光診断",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "blockList": "ブロックリスト",
+    "devDiag": "接続診断",
+    "myLevel": "マイレベル",
+    "myBadges": "バッジコレクション",
+    "colorRanking": "カラー分析",
+    "colorPattern": "カラーパターン",
+    "challenges": "チャレンジ",
+    "titleExam": "称号試験",
+    "myPosts": "マイ投稿",
+    "insights": "インサイト",
+    "savedCoords": "保存したコーデ",
+    "userDiscover": "ユーザー検索",
+    "postInsight": "投稿分析",
+    "eventDetail": "イベント",
+    "eventSubmit": "イベント参加"
+  },
+  "onboarding": {
+    "slide1Title": "AIカラーコーデ",
+    "slide1Desc": "カラー調和アルゴリズムが最適なコーデを提案します",
+    "slide2Title": "OOTD記録",
+    "slide2Desc": "毎日のコーデを記録して成長をトラッキングしましょう",
+    "slide3Title": "スタイルコミュニティ",
+    "slide3Desc": "他のユーザーのコーデをチェックしてインスピレーションを",
+    "slide4Title": "パーソナルカラー＆体型",
+    "slide4Desc": "あなただけの診断結果でカスタム提案を受けましょう",
+    "start": "はじめる",
+    "skip": "スキップ"
+  },
+  "home": {
+    "greetingMorning": "おはようございます",
+    "greetingAfternoon": "こんにちは",
+    "greetingEvening": "こんばんは",
+    "weatherCard": "今日の天気",
+    "feelsLike": "体感 {{temp}}°C",
+    "recentOotd": "最近のOOTD",
+    "noRecords": "まだ記録がありません",
+    "personalColorBanner": "パーソナルカラーを設定するとカスタム提案が受けられます",
+    "setupNow": "設定する",
+    "wardrobeCombo": "クローゼットのコーデ組み合わせを見る",
+    "wardrobeComboItems": "{{count}}個のアイテム",
+    "mainCta": {
+      "recommend": "コーデ提案を受ける",
+      "build": "自分で作る",
+      "weather": "天気コーデ",
+      "saved": "保存したコーデ"
+    },
+    "guide": {
+      "fabricGuide": "素材ガイド",
+      "bodyGuide": "体型別コーデ",
+      "quiz": "クイズ"
+    }
+  },
+  "auth": {
+    "loginTitle": "ログイン",
+    "signupTitle": "新規登録",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "passwordConfirm": "パスワード確認",
+    "nickname": "ニックネーム",
+    "loginButton": "ログイン",
+    "signupButton": "新規登録",
+    "switchToSignup": "アカウントをお持ちでない方は 新規登録",
+    "switchToLogin": "すでにアカウントをお持ちの方は ログイン",
+    "kakaoLogin": "Kakaoログイン",
+    "googleLogin": "Googleログイン",
+    "agreement": "登録すると利用規約およびプライバシーポリシーに同意したものとみなされます",
+    "emailRequired": "メールアドレスを入力してください",
+    "emailInvalid": "正しいメールアドレスを入力してください",
+    "passwordRequired": "パスワードを入力してください",
+    "passwordMin": "パスワードは6文字以上で入力してください",
+    "passwordMismatch": "パスワードが一致しません",
+    "nicknameRequired": "ニックネームを入力してください",
+    "loginFailed": "ログイン失敗",
+    "signupFailed": "登録失敗",
+    "signupSuccess": "登録完了！メールをご確認ください",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "and": "および"
+  },
+  "settings": {
+    "display": "ディスプレイ",
+    "language": "言語",
+    "languageDesc": "アプリの表示言語を変更します",
+    "darkMode": "ダークモード",
+    "darkModeDesc": "目の疲れを軽減します",
+    "hideCounts": "いいね/保存数を隠す",
+    "hideCountsDesc": "自分の投稿のリアクション数を他のユーザーに非表示にします",
+    "data": "データ",
+    "autoSyncActive": "自動同期が有効",
+    "notSynced": "まだ同期されていません",
+    "syncJustNow": "たった今同期済み",
+    "syncMinutesAgo": "{{count}}分前に同期",
+    "syncHoursAgo": "{{count}}時間前に同期",
+    "syncDateFormat": "{{date}} 同期",
+    "syncNow": "今すぐ同期",
+    "syncNowDesc": "手動でサーバーと同期します",
+    "syncSuccess": "同期完了！",
+    "syncFailed": "同期失敗: {{error}}",
+    "exportData": "データエクスポート",
+    "exportDataDesc": "OOTD記録、クローゼット、保存したコーデをJSONでダウンロード",
+    "exportFailed": "エクスポート失敗: {{error}}",
+    "feedback": "フィードバックを送る",
+    "info": "情報",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "account": "アカウント",
+    "logout": "ログアウト",
+    "deleteAccount": "アカウント削除",
+    "deleteAccountTitle": "アカウント削除",
+    "deleteAccountMessage": "本当にアカウントを削除しますか？\n\n• すべてのコーデ記録が削除されます\n• コミュニティ投稿が削除されます\n• この操作は元に戻せません",
+    "deleteAccountContinue": "続ける",
+    "deleteAccountConfirmTitle": "最終確認",
+    "deleteAccountConfirmMessage": "確認のため「アカウント削除」と入力してください。",
+    "deleteAccountPlaceholder": "アカウント削除",
+    "deleteAccountValidation": "「アカウント削除」と正確に入力してください",
+    "deleteAccountSuccess": "アカウントが削除されました。ご利用ありがとうございました。",
+    "deleteAccountError": "アカウント削除中にエラー: {{error}}"
+  },
+  "feedbackModal": {
+    "title": "フィードバックを送る",
+    "typeBug": "🐛 バグ",
+    "typeFeature": "✨ 機能リクエスト",
+    "typeDesign": "🎨 デザイン",
+    "typeOther": "💡 その他",
+    "placeholder": "ご意見を自由にお書きください（最大1000文字）",
+    "typeRequired": "種類と内容を入力してください",
+    "sending": "送信中...",
+    "sendSuccess": "貴重なご意見ありがとうございます！",
+    "sendFailed": "送信失敗: {{error}}"
+  },
+  "closet": {
+    "myCloset": "マイクローゼット",
+    "coordRecord": "コーデ記録",
+    "emptyCloset": "クローゼットが空です",
+    "addFirstItem": "最初のアイテムを登録してみましょう",
+    "itemCount": "{{count}}個",
+    "deleteItem": "削除しますか？",
+    "deleteSuccess": "削除しました",
+    "bestCoordTitle": "ベストコーデ",
+    "sortByScore": "高スコア順に並べました"
+  },
+  "closetAdd": {
+    "photoMode": "写真で登録",
+    "manualMode": "手動で登録",
+    "step1": "カテゴリー選択",
+    "step2": "カラー選択",
+    "step3": "情報入力",
+    "brand": "ブランド",
+    "brandPlaceholder": "ブランド名（任意）",
+    "name": "名前",
+    "namePlaceholder": "アイテム名（任意）",
+    "colorExtract": "写真からカラーを抽出中..."
+  },
+  "closetCoord": {
+    "title": "手持ちでコーデ",
+    "subtitle": "クローゼットのアイテムでコーデを確認しましょう",
+    "allCombos": "全組み合わせを見る",
+    "allCombosDesc": "すべての可能な組み合わせをスコア順に",
+    "whatToBuy": "何を買えばいい？",
+    "whatToBuyDesc": "新しいアイテム追加時の効果をシミュレーション",
+    "wardrobeReport": "クローゼットレポート",
+    "wardrobeReportDesc": "活躍アイテム、隠れた可能性、カラーバランス"
+  },
+  "allCombos": {
+    "title": "クローゼット全組み合わせ",
+    "sortScore": "スコア順",
+    "sortRecent": "最近着ていない順",
+    "sortFewer": "アイテム少ない順",
+    "filterAll": "すべて",
+    "filterOuter": "アウター含む",
+    "filterNoOuter": "アウターなし",
+    "woreToday": "今日着ました",
+    "selectDate": "日付を選択",
+    "weatherHot": "{{temp}}°C — 軽装がおすすめの日です",
+    "weatherWarm": "{{temp}}°C — 季節の変わり目コーデに",
+    "weatherMild": "{{temp}}°C — ジャケットやカーディガンがおすすめ",
+    "weatherCool": "{{temp}}°C — アウターが必要です",
+    "weatherCold": "{{temp}}°C — 暖かくレイヤリングしましょう",
+    "catTop": "トップス",
+    "catBottom": "ボトムス",
+    "catShoes": "シューズ",
+    "closetStatus": "現在のクローゼット状態",
+    "itemCountN": "{{count}}個",
+    "noneMissing": "なし ← 必要！",
+    "none": "なし",
+    "registerToSee": "{{items}}を登録するとコーデ組み合わせが見られます",
+    "reference": "（参考）",
+    "includes": "{{name}} 含む",
+    "comboCount": "{{count}}個の組み合わせ",
+    "showingCount": "{{count}}個表示中",
+    "colorScheme": "{{theory}} 配色",
+    "lastWorn": "最後に着用: {{date}}",
+    "improveSuggestion": "{{part}}を{{color}}に変えると{{score}}点",
+    "alreadyRecordedToday": "すでに今日記録済みの組み合わせです",
+    "record": "記録",
+    "showMore": "もっと見る（残り{{count}}個）",
+    "fewCombos": "コーデが{{count}}個しかありません",
+    "addItemsHint": "クローゼットにアイテムを追加すると組み合わせが増えます",
+    "checkWhatToBuy": "何を買えばいいか確認する",
+    "subScoreLabels": {
+      "colorPlacement": "カラー配置",
+      "colorRatio": "色の比率",
+      "colorHarmony": "色の調和",
+      "seasonal": "季節感",
+      "balance": "バランス",
+      "personalColor": "パーソナルカラー",
+      "bodyFit": "体型フィット"
+    }
+  },
+  "todayCoord": {
+    "title": "今日何着る？",
+    "subtitle": "クローゼットからAIが選んだコーデ",
+    "impression": {
+      "daily": "快適でナチュラルな雰囲気",
+      "interview": "落ち着いて信頼感のある雰囲気",
+      "date": "温かくやさしい雰囲気",
+      "workout": "アクティブでダイナミックな雰囲気",
+      "travel": "実用的で快適な雰囲気"
+    },
+    "situation": {
+      "daily": "日常",
+      "interview": "通勤・面接",
+      "date": "デート",
+      "workout": "運動",
+      "travel": "旅行"
+    },
+    "needMoreItems": "クローゼットにアイテムを登録してください",
+    "needMoreItemsDesc": "トップス、ボトムス、シューズが各1つ以上必要です",
+    "analyzingCloset": "クローゼット分析中...",
+    "noResults": "可能な組み合わせが見つかりませんでした",
+    "noResultsDesc": "クローゼットにさまざまなカラーのアイテムを追加してみてください",
+    "viewOther": "🔄 他の組み合わせを見る",
+    "recordThis": "これで記録する",
+    "best": "BEST"
+  },
+  "recommend": {
+    "moodTitle": "どんな雰囲気がお好みですか？",
+    "moodDesc": "ムードを選ぶと、そのスタイルのコーデを提案します。",
+    "allStyles": "すべてのスタイルから提案 →",
+    "styleTitle": "スタイル選択",
+    "allRecommend": "すべてから提案 →",
+    "mustWear": "これは絶対着たい！",
+    "mustWearDesc": "着たい服があれば選んでください。なければそのまま進んでOKです。",
+    "alwaysIncluded": "👕 インナー + 👖 ボトムス + 👟 シューズは常に含まれます",
+    "clothing": "衣類",
+    "accessory": "アクセサリー",
+    "plusBasics": "+ インナー + ボトムス + シューズ",
+    "getAll": "全体から提案を受ける",
+    "getWithPicked": "この服で提案を受ける",
+    "resultTitle": "おすすめコーデ",
+    "resultSubtitle": "カラーの組み合わせを分析しました",
+    "noResults": "条件に合う組み合わせが見つかりませんでした",
+    "pinned": "{{part}} 固定",
+    "changeClothes": "+ 服を変更",
+    "pinColor": "カラーを固定",
+    "addRemoveClothes": "服の追加/削除（タップですぐ反映）",
+    "selectPartToPin": "固定する部位を選択してください",
+    "clearAll": "すべて解除",
+    "reshuffle": "シャッフル",
+    "showMannequin": "👤 マネキンを見る ▼",
+    "hideMannequin": "👤 マネキンを閉じる ▲",
+    "pcCheck": "パーソナルカラー✓",
+    "coordNamePlaceholder": "コーデ名を入力してください",
+    "tapToChangeColor": "部位をタップするとカラーを変更できます",
+    "colorChange": "{{part}} カラー変更",
+    "recommendedColors": "おすすめカラー",
+    "allColors": "すべてのカラー",
+    "colors": "カラー",
+    "revert": "元に戻す",
+    "apply": "適用",
+    "backToList": "一覧へ",
+    "partTop": "インナー",
+    "partBottom": "ボトムス",
+    "partShoes": "シューズ",
+    "partOuter": "アウター",
+    "partMiddleware": "ミドルレイヤー",
+    "partScarf": "マフラー",
+    "partHat": "帽子",
+    "save": "保存",
+    "share": "シェア",
+    "communityShare": "コミュニティにシェア",
+    "saveSuccess": "コーデが保存されました",
+    "colorImprove": "このカラーを変えるとスコアが上がります",
+    "tips": {
+      "tip1": "{{color1}}と{{color2}}の{{technique}}の組み合わせで洗練されたルックに",
+      "tip2": "{{technique}}で仕上げる{{style}}スタイル",
+      "tip3": "{{color}}を中心にした配色で雰囲気のあるコーデに",
+      "tip4": "{{color}}をアクセントにしたセンスあるスタイリング",
+      "tip5": "{{count}}部位のレイヤードで奥行きのある{{technique}}コーデ"
+    },
+    "stylePrefix": "スタイル"
+  },
+  "build": {
+    "stepStyle": "スタイル選択",
+    "stepColor": "カラー選択",
+    "stepFabric": "素材選択",
+    "scoreItems": {
+      "colorPlacement": "カラー配置",
+      "colorRatio": "色の比率",
+      "colorHarmony": "色の調和",
+      "seasonal": "季節感",
+      "balance": "バランス",
+      "personalColor": "パーソナルカラー",
+      "bodyFit": "体型フィット"
+    },
+    "saveCoord": "コーデ保存",
+    "shareCoord": "シェア",
+    "styleDesc": "スタイルに合ったカラーを提案します。スキップも可能です。",
+    "fabricToggle": "素材も一緒に選ぶ",
+    "fabricToggleDesc": "部位別にカラーを選んだ後、素材を選んで相性チェック",
+    "startWithoutStyle": "スタイルなしで始める →",
+    "items": "アイテム",
+    "colorLabel": "カラー",
+    "itemColor": "{{item}} カラー",
+    "simpleEditColor": "{{part}} カラー",
+    "itemColorChange": "{{item}} カラー変更",
+    "changeItem": "アイテム変更",
+    "recommendedColors": "おすすめカラー",
+    "personalColorBadge": "パーソナルカラー",
+    "bodyTypeBadge": "体型",
+    "allColors": "すべてのカラー",
+    "colors": "カラー",
+    "missingParts": "{{parts}}まで選ぶと結果が見られます",
+    "selectBottom": "👖 ボトムスを選択",
+    "selectShoes": "👟 シューズを選択",
+    "readyToSee": "結果を見られます",
+    "scoreAnalysis": "スコア分析",
+    "coordColors": "コーデカラー",
+    "editColors": "カラーを編集",
+    "communityBtn": "コミュニティ",
+    "similarCoords": "似たコーデ",
+    "goHome": "最初に戻る",
+    "backToResult": "結果へ",
+    "similarTitle": "似たコーデ",
+    "similarDesc": "今のコーデからカラーを1つずつ変えてみました",
+    "scoreGrade": {
+      "perfect": "完璧な組み合わせ！",
+      "great": "素晴らしいコーデ！",
+      "good": "いい組み合わせです",
+      "okay": "悪くないです",
+      "improve": "改善してみましょう？"
+    },
+    "showMannequin": "👤 マネキンを見る ▼",
+    "hideMannequin": "👤 マネキンを閉じる ▲",
+    "maxLayerWarning": "上半身は最大4枚まで重ね着できます",
+    "duplicateWarning": "すでに追加されたアイテムです",
+    "weather": {
+      "needOuter": "体感 {{feels}}°Cです。アウターが必要な天気です。",
+      "feelsLike": "体感 {{feels}}°Cです。",
+      "tooThin": "これだけでは寒いかもしれません。アウターを追加してみてください。",
+      "outerReady": "アウター準備OK！中にもう1枚重ねると◎",
+      "addLayer": "{{feels}}°Cにはもう1枚重ね着がおすすめです。",
+      "justRight": "ちょうどいいですね！👍",
+      "warm": "しっかり暖かいですね！🔥",
+      "suggestOuter": "アウターを追加するといいですね。",
+      "feelsTemp": "体感 {{feels}}°C"
+    },
+    "tapToEdit": "編集したい部位をタップしてください",
+    "upperBody": "上半身",
+    "addItemPlease": "アイテムを追加してください",
+    "lowerBody": "下半身・アクセサリー",
+    "showMannequinCollapse": "👤 マネキンを見る ▽",
+    "collapse": "閉じる △",
+    "addClothes": "+ 服を追加",
+    "editing": "編集中",
+    "editHint": "マネキン横のアイテムをタップして編集するか<br/><b>+ 服を追加</b>をタップしてください",
+    "initialPrompt": "今日は何を着ますか？<br/>最初に思いつくアイテムを選んでください",
+    "confirmEdit": "このカラーで編集",
+    "confirmSelect": "このカラーで選択",
+    "confirmAdd": "このカラーで追加",
+    "selectColor": "カラーを選択してください",
+    "viewResults": "結果を見る →",
+    "selectItem": "アイテムを選択してください",
+    "addMore": "+ 服を追加する",
+    "fabricDesc": "各部位の素材を選んで相性を確認してください",
+    "points": "点",
+    "alreadyGood": "すでに良い組み合わせです！",
+    "feelsLabel": "体感",
+    "slot": {
+      "outer": "外側",
+      "middleware": "中間",
+      "top": "内側",
+      "inner": "内側(中)"
+    },
+    "reason": {
+      "pcAndBody": "パーソナルカラー + 体型",
+      "pc": "パーソナルカラー",
+      "body": "体型補正",
+      "style": "スタイル提案",
+      "basic": "ベーシックアイテム",
+      "harmony": "カラー調和"
+    }
+  },
+  "ootdRecord": {
+    "situations": {
+      "commute": "通勤",
+      "date": "デート",
+      "casual": "カジュアル",
+      "interview": "面接",
+      "travel": "旅行",
+      "exercise": "運動"
+    },
+    "moods": {
+      "satisfied": "満足",
+      "okay": "まあまあ",
+      "regret": "残念"
+    },
+    "visibility": {
+      "private": "非公開",
+      "friends": "友達",
+      "public": "公開"
+    },
+    "memoPlaceholder": "今日のコーデひとこと（任意）",
+    "saveComplete": "記録完了！",
+    "streakMessage": "{{count}}日連続記録中！",
+    "selectAllRequired": "服1つ以上 + ボトムス + シューズをすべて選択してください",
+    "photoRequiredPublic": "全体公開には着用写真が必須です",
+    "saveFailed": "保存に失敗しました",
+    "saveError": "保存中にエラーが発生しました",
+    "savedMessage": "今日のコーデが保存されました",
+    "whatDidYouWear": "今日何を着ましたか？",
+    "addClothes": "服を追加",
+    "accessoryBtn": "🧣 アクセサリー",
+    "bottomBtn": "👖 ボトムス",
+    "shoesBtn": "👟 シューズ",
+    "whatClothes": "どんな服を着ましたか？",
+    "selectColorFor": "{{item}}のカラーを選んでください",
+    "accessoryLabel": "アクセサリー",
+    "colorOf": "{{item}}のカラー",
+    "bottomColor": "👖 ボトムスのカラー",
+    "shoesColor": "👟 シューズのカラー",
+    "color": "カラー",
+    "bottom": "ボトムス",
+    "shoes": "シューズ",
+    "guideSelectClothesAndColor": "服とカラーを選択してください",
+    "guideSelectBottomAndShoes": "ボトムスとシューズを選択してください",
+    "guideSelectBottom": "ボトムスを選択してください",
+    "guideSelectShoes": "シューズを選択してください",
+    "guideAddClothes": "服を1つ以上追加してください",
+    "photoPublicRequired": "（全体公開時は必須）",
+    "situationLabel": "📍 シチュエーション",
+    "customInput": "✏️ 自由入力",
+    "customPlaceholder": "例: 合コン、結婚式...",
+    "moodLabel": "気分",
+    "visibilityLabel": "公開範囲",
+    "publicNotice": "🌐 記録するとコミュニティにすぐ公開・着用写真必須",
+    "viewCalendar": "コーデカレンダーを見る"
+  },
+  "ootdCalendar": {
+    "weekDays": [
+      "日",
+      "月",
+      "火",
+      "水",
+      "木",
+      "金",
+      "土"
+    ],
+    "filterAll": "すべて",
+    "filterPhoto": "写真",
+    "filterMannequin": "マネキン",
+    "sortNewest": "新しい順",
+    "sortOldest": "古い順",
+    "colorStreakWarning": "同じカラーが連続しています",
+    "yearMonth": "{{year}}年{{month}}月",
+    "monthSummary": "{{days}}日記録・{{coords}}コーデ",
+    "colorStreakMessage": "今週似たカラーが{{days}}日続いています",
+    "tryOtherCombos": "他の組み合わせも見てみますか？",
+    "viewOtherCombos": "他の組み合わせを見る →",
+    "monthRecordTitle": "{{month}}月の記録（{{count}}）"
+  },
+  "ootdDetail": {
+    "editRecord": "編集",
+    "deleteRecord": "削除",
+    "deleteConfirm": "この記録を削除しますか？",
+    "deleteSuccess": "記録が削除されました",
+    "shareCard": "シェアカード",
+    "shareTitle": "BaruPick コーデ",
+    "communityShare": "コミュニティにシェア",
+    "communityShareSuccess": "コミュニティにシェアされました！",
+    "notFound": "記録が見つかりません",
+    "goToCloset": "クローゼットへ",
+    "addPhotoToShare": "着用写真を追加するとコミュニティにシェアできます",
+    "alreadyShared": "すでにシェア済みの記録です",
+    "todaysCoord": "今日のコーデ",
+    "shareError": "シェア中にエラーが発生しました",
+    "recordCount": "{{count}}件の記録"
+  },
+  "community": {
+    "tabs": {
+      "all": "すべて",
+      "friends": "友達",
+      "ranking": "ランキング"
+    },
+    "sort": {
+      "latest": "新着順",
+      "popular": "人気順"
+    },
+    "content": {
+      "photo": "写真",
+      "mannequin": "マネキン"
+    },
+    "friendsTab": {
+      "empty": "まだ友達がいません",
+      "findUsers": "ユーザーを探す"
+    },
+    "ranking": {
+      "weekly": "週間",
+      "monthly": "月間",
+      "users": "ユーザー",
+      "events": "イベント"
+    },
+    "empty": "まだ投稿がありません",
+    "feedCardLabel": "{{nick}}のコーデ{{title}}"
+  },
+  "communityDetail": {
+    "like": "いいね",
+    "unlikeLabel": "いいね取消",
+    "save": "保存",
+    "share": "シェア",
+    "report": "通報",
+    "editPost": "編集",
+    "deletePost": "削除",
+    "deleteConfirm": "この投稿を削除しますか？",
+    "deleteSuccess": "投稿が削除されました",
+    "follow": "フォロー",
+    "instagramLink": "Instagram",
+    "comments": "コメント",
+    "commentPlaceholder": "コメントを書く...",
+    "commentEmpty": "まだコメントがありません",
+    "reportSuccess": "通報が受理されました",
+    "likeSuccess": "いいね！",
+    "saveSuccess": "保存しました"
+  },
+  "communityPost": {
+    "title": "コーデシェア",
+    "caption": "キャプション",
+    "captionPlaceholder": "コーデについてひとこと（任意）",
+    "photos": "写真",
+    "visibility": {
+      "public": "全体公開",
+      "friends": "友達公開"
+    },
+    "instagramToggle": "Instagram連携",
+    "posting": "投稿中...",
+    "postSuccess": "投稿がシェアされました！",
+    "postFailed": "投稿失敗: {{error}}"
+  },
+  "profile": {
+    "defaultLevel": "入門者",
+    "stats": {
+      "coords": "コーデ",
+      "followers": "フォロワー",
+      "following": "フォロー中",
+      "streak": "連続",
+      "badges": "バッジ",
+      "saved": "保存"
+    },
+    "sections": {
+      "growth": "成長",
+      "diagnosis": "マイ診断",
+      "settings": "設定"
+    },
+    "menu": {
+      "myLevel": "マイレベル",
+      "myBadges": "バッジコレクション",
+      "colorRanking": "カラー分析",
+      "colorPattern": "カラーパターン",
+      "challenges": "チャレンジ",
+      "titleExam": "称号試験",
+      "myPosts": "マイ投稿",
+      "insights": "インサイト",
+      "savedCoords": "保存したコーデ",
+      "personalColor": "パーソナルカラー",
+      "bodyType": "体型別コーデ",
+      "settings": "設定",
+      "blockList": "ブロックリスト"
+    },
+    "edit": {
+      "title": "プロフィール編集",
+      "nickname": "ニックネーム",
+      "nicknamePlaceholder": "ニックネームを入力してください",
+      "bio": "ひとこと",
+      "bioPlaceholder": "自己紹介を入力してください",
+      "instagram": "Instagram ID",
+      "instagramPlaceholder": "@ なし",
+      "avatar": "プロフィール写真",
+      "saveSuccess": "プロフィールが更新されました"
+    },
+    "fitLabel": {
+      "pcAndBody": "パーソナルカラー + 体型補正を適用",
+      "pcOnly": "パーソナルカラーを適用",
+      "bodyOnly": "体型補正を適用",
+      "setup": "カスタム設定する"
+    }
+  },
+  "profileSub": {
+    "myLevel": {
+      "title": "マイレベル",
+      "xpMethods": {
+        "record": "OOTD記録",
+        "community": "コミュニティ活動",
+        "streak": "連続記録",
+        "quiz": "クイズ参加"
+      }
+    },
+    "myBadges": {
+      "title": "バッジコレクション",
+      "earned": "獲得済み",
+      "locked": "未獲得"
+    },
+    "colorRanking": {
+      "title": "カラー分析",
+      "warmCenter": "ウォームトーン中心",
+      "coolCenter": "クールトーン中心",
+      "neutralBalance": "ニュートラルバランス",
+      "comfortZone": "コンフォートゾーン拡張"
+    },
+    "colorPattern": {
+      "title": "カラーパターン"
+    },
+    "challenges": {
+      "title": "チャレンジ",
+      "weekly": "週間チャレンジ"
+    },
+    "titleExam": {
+      "title": "称号試験",
+      "play": "クイズに挑戦"
+    },
+    "myPosts": {
+      "title": "マイ投稿",
+      "visibility": {
+        "public": "公開",
+        "friends": "友達",
+        "private": "非公開"
+      }
+    },
+    "insights": {
+      "title": "インサイト"
+    },
+    "savedCoords": {
+      "title": "保存したコーデ"
+    }
+  },
+  "blockList": {
+    "title": "ブロックリスト",
+    "subtitle": "ブロックしたユーザーの投稿は表示されません",
+    "empty": "ブロックしたユーザーはいません",
+    "unblockConfirm": "@{{nickname}}さんのブロックを解除しますか？",
+    "unblockFailed": "ブロック解除失敗: {{error}}"
+  },
+  "notifications": {
+    "title": "通知",
+    "clearAll": "すべて削除",
+    "clearConfirm": "すべての通知を削除しますか？",
+    "empty": "新しい通知はありません"
+  },
+  "followList": {
+    "followers": "フォロワー",
+    "following": "フォロー中",
+    "noFollowers": "まだフォロワーがいません",
+    "noFollowing": "まだフォロー中のユーザーがいません"
+  },
+  "userDiscover": {
+    "searchPlaceholder": "ニックネームまたはInstagram IDで検索",
+    "searchButton": "検索",
+    "searchMinLength": "2文字以上入力してください",
+    "searchError": "検索中にエラーが発生しました",
+    "noResults": "検索結果がありません",
+    "searchResults": "検索結果 {{count}}人",
+    "suggestedUsers": "おすすめユーザー",
+    "noUsers": "まだ登録ユーザーがいません"
+  },
+  "userProfile": {
+    "publicCoords": "公開コーデ",
+    "noPublicCoords": "まだ公開コーデがありません",
+    "followCta": "フォローするともっと見られます",
+    "followCtaDesc": "友達限定コーデやコメントを確認できます",
+    "blockedToast": "ブロックしました",
+    "unblockedToast": "ブロックを解除しました"
+  },
+  "postInsight": {
+    "title": "投稿分析",
+    "views": "閲覧",
+    "likes": "いいね",
+    "saves": "保存",
+    "comments": "コメント",
+    "engagementTitle": "エンゲージメント分析",
+    "likeRate": "いいね率",
+    "saveRate": "保存率",
+    "compareAvg": "自分の投稿の平均と比較",
+    "avgLabel": "平均 {{count}}",
+    "trend14d": "14日トレンド",
+    "daysOld": "{{count}}日目",
+    "avgViewsPerDay": "1日平均 {{count}}回閲覧",
+    "notFound": "投稿が見つかりません"
+  },
+  "eventSubmit": {
+    "participationDone": "参加完了！",
+    "waitResult": "結果発表をお待ちください",
+    "warning": "顔が映っていない写真のみ提出してください。提出後は修正・削除できません。",
+    "coordColors": "🎨 コーデカラー",
+    "minColors": "2色以上選択してください",
+    "wearPhoto": "📷 着用写真",
+    "required": "必須",
+    "wearPhotoDesc": "顔が映らないように撮影してください（最大2枚）",
+    "style": "👔 スタイル",
+    "optional": "（任意）",
+    "instagramId": "📸 Instagram ID",
+    "instagramIdDesc": "当選時の連絡に必要です",
+    "instagramPlaceholder": "Instagram ID（@なし）",
+    "submitting": "提出中...",
+    "submit": "🎨 参加する",
+    "needColors": "カラー2つ以上",
+    "needPhoto": "着用写真必須",
+    "needInstagram": "Instagram ID必須",
+    "alreadySubmitted": "すでにこのイベントに参加済みです",
+    "submitFailed": "提出失敗: {{error}}"
+  },
+  "eventDetail": {
+    "active": "🔥 開催中",
+    "ended": "⏳ 終了",
+    "submissions": "参加作品（{{count}}）",
+    "noSubmissions": "まだ参加作品がありません",
+    "participate": "🎨 参加する",
+    "notFound": "イベントが見つかりません"
+  },
+  "purchaseSimulate": {
+    "title": "何を買えばいい？",
+    "subtitle": "クローゼットを分析しておすすめします",
+    "recommendMode": "クローゼットを分析しておすすめ",
+    "recommendModeDesc": "何も選ばなくてOKです",
+    "manualMode": "特定のアイテムの相性を確認",
+    "manualModeDesc": "買いたい服のカラーを直接選択",
+    "resultTitle": "おすすめ結果",
+    "resultSubtitle": "クローゼットを分析して効果の高い順に並べました",
+    "analyzingCompat": "クローゼットとの相性を分析中...",
+    "noRecommend": "おすすめアイテムが見つかりませんでした",
+    "noRecommendDesc": "クローゼットにアイテムをもっと登録してみてください",
+    "addToCloset": "クローゼットに追加",
+    "compatCheck": "相性チェック",
+    "selectCategory": "買いたい服の種類を選択してください",
+    "currentCount": "現在 {{count}}個",
+    "reselectPart": "部位を再選択",
+    "selectColor": "{{category}}のカラーを選択してください",
+    "reselect": "再選択",
+    "newCombos": "新しいコーデ数",
+    "bestScore": "最高スコア",
+    "avgScore": "平均スコア",
+    "verdict": {
+      "strongBuy": "強くおすすめ！",
+      "buy": "いい選択",
+      "weak": "効果は少なめ",
+      "skip": "組み合わせなし"
+    },
+    "comboDelta": "+{{count}}コーデ",
+    "avgScoreLabel": "平均 {{score}}点",
+    "bestScoreLabel": "最高 {{score}}点"
+  },
+  "wardrobeReport": {
+    "title": "クローゼットレポート",
+    "analyzingCloset": "クローゼット分析中...",
+    "needMoreItems": "クローゼットにアイテムを3つ以上登録してください",
+    "summary": "クローゼットに{{items}}個のアイテム、計{{combos}}個のコーデ組み合わせが可能です",
+    "mvpTitle": "最も活躍しているアイテム",
+    "mvpUsage": "{{count}}コーデに活用（{{pct}}%）",
+    "hiddenTitle": "まだ可能性が隠れているアイテム",
+    "noCombo": "まだ合う組み合わせがありません",
+    "fewCombos": "コーデ{{count}}個で少なめです",
+    "bestCombo": "ベスト組み合わせ: {{color}} {{category}}（{{score}}点）",
+    "colorBalance": "クローゼットのカラーバランス",
+    "warmCenter": "ウォームトーン中心",
+    "coolCenter": "クールトーン中心",
+    "balancedCenter": "バランスの取れた配分",
+    "warmPct": "ウォームトーン {{pct}}%",
+    "neutralPct": "ニュートラル {{pct}}%",
+    "coolPct": "クールトーン {{pct}}%",
+    "addCoolTip": "クールトーン（ネイビー、スチールブルーなど）を追加するとバランスが良くなります",
+    "addWarmTip": "ウォームトーン（ベージュ、キャメルなど）を追加するとバランスが良くなります",
+    "viewAllCombos": "全組み合わせを見る",
+    "checkPurchase": "何を買えばいいか確認する"
+  },
+  "weather": {
+    "title": "今日何着る？",
+    "loadingWeather": "天気を読み込み中...",
+    "humidity": "湿度 {{pct}}%",
+    "wind": "風速 {{speed}}km/h",
+    "feelsLike": "体感 {{temp}}°C",
+    "recommendItems": "おすすめアイテム",
+    "colorTip": "カラーのヒント",
+    "ctaButton": "この天気に合ったコーデ提案を受ける",
+    "noLocation": "位置情報を許可してください",
+    "noLocationDesc": "天気に基づいて今日のコーデを提案します",
+    "clear": "晴れ",
+    "partlyCloudy": "少し曇り",
+    "fog": "霧",
+    "drizzle": "小雨",
+    "rain": "雨",
+    "snow": "雪",
+    "shower": "にわか雨",
+    "thunderstorm": "雷雨",
+    "advice": {
+      "hotSummer": {
+        "title": "真夏コーデ",
+        "desc": "半袖 + ショートパンツ or リネンパンツ",
+        "detail": "薄くて通気性の良い素材を選びましょう。リネン、コットンジャージー、シアサッカーがおすすめです。",
+        "items": [
+          "半袖Tシャツ",
+          "リネンシャツ",
+          "ショートパンツ",
+          "リネンパンツ",
+          "サンダル/スリッパ"
+        ],
+        "colorTip": "ホワイト、アイボリー、パステルトーンで涼しげな印象を"
+      },
+      "earlySummer": {
+        "title": "初夏コーデ",
+        "desc": "半袖 + コットンパンツ・軽めのワンピース",
+        "detail": "昼は半袖、室内の冷房対策に薄手のカーディガンを1枚持てば完璧です。",
+        "items": [
+          "半袖シャツ",
+          "薄手カーディガン",
+          "コットンチノ",
+          "コットンパンツ",
+          "スニーカー/ローファー"
+        ],
+        "colorTip": "ベージュ + ネイビー、ホワイト + カーキの組み合わせがおすすめ"
+      },
+      "midSeason": {
+        "title": "季節の変わり目コーデ",
+        "desc": "長袖 + 長ズボン・軽めのアウター",
+        "detail": "寒暖差が大きい時期。レイヤードしやすいシャツ + ニットの組み合わせが活用度◎",
+        "items": [
+          "オックスフォードシャツ",
+          "薄手ニット",
+          "コットンパンツ/デニム",
+          "ライトジャケット",
+          "ローファー/ダービーシューズ"
+        ],
+        "colorTip": "アーストーン系 — ベージュ、カーキ、オリーブが季節感にぴったり"
+      },
+      "earlyFall": {
+        "title": "初秋コーデ",
+        "desc": "ジャケット or カーディガン + 長ズボン",
+        "detail": "風を防ぐアウターが必要です。スウェットの上にジャケットを羽織るときれいにまとまります。",
+        "items": [
+          "ブレザー/チノジャケット",
+          "カーディガン",
+          "スウェット",
+          "ウールパンツ",
+          "チェルシーブーツ"
+        ],
+        "colorTip": "ブラウン、テラコッタ、マスタードで秋のムードを"
+      },
+      "winter": {
+        "title": "冬コーデ",
+        "desc": "コート + ニット・マフラーがおすすめ",
+        "detail": "保温が大事です。インナーは薄く重ね着、アウターは防風機能のあるものを選びましょう。",
+        "items": [
+          "ウールコート",
+          "厚手ニット",
+          "裏起毛パンツ",
+          "マフラー",
+          "ワーカー/ブーツ"
+        ],
+        "colorTip": "チャコール、ネイビー、キャメル — 冬のクラシック3色"
+      },
+      "deepWinter": {
+        "title": "真冬コーデ",
+        "desc": "ダウン + 裏起毛・防寒必須",
+        "detail": "発熱インナー → ニット/スウェット → ダウンの3段レイヤリングが基本。首・手・足の保温を意識して。",
+        "items": [
+          "ロングダウン/ショートダウン",
+          "裏起毛スウェット",
+          "裏起毛パンツ",
+          "ビーニー/手袋",
+          "防寒ブーツ"
+        ],
+        "colorTip": "ブラック、ネイビーをベースにマフラーでアクセントを"
+      },
+      "extreme": {
+        "title": "極寒対策",
+        "desc": "完全防備・露出最小限",
+        "detail": "屋外活動を最小限に。防風 + 防水素材が必須です。",
+        "items": [
+          "ヘビーダウン",
+          "裏起毛インナー",
+          "防風パンツ",
+          "ネックウォーマー",
+          "防寒シューズ"
+        ],
+        "colorTip": "機能性優先"
+      }
+    }
+  },
+  "quiz": {
+    "q1": "週末は主に何をしていますか？",
+    "q1a1": "カフェ巡り ☕",
+    "q1a2": "運動/ハイキング 🏃",
+    "q1a3": "ショッピング/展示会 🛍️",
+    "q1a4": "家でゆっくり 🏠",
+    "q2": "好みのカラートーンは？",
+    "q2a1": "ニュートラル/ベージュ系",
+    "q2a2": "ネイビー/チャコール系",
+    "q2a3": "パステル/明るいトーン",
+    "q2a4": "ダーク/無彩色",
+    "q3": "服を選ぶとき一番大事なのは？",
+    "q3a1": "快適さ",
+    "q3a2": "洗練さ",
+    "q3a3": "個性",
+    "q3a4": "コスパ",
+    "q4": "よく履く靴は？",
+    "q4a1": "スニーカー 👟",
+    "q4a2": "ローファー/革靴 👞",
+    "q4a3": "ブーツ 🥾",
+    "q4a4": "サンダル/スリッパ 🩴",
+    "resultTitle": "分析完了！",
+    "resultSubtitle": "あなたに似合うスタイルが見つかりました",
+    "prevQuestion": "前の質問",
+    "retake": "もう一度やる"
+  },
+  "fabricGuide": {
+    "title": "素材の相性チェック",
+    "subtitle": "着たいアイテムを選ぶと素材の相性をすぐお知らせします",
+    "whatPart": "どの部位ですか？",
+    "wearingItem": "着ているアイテムの部位を選択してください",
+    "pairItem": "合わせるアイテムの部位を選択してください",
+    "selectMaterial": "素材を選択してください",
+    "seasonAll": "すべて",
+    "noSeasonItems": "この季節に該当するアイテムがありません",
+    "otherPart": "← 他の部位を選択",
+    "wearingSlot": "着ているアイテムを選択",
+    "pairSlot": "合わせるアイテムを選択",
+    "addItem": "+ アイテム追加（最大6個）",
+    "compatResult": "相性結果",
+    "ratingGreat": "おすすめ",
+    "ratingOk": "普通",
+    "ratingBad": "非推奨",
+    "noSpecialRule": "特別な相性ルールなし — 無難な組み合わせ",
+    "guide2items": "2つ以上のアイテムを選択すると\n素材の相性をすぐ確認できます",
+    "guideExample": "例）デニムジャケット + ウールニット → おすすめ組み合わせ！\nシルクブラウス + フリース → フォーマル度の衝突"
+  },
+  "bodyGuide": {
+    "title": "体型別コーデガイド",
+    "subtitle": "自分の体型に合ったカラー配置とスタイリングのコツを確認しましょう",
+    "myBodyType": "マイ体型: {{type}}",
+    "tapToView": "タップしてガイドを見る",
+    "diagnose": "体型診断する",
+    "directSelect": "直接選択",
+    "bodyTypes": "体型タイプ",
+    "directSelectTitle": "体型を直接選択",
+    "directSelectDesc": "最も近い体型を選んでください",
+    "backToList": "一覧へ",
+    "male": "👔 メンズ",
+    "female": "👗 レディース",
+    "colorPlacement": "カラー配置",
+    "lightRule": "明るく",
+    "darkRule": "暗く",
+    "anyRule": "自由",
+    "doTitle": "こう着ましょう",
+    "dontTitle": "避けましょう",
+    "saveBodyType": "マイ体型として保存",
+    "saveSuccess": "体型が保存されました！コーデ提案に反映されます。",
+    "getRecommend": "この体型でコーデ提案を受ける"
+  },
+  "pcSelect": {
+    "title": "パーソナルカラー",
+    "currentSetting": "現在の設定: {{name}}",
+    "noSettingDesc": "パーソナルカラーを設定するとカスタム提案が受けられます",
+    "selfDiagnosis": "セルフ診断",
+    "selfDiagnosisDesc": "{{count}}問の質問でマイパーソナルカラーを見つける",
+    "lightDiagnosis": "光診断",
+    "lightDiagnosisDesc": "自然光で直接比較する精密診断",
+    "directSelect": "直接選択",
+    "directSelectDesc": "すでに知っていれば12シーズンから選択",
+    "prevQuestion": "前の質問",
+    "saveAndApply": "このパーソナルカラーを適用する",
+    "select12Season": "12シーズンパーソナルカラーから選んでください"
+  },
+  "pcLight": {
+    "title": "光診断",
+    "guideTitle": "自然光診断",
+    "guideDesc": "自然光（日光）の下で行うと正確な結果が得られます",
+    "startButton": "診断開始",
+    "stepProgress": "{{current}} / {{total}}",
+    "resultTitle": "診断結果",
+    "bestColors": "似合うカラー",
+    "worstColors": "避けるべきカラー",
+    "applyResult": "この結果を適用する",
+    "disclaimer": "この診断は簡易テストです。正確な診断は専門家にご相談ください。",
+    "selectA": "A を選択・{{desc}}",
+    "selectB": "B を選択・{{desc}}",
+    "similar": "似ています（区別が難しい）",
+    "similarHint": "区別が難しければ「似ています」を押してもOKです",
+    "screenLayout": "画面構成",
+    "screenLayoutDesc": "同じ色系統でトーンだけ異なります・中央の黒い部分が光の混合を防ぎます",
+    "rememberTitle": "💡 これだけ覚えてください",
+    "matchingTone": "✅ 合うトーン:",
+    "matchingToneDesc": "肌がきれいに均一に見える",
+    "wrongTone": "❌ 合わないトーン:",
+    "wrongToneDesc": "肌がくすんで荒く見える",
+    "beforeStartTitle": "📱 始める前に確認",
+    "beforeStart1": "ナイトモード/ブルーライトカットをオフにしてください",
+    "beforeStart2": "画面の明るさを最大にしてください",
+    "beforeStart3": "メイクを落とした状態が正確です",
+    "guide": {
+      "step1Title": "暗い場所に移動",
+      "step1Desc": "照明を消すか暗い部屋で行ってください",
+      "step2Title": "スマホを裏返して立てる",
+      "step2Desc": "画面を下に向けて裏返し、45°傾けて立ててください",
+      "step3Title": "手を画面の下に置く",
+      "step3Desc": "画面から出る光が手の甲に当たるようにしてください",
+      "step4Title": "肌がきれいに見える方を選択！",
+      "step4Desc": "両側の光を比べて選んでください"
+    },
+    "steps": {
+      "phaseUndertone": "アンダートーン診断",
+      "phaseValue": "明度診断",
+      "phaseChroma": "彩度診断",
+      "u1Inst": "同じピンクでトーンだけ違います\n肌がきれいに見えるのは？",
+      "u1Tip": "💡 慣れた方ではなく肌がきれいに見える方を選んでください",
+      "u1Left": "ウォームピンク",
+      "u1Right": "クールピンク",
+      "u2Inst": "同じグリーンでトーンだけ違います\n肌がきれいに見えるのは？",
+      "u2Tip": "💡 色がきれいな方ではなく「自分の肌」がきれいに見える方！",
+      "u2Left": "ウォームグリーン",
+      "u2Right": "クールグリーン",
+      "u3Inst": "微妙な違いです\n肌がきれいに見えるのは？",
+      "u3Tip": "💡 似ていると感じたら「似ています」を押してもOK",
+      "u3Left": "アイボリーの光",
+      "u3Right": "ブルーホワイトの光",
+      "wv4Inst": "ウォームトーンですね！🌅\n明るい光 vs 深い光\n肌がきれいに見えるのは？",
+      "wv4Tip": "💡 明るければいいわけではありません — 肌が心地よく見える方！",
+      "wv4Left": "明るいピーチ",
+      "wv4Right": "リッチアンバー",
+      "wv5Inst": "もう一度！\n肌がきれいに見えるのは？",
+      "wv5Tip": "💡 青白く浮くかくすんで沈むなら合わないトーンです",
+      "wv5Left": "ライトゴールド",
+      "wv5Right": "ディープゴールド",
+      "cv4Inst": "クールトーンですね！❄️\n明るい光 vs 深い光\n肌がきれいに見えるのは？",
+      "cv4Tip": "💡 明るければいいわけではありません — 肌が心地よく見える方！",
+      "cv4Left": "パウダーブルー",
+      "cv4Right": "ディープブルー",
+      "cv5Inst": "もう一度！\n肌がきれいに見えるのは？",
+      "cv5Tip": "💡 青白く浮くかくすんで沈むなら合わないトーンです",
+      "cv5Left": "ライトライラック",
+      "cv5Right": "ディープライラック",
+      "wc6Inst": "もう少しです！\n鮮やかな光 vs 落ち着いた光\n肌がきれいに見えるのは？",
+      "wc6Tip": "💡 鮮やかな光で肌荒れが目立つなら落ち着いたトーンが合っています",
+      "wc6Left": "ビビッドコーラル",
+      "wc6Right": "ダスティサーモン",
+      "wc7Inst": "最後です！\n肌がきれいに見えるのは？",
+      "wc7Tip": "💡 最後です — 直感を信じて！",
+      "wc7Left": "ビビッドグリーン",
+      "wc7Right": "セージ",
+      "cc6Inst": "もう少しです！\n鮮やかな光 vs 柔らかな光\n肌がきれいに見えるのは？",
+      "cc6Tip": "💡 鮮やかな光で肌荒れが目立つなら柔らかなトーンが合っています",
+      "cc6Left": "ビビッドピンク",
+      "cc6Right": "ダスティローズ",
+      "cc7Inst": "最後です！\n肌がきれいに見えるのは？",
+      "cc7Tip": "💡 最後です — 直感を信じて！",
+      "cc7Left": "ビビッドブルー",
+      "cc7Right": "グレーブルー"
+    }
+  },
+  "shop": {
+    "heroSubtitle": "プレッピー＆オールドマネー ヴィンテージショップ",
+    "devBadge": "BaruPick開発者が運営するヴィンテージショップ",
+    "viewOnInstagram": "📸 Instagramで見る →",
+    "visitStore": "BARUSAストアを訪問する",
+    "partnerTitle": "ヴィンテージショップ出店案内",
+    "partnerDesc": "BaruPickにショップを登録しませんか？\n出店に関するお問い合わせは下のボタンからどうぞ。",
+    "partnerCta": "出店お問い合わせ",
+    "brandDesc": "BARUSA・プレッピー＆オールドマネー ヴィンテージ",
+    "posts": "投稿",
+    "followers": "フォロワー"
+  },
+  "terms": {
+    "title": "利用規約",
+    "article1Title": "第1条（目的）",
+    "article1Content": "本規約は、BaruPick（以下「サービス」）の利用条件および手続きを定めるものです。",
+    "article2Title": "第2条（サービス内容）",
+    "article2Content": "サービスはAIベースのカラーコーディネート提案、OOTD記録、コミュニティ機能を提供します。",
+    "article3Title": "第3条（利用者の義務）",
+    "article3Content": "利用者は他人の権利を侵害したり、不適切なコンテンツを投稿してはなりません。",
+    "article4Title": "第4条（免責事項）",
+    "article4Content": "サービスで提供するコーデ提案は参考用であり、サービスは提案結果に対する責任を負いません。"
+  },
+  "privacy": {
+    "title": "プライバシーポリシー",
+    "section1Title": "1. 収集する個人情報",
+    "section1Content": "メールアドレス、ニックネーム、プロフィール写真（任意）、コーデ記録",
+    "section2Title": "2. 収集目的",
+    "section2Content": "サービス提供、コミュニティ機能、カスタム提案",
+    "section3Title": "3. 保持期間",
+    "section3Content": "退会時に即時削除",
+    "section4Title": "4. 第三者提供",
+    "section4Content": "第三者に個人情報を提供しません。",
+    "section5Title": "5. お問い合わせ",
+    "section5Content": "barusa.official@gmail.com"
+  },
+  "devDiag": {
+    "title": "Supabase接続診断",
+    "subtitle": "開発DB (ywqaxxcv...) の接続状態を確認します",
+    "runAll": "全体診断実行",
+    "running": "テスト実行中...",
+    "fixTitle": "修正方法",
+    "allPassed": "すべてのテストに合格！",
+    "allPassedDesc": "Supabase接続は正常です。Vercelデプロイを進めても大丈夫です。"
+  },
+  "placeholder": {
+    "comingSoon": "この画面はまもなく実装予定です"
+  },
+  "shareCard": {
+    "shareTitle": "BaruPick コーデ",
+    "shareButton": "シェア",
+    "iosSaveHint": "画像を長押しして保存してください"
+  },
+  "colorPicker": {
+    "title": "カラー選択",
+    "reset": "リセット",
+    "closeLabel": "閉じる"
+  },
+  "cropOverlay": {
+    "profilePhoto": "プロフィール写真",
+    "photoCrop": "写真クロップ",
+    "pinchHint": "2本指で拡大/縮小・ドラッグで位置調整",
+    "cancel": "キャンセル",
+    "done": "完了"
+  },
+  "imageEditor": {
+    "title": "写真編集",
+    "cancel": "キャンセル",
+    "done": "完了",
+    "loading": "読み込み中...",
+    "sticker": "😎 スタンプ",
+    "blur": "🔲 ぼかし",
+    "fill": "⬛ 塗りつぶし",
+    "addSticker": "+ スタンプ追加",
+    "addBlur": "+ ぼかし追加",
+    "addFill": "+ 塗りつぶし追加",
+    "colorLabel": "カラー:",
+    "touchHint": "タッチ: 選択・ドラッグ: 移動・2本指: サイズ/回転"
+  },
+  "modal": {
+    "defaultConfirm": "確認",
+    "defaultCancel": "キャンセル"
+  },
+  "colorTheory": {
+    "monochrome": "モノクローム",
+    "tone_on_tone": "トーンオントーン",
+    "gradient": "グラデーション",
+    "tone_in_tone": "トーンイントーン",
+    "one_point": "ワンポイント",
+    "complementary": "補色",
+    "analogous": "類似色",
+    "split_complementary": "分裂補色",
+    "color_blocking": "カラーブロッキング",
+    "light_dark_contrast": "明暗コントラスト",
+    "neutral_accent": "ニュートラルアクセント",
+    "all_neutral": "オールニュートラル",
+    "ratio_211": "2:1:1比率",
+    "sandwich": "サンドイッチ"
+  },
+  "weatherText": {
+    "clear": "晴れ",
+    "partlyCloudy": "少し曇り",
+    "fog": "霧",
+    "drizzle": "小雨",
+    "rain": "雨",
+    "snow": "雪",
+    "shower": "にわか雨",
+    "heavySnow": "大雪",
+    "thunderstorm": "雷雨",
+    "cloudy": "曇り"
+  },
+  "gamification": {
+    "levels": {
+      "1": "コーデ入門者",
+      "2": "コーデ探検家",
+      "3": "コーデコレクター",
+      "4": "スタイル研究家",
+      "5": "コーデ達人",
+      "6": "カラーマスター",
+      "7": "スタイルマスター"
+    },
+    "badges": {
+      "first_step": {
+        "name": "はじめの一歩",
+        "desc": "初めてのOOTD記録"
+      },
+      "recorder": {
+        "name": "記録の達人",
+        "desc": "OOTD 10回記録"
+      },
+      "streak3": {
+        "name": "3日連続",
+        "desc": "3日連続記録達成"
+      },
+      "streak7": {
+        "name": "7日連続",
+        "desc": "7日連続記録達成"
+      },
+      "streak30": {
+        "name": "30日連続",
+        "desc": "30日連続記録！"
+      },
+      "closet_start": {
+        "name": "クローゼットスタート",
+        "desc": "クローゼットに初めてのアイテム登録"
+      },
+      "closet10": {
+        "name": "クローゼットコレクター",
+        "desc": "クローゼットに10個以上"
+      },
+      "saver": {
+        "name": "コーデコレクター",
+        "desc": "コーデ5個以上保存"
+      },
+      "photo_lover": {
+        "name": "写真記録家",
+        "desc": "写真付き記録5回"
+      },
+      "color_variety": {
+        "name": "カラー探検家",
+        "desc": "10種類以上のカラーを使用"
+      },
+      "quiz_master": {
+        "name": "ファッション博士",
+        "desc": "ファッションクイズ完了"
+      },
+      "pc_diagnosed": {
+        "name": "パーソナルカラー",
+        "desc": "パーソナルカラー診断完了"
+      },
+      "title_holder": {
+        "name": "称号保持者",
+        "desc": "称号試験1回合格"
+      },
+      "challenger": {
+        "name": "チャレンジャー",
+        "desc": "チャレンジ3回完了"
+      },
+      "master100": {
+        "name": "スタイルマスター",
+        "desc": "OOTD 100回記録"
+      }
+    },
+    "challenges": {
+      "pastel_3": {
+        "name": "パステルウィーク",
+        "desc": "パステルカラーコーデ3回記録"
+      },
+      "dark_3": {
+        "name": "ダークムード",
+        "desc": "ダークトーンコーデ3回記録"
+      },
+      "mono_2": {
+        "name": "モノトーンチャレンジ",
+        "desc": "単色系コーデ2回"
+      },
+      "photo_5": {
+        "name": "フォトジェニック",
+        "desc": "写真付き記録5回"
+      },
+      "streak_5": {
+        "name": "5日連続記録",
+        "desc": "5日連続でOOTD記録"
+      },
+      "variety_7": {
+        "name": "カラフルウィーク",
+        "desc": "7種類以上の異なるカラーを使用"
+      },
+      "earth_3": {
+        "name": "アーストーンウィーク",
+        "desc": "アーストーンコーデ3回記録"
+      },
+      "record_7": {
+        "name": "週間記録王",
+        "desc": "今週7日すべて記録"
+      }
+    },
+    "titleExams": {
+      "beginner": {
+        "name": "初級コーディネーター",
+        "desc": "基本カラー組み合わせの理解"
+      },
+      "intermediate": {
+        "name": "中級コーディネーター",
+        "desc": "カラーハーモニー理論の活用"
+      },
+      "advanced": {
+        "name": "上級コーディネーター",
+        "desc": "プロフェッショナルなスタイリングセンス"
+      }
+    }
+  },
+  "categories": {
+    "outer": "アウター",
+    "middleware": "ミドルレイヤー",
+    "top": "トップス",
+    "bottom": "ボトムス",
+    "shoes": "シューズ",
+    "scarf": "マフラー",
+    "hat": "帽子"
+  },
+  "evaluation": {
+    "freeColor": "自由配色",
+    "feedback": {
+      "placementPerfect": "カラー配置が完璧です！部位ごとのカラーが自然につながっています。",
+      "placementGood": "カラー配置がいいですね。隣り合う服同士がよく合っています。",
+      "placementOk": "カラー配置は悪くないです。",
+      "placementWeak": "隣り合う部位のカラーのつながりをもう少し意識すると良いですね。",
+      "placementPoor": "カラー配置を改善してみましょう。隣り合う服のトーンを合わせるとぐっと良くなります。",
+      "ratioPerfect": "色の比率が理想的です！",
+      "ratioGood": "色の比率が適切です。",
+      "ratioPoor": "メインカラーとサブカラーの比率を調整するともっと良くなります。",
+      "harmonyPerfect": "色の調和がとても良いです！",
+      "harmonyOk": "色の調和は悪くないです。",
+      "harmonyPoor": "色の調和をもう少し意識すると良いですね。",
+      "seasonPerfect": "季節感が完璧です！",
+      "seasonGood": "季節感が感じられます。",
+      "avoidColor": "⚠️ {{name}}さんには{{colors}}は避けた方がいいです。",
+      "pcPerfect": "あなたにとても似合うカラーです！⭐",
+      "pcGood": "無難に似合うカラーです。",
+      "pcPoor": "パーソナルカラーにもっと合うカラーをおすすめします。"
+    },
+    "improve": {
+      "accent": "無彩色コーデにアクセントカラーを加えると視線が集まります",
+      "classic": "{{color1}} + {{color2}}は定番のクラシック組み合わせです",
+      "temperature": "{{tone}}トーンで統一するとコーデがまとまります",
+      "upgrade": "{{from}}より{{to}}の方が深みがあります",
+      "contrast": "明暗のコントラストをつけるとコーデに立体感が出ます",
+      "personal": "{{name}}さんにもっと似合うカラーです"
+    },
+    "tone": {
+      "warm": "ウォーム",
+      "cool": "クール"
+    }
+  }
+}
