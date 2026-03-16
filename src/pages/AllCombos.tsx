@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { Calendar, Check, ShoppingBag } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
+
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import { useWardrobe, getScorePercentile } from '@/hooks/useWardrobe'
@@ -269,7 +269,7 @@ export default function AllCombos() {
           <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 mb-3">{t('allCombos.closetStatus')}</div>
           {['top', 'bottom', 'shoes', 'outer', 'middleware'].map(cat => {
             const count = diagnosis.pools[cat] || 0
-            const label = (CATEGORY_NAMES as any)[cat] || cat
+            const label = t('categories:names.' + cat)
             const isMissing = ['top', 'bottom', 'shoes'].includes(cat) && count === 0
             return (
               <div key={cat} className="flex items-center gap-2 py-1 text-sm">
@@ -391,7 +391,7 @@ export default function AllCombos() {
                     return (
                       <div key={part} className="flex items-center gap-1.5 text-[11px]">
                         <span className="w-3.5 h-3.5 rounded border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
-                        <span className="text-warm-500 dark:text-warm-400 w-8">{(CATEGORY_NAMES as any)?.[part]?.slice(0, 2)}</span>
+                        <span className="text-warm-500 dark:text-warm-400 w-8">{t('categories:names.' + part).slice(0, 2)}</span>
                         <span className="text-warm-800 dark:text-warm-200 font-medium">{c.name}</span>
                       </div>
                     )
@@ -428,7 +428,7 @@ export default function AllCombos() {
                     return (
                       <div key={i} className="text-[10px] text-warm-600 dark:text-warm-400 flex items-center gap-1">
                         <span>{imp.icon || '💡'}</span>
-                        <span>{t('allCombos.improveSuggestion', { part: (CATEGORY_NAMES as any)?.[imp.item]?.slice(0, 2), color: newC?.name || imp.newColor, score: imp.newScore })}</span>
+                        <span>{t('allCombos.improveSuggestion', { part: t('categories:names.' + imp.item).slice(0, 2), color: newC?.name || imp.newColor, score: imp.newScore })}</span>
                         {newC && <span className="w-2.5 h-2.5 rounded inline-block border border-warm-300" style={{ background: newC.hex }} />}
                       </div>
                     )

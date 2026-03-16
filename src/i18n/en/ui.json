@@ -133,6 +133,7 @@
     "personalColorBanner": "Set your personal color for personalized recommendations",
     "setupNow": "Set up now",
     "wardrobeCombo": "See outfit combos from your closet",
+    "wardrobeComboItems": "{{count}} items",
     "mainCta": {
       "recommend": "Get Recommendations",
       "build": "Build Your Own",
@@ -300,6 +301,20 @@
   "todayCoord": {
     "title": "What to Wear Today?",
     "subtitle": "AI picks from your closet",
+    "impression": {
+      "daily": "Comfortable and natural feel",
+      "interview": "Calm and trustworthy feel",
+      "date": "Warm and soft feel",
+      "workout": "Active and dynamic feel",
+      "travel": "Practical and comfortable feel"
+    },
+    "situation": {
+      "daily": "Daily",
+      "interview": "Work",
+      "date": "Date",
+      "workout": "Workout",
+      "travel": "Travel"
+    },
     "needMoreItems": "Please add items to your closet",
     "needMoreItemsDesc": "You need at least 1 top, 1 bottom, and 1 pair of shoes",
     "analyzingCloset": "Analyzing closet...",
@@ -356,7 +371,15 @@
     "share": "Share",
     "communityShare": "Share to Community",
     "saveSuccess": "Coord saved",
-    "colorImprove": "Changing this color would improve the score"
+    "colorImprove": "Changing this color would improve the score",
+    "tips": {
+      "tip1": "A refined look with {{color1}} and {{color2}} in {{technique}}",
+      "tip2": "{{style}} style completed with {{technique}}",
+      "tip3": "A stylish coord centered around {{color}}",
+      "tip4": "Sophisticated styling with {{color}} as a point",
+      "tip5": "A {{technique}} coord with depth using {{count}} layers"
+    },
+    "stylePrefix": "Style"
   },
   "build": {
     "stepStyle": "Select Style",
@@ -372,7 +395,78 @@
       "bodyFit": "Body Fit"
     },
     "saveCoord": "Save Coord",
-    "shareCoord": "Share"
+    "shareCoord": "Share",
+    "styleDesc": "We'll recommend colors for your style. You can also skip.",
+    "fabricToggle": "Choose fabric too",
+    "fabricToggleDesc": "Pick fabrics after colors to check compatibility",
+    "startWithoutStyle": "Start without style →",
+    "items": "Items",
+    "colorLabel": "Color",
+    "itemColor": "{{item}} color",
+    "simpleEditColor": "{{part}} color",
+    "itemColorChange": "{{item}} color change",
+    "changeItem": "Change item",
+    "recommendedColors": "Recommended colors",
+    "personalColorBadge": "Personal Color",
+    "bodyTypeBadge": "Body type",
+    "allColors": "All colors",
+    "colors": "Colors",
+    "missingParts": "Select {{parts}} to see results",
+    "selectBottom": "👖 Select Bottom",
+    "selectShoes": "👟 Select Shoes",
+    "readyToSee": "Ready to see results",
+    "scoreAnalysis": "Score Analysis",
+    "coordColors": "Coord Colors",
+    "editColors": "Edit Colors",
+    "communityBtn": "Community",
+    "similarCoords": "Similar Coords",
+    "goHome": "Go back home",
+    "backToResult": "Back to result",
+    "similarTitle": "Similar Coords",
+    "similarDesc": "We tried changing one color at a time",
+    "scoreGrade": {
+      "perfect": "Perfect combo!",
+      "great": "Great coord!",
+      "good": "Good combo",
+      "okay": "Not bad",
+      "improve": "Room to improve?"
+    },
+    "showMannequin": "👤 Show mannequin ▼",
+    "hideMannequin": "👤 Hide mannequin ▲",
+    "maxLayerWarning": "Maximum 4 layers for upper body",
+    "duplicateWarning": "This item is already added",
+    "weather": {
+      "needOuter": "Feels like {{feels}}°C. You need an outer layer.",
+      "feelsLike": "Feels like {{feels}}°C.",
+      "tooThin": "This might be too thin. Try adding an outer layer.",
+      "outerReady": "Outer layer ready! Add one more layer underneath.",
+      "addLayer": "At {{feels}}°C, one more layer is recommended.",
+      "justRight": "Looks just right! 👍",
+      "warm": "Nice and warm! 🔥",
+      "suggestOuter": "Adding an outer layer would help.",
+      "feelsTemp": "Feels like {{feels}}°C"
+    },
+    "tapToEdit": "Tap a part to edit",
+    "upperBody": "Upper",
+    "addItemPlease": "Please add an item",
+    "lowerBody": "Lower & Acc.",
+    "showMannequinCollapse": "👤 Show mannequin ▽",
+    "collapse": "Collapse △",
+    "addClothes": "+ Add clothes",
+    "editing": "Editing",
+    "editHint": "Tap items next to the mannequin to edit, or press <b>+ Add clothes</b>",
+    "initialPrompt": "What are you wearing today?<br/>Pick the first item that comes to mind",
+    "confirmEdit": "Apply this color",
+    "confirmSelect": "Select this color",
+    "confirmAdd": "Add this color",
+    "selectColor": "Please select a color",
+    "viewResults": "View results →",
+    "selectItem": "Please select an item",
+    "addMore": "+ Add more",
+    "fabricDesc": "Select fabrics for each part to check compatibility",
+    "points": "pts",
+    "alreadyGood": "Already a great combo!",
+    "feelsLabel": "feels"
   },
   "ootdRecord": {
     "situations": {
@@ -1123,11 +1217,118 @@
     "defaultConfirm": "OK",
     "defaultCancel": "Cancel"
   },
+  "colorTheory": {
+    "monochrome": "Monochrome",
+    "tone_on_tone": "Tone-on-Tone",
+    "gradient": "Gradient",
+    "tone_in_tone": "Tone-in-Tone",
+    "one_point": "One Point",
+    "complementary": "Complementary",
+    "analogous": "Analogous",
+    "split_complementary": "Split Comp.",
+    "color_blocking": "Color Blocking",
+    "light_dark_contrast": "Light-Dark",
+    "neutral_accent": "Neutral+Accent",
+    "all_neutral": "All Neutral",
+    "ratio_211": "2:1:1 Ratio",
+    "sandwich": "Sandwich"
+  },
+  "weatherText": {
+    "clear": "Clear",
+    "partlyCloudy": "Partly cloudy",
+    "fog": "Foggy",
+    "drizzle": "Drizzle",
+    "rain": "Rain",
+    "snow": "Snow",
+    "shower": "Shower",
+    "heavySnow": "Heavy snow",
+    "thunderstorm": "Thunderstorm",
+    "cloudy": "Cloudy"
+  },
+  "gamification": {
+    "levels": {
+      "1": "Coord Beginner",
+      "2": "Coord Explorer",
+      "3": "Coord Collector",
+      "4": "Style Researcher",
+      "5": "Coord Expert",
+      "6": "Color Master",
+      "7": "Style Master"
+    },
+    "badges": {
+      "first_step": { "name": "First Step", "desc": "First OOTD record" },
+      "recorder": { "name": "Recorder", "desc": "10 OOTD records" },
+      "streak3": { "name": "3-Day Streak", "desc": "3-day streak achieved" },
+      "streak7": { "name": "7-Day Streak", "desc": "7-day streak achieved" },
+      "streak30": { "name": "30-Day Streak", "desc": "30-day streak!" },
+      "closet_start": { "name": "Closet Start", "desc": "First item in closet" },
+      "closet10": { "name": "Closet Collector", "desc": "10+ items in closet" },
+      "saver": { "name": "Coord Collector", "desc": "5+ coords saved" },
+      "photo_lover": { "name": "Photo Logger", "desc": "5 records with photos" },
+      "color_variety": { "name": "Color Explorer", "desc": "10+ colors used" },
+      "quiz_master": { "name": "Fashion Expert", "desc": "Fashion quiz completed" },
+      "pc_diagnosed": { "name": "Personal Color", "desc": "Personal color diagnosed" },
+      "title_holder": { "name": "Title Holder", "desc": "Passed 1 title exam" },
+      "challenger": { "name": "Challenger", "desc": "3 challenges completed" },
+      "master100": { "name": "Style Master", "desc": "100 OOTD records" }
+    },
+    "challenges": {
+      "pastel_3": { "name": "Pastel Week", "desc": "3 pastel color coords" },
+      "dark_3": { "name": "Dark Mood", "desc": "3 dark-tone coords" },
+      "mono_2": { "name": "Monotone Challenge", "desc": "2 monochrome coords" },
+      "photo_5": { "name": "Photogenic", "desc": "5 records with photos" },
+      "streak_5": { "name": "5-Day Streak", "desc": "5 consecutive OOTD records" },
+      "variety_7": { "name": "Colorful Week", "desc": "7+ different colors used" },
+      "earth_3": { "name": "Earth Tone Week", "desc": "3 earth-tone coords" },
+      "record_7": { "name": "Weekly Recorder", "desc": "Record all 7 days this week" }
+    },
+    "titleExams": {
+      "beginner": { "name": "Beginner Coordinator", "desc": "Basic color combo understanding" },
+      "intermediate": { "name": "Intermediate Coordinator", "desc": "Color harmony theory" },
+      "advanced": { "name": "Advanced Coordinator", "desc": "Expert styling sense" }
+    }
+  },
   "categories": {
     "outer": "Outer",
     "middleware": "Middleware",
     "top": "Top",
     "bottom": "Bottom",
-    "shoes": "Shoes"
+    "shoes": "Shoes",
+    "scarf": "Scarf",
+    "hat": "Hat"
+  },
+  "evaluation": {
+    "freeColor": "Free Color",
+    "feedback": {
+      "placementPerfect": "Perfect color placement! Colors flow naturally between each piece.",
+      "placementGood": "Good color placement. Adjacent pieces match well.",
+      "placementOk": "Color placement is decent.",
+      "placementWeak": "Try to better coordinate colors between adjacent pieces.",
+      "placementPoor": "Consider improving color placement. Matching tones between adjacent pieces will help a lot.",
+      "ratioPerfect": "Ideal color ratio!",
+      "ratioGood": "Color ratio is appropriate.",
+      "ratioPoor": "Adjusting the ratio between main and accent colors would improve this.",
+      "harmonyPerfect": "Excellent color harmony!",
+      "harmonyOk": "Color harmony is decent.",
+      "harmonyPoor": "Consider paying more attention to color harmony.",
+      "seasonPerfect": "Perfect seasonal feel!",
+      "seasonGood": "Good seasonal feel.",
+      "avoidColor": "⚠️ {{colors}} may not be the best choice for {{name}}.",
+      "pcPerfect": "These colors suit you perfectly! ⭐",
+      "pcGood": "These colors work well for you.",
+      "pcPoor": "Consider colors that better match your personal color."
+    },
+    "improve": {
+      "accent": "Adding a point color to a neutral outfit draws attention",
+      "classic": "{{color1}} + {{color2}} is a proven classic combo",
+      "temperature": "Unifying to {{tone}} tone will make the coord more cohesive",
+      "upgrade": "{{to}} adds more depth than {{from}}",
+      "contrast": "Adding brightness contrast gives the outfit more dimension",
+      "personal": "A color that better suits {{name}}"
+    },
+    "tone": {
+      "warm": "warm",
+      "cool": "cool"
+    }
   }
 }

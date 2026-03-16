@@ -6,8 +6,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BarChart3, ShoppingBag, Shirt, Sparkles } from 'lucide-react'
-import { COLORS_60 } from '@/lib/colors'
-import { CATEGORY_NAMES } from '@/lib/categories'
+import { COLORS_60, getColorName } from '@/lib/colors'
+
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
 
@@ -133,7 +133,7 @@ export default function WardrobeReport() {
           <div className="flex flex-col gap-2">
             {mvpItems.map((stat, idx) => {
               const c = COLORS_60[stat.item.color || stat.item.colorKey]
-              const catLabel = (CATEGORY_NAMES)[stat.item.category] || ''
+              const catLabel = t('categories:names.' + stat.item.category)
               const pct = totalCombos > 0 ? Math.round((stat.inCombos / totalCombos) * 100) : 0
               return (
                 <div key={stat.item.id} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3.5 shadow-warm-sm">
@@ -157,7 +157,7 @@ export default function WardrobeReport() {
           <div className="flex flex-col gap-2">
             {[...hiddenPotential, ...noComboItems].slice(0, 5).map(stat => {
               const c = COLORS_60[stat.item.color || stat.item.colorKey]
-              const catLabel = (CATEGORY_NAMES)[stat.item.category] || ''
+              const catLabel = t('categories:names.' + stat.item.category)
               return (
                 <div key={stat.item.id} className="bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3.5">
                   <div className="flex items-center gap-3">
@@ -171,7 +171,7 @@ export default function WardrobeReport() {
                   </div>
                   {stat.bestPartner && (
                     <div className="mt-2 pl-12 text-[11px] text-warm-600 dark:text-warm-400">
-                      {t('wardrobeReport.bestCombo', { color: COLORS_60[stat.bestPartner.color]?.name || '?', category: (CATEGORY_NAMES)[stat.bestPartner.category] || '', score: stat.bestPartner.score })}
+                      {t('wardrobeReport.bestCombo', { color: getColorName(stat.bestPartner.color), category: t('categories:names.' + stat.bestPartner.category), score: stat.bestPartner.score })}
                     </div>
                   )}
                 </div>

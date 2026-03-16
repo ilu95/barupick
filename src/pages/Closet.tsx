@@ -5,7 +5,7 @@ import { Plus, Calendar, Star, ChevronLeft, ChevronRight, Shirt, Trash2, Wand2, 
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
 
 type ClosetTab = 'wardrobe' | 'records'
@@ -58,7 +58,6 @@ function WardrobeTab({ navigate }: { navigate: any }) {
 
   const getColor = (item: any) => item.color || item.colorKey || null
   const catOrder = ['outer', 'middleware', 'top', 'bottom', 'scarf', 'hat', 'shoes']
-  const catNames: Record<string, string> = { outer: '아우터', middleware: '미들웨어', top: '상의', bottom: '하의', scarf: '목도리', hat: '모자', shoes: '신발' }
   const getCatKey = (item: any) => catOrder.includes(item.category) ? item.category : 'etc'
 
   // localStorage 저장 헬퍼
@@ -69,7 +68,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
   const handleDelete = (id: string) => {
     const target = items.find((i: any) => i.id === id)
     if (!target) return
-    const displayName = target.name || COLORS_60[getColor(target)]?.name || ''
+    const displayName = target.name || getColorName(getColor(target))
 
     modal.confirm({
       title: t('closet.deleteItem'),
@@ -193,7 +192,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
           const count = items.filter((i: any) => i.category === cat).length
           if (count === 0) return null
           return (
-            <button key={cat} onClick={() => setFilter(filter === cat ? 'all' : cat)} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${filter === cat ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400 active:scale-95'}`}>{catNames[cat]} {count}</button>
+            <button key={cat} onClick={() => setFilter(filter === cat ? 'all' : cat)} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${filter === cat ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400 active:scale-95'}`}>{t('categories:names.' + cat)} {count}</button>
           )
         })}
       </div>
@@ -212,7 +211,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
           return (
             <div key={cat} className="mb-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-wide mb-2">
-                {catNames[cat]} <span className="text-warm-500">{catItems.length}</span>
+                {t('categories:names.' + cat)} <span className="text-warm-500">{catItems.length}</span>
               </div>
               {catItems.map(renderItem)}
             </div>

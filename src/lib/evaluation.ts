@@ -5,10 +5,11 @@
 // ⚠️ 이 알고리즘의 점수 계산은 기존과 100% 동일해야 합니다.
 // ================================================================
 
-import { COLORS_60, COLORS, hcl, H, Cv, L, hex, temp, COLOR_FAMILIES, WARM_SET, COOL_SET, getHueDiff, isNeutralColor, getToneGroup, getColorTemperature, PASTEL_COLORS, EARTH_TONE_COLORS, CLASSIC_COMBOS, AVOID_COMBOS } from './colors'
+import { COLORS_60, COLORS, hcl, H, Cv, L, hex, temp, COLOR_FAMILIES, WARM_SET, COOL_SET, getHueDiff, isNeutralColor, getToneGroup, getColorTemperature, PASTEL_COLORS, EARTH_TONE_COLORS, CLASSIC_COMBOS, AVOID_COMBOS, getColorName } from './colors'
 import { PERSONAL_COLOR_12, FACE_NEAR_ITEMS } from './personalColor'
 import { BODY_GUIDE_DATA } from './bodyType'
 import { profile } from './profile'
+import i18n from '@/i18n'
 
 
 export const evaluationSystem = {
@@ -459,7 +460,7 @@ export const evaluationSystem = {
         const theories = new Set();
 
         const hclValues = colors.map(c => COLORS_60[c]?.hcl).filter(Boolean);
-        if (hclValues.length < 2) return ["단색"];
+        if (hclValues.length < 2) return [i18n.t('colorTheory.monochrome')];
 
         const lValues = hclValues.map(v => v[2]);
         const hValues = hclValues.map(v => v[0]);
@@ -480,13 +481,13 @@ export const evaluationSystem = {
             }
         }
 
-        if (hclValues.every(v => v[1] < 15)) theories.add("무채색 조화");
-        if (maxHDiff < 30) theories.add("톤온톤");
-        if (lDiff < 20 && cDiff < 20 && maxHDiff > 35) theories.add("톤인톤");
-        if (maxHDiff > 30 && maxHDiff < 60) theories.add("유사색");
-        if (maxHDiff > 150 && maxHDiff < 210) theories.add("보색");
+        if (hclValues.every(v => v[1] < 15)) theories.add(i18n.t('colorTheory.all_neutral'));
+        if (maxHDiff < 30) theories.add(i18n.t('colorTheory.tone_on_tone'));
+        if (lDiff < 20 && cDiff < 20 && maxHDiff > 35) theories.add(i18n.t('colorTheory.tone_in_tone'));
+        if (maxHDiff > 30 && maxHDiff < 60) theories.add(i18n.t('colorTheory.analogous'));
+        if (maxHDiff > 150 && maxHDiff < 210) theories.add(i18n.t('colorTheory.complementary'));
 
-        return theories.size > 0 ? Array.from(theories) : ["자유 배색"];
+        return theories.size > 0 ? Array.from(theories) : [i18n.t('evaluation.freeColor')];
     },
 
     // 피드백 생성
@@ -496,40 +497,40 @@ export const evaluationSystem = {
 
         // 컬러 배치 피드백
         if (goldilocks >= 18) {
-            feedback += "컬러 배치가 완벽해요! 부위별 색상이 자연스럽게 연결됩니다. ";
+            feedback += i18n.t('evaluation.feedback.placementPerfect') + ' ';
         } else if (goldilocks >= 14) {
-            feedback += "컬러 배치가 좋아요. 인접한 옷끼리 잘 어울려요. ";
+            feedback += i18n.t('evaluation.feedback.placementGood') + ' ';
         } else if (goldilocks >= 10) {
-            feedback += "컬러 배치가 괜찮아요. ";
+            feedback += i18n.t('evaluation.feedback.placementOk') + ' ';
         } else if (goldilocks >= 6) {
-            feedback += "인접한 부위의 색상 연결을 좀 더 신경쓰면 좋겠어요. ";
+            feedback += i18n.t('evaluation.feedback.placementWeak') + ' ';
         } else {
-            feedback += "색상 배치를 개선해보세요. 인접한 옷끼리 톤을 맞추면 훨씬 나아질 거예요. ";
+            feedback += i18n.t('evaluation.feedback.placementPoor') + ' ';
         }
 
         // 비율 피드백
         if (ratio >= 12) {
-            feedback += "색상 비율이 이상적이에요! ";
+            feedback += i18n.t('evaluation.feedback.ratioPerfect') + ' ';
         } else if (ratio >= 8) {
-            feedback += "색상 비율이 적절해요. ";
+            feedback += i18n.t('evaluation.feedback.ratioGood') + ' ';
         } else if (ratio < 5) {
-            feedback += "주 색상과 보조 색상의 비율을 조정하면 더 좋아질 거예요. ";
+            feedback += i18n.t('evaluation.feedback.ratioPoor') + ' ';
         }
 
         // 조화도 피드백
         if (harmony >= 8) {
-            feedback += "색상 조화가 아주 좋아요! ";
+            feedback += i18n.t('evaluation.feedback.harmonyPerfect') + ' ';
         } else if (harmony >= 5) {
-            feedback += "색상 조화가 괜찮아요. ";
+            feedback += i18n.t('evaluation.feedback.harmonyOk') + ' ';
         } else {
-            feedback += "색상 조화를 더 신경쓰면 좋겠어요. ";
+            feedback += i18n.t('evaluation.feedback.harmonyPoor') + ' ';
         }
 
         // 계절감 피드백
         if (season >= 8) {
-            feedback += "계절감이 완벽해요! ";
+            feedback += i18n.t('evaluation.feedback.seasonPerfect') + ' ';
         } else if (season >= 5) {
-            feedback += "계절감이 느껴져요. ";
+            feedback += i18n.t('evaluation.feedback.seasonGood') + ' ';
         }
 
         // 퍼스널 컬러 피드백 (12톤 시스템)
@@ -542,18 +543,17 @@ export const evaluationSystem = {
                 const wornAvoidColors = FACE_NEAR_ITEMS
                     .filter(item => outfit[item] && avoidColors.includes(outfit[item]))
                     .map(item => {
-                        const color = COLORS_60[outfit[item]];
-                        return color?.name || outfit[item];
+                        return getColorName(outfit[item]);
                     });
 
                 if (wornAvoidColors.length > 0) {
-                    feedback += `⚠️ ${pcData.name}에게 ${wornAvoidColors.join(', ')}은(는) 피하는 게 좋아요. `;
+                    feedback += i18n.t('evaluation.feedback.avoidColor', { name: pcData.name, colors: wornAvoidColors.join(', ') }) + ' ';
                 } else if (personal >= 8) {
-                    feedback += "나에게 아주 잘 어울리는 색이에요! ⭐";
+                    feedback += i18n.t('evaluation.feedback.pcPerfect');
                 } else if (personal >= 5) {
-                    feedback += "무난하게 어울리는 색이에요.";
+                    feedback += i18n.t('evaluation.feedback.pcGood');
                 } else if (personal >= 3) {
-                    feedback += "퍼스널컬러와 더 맞는 색상을 추천드려요.";
+                    feedback += i18n.t('evaluation.feedback.pcPoor');
                 }
             }
         }
@@ -709,7 +709,7 @@ export const evaluationSystem = {
                 if (bestAccent && bestAccent !== outfit[accentItem]) {
                     suggestions.push({
                         item: accentItem, currentColor: outfit[accentItem], newColor: bestAccent,
-                        category: 'accent', reason: '무채색 코디에 포인트 컬러를 더하면 시선이 모여요', icon: '🎯'
+                        category: 'accent', reason: i18n.t('evaluation.improve.accent'), icon: '🎯'
                     });
                     usedItems.add(accentItem);
                 }
@@ -740,11 +740,11 @@ export const evaluationSystem = {
                     return pTemp.temp === cTemp.temp || pTemp.temp === 'neutral' || cTemp.temp === 'neutral';
                 });
                 if (bestPartner) {
-                    const cName = COLORS_60[cKey]?.name || cKey;
-                    const pName = COLORS_60[bestPartner]?.name || bestPartner;
+                    const cName = getColorName(cKey);
+                    const pName = getColorName(bestPartner);
                     suggestions.push({
                         item: swapItem, currentColor: swapColor, newColor: bestPartner,
-                        category: 'classic', reason: `${cName} + ${pName}는 검증된 클래식 조합이에요`, icon: '👔'
+                        category: 'classic', reason: i18n.t('evaluation.improve.classic', { color1: cName, color2: pName }), icon: '👔'
                     });
                     usedItems.add(swapItem);
                     break;
@@ -773,7 +773,7 @@ export const evaluationSystem = {
                     suggestions.push({
                         item, currentColor: colorKey, newColor: alternatives[0][0],
                         category: 'temperature',
-                        reason: `${majorTemp === 'warm' ? '웜' : '쿨'}톤으로 통일하면 코디가 정돈돼요`, icon: '🌡️'
+                        reason: i18n.t('evaluation.improve.temperature', { tone: majorTemp === 'warm' ? i18n.t('evaluation.tone.warm') : i18n.t('evaluation.tone.cool') }), icon: '🌡️'
                     });
                     usedItems.add(item);
                 }
@@ -808,11 +808,11 @@ export const evaluationSystem = {
                 return t.temp === char.dominantTemp || t.temp === 'neutral';
             }) || available[0];
 
-            const fromName = COLORS_60[colorKey]?.name || colorKey;
-            const toName = COLORS_60[best]?.name || best;
+            const fromName = getColorName(colorKey);
+            const toName = getColorName(best);
             suggestions.push({
                 item, currentColor: colorKey, newColor: best,
-                category: 'upgrade', reason: `${fromName}보다 ${toName}가 더 깊이감 있어요`, icon: '✨'
+                category: 'upgrade', reason: i18n.t('evaluation.improve.upgrade', { from: fromName, to: toName }), icon: '✨'
             });
             usedItems.add(item);
         });
@@ -842,7 +842,7 @@ export const evaluationSystem = {
                 if (best) {
                     suggestions.push({
                         item: targetItem, currentColor: outfit[targetItem], newColor: best[0],
-                        category: 'contrast', reason: '밝기 대비를 주면 코디에 입체감이 생겨요', icon: '🔲'
+                        category: 'contrast', reason: i18n.t('evaluation.improve.contrast'), icon: '🔲'
                     });
                     usedItems.add(targetItem);
                     break;
@@ -867,7 +867,7 @@ export const evaluationSystem = {
                         if (replacement) {
                             suggestions.push({
                                 item, currentColor: outfit[item], newColor: replacement,
-                                category: 'personal', reason: `${pcData.name}에게 더 어울리는 색이에요`, icon: '🎨'
+                                category: 'personal', reason: i18n.t('evaluation.improve.personal', { name: pcData.name }), icon: '🎨'
                             });
                             usedItems.add(item);
                         }

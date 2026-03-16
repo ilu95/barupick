@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, Edit3, ArrowLeft, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { ITEMS_CATALOG } from '@/lib/styles'
 
 // ITEMS_CATALOG + 하의/신발 통합 목록
@@ -264,7 +264,7 @@ export default function ClosetAdd() {
       {selectedItem && (
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">
-            2. {t('closetAdd.step2')} {color && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {COLORS_60[color]?.name}</span>}
+            2. {t('closetAdd.step2')} {color && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {getColorName(color)}</span>}
           </div>
           <ColorPicker inline selected={color} onSelect={setColor} onClear={() => setColor(null)} />
         </div>

@@ -133,6 +133,7 @@
     "personalColorBanner": "퍼스널컬러를 설정하면 맞춤 추천을 받을 수 있어요",
     "setupNow": "설정하기",
     "wardrobeCombo": "내 옷장에서 코디 조합 보기",
+    "wardrobeComboItems": "{{count}}개 아이템",
     "mainCta": {
       "recommend": "코디 추천받기",
       "build": "직접 만들기",
@@ -300,6 +301,20 @@
   "todayCoord": {
     "title": "오늘 뭐 입지?",
     "subtitle": "내 옷장에서 AI가 골라준 코디",
+    "impression": {
+      "daily": "편안하고 자연스러운 느낌",
+      "interview": "차분하고 신뢰감 있는 느낌",
+      "date": "따뜻하고 부드러운 느낌",
+      "workout": "활동적이고 역동적인 느낌",
+      "travel": "실용적이고 편안한 느낌"
+    },
+    "situation": {
+      "daily": "일상",
+      "interview": "출근·면접",
+      "date": "데이트",
+      "workout": "운동",
+      "travel": "여행"
+    },
     "needMoreItems": "옷장에 아이템을 등록해주세요",
     "needMoreItemsDesc": "상의, 하의, 신발이 각 1개 이상 필요해요",
     "analyzingCloset": "옷장 분석 중...",
@@ -356,7 +371,15 @@
     "share": "공유",
     "communityShare": "커뮤니티에 공유",
     "saveSuccess": "코디가 저장되었어요",
-    "colorImprove": "이 색상을 바꾸면 점수가 올라요"
+    "colorImprove": "이 색상을 바꾸면 점수가 올라요",
+    "tips": {
+      "tip1": "{{color1}}과(와) {{color2}}의 {{technique}} 조합으로 세련된 룩",
+      "tip2": "{{technique}} 연출로 완성하는 {{style}} 스타일",
+      "tip3": "{{color}} 위주의 배색으로 분위기 있는 코디 완성",
+      "tip4": "{{color}}을(를) 포인트로 활용한 감각적인 스타일링",
+      "tip5": "{{count}}부위 레이어드로 깊이감 있는 {{technique}} 코디"
+    },
+    "stylePrefix": "스타일"
   },
   "build": {
     "stepStyle": "스타일 선택",
@@ -372,7 +395,78 @@
       "bodyFit": "체형 맞춤"
     },
     "saveCoord": "코디 저장",
-    "shareCoord": "공유하기"
+    "shareCoord": "공유하기",
+    "styleDesc": "스타일에 맞는 컬러를 추천해 드려요. 건너뛰기도 가능합니다.",
+    "fabricToggle": "소재도 함께 고르기",
+    "fabricToggleDesc": "부위별 색상 선택 후 소재를 골라 궁합 체크",
+    "startWithoutStyle": "스타일 없이 시작 →",
+    "items": "아이템",
+    "colorLabel": "컬러",
+    "itemColor": "{{item}} 컬러",
+    "simpleEditColor": "{{part}} 컬러",
+    "itemColorChange": "{{item}} 컬러 변경",
+    "changeItem": "아이템 변경",
+    "recommendedColors": "추천 색상",
+    "personalColorBadge": "퍼스널컬러",
+    "bodyTypeBadge": "체형",
+    "allColors": "전체 색상",
+    "colors": "색상",
+    "missingParts": "{{parts}}까지 선택하면 결과를 볼 수 있어요",
+    "selectBottom": "👖 하의 선택",
+    "selectShoes": "👟 신발 선택",
+    "readyToSee": "결과를 볼 수 있어요",
+    "scoreAnalysis": "점수 분석",
+    "coordColors": "코디 색상",
+    "editColors": "컬러 수정하기",
+    "communityBtn": "커뮤니티",
+    "similarCoords": "비슷한 코디",
+    "goHome": "처음으로 돌아가기",
+    "backToResult": "결과로",
+    "similarTitle": "비슷한 코디",
+    "similarDesc": "현재 코디에서 색상을 하나씩 바꿔봤어요",
+    "scoreGrade": {
+      "perfect": "완벽한 조합!",
+      "great": "훌륭한 코디!",
+      "good": "좋은 조합이에요",
+      "okay": "나쁘지 않아요",
+      "improve": "개선해볼까요?"
+    },
+    "showMannequin": "👤 마네킹 보기 ▼",
+    "hideMannequin": "👤 마네킹 접기 ▲",
+    "maxLayerWarning": "상체는 최대 4겹까지 가능해요",
+    "duplicateWarning": "이미 추가된 아이템이에요",
+    "weather": {
+      "needOuter": "체감 {{feels}}°C예요. 겉옷이 필요한 날씨입니다.",
+      "feelsLike": "체감 {{feels}}°C예요.",
+      "tooThin": "이것만으로는 추울 수 있어요. 겉옷을 추가해보세요.",
+      "outerReady": "겉옷 준비 완료! 안에 한 겹 더 입으면 좋아요.",
+      "addLayer": "{{feels}}°C에는 한 겹 더 추천해요.",
+      "justRight": "이 정도면 적당해요! 👍",
+      "warm": "따뜻하게 입었네요! 🔥",
+      "suggestOuter": "겉옷을 추가하면 좋겠어요.",
+      "feelsTemp": "체감 {{feels}}°C"
+    },
+    "tapToEdit": "수정을 원하시면 해당 부위를 탭해주세요",
+    "upperBody": "상체",
+    "addItemPlease": "아이템을 추가해주세요",
+    "lowerBody": "하체·악세서리",
+    "showMannequinCollapse": "👤 마네킹 보기 ▽",
+    "collapse": "접기 △",
+    "addClothes": "+ 옷 추가",
+    "editing": "수정 중",
+    "editHint": "마네킹 옆 아이템을 탭해서 수정하거나<br/><b>+ 옷 추가</b>를 눌러주세요",
+    "initialPrompt": "오늘 뭐 입으세요?<br/>가장 먼저 떠오르는 아이템을 골라주세요",
+    "confirmEdit": "이 컬러로 수정",
+    "confirmSelect": "이 컬러로 선택",
+    "confirmAdd": "이 컬러로 추가",
+    "selectColor": "컬러를 선택해주세요",
+    "viewResults": "결과 보기 →",
+    "selectItem": "아이템을 선택해주세요",
+    "addMore": "+ 옷 추가하기",
+    "fabricDesc": "각 부위의 소재를 골라 궁합을 확인하세요",
+    "points": "점",
+    "alreadyGood": "이미 좋은 조합이에요!",
+    "feelsLabel": "체감"
   },
   "ootdRecord": {
     "situations": {
@@ -1123,11 +1217,118 @@
     "defaultConfirm": "확인",
     "defaultCancel": "취소"
   },
+  "colorTheory": {
+    "monochrome": "모노크롬",
+    "tone_on_tone": "톤온톤",
+    "gradient": "그라데이션",
+    "tone_in_tone": "톤인톤",
+    "one_point": "원포인트",
+    "complementary": "보색대비",
+    "analogous": "유사색",
+    "split_complementary": "분할보색",
+    "color_blocking": "컬러블로킹",
+    "light_dark_contrast": "명암대비",
+    "neutral_accent": "뉴트럴악센트",
+    "all_neutral": "올뉴트럴",
+    "ratio_211": "2:1:1비율",
+    "sandwich": "샌드위치"
+  },
+  "weatherText": {
+    "clear": "맑음",
+    "partlyCloudy": "구름 조금",
+    "fog": "안개",
+    "drizzle": "이슬비",
+    "rain": "비",
+    "snow": "눈",
+    "shower": "소나기",
+    "heavySnow": "폭설",
+    "thunderstorm": "뇌우",
+    "cloudy": "흐림"
+  },
+  "gamification": {
+    "levels": {
+      "1": "코디 입문자",
+      "2": "코디 탐험가",
+      "3": "코디 수집가",
+      "4": "스타일 연구가",
+      "5": "코디 달인",
+      "6": "컬러 마스터",
+      "7": "스타일 마스터"
+    },
+    "badges": {
+      "first_step": { "name": "첫 발걸음", "desc": "첫 번째 OOTD 기록" },
+      "recorder": { "name": "기록왕", "desc": "OOTD 10번 기록" },
+      "streak3": { "name": "3일 연속", "desc": "3일 연속 기록 달성" },
+      "streak7": { "name": "7일 연속", "desc": "7일 연속 기록 달성" },
+      "streak30": { "name": "30일 연속", "desc": "30일 연속 기록!" },
+      "closet_start": { "name": "옷장 시작", "desc": "옷장에 첫 아이템 등록" },
+      "closet10": { "name": "옷장 컬렉터", "desc": "옷장에 10개 이상" },
+      "saver": { "name": "코디 수집가", "desc": "코디 5개 이상 저장" },
+      "photo_lover": { "name": "사진 기록가", "desc": "사진 포함 기록 5회" },
+      "color_variety": { "name": "컬러 탐험가", "desc": "10가지 이상 컬러 사용" },
+      "quiz_master": { "name": "패션 박사", "desc": "패션 퀴즈 완료" },
+      "pc_diagnosed": { "name": "퍼스널컬러", "desc": "퍼스널컬러 진단 완료" },
+      "title_holder": { "name": "칭호 보유자", "desc": "칭호 시험 1회 통과" },
+      "challenger": { "name": "챌린저", "desc": "챌린지 3회 완료" },
+      "master100": { "name": "스타일 마스터", "desc": "OOTD 100번 기록" }
+    },
+    "challenges": {
+      "pastel_3": { "name": "파스텔 위크", "desc": "파스텔 컬러 코디 3회 기록" },
+      "dark_3": { "name": "다크 무드", "desc": "다크톤 코디 3회 기록" },
+      "mono_2": { "name": "모노톤 챌린지", "desc": "단색 계열 코디 2회" },
+      "photo_5": { "name": "포토제닉", "desc": "사진 포함 기록 5회" },
+      "streak_5": { "name": "5일 연속 기록", "desc": "5일 연속으로 OOTD 기록" },
+      "variety_7": { "name": "컬러풀 위크", "desc": "7가지 이상 다른 컬러 사용" },
+      "earth_3": { "name": "어스톤 위크", "desc": "어스톤 코디 3회 기록" },
+      "record_7": { "name": "주간 기록왕", "desc": "이번 주 7일 모두 기록" }
+    },
+    "titleExams": {
+      "beginner": { "name": "초급 코디네이터", "desc": "기본 색상 조합 이해" },
+      "intermediate": { "name": "중급 코디네이터", "desc": "컬러 하모니 이론 활용" },
+      "advanced": { "name": "고급 코디네이터", "desc": "전문 스타일링 감각" }
+    }
+  },
   "categories": {
     "outer": "아우터",
     "middleware": "미들웨어",
     "top": "상의",
     "bottom": "하의",
-    "shoes": "신발"
+    "shoes": "신발",
+    "scarf": "목도리",
+    "hat": "모자"
+  },
+  "evaluation": {
+    "freeColor": "자유 배색",
+    "feedback": {
+      "placementPerfect": "컬러 배치가 완벽해요! 부위별 색상이 자연스럽게 연결됩니다.",
+      "placementGood": "컬러 배치가 좋아요. 인접한 옷끼리 잘 어울려요.",
+      "placementOk": "컬러 배치가 괜찮아요.",
+      "placementWeak": "인접한 부위의 색상 연결을 좀 더 신경쓰면 좋겠어요.",
+      "placementPoor": "색상 배치를 개선해보세요. 인접한 옷끼리 톤을 맞추면 훨씬 나아질 거예요.",
+      "ratioPerfect": "색상 비율이 이상적이에요!",
+      "ratioGood": "색상 비율이 적절해요.",
+      "ratioPoor": "주 색상과 보조 색상의 비율을 조정하면 더 좋아질 거예요.",
+      "harmonyPerfect": "색상 조화가 아주 좋아요!",
+      "harmonyOk": "색상 조화가 괜찮아요.",
+      "harmonyPoor": "색상 조화를 더 신경쓰면 좋겠어요.",
+      "seasonPerfect": "계절감이 완벽해요!",
+      "seasonGood": "계절감이 느껴져요.",
+      "avoidColor": "⚠️ {{name}}에게 {{colors}}은(는) 피하는 게 좋아요.",
+      "pcPerfect": "나에게 아주 잘 어울리는 색이에요! ⭐",
+      "pcGood": "무난하게 어울리는 색이에요.",
+      "pcPoor": "퍼스널컬러와 더 맞는 색상을 추천드려요."
+    },
+    "improve": {
+      "accent": "무채색 코디에 포인트 컬러를 더하면 시선이 모여요",
+      "classic": "{{color1}} + {{color2}}는 검증된 클래식 조합이에요",
+      "temperature": "{{tone}}톤으로 통일하면 코디가 정돈돼요",
+      "upgrade": "{{from}}보다 {{to}}가 더 깊이감 있어요",
+      "contrast": "밝기 대비를 주면 코디에 입체감이 생겨요",
+      "personal": "{{name}}에게 더 어울리는 색이에요"
+    },
+    "tone": {
+      "warm": "웜",
+      "cool": "쿨"
+    }
   }
 }

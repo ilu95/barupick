@@ -6,6 +6,7 @@ import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
+import i18n from '@/i18n'
 
 import { profile as profileLib } from '@/lib/profile'
 
@@ -99,7 +100,8 @@ export default function Home() {
             if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
           })
           const d = new Date(recentOotd.date)
-          const dayLabel = d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+          const locale = i18n.language === 'en' ? 'en-US' : 'ko-KR'
+          const dayLabel = d.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
           return (
             <button onClick={() => navigate(`/closet/ootd/${recentOotd.date}?id=${recentOotd.id}`)} className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-4 py-3 shadow-warm-sm active:scale-[0.98] transition-all">
               <MannequinSVG outfit={outfitHex} size={44} />

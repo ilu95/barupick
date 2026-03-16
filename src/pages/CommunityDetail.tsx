@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink, Pencil } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
-import { STYLE_GUIDE } from '@/lib/styles'
-import { CATEGORY_NAMES } from '@/lib/categories'
+
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
@@ -268,7 +267,7 @@ export default function CommunityDetail() {
   const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
   const instaId = post.profiles?.instagram_id
-  const styleName = post.style ? STYLE_GUIDE[post.style]?.name : null
+  const styleName = post.style ? t('styles:guide.' + post.style + '.name') : null
   const isMe = user?.id === post.user_id
   const isFriendsPost = post.visibility === 'friends'
   const canComment = isFriendsPost && (isFriend(post.user_id) || isMe)
@@ -429,7 +428,7 @@ export default function CommunityDetail() {
               return (
                 <div key={part} className="flex items-center gap-1.5 text-xs">
                   <span className="w-4 h-4 rounded border border-warm-400" style={{ background: c.hex }} />
-                  <span className="text-warm-500">{(CATEGORY_NAMES as any)?.[part]}</span>
+                  <span className="text-warm-500">{t('categories:names.' + part)}</span>
                   <span className="text-warm-800 dark:text-warm-200">{c.name}</span>
                 </div>
               )
