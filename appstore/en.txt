@@ -1,0 +1,50 @@
+[App Name] (30자 이내)
+BaruPick - Outfit Color Match
+
+[Subtitle] (30자 이내)
+AI Outfit Ideas · Personal Color · OOTD
+
+---
+
+[Description]
+
+"What should I wear today?" BaruPick solves your daily outfit dilemma with AI-powered color coordination.
+
+BaruPick is a styling assistant app that analyzes color harmony to find the outfit combinations that look best on you.
+
+# Get Outfit Recommendations
+Pick one item you want to wear, and BaruPick suggests 30 outfits with color harmony scores. Save your favorites and revisit them anytime.
+
+# Build Your Own Outfit
+Dress up a mannequin with your own color picks. AI suggests colors that match your taste, then scores the result across 7 categories: color placement, proportion, harmony, color temperature, balance, personal color, and body type fit.
+
+# Personal Color Diagnosis & Body Type Guide
+Find your personal color through a quick quiz (8 questions), a daylight comparison test, or by choosing directly from 12 seasonal types. The body type guide shows you how to use color placement and styling to flatter your figure.
+
+# My Wardrobe
+Register the clothes you own, and BaruPick creates outfits from them. It also analyzes what you use most and suggests what to buy next.
+
+# Weather-Based Outfits
+Get outfit suggestions based on today's weather — temperature, wind chill, humidity, and wind all factored in.
+
+# OOTD Log & Outfit Calendar
+Snap a photo of what you wore. Tag the occasion (work, date, casual, interview, travel, workout), add your mood, or cover your face with stickers. Your log builds into a calendar so you can check when you last wore something.
+
+# Community
+Browse other people's outfits and show off yours. You can also share privately with friends only.
+
+---
+
+[What's New]
+v1.0.1 Update
+- Edit colors directly from outfit builder results
+- Monthly overview added to outfit calendar
+- Add brand and product name when registering wardrobe items
+- OOTD log now displays in a 2-column layout
+- Fixed date display issues
+- General stability improvements
+
+---
+
+[Keywords] (100자 이내)
+AI,outfit,color,personal color,OOTD,fashion,styling,body type,wardrobe,daily look,color analysis

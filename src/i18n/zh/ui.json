@@ -161,6 +161,7 @@
     "switchToLogin": "已有账号？登录",
     "kakaoLogin": "Kakao 登录",
     "googleLogin": "Google 登录",
+    "appleLogin": "通过Apple登录",
     "agreement": "注册即表示同意使用条款和隐私政策",
     "emailRequired": "请输入邮箱",
     "emailInvalid": "请输入有效的邮箱地址",
