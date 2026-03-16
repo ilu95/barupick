@@ -8,7 +8,7 @@ import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60 } from '@/lib/colors'
 import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styles'
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
-import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType } from '@/hooks/useBuild'
+import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType, predictSlot } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick } from '@/lib/analytics'
 import { useWeather, weatherEmoji, getLayerAdvice } from '@/hooks/useWeather'
@@ -595,6 +595,20 @@ function StepFabric({ build }: { build: BH }) {
   )
 }
 
+// ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 (BuildCoord용) ───
+function getBuildPartLabel(partKey: string, upper: any[]): string {
+  const sorted = sortUpper(upper)
+  for (let i = 0; i < sorted.length; i++) {
+    const slot = getSlotKey(i, sorted.length, sorted[i])
+    if (slot === partKey) {
+      const item = ITEMS_CATALOG.find(x => x.id === sorted[i].itemId)
+      if (item) return item.label
+    }
+  }
+  const fallbacks: Record<string, string> = { top: '이너', bottom: '하의', shoes: '신발', outer: '아우터', middleware: '미들웨어', scarf: '목도리', hat: '모자' }
+  return fallbacks[partKey] || partKey
+}
+
 // ═══════════════════════════════════════
 // Step 4: 결과
 // ═══════════════════════════════════════
@@ -705,7 +719,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
               <div key={cat} className="flex flex-col items-center gap-1">
                 <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold border border-warm-400/30"
                   style={{ background: c.hex, color: c.hcl[2] > 60 ? '#1C1917' : '#fff' }}>{c.name}</div>
-                <div className="text-[10px] text-warm-700 dark:text-warm-300">{(CATEGORY_NAMES as any)?.[cat]}</div>
+                <div className="text-[10px] text-warm-700 dark:text-warm-300">{getBuildPartLabel(cat, build.state.upper)}</div>
               </div>
             )
           })}
@@ -780,7 +794,7 @@ function StepImprove({ build }: { build: BH }) {
                 <MannequinSVG outfit={newOutfitHex} options={{ outerType: build.outerType, midType: build.midType }} size={60} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] text-warm-600">{(CATEGORY_NAMES as any)?.[imp.part]}</span>
+                    <span className="text-[11px] text-warm-600">{getBuildPartLabel(imp.part, build.state.upper)}</span>
                     <div className="flex items-center gap-1">
                       <span className="w-4 h-4 rounded border border-warm-400" style={{ background: origC.hex }} />
                       <span className="text-warm-400">→</span>

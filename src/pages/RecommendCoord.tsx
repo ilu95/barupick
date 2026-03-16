@@ -13,6 +13,21 @@ import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
 import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
 import { useToast } from '@/components/ui/Toast'
 
+// ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 ───
+function getPickedPartLabel(partKey: string, pickedItems: string[]): string {
+  for (const id of pickedItems) {
+    const item = ITEMS_CATALOG.find(i => i.id === id)
+    if (!item) continue
+    if (partKey === 'outer' && item.outerType) return item.label
+    if (partKey === 'middleware' && item.midType) return item.label
+    if (partKey === 'scarf' && item.slot === 'scarf') return item.label
+    if (partKey === 'hat' && item.slot === 'hat') return item.label
+    if (partKey === 'top' && !item.outerType && !item.midType && !item.slot) return item.label
+  }
+  const fallbacks: Record<string, string> = { top: '이너', bottom: '하의', shoes: '신발', outer: '아우터', middleware: '미들웨어', scarf: '목도리', hat: '모자' }
+  return fallbacks[partKey] || partKey
+}
+
 export default function RecommendCoord() {
   const navigate = useNavigate()
   const rec = useRecommend()
@@ -374,17 +389,20 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const [saveModal, setSaveModal] = useState(false)
   const [saveName, setSaveName] = useState('')
   const [vizCollapsed, setVizCollapsed] = useState(false)
+  const [editingPart, setEditingPart] = useState<string | null>(null)
+  const [editedOutfit, setEditedOutfit] = useState<Record<string, string> | null>(null)
 
   if (!combo) return <div className="text-center py-16 text-warm-500 dark:text-warm-400">결과를 불러올 수 없어요</div>
 
-  const outfitHex = outfitToHex(combo.outfit)
-  const parts = Object.keys(combo.outfit).filter(k => combo.outfit[k])
+  const currentOutfit = editedOutfit || combo.outfit
+  const outfitHex = outfitToHex(currentOutfit)
+  const parts = Object.keys(currentOutfit).filter(k => currentOutfit[k])
 
   let evalResult: any = null
   let finalScore = combo.score
   try {
     const pc = profile.getPersonalColor()
-    evalResult = evaluationSystem.evaluate(combo.outfit, pc)
+    evalResult = evaluationSystem.evaluate(currentOutfit, pc)
     finalScore = evalResult?.total || combo.score
   } catch {}
 
@@ -404,7 +422,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const handleSave = () => {
     const name = saveName.trim() || combo.name
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit: combo.outfit, score: finalScore, name, createdAt: Date.now() })
+    saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now() })
     if (saved.length > 100) saved.length = 100
     localStorage.setItem('cs_saved', JSON.stringify(saved))
     setSaveModal(false)
@@ -451,7 +469,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
             return (
               <div key={k} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
-                <span className="text-warm-500 dark:text-warm-400 w-10">{(CATEGORY_NAMES as any)?.[k] || k}</span>
+                <span className="text-warm-500 dark:text-warm-400 w-10">{getPickedPartLabel(k, rec.state.pickedItems)}</span>
                 <span className="text-warm-800 dark:text-warm-200 font-medium">{c?.name || ''}</span>
               </div>
             )
@@ -529,20 +547,47 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
         </div>
         <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">부위를 탭하면 색상을 교체할 수 있어요</div>
         <div className="flex gap-2 flex-wrap justify-center py-1 pb-2">
-          {Object.entries(combo.outfit).filter(([_, v]) => v).map(([cat, colorKey]) => {
+          {Object.entries(currentOutfit).filter(([_, v]) => v).map(([cat, colorKey]) => {
             const c = COLORS_60[colorKey as string]
             if (!c) return null
+            const isEditing = editingPart === cat
             return (
-              <div key={cat} className="flex flex-col items-center gap-1 flex-shrink-0">
-                <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold active:scale-90 transition-transform border border-warm-400/30"
+              <button key={cat} onClick={() => setEditingPart(isEditing ? null : cat)}
+                className="flex flex-col items-center gap-1 flex-shrink-0">
+                <div className={`w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold active:scale-90 transition-transform border ${isEditing ? 'border-terra-500 border-2 ring-2 ring-terra-300' : 'border-warm-400/30'}`}
                   style={{ background: c.hex }}>
                   <span style={{ color: c.hcl[2] > 60 ? '#1C1917' : '#ffffff' }}>{c.name}</span>
                 </div>
-                <div className="text-[10px] text-warm-700 dark:text-warm-300 whitespace-nowrap">{(CATEGORY_NAMES as any)?.[cat] || cat}</div>
-              </div>
+                <div className={`text-[10px] whitespace-nowrap ${isEditing ? 'text-terra-600 dark:text-terra-400 font-semibold' : 'text-warm-700 dark:text-warm-300'}`}>
+                  {getPickedPartLabel(cat, rec.state.pickedItems)}
+                </div>
+              </button>
             )
           })}
         </div>
+        {editingPart && (
+          <div className="mt-2 animate-screen-fade">
+            <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">
+              {getPickedPartLabel(editingPart, rec.state.pickedItems)} 색상 변경
+            </div>
+            <ColorPicker
+              inline
+              selected={currentOutfit[editingPart]}
+              onSelect={(k) => {
+                setEditedOutfit(prev => ({ ...(prev || combo.outfit), [editingPart]: k }))
+              }}
+              onClear={() => setEditingPart(null)}
+            />
+            {editedOutfit && (
+              <div className="flex gap-2 mt-2">
+                <button onClick={() => { setEditedOutfit(null); setEditingPart(null) }}
+                  className="flex-1 py-2 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-700 rounded-xl active:scale-[0.98]">원래대로</button>
+                <button onClick={() => setEditingPart(null)}
+                  className="flex-1 py-2 text-[11px] text-white bg-terra-500 rounded-xl font-semibold active:scale-[0.98]">적용</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 뒤로 */}
