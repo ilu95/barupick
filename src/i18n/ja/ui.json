@@ -367,6 +367,7 @@
     "revert": "元に戻す",
     "apply": "適用",
     "backToList": "一覧へ",
+    "unsavedColorWarning": "変更した色が保存されません。戻りますか？",
     "partTop": "インナー",
     "partBottom": "ボトムス",
     "partShoes": "シューズ",

@@ -367,6 +367,7 @@
     "revert": "원래대로",
     "apply": "적용",
     "backToList": "목록으로",
+    "unsavedColorWarning": "변경한 색상이 저장되지 않습니다. 돌아가시겠습니까?",
     "partTop": "이너",
     "partBottom": "하의",
     "partShoes": "신발",
