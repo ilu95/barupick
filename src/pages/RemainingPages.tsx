@@ -838,7 +838,7 @@ export function EventDetail() {
                 {idx < 3 && <div className="text-lg mb-1">{['🥇', '🥈', '🥉'][idx]}</div>}
                 {sub.photo_urls?.[0] ? <img src={sub.photo_urls[0]} className="w-full aspect-square rounded-xl object-cover mb-2" alt="" />
                 : <div className="flex justify-center mb-2"><MannequinSVG outfit={outfitHex} size={80} /></div>}
-                <div className="text-xs font-semibold text-terra-600">{sub.score}점</div>
+                <div className="text-xs font-semibold text-terra-600">{t('common.score', { score: sub.score })}</div>
               </div>
             )
           })}
@@ -1030,7 +1030,7 @@ export function PcSelect() {
         {/* 피해야 할 컬러 */}
         {displayData?.worstColors && (
           <div className="bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-2xl p-4 mb-5 shadow-warm-sm">
-            <div className="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-widest mb-3">피해야 할 컬러</div>
+            <div className="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-widest mb-3">{t('pcLight.worstColors')}</div>
             <div className="flex gap-2 flex-wrap">
               {displayData.worstColors.slice(0, 6).map((ck: string) => {
                 const c = COLORS_60[ck]
@@ -1050,13 +1050,13 @@ export function PcSelect() {
 
         <div className="flex flex-col gap-2.5">
           <button onClick={() => { if (resultType) setPC(resultType) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
-            이 결과로 설정하기
+            {t('pcSelect.saveAndApply')}
           </button>
           <button onClick={() => { setQuizStep(0); setScores({}); setMode('quiz') }} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
-            다시 진단하기
+            {t('pcSelect.selfDiagnosis')}
           </button>
           <button onClick={() => setMode('select')} className="text-sm text-terra-600 dark:text-terra-400 text-center py-2 active:opacity-70">
-            직접 선택할게요 →
+            {t('pcSelect.directSelect')} →
           </button>
         </div>
       </div>
@@ -1067,11 +1067,11 @@ export function PcSelect() {
   return (
     <div className="animate-screen-enter px-5 pt-2 pb-10">
       <button onClick={() => setMode('menu')} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> 뒤로
+        <ArrowLeft size={16} /> {t('common.back')}
       </button>
 
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">12계절 직접 선택</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">이미 퍼스널컬러를 알고 있다면 선택하세요</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('pcSelect.directSelect')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('pcSelect.select12Season')}</p>
 
       <div className="grid grid-cols-2 gap-2.5">
         {Object.entries(PERSONAL_COLOR_12).filter(([k]) => !['spring', 'summer', 'autumn', 'winter'].includes(k)).map(([key, data]: [string, any]) => (
