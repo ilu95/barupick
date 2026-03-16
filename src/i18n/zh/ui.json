@@ -173,7 +173,13 @@
     "signupFailed": "注册失败",
     "signupSuccess": "注册成功！请查看邮箱",
     "forgotPassword": "忘记密码？",
-    "and": "和"
+    "and": "和",
+    "providerNotEnabled": "此登录方式目前不可用。\n请使用邮箱或其他社交登录。",
+    "callbackFailed": "登录过程中出现问题。\n请重试。",
+    "accessDenied": "登录已取消。",
+    "loggingIn": "正在登录...",
+    "backToLogin": "返回登录",
+    "kakaoPrivateRelay": "如果您正在使用iCloud私人中继，\n请前往设置→iCloud→私人中继将其关闭后重试。"
   },
   "settings": {
     "display": "显示",

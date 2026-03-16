@@ -18,6 +18,7 @@ import RecommendCoord from '@/pages/RecommendCoord'
 import BuildCoord from '@/pages/BuildCoord'
 import Profile from '@/pages/Profile'
 import Auth from '@/pages/Auth'
+import AuthCallback from '@/pages/AuthCallback'
 import Settings from '@/pages/Settings'
 import OotdRecord from '@/pages/OotdRecord'
 import Closet from '@/pages/Closet'
@@ -134,6 +135,7 @@ export default function App() {
 
                   <Route path="/auth/login" element={<Auth />} />
                   <Route path="/auth/signup" element={<Auth />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
 
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/terms" element={<Terms />} />
