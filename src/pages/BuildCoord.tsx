@@ -643,7 +643,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     if (saved.length > 100) saved.length = 100
     localStorage.setItem('cs_saved', JSON.stringify(saved))
     trackSave('build', score)
-    toast.success('코디를 저장했어요!')
+    toast.success(t('recommend.saveSuccess'))
   }
 
   const handleShare = () => { navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
