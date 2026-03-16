@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "学院风", "subtitle": "常春藤名校的整洁精致感", "keywords": ["针织马甲", "牛津衬衫", "卡其裤", "乐福鞋"] },
+    "ivy": { "name": "常春藤风", "subtitle": "正统美国东部校园风格", "keywords": ["西装外套", "扣领衬衫", "乐福鞋"] },
+    "dandy": { "name": "绅士风", "subtitle": "绅士的品格，精致成熟的风格", "keywords": ["羊毛大衣", "高领衫", "切尔西靴"] },
+    "oldmoney": { "name": "老钱风", "subtitle": "低调奢华的典范", "keywords": ["羊绒", "灯芯绒", "乐福鞋"] },
+    "ralphlook": { "name": "拉夫造型", "subtitle": "用拉夫·劳伦打造美式经典传统", "keywords": ["Polo衫", "麻花针织衫", "卡其裤"] },
+    "minimal": { "name": "极简风", "subtitle": "以最少的元素呈现最大的精致感", "keywords": ["纯色T恤", "阔腿裤", "极简运动鞋"] },
+    "casual": { "name": "休闲风", "subtitle": "舒适又有品位的日常穿搭", "keywords": ["卫衣", "牛仔裤", "运动鞋"] },
+    "cityboy": { "name": "城市男孩风", "subtitle": "都市的自由感，自然粉彩色调", "keywords": ["宽松衬衫", "阔腿裤", "新百伦"] },
+    "normcore": { "name": "极简日常风", "subtitle": "刻意的平凡，不费力的美学", "keywords": ["纯色T恤", "直筒牛仔裤", "阿迪达斯"] },
+    "athleisure": { "name": "运动休闲风", "subtitle": "跨越运动与日常的界限", "keywords": ["束脚裤", "连帽拉链衫", "跑鞋"] },
+    "amekaji": { "name": "美式复古风", "subtitle": "牛仔与工装靴的复古情怀", "keywords": ["牛仔夹克", "工装靴", "格纹衬衫"] },
+    "workwear": { "name": "工装风", "subtitle": "实用主义的劳动美学", "keywords": ["工装连体衣", "工装裤", "靴子"] },
+    "military": { "name": "军旅风", "subtitle": "从军装中汲取灵感的刚毅风格", "keywords": ["MA-1飞行夹克", "工装裤", "战斗靴"] },
+    "british": { "name": "英伦传统风", "subtitle": "英国乡村的品格户外", "keywords": ["巴伯夹克", "粗花呢", "切尔西靴"] },
+    "gorpcore": { "name": "山系/户外风", "subtitle": "将户外品牌带入都市生活", "keywords": ["摇粒绒", "徒步鞋", "工装裤"] },
+    "street": { "name": "街头风", "subtitle": "源自嘻哈与滑板文化的自由", "keywords": ["连帽衫", "工装裤", "高帮鞋"] },
+    "grunge": { "name": "垃圾摇滚风", "subtitle": "90年代另类摇滚的叛逆", "keywords": ["格纹法兰绒衫", "破洞牛仔裤", "马丁靴"] },
+    "contemporary": { "name": "当代风", "subtitle": "都市实验，现代前卫", "keywords": ["结构感夹克", "不对称剪裁", "黑白灰"] },
+    "techwear": { "name": "机能风", "subtitle": "功能性面料的都市未来感", "keywords": ["Gore-Tex", "工装裤", "机能跑鞋"] },
+    "genderless": { "name": "无性别风", "subtitle": "跨越性别界限的自由风格", "keywords": ["宽松衬衫", "阔腿裤", "中性款"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "半正式", "description": "兼具格调与精致感的风格" },
+    "casual": { "name": "休闲", "description": "舒适又有品位的日常风格" },
+    "work_outdoor": { "name": "工装·户外", "description": "实用而充满粗犷魅力的风格" },
+    "street": { "name": "街头", "description": "自由且个性十足的街头文化" }
+  },
+  "layerLevels": {
+    "simple": { "name": "简约", "parts": ["上衣", "下装", "鞋子"] },
+    "basic": { "name": "外套 + 内搭", "parts": ["外套", "内搭", "下装", "鞋子"] },
+    "mid_inner": { "name": "中间层 + 内搭", "parts": ["中间层", "内搭", "下装", "鞋子"] },
+    "scarf_top": { "name": "围巾 + 上衣", "parts": ["围巾", "上衣", "下装", "鞋子"] },
+    "layered": { "name": "外套 + 中间层 + 内搭", "parts": ["外套", "中间层", "内搭", "下装", "鞋子"] },
+    "scarf_basic": { "name": "围巾 + 外套 + 内搭", "parts": ["围巾", "外套", "内搭", "下装", "鞋子"] },
+    "scarf_mid": { "name": "围巾 + 中间层 + 内搭", "parts": ["围巾", "中间层", "内搭", "下装", "鞋子"] },
+    "full": { "name": "全层叠", "parts": ["围巾", "外套", "中间层", "内搭", "下装", "鞋子"] }
+  }
+}

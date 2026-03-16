@@ -37,6 +37,8 @@ const SLIDES = [
 const LANGUAGES = [
   { code: 'ko', label: '한국어', flag: '🇰🇷', desc: 'Korean' },
   { code: 'en', label: 'English', flag: '🇺🇸', desc: 'English' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵', desc: 'Japanese' },
+  { code: 'zh', label: '中文', flag: '🇨🇳', desc: 'Chinese' },
 ]
 
 const SWIPE_THRESHOLD = 50
@@ -44,7 +46,7 @@ const SWIPE_THRESHOLD = 50
 export default function Onboarding() {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
-  // Start at language selection (-1) if no language was previously set
+  // Language is auto-detected in i18n/index.ts (Korean browsers skip selection)
   const hasLang = !!localStorage.getItem('sp_language')
   const [step, setStep] = useState(hasLang ? 0 : -1)
   const [direction, setDirection] = useState<'left' | 'right' | null>(null)
