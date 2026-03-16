@@ -38,27 +38,42 @@ export type RankingMode = 'weekly' | 'monthly' | 'user' | 'event'
 
 const PAGE_SIZE = 20
 
+// 모듈 레벨 캐시: 페이지 이동 후 돌아왔을 때 즉시 복원
+let _cache: {
+  posts: CommunityPost[]
+  tab: CommTab
+  sort: SortMode
+  contentFilter: ContentFilter
+  styleFilter: string | null
+  friendsMode: FriendsMode
+  rankingMode: RankingMode
+  page: number
+  hasMore: boolean
+  myLikes: Set<string>
+} | null = null
+
 export function useCommunity() {
   const { user } = useAuth()
 
-  const [tab, setTab] = useState<CommTab>('all')
-  const [sort, setSort] = useState<SortMode>('latest')
-  const [contentFilter, setContentFilter] = useState<ContentFilter>('all')
-  const [styleFilter, setStyleFilter] = useState<string | null>(null)
-  const [friendsMode, setFriendsMode] = useState<FriendsMode>('mutual')
-  const [rankingMode, setRankingMode] = useState<RankingMode>('weekly')
+  const [tab, setTab] = useState<CommTab>(_cache?.tab || 'all')
+  const [sort, setSort] = useState<SortMode>(_cache?.sort || 'latest')
+  const [contentFilter, setContentFilter] = useState<ContentFilter>(_cache?.contentFilter || 'all')
+  const [styleFilter, setStyleFilter] = useState<string | null>(_cache?.styleFilter ?? null)
+  const [friendsMode, setFriendsMode] = useState<FriendsMode>(_cache?.friendsMode || 'mutual')
+  const [rankingMode, setRankingMode] = useState<RankingMode>(_cache?.rankingMode || 'weekly')
 
-  const [posts, setPosts] = useState<CommunityPost[]>([])
+  const [posts, setPosts] = useState<CommunityPost[]>(_cache?.posts || [])
   const [loading, setLoading] = useState(false)
-  const [hasMore, setHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(_cache?.hasMore ?? true)
   const [error, setError] = useState<string | null>(null)
 
-  const [myLikes, setMyLikes] = useState<Set<string>>(new Set())
+  const [myLikes, setMyLikes] = useState<Set<string>>(_cache?.myLikes || new Set())
   const [myFollows, setMyFollows] = useState<Set<string>>(new Set())
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set())
 
-  const pageRef = useRef(0)
+  const pageRef = useRef(_cache?.page || 0)
   const loadVerRef = useRef(0)
+  const hasCacheRef = useRef(!!_cache)
 
   // 팔로우 목록 로드
   useEffect(() => {
@@ -265,12 +280,26 @@ export function useCommunity() {
     setHasMore(true)
   }, [])
 
+  // 캐시 저장 (언마운트 시)
+  useEffect(() => {
+    return () => {
+      _cache = { posts, tab, sort, contentFilter, styleFilter, friendsMode, rankingMode, page: pageRef.current, hasMore, myLikes }
+    }
+  })
+
+  // 캐시에서 복원된 경우 초기 로드 건너뜀 여부
+  const hadCache = hasCacheRef.current
+  useEffect(() => {
+    hasCacheRef.current = false
+  }, [])
+
   return {
     // 상태
     tab, sort, contentFilter, styleFilter, friendsMode, rankingMode,
     posts: filteredPosts,
     loading, hasMore, error,
     myLikes, myFollows,
+    hadCache,
 
     // 액션
     loadPosts,

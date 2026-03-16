@@ -367,6 +367,7 @@
     "revert": "恢复原样",
     "apply": "应用",
     "backToList": "返回列表",
+    "unsavedColorWarning": "更改的颜色将不会保存。确定返回吗？",
     "partTop": "内搭",
     "partBottom": "下装",
     "partShoes": "鞋子",

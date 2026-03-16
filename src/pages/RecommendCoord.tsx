@@ -12,6 +12,7 @@ import { profile } from '@/lib/profile'
 import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
 import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
 import { useToast } from '@/components/ui/Toast'
+import { useModal } from '@/components/ui/Modal'
 import { useTranslation } from 'react-i18next'
 
 // ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 ───
@@ -30,12 +31,39 @@ function getPickedPartLabel(partKey: string, pickedItems: string[], t?: any): st
   return partKey
 }
 
+// ─── 스텝 진행 표시기 ───
+const STEP_ORDER: RecStep[] = ['mood', 'style', 'pick', 'results']
+function StepIndicator({ current }: { current: RecStep }) {
+  const { t } = useTranslation()
+  const labels = [t('recommend.moodTitle'), t('recommend.styleTitle'), t('recommend.mustWear'), t('recommend.resultTitle')]
+  const currentIdx = STEP_ORDER.indexOf(current)
+  if (currentIdx < 0) return null // detail에서는 숨김
+
+  return (
+    <div className="flex items-center gap-1 mb-4">
+      {STEP_ORDER.map((s, i) => (
+        <div key={s} className="flex items-center gap-1 flex-1">
+          <div className="flex flex-col items-center flex-1">
+            <div className={`w-full h-1 rounded-full transition-all ${
+              i <= currentIdx ? 'bg-terra-500' : 'bg-warm-300 dark:bg-warm-600'
+            }`} />
+            <span className={`text-[9px] mt-1 font-medium whitespace-nowrap ${
+              i === currentIdx ? 'text-terra-600 dark:text-terra-400' : i < currentIdx ? 'text-warm-500 dark:text-warm-400' : 'text-warm-400 dark:text-warm-500'
+            }`}>{labels[i]}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function RecommendCoord() {
   const navigate = useNavigate()
   const rec = useRecommend()
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
+      <StepIndicator current={rec.step} />
       {rec.step === 'mood' && <StepMood rec={rec} />}
       {rec.step === 'style' && <StepStyle rec={rec} />}
       {rec.step === 'pick' && <StepPick rec={rec} />}
@@ -68,8 +96,8 @@ function StepMood({ rec }: { rec: RecHook }) {
         ))}
       </div>
       <button onClick={() => rec.selectMood(null)}
-        className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
-        {t('recommend.allStyles')}
+        className="w-full py-3 bg-warm-100 dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
+        🎲 {t('recommend.allStyles')}
       </button>
     </div>
   )
@@ -107,8 +135,8 @@ function StepStyle({ rec }: { rec: RecHook }) {
         })}
       </div>
       <button onClick={() => rec.selectStyle(null)}
-        className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
-        {t('recommend.allRecommend')}
+        className="w-full py-3 bg-warm-100 dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
+        🎲 {t('recommend.allRecommend')}
       </button>
     </div>
   )
@@ -154,18 +182,18 @@ function StepPick({ rec }: { rec: RecHook }) {
 
       {/* 아이템 그리드 — 의류 */}
       <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('recommend.clothing')}</div>
-      <div className="grid grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-3 gap-2.5 mb-4">
         {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
           const selected = picked.includes(item.id)
           return (
             <button key={item.id} onClick={() => rec.toggleItem(item.id)}
-              className={`flex flex-col items-center gap-1 py-3 px-1 rounded-xl text-center transition-all active:scale-93 ${
+              className={`flex flex-col items-center gap-1.5 py-4 px-2 rounded-xl text-center transition-all active:scale-93 ${
                 selected
                   ? 'bg-terra-50 dark:bg-terra-900/30 border-[1.5px] border-terra-400 shadow-warm'
                   : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
               }`}>
-              <span className="text-xl">{item.emoji}</span>
-              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
+              <span className="text-2xl">{item.emoji}</span>
+              <span className={`text-xs font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
             </button>
           )
         })}
@@ -173,18 +201,18 @@ function StepPick({ rec }: { rec: RecHook }) {
 
       {/* 아이템 그리드 — 악세서리 */}
       <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('recommend.accessory')}</div>
-      <div className="grid grid-cols-4 gap-2 mb-6">
+      <div className="grid grid-cols-3 gap-2.5 mb-6">
         {ITEMS_CATALOG.filter(i => i.slot).map(item => {
           const selected = picked.includes(item.id)
           return (
             <button key={item.id} onClick={() => rec.toggleItem(item.id)}
-              className={`flex flex-col items-center gap-1 py-3 px-1 rounded-xl text-center transition-all active:scale-93 ${
+              className={`flex flex-col items-center gap-1.5 py-4 px-2 rounded-xl text-center transition-all active:scale-93 ${
                 selected
                   ? 'bg-terra-50 dark:bg-terra-900/30 border-[1.5px] border-terra-400 shadow-warm'
                   : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
               }`}>
-              <span className="text-xl">{item.emoji}</span>
-              <span className={`text-[10px] font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
+              <span className="text-2xl">{item.emoji}</span>
+              <span className={`text-xs font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
             </button>
           )
         })}
@@ -392,12 +420,27 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
 function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const { t } = useTranslation()
   const toast = useToast()
+  const modal = useModal()
   const combo = rec.state.results[rec.state.detailIdx]
   const [saveModal, setSaveModal] = useState(false)
   const [saveName, setSaveName] = useState('')
   const [vizCollapsed, setVizCollapsed] = useState(false)
   const [editingPart, setEditingPart] = useState<string | null>(null)
   const [editedOutfit, setEditedOutfit] = useState<Record<string, string> | null>(null)
+
+  const handleBack = () => {
+    if (editedOutfit) {
+      modal.confirm({
+        title: t('recommend.colorImprove'),
+        message: t('recommend.unsavedColorWarning'),
+        confirmLabel: t('common.back'),
+        variant: 'danger',
+        onConfirm: () => { setEditedOutfit(null); rec.goBack() },
+      })
+    } else {
+      rec.goBack()
+    }
+  }
 
   if (!combo) return <div className="text-center py-16 text-warm-500 dark:text-warm-400">{t('recommend.noResults')}</div>
 
@@ -652,7 +695,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       </div>
 
       {/* 뒤로 */}
-      <button onClick={rec.goBack}
+      <button onClick={handleBack}
         className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm flex items-center justify-center gap-1.5 mb-12 active:scale-[0.98] transition-all">
         <ArrowLeft size={16} /> {t('recommend.backToList')}
       </button>

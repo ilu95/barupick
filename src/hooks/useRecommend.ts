@@ -104,12 +104,31 @@ function findMoodForStyle(style: string): string | null {
   return null
 }
 
+const SESSION_KEY = 'rec_session'
+
+function loadSession(): { step: RecStep; state: RecState; history: RecStep[] } | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed?.state?.results?.length > 0) return parsed
+  } catch {}
+  return null
+}
+
+function saveSession(step: RecStep, state: RecState, history: RecStep[]) {
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ step, state, history }))
+  } catch {}
+}
+
 export function useRecommend() {
   const [searchParams] = useSearchParams()
-  const [step, setStep] = useState<RecStep>('mood')
-  const [state, setState] = useState<RecState>(initialState)
-  const [history, setHistory] = useState<RecStep[]>([])
-  const initRef = useRef(false)
+  const cached = useRef(loadSession()).current
+  const [step, setStep] = useState<RecStep>(cached?.step || 'mood')
+  const [state, setState] = useState<RecState>(cached?.state || initialState)
+  const [history, setHistory] = useState<RecStep[]>(cached?.history || [])
+  const initRef = useRef(!!cached)
 
   // URL에서 style 파라미터 → 바로 pick 단계로
   useEffect(() => {
@@ -250,11 +269,17 @@ export function useRecommend() {
     })
   }, [])
 
+  // 세션 저장 (상태 변경 시)
+  useEffect(() => {
+    saveSession(step, state, history)
+  })
+
   // ─── 리셋 ───
   const reset = useCallback(() => {
     setState(initialState)
     setStep('mood')
     setHistory([])
+    sessionStorage.removeItem(SESSION_KEY)
   }, [])
 
   return {

@@ -367,6 +367,7 @@
     "revert": "Revert",
     "apply": "Apply",
     "backToList": "Back to list",
+    "unsavedColorWarning": "Your color changes will be lost. Go back?",
     "partTop": "Top",
     "partBottom": "Bottom",
     "partShoes": "Shoes",
