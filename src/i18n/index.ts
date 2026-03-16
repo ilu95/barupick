@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
 // i18n/index.ts — i18next initialization for BaruPick
-// Languages: ko (default), en
+// Languages: ko (default), en, ja, zh
 // Namespaces: ui, colors, categories, styles, bodyType, personalColor
 // ═══════════════════════════════════════════════════════
 import i18n from 'i18next'
@@ -22,6 +22,22 @@ import enStyles from './en/styles.json'
 import enBodyType from './en/bodyType.json'
 import enPersonalColor from './en/personalColor.json'
 
+// Japanese
+import jaUi from './ja/ui.json'
+import jaColors from './ja/colors.json'
+import jaCategories from './ja/categories.json'
+import jaStyles from './ja/styles.json'
+import jaBodyType from './ja/bodyType.json'
+import jaPersonalColor from './ja/personalColor.json'
+
+// Chinese (Simplified)
+import zhUi from './zh/ui.json'
+import zhColors from './zh/colors.json'
+import zhCategories from './zh/categories.json'
+import zhStyles from './zh/styles.json'
+import zhBodyType from './zh/bodyType.json'
+import zhPersonalColor from './zh/personalColor.json'
+
 const resources = {
   ko: {
     ui: koUi,
@@ -39,13 +55,36 @@ const resources = {
     bodyType: enBodyType,
     personalColor: enPersonalColor,
   },
+  ja: {
+    ui: jaUi,
+    colors: jaColors,
+    categories: jaCategories,
+    styles: jaStyles,
+    bodyType: jaBodyType,
+    personalColor: jaPersonalColor,
+  },
+  zh: {
+    ui: zhUi,
+    colors: zhColors,
+    categories: zhCategories,
+    styles: zhStyles,
+    bodyType: zhBodyType,
+    personalColor: zhPersonalColor,
+  },
 }
 
 const storedLang = localStorage.getItem('sp_language')
 
+// Auto-detect Korean browsers: set Korean without showing language selection
+if (!storedLang && navigator.language.startsWith('ko')) {
+  localStorage.setItem('sp_language', 'ko')
+}
+
+const initialLang = localStorage.getItem('sp_language')
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: storedLang || 'ko',
+  lng: initialLang || 'ko',
   fallbackLng: 'ko',
   defaultNS: 'ui',
   ns: ['ui', 'colors', 'categories', 'styles', 'bodyType', 'personalColor'],
@@ -69,6 +108,8 @@ export function getLocale(lang?: string): string {
   const map: Record<string, string> = {
     ko: 'ko-KR',
     en: 'en-US',
+    ja: 'ja-JP',
+    zh: 'zh-CN',
   }
   return map[l] || 'ko-KR'
 }
