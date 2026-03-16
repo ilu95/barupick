@@ -7,6 +7,7 @@ import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
+import { useScrollRestore } from '@/hooks/useScrollRestore'
 
 type ClosetTab = 'wardrobe' | 'records'
 
@@ -14,6 +15,8 @@ export default function Closet() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [tab, setTab] = useState<ClosetTab>('records')
+
+  useScrollRestore()
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">

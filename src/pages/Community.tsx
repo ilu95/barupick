@@ -6,6 +6,7 @@ import FeedCard from '@/components/community/FeedCard'
 import { useCommunity, type CommTab, type SortMode, type ContentFilter, type FriendsMode, type RankingMode } from '@/hooks/useCommunity'
 import { STYLE_GUIDE } from '@/lib/styles'
 import { useAuth } from '@/contexts/AuthContext'
+import { useScrollRestore } from '@/hooks/useScrollRestore'
 
 export default function Community() {
   const navigate = useNavigate()
@@ -15,10 +16,18 @@ export default function Community() {
   const observerRef = useRef<IntersectionObserver | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
-  // 초기 로드 + 탭/필터 변경 시 재로드
+  // 캐시 복원 시 초기 로드 건너뜀, 탭/필터 변경 시 재로드
+  const skipInitRef = useRef(comm.hadCache)
   useEffect(() => {
+    if (skipInitRef.current) {
+      skipInitRef.current = false
+      return
+    }
     comm.loadPosts(true)
   }, [comm.tab, comm.sort, comm.styleFilter, comm.friendsMode, comm.rankingMode])
+
+  // 스크롤 위치 복원 (포스트가 로드된 후)
+  useScrollRestore(comm.posts.length > 0 || !comm.loading)
 
   // 무한 스크롤
   const lastCardRef = useCallback((node: HTMLDivElement | null) => {
