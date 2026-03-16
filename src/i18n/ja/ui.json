@@ -161,6 +161,7 @@
     "switchToLogin": "すでにアカウントをお持ちの方は ログイン",
     "kakaoLogin": "Kakaoログイン",
     "googleLogin": "Googleログイン",
+    "appleLogin": "Appleでログイン",
     "agreement": "登録すると利用規約およびプライバシーポリシーに同意したものとみなされます",
     "emailRequired": "メールアドレスを入力してください",
     "emailInvalid": "正しいメールアドレスを入力してください",

@@ -19,7 +19,7 @@ interface AuthState {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   signup: (email: string, password: string, nickname: string) => Promise<void>
-  socialLogin: (provider: 'kakao' | 'google') => Promise<void>
+  socialLogin: (provider: 'kakao' | 'google' | 'apple') => Promise<void>
   logout: () => Promise<void>
   fetchProfile: () => Promise<void>
   updateProfile: (data: Partial<Profile>) => Promise<void>
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     trackSignup()
   }
 
-  const socialLogin = async (provider: 'kakao' | 'google') => {
+  const socialLogin = async (provider: 'kakao' | 'google' | 'apple') => {
     trackSocialLogin(provider)
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
 

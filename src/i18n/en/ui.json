@@ -161,6 +161,7 @@
     "switchToLogin": "Already have an account? Sign In",
     "kakaoLogin": "Continue with Kakao",
     "googleLogin": "Continue with Google",
+    "appleLogin": "Continue with Apple",
     "agreement": "By signing up, you agree to our Terms of Service and Privacy Policy",
     "emailRequired": "Email is required",
     "emailInvalid": "Please enter a valid email",
