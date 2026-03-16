@@ -12,8 +12,11 @@ import ShareCard, { useShareCard } from '@/components/ui/ShareCard'
 import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 import { getScorePercentile } from '@/hooks/useWardrobe'
+import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 
 export default function OotdDetail() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { date } = useParams()
   const [searchParams] = useSearchParams()
@@ -33,9 +36,9 @@ export default function OotdDetail() {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
         <div className="text-4xl mb-3">📝</div>
-        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">기록을 찾을 수 없어요</div>
+        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('ootdDetail.notFound')}</div>
         <button onClick={() => navigate('/closet')} className="px-5 py-2 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all">
-          옷장으로
+          {t('ootdDetail.goToCloset')}
         </button>
       </div>
     )
@@ -49,17 +52,17 @@ export default function OotdDetail() {
 
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
   const dateObj = new Date(ry, rm - 1, rd)
-  const dateLabel = dateObj.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+  const dateLabel = dateObj.toLocaleDateString(getLocale(), { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
 
   const handleDelete = () => {
     modal.confirm({
-      title: '기록 삭제',
-      message: '이 기록을 삭제할까요? 되돌릴 수 없습니다.',
-      confirmLabel: '삭제',
+      title: t('ootdDetail.deleteRecord'),
+      message: t('ootdDetail.deleteConfirm'),
+      confirmLabel: t('common.delete'),
       variant: 'danger',
       onConfirm: () => {
         deleteRecord(record.id)
-        toast.success('기록을 삭제했어요')
+        toast.success(t('ootdDetail.deleteSuccess'))
         navigate('/closet', { replace: true })
       },
     })
@@ -74,7 +77,7 @@ export default function OotdDetail() {
     if (sharing) return
     // 사진 없으면 안내
     if (!record.photos || record.photos.length === 0) {
-      setShareMsg('착용샷을 추가하면 커뮤니티에 공유할 수 있어요')
+      setShareMsg(t('ootdDetail.addPhotoToShare'))
       setTimeout(() => setShareMsg(''), 3000)
       return
     }
@@ -82,7 +85,7 @@ export default function OotdDetail() {
     try {
       const userId = (await supabase.auth.getUser())?.data?.user?.id
       if (!userId) {
-        setShareMsg('로그인이 필요해요')
+        setShareMsg(t('common.loginRequired'))
         navigate('/auth/login')
         return
       }
@@ -97,7 +100,7 @@ export default function OotdDetail() {
       } catch {}
 
       if (record.postId && record.visibility !== 'private') {
-        setShareMsg('이미 공유된 기록이에요')
+        setShareMsg(t('ootdDetail.alreadyShared'))
       } else if (record.postId && record.visibility === 'private') {
         // 비공개→다시 공개: 기존 게시물 visibility 업데이트
         await supabase.from('posts').update({
@@ -113,11 +116,11 @@ export default function OotdDetail() {
           recs[ri].visibility = 'public'
           localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
         }
-        setShareMsg('커뮤니티에 다시 공유했어요!')
+        setShareMsg(t('ootdDetail.communityShareSuccess'))
       } else {
         const { data: inserted } = await supabase.from('posts').insert({
           user_id: userId,
-          title: record.memo?.slice(0, 100) || '오늘의 코디',
+          title: record.memo?.slice(0, 100) || t('ootdDetail.todaysCoord'),
           outfit,
           score: record.score,
           style: autoStyle,
@@ -139,12 +142,12 @@ export default function OotdDetail() {
             recs[ri].visibility = 'public'
             localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
           }
-          setShareMsg('커뮤니티에 공유했어요!')
+          setShareMsg(t('ootdDetail.communityShareSuccess'))
         }
       }
     } catch (e) {
       console.error('Share error:', e)
-      setShareMsg('공유 중 오류가 발생했어요')
+      setShareMsg(t('ootdDetail.shareError'))
     } finally {
       setSharing(false)
       setTimeout(() => setShareMsg(''), 3000)
@@ -156,7 +159,7 @@ export default function OotdDetail() {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
         <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{dateLabel}</h2>
-        <p className="text-sm text-warm-600 mb-5">{records.length}개의 기록</p>
+        <p className="text-sm text-warm-600 mb-5">{t('ootdDetail.recordCount', { count: records.length })}</p>
         <div className="flex flex-col gap-2.5">
           {records.map(r => {
             const hex: Record<string, string> = {}
@@ -176,7 +179,7 @@ export default function OotdDetail() {
                   <MannequinSVG outfit={hex} size={60} />
                 )}
                 <div className="flex-1">
-                  <span className="font-display text-sm font-bold text-terra-600">{r.score}점</span>
+                  <span className="font-display text-sm font-bold text-terra-600">{t('common.score', { score: r.score })}</span>
                   {r.situation && <span className="text-[11px] text-warm-600 ml-2">{r.situation}</span>}
                   {r.memo && <div className="text-[11px] text-warm-500 truncate mt-0.5">{r.memo}</div>}
                 </div>
@@ -264,13 +267,13 @@ export default function OotdDetail() {
           onClick={handleEdit}
           className="flex-1 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
         >
-          <Pencil size={14} /> 수정
+          <Pencil size={14} /> {t('ootdDetail.editRecord')}
         </button>
         <button
           onClick={handleDelete}
           className="flex-1 py-3 bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-2xl text-sm font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
         >
-          <Trash2 size={14} /> 삭제
+          <Trash2 size={14} /> {t('ootdDetail.deleteRecord')}
         </button>
       </div>
 
@@ -285,7 +288,7 @@ export default function OotdDetail() {
           }}
           className="w-full py-3 mb-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
         >
-          <Image size={16} /> 공유 카드 만들기
+          <Image size={16} /> {t('ootdDetail.shareCard')}
         </button>
       )}
 
@@ -300,7 +303,7 @@ export default function OotdDetail() {
         disabled={sharing}
         className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
       >
-        <Globe size={16} /> {sharing ? '공유 중...' : (record.postId && record.visibility !== 'private') ? '이미 공유됨' : '커뮤니티에 공유'}
+        <Globe size={16} /> {sharing ? '...' : (record.postId && record.visibility !== 'private') ? t('ootdDetail.communityShareSuccess') : t('ootdDetail.communityShare')}
       </button>
 
       {/* 공유 카드 모달 */}

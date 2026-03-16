@@ -4,6 +4,7 @@ import { User } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
+import { useTranslation } from 'react-i18next'
 
 type Tab = 'followers' | 'following'
 
@@ -12,6 +13,7 @@ interface FollowUser {
 }
 
 export default function FollowList() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { userId } = useParams<{ userId: string }>()
   const location = useLocation()
@@ -53,7 +55,7 @@ export default function FollowList() {
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       {/* 탭 */}
       <div className="flex gap-1.5 mb-5">
-        {([['followers', '팔로워'], ['following', '팔로잉']] as const).map(([key, label]) => (
+        {([['followers', t('followList.followers')] as [Tab, string], ['following', t('followList.following')] as [Tab, string]]).map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -68,11 +70,11 @@ export default function FollowList() {
 
       {/* 리스트 */}
       {loading ? (
-        <div className="text-center py-10 text-warm-400 text-sm">불러오는 중...</div>
+        <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>
       ) : users.length === 0 ? (
         <div className="text-center py-10">
           <div className="text-4xl mb-3">{tab === 'followers' ? '👤' : '👥'}</div>
-          <div className="text-sm text-warm-600">{tab === 'followers' ? '아직 팔로워가 없어요' : '아직 팔로잉이 없어요'}</div>
+          <div className="text-sm text-warm-600">{tab === 'followers' ? t('followList.noFollowers') : t('followList.noFollowing')}</div>
         </div>
       ) : (
         <div className="flex flex-col">
@@ -93,8 +95,8 @@ export default function FollowList() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0 cursor-pointer" onClick={() => navigate(`/user/${u.id}`)}>
-                  <div className="text-sm font-semibold text-warm-900 truncate">@{u.nickname || '유저'}</div>
-                  {mutual && <div className="text-[10px] text-green-600 font-medium">👫 서로 친구</div>}
+                  <div className="text-sm font-semibold text-warm-900 truncate">@{u.nickname || t('common.user')}</div>
+                  {mutual && <div className="text-[10px] text-green-600 font-medium">{t('common.mutualFriend')}</div>}
                 </div>
                 {!isMe && (
                   <button
@@ -105,7 +107,7 @@ export default function FollowList() {
                       : 'bg-terra-500 text-white shadow-terra'
                     }`}
                   >
-                    {mutual ? '👫 친구' : following ? '팔로잉 ✓' : '팔로우'}
+                    {mutual ? t('common.friend') : following ? t('common.following') : t('common.follow')}
                   </button>
                 )}
               </div>

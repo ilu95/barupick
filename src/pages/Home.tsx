@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, X, Droplets, Wind, Shirt } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
@@ -10,6 +11,7 @@ import { profile as profileLib } from '@/lib/profile'
 
 export default function Home() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { profile, user } = useAuth()
   const { weather, loading: wLoading } = useWeather()
 
@@ -22,9 +24,9 @@ export default function Home() {
 
   // 시간대별 인사
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? '좋은 아침' : hour < 18 ? '좋은 오후' : '좋은 저녁'
+  const greeting = hour < 12 ? t('home.greetingMorning') : hour < 18 ? t('home.greetingAfternoon') : t('home.greetingEvening')
   const userName = profile?.nickname || ''
-  const greetingText = userName ? `${greeting}, ${userName}님` : greeting
+  const greetingText = userName ? `${greeting}, ${userName}` : greeting
 
   // 날씨 기반 배경 그라데이션
   const weatherGradient = weather ? (
@@ -65,7 +67,7 @@ export default function Home() {
                 <span className="text-2xl">{weatherEmoji(weather.code)}</span>
                 <div>
                   <span className="font-display text-2xl font-bold text-warm-900 dark:text-warm-100">{weather.temp}°</span>
-                  <span className="text-xs text-warm-500 dark:text-warm-400 ml-1.5">체감 {weather.feels}°</span>
+                  <span className="text-xs text-warm-500 dark:text-warm-400 ml-1.5">{t('home.feelsLike', { temp: weather.feels })}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2.5 text-[11px] text-warm-500 dark:text-warm-400">
@@ -86,7 +88,7 @@ export default function Home() {
           </button>
         ) : (
           <button onClick={() => navigate('/home/weather')} className="w-full flex items-center gap-2 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-4 py-3.5 text-sm text-warm-500 dark:text-warm-400 shadow-warm-sm active:scale-[0.98] transition-all mb-3">
-            <CloudSun size={16} /> {wLoading ? '날씨 불러오는 중...' : '위치 허용하면 날씨 추천을 받을 수 있어요'}
+            <CloudSun size={16} /> {wLoading ? t('common.loading') : t('weather.noLocation')}
           </button>
         )}
 
@@ -102,8 +104,8 @@ export default function Home() {
             <button onClick={() => navigate(`/closet/ootd/${recentOotd.date}?id=${recentOotd.id}`)} className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-4 py-3 shadow-warm-sm active:scale-[0.98] transition-all">
               <MannequinSVG outfit={outfitHex} size={44} />
               <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-semibold text-warm-900 dark:text-warm-100">최근 기록 · {dayLabel}</div>
-                <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{recentOotd.score}점{recentOotd.situation ? ` · ${recentOotd.situation}` : ''}</div>
+                <div className="text-[13px] font-semibold text-warm-900 dark:text-warm-100">{t('home.recentOotd')} · {dayLabel}</div>
+                <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{t('common.score', { score: recentOotd.score })}{recentOotd.situation ? ` · ${recentOotd.situation}` : ''}</div>
               </div>
               <div className="flex gap-1">
                 {Object.values(recentOotd.colors || {}).filter(Boolean).slice(0, 4).map((ck, i) => {
@@ -116,7 +118,7 @@ export default function Home() {
           )
         })() : (
           <button onClick={() => navigate('/record')} className="inline-flex items-center gap-1.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3.5 py-2 text-sm text-warm-600 dark:text-warm-400 shadow-warm-sm active:scale-[0.97] transition-all">
-            <Calendar size={16} /> 오늘 첫 기록을 남겨보세요
+            <Calendar size={16} /> {t('home.noRecords')}
           </button>
         )}
       </div>
@@ -127,7 +129,7 @@ export default function Home() {
           <div className="w-10 h-10 rounded-xl bg-terra-200 flex items-center justify-center flex-shrink-0">
             <Sparkles size={20} className="text-terra-600" />
           </div>
-          <span className="text-sm text-terra-700 leading-snug flex-1">퍼스널컬러를 설정하면 더 정확한 추천을 받을 수 있어요</span>
+          <span className="text-sm text-terra-700 leading-snug flex-1">{t('home.personalColorBanner')}</span>
           <ChevronRight size={16} className="text-terra-600 flex-shrink-0" />
         </button>
       )}
@@ -152,9 +154,9 @@ export default function Home() {
               <Shirt size={26} className={enabled ? 'text-amber-700 dark:text-amber-300' : 'text-warm-500 dark:text-warm-400'} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className={`font-display text-lg font-bold tracking-tight ${enabled ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>내 옷장 전체 조합</div>
+              <div className={`font-display text-lg font-bold tracking-tight ${enabled ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>{t('closetCoord.allCombos')}</div>
               <div className="text-sm text-warm-600 dark:text-warm-400 mt-0.5">
-                {enabled ? '내 옷으로 가능한 모든 코디 + 점수' : `옷장에 아이템 ${needed}개 더 등록하면 사용할 수 있어요`}
+                {enabled ? t('closetCoord.allCombosDesc') : t('closet.itemCount', { count: needed })}
               </div>
             </div>
             <ChevronRight size={18} className={`flex-shrink-0 ${enabled ? 'text-amber-600 dark:text-amber-400' : 'text-warm-400'}`} />
@@ -170,8 +172,8 @@ export default function Home() {
             <Wand2 size={26} className="text-terra-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-display text-lg font-bold text-terra-700 tracking-tight">코디 추천받기</div>
-            <div className="text-sm text-warm-600 mt-0.5">AI가 분석하는 오늘의 컬러 조합</div>
+            <div className="font-display text-lg font-bold text-terra-700 tracking-tight">{t('home.mainCta.recommend')}</div>
+            <div className="text-sm text-warm-600 mt-0.5">{t('recommend.resultSubtitle')}</div>
           </div>
           <ChevronRight size={18} className="text-terra-600 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
         </button>
@@ -182,8 +184,8 @@ export default function Home() {
             <Palette size={20} className="text-warm-800" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[15px] font-semibold text-warm-900 tracking-tight">직접 만들기</div>
-            <div className="text-xs text-warm-600 mt-0.5">내 조합의 점수를 확인해보세요</div>
+            <div className="text-[15px] font-semibold text-warm-900 tracking-tight">{t('home.mainCta.build')}</div>
+            <div className="text-xs text-warm-600 mt-0.5">{t('recommend.resultSubtitle')}</div>
           </div>
           <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
         </button>
@@ -195,8 +197,7 @@ export default function Home() {
               <CloudSun size={18} className="text-sky-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-semibold text-warm-900">날씨 코디</div>
-              <div className="text-[11px] text-warm-500 mt-0.5">오늘 기온에 맞는</div>
+              <div className="text-[13px] font-semibold text-warm-900">{t('home.mainCta.weather')}</div>
             </div>
           </button>
 
@@ -205,8 +206,7 @@ export default function Home() {
               <Bookmark size={18} className="text-warm-700" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-semibold text-warm-900">저장한 코디</div>
-              <div className="text-[11px] text-warm-500 mt-0.5">즐겨찾기</div>
+              <div className="text-[13px] font-semibold text-warm-900">{t('home.mainCta.saved')}</div>
             </div>
           </button>
         </div>
@@ -215,20 +215,20 @@ export default function Home() {
       {/* 가이드 섹션 */}
       <div className="mb-5">
         <div className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3 flex items-center gap-1.5">
-          가이드
+          {t('home.guide.fabricGuide').replace(t('home.guide.fabricGuide'), '')}GUIDE
         </div>
         <div className="grid grid-cols-3 gap-2.5">
           <button onClick={() => navigate('/home/fabric')} className="bg-white border border-warm-400 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm">
             <Scissors size={24} className="text-terra-600 mx-auto mb-2" />
-            <div className="text-[13px] font-medium text-warm-800">소재 가이드</div>
+            <div className="text-[13px] font-medium text-warm-800">{t('home.guide.fabricGuide')}</div>
           </button>
           <button onClick={() => navigate('/home/body')} className="bg-white border border-warm-400 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm">
             <Ruler size={24} className="text-terra-600 mx-auto mb-2" />
-            <div className="text-[13px] font-medium text-warm-800">체형별 코디</div>
+            <div className="text-[13px] font-medium text-warm-800">{t('home.guide.bodyGuide')}</div>
           </button>
           <button onClick={() => navigate('/home/quiz')} className="bg-white border border-warm-400 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm">
             <HelpCircle size={24} className="text-terra-600 mx-auto mb-2" />
-            <div className="text-[13px] font-medium text-warm-800">퀴즈</div>
+            <div className="text-[13px] font-medium text-warm-800">{t('home.guide.quiz')}</div>
           </button>
         </div>
       </div>

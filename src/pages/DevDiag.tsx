@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 interface TestResult {
   name: string
@@ -12,6 +13,7 @@ interface TestResult {
 
 export default function DevDiag() {
   const { user, profile } = useAuth()
+  const { t } = useTranslation()
   const [results, setResults] = useState<TestResult[]>([])
   const [running, setRunning] = useState(false)
 
@@ -237,11 +239,11 @@ export default function DevDiag() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">Supabase 연결 진단</h2>
-      <p className="text-sm text-warm-600 mb-2">개발DB (ywqaxxcv...) 연결 상태를 확인합니다</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('devDiag.title')}</h2>
+      <p className="text-sm text-warm-600 mb-2">{t('devDiag.subtitle')}</p>
 
       <div className="flex gap-2 text-xs mb-4">
-        <span className="px-2 py-1 rounded-full bg-warm-200">유저: {user ? user.email || user.id.slice(0, 8) : '로그인 안됨'}</span>
+        <span className="px-2 py-1 rounded-full bg-warm-200">{t('common.user')}: {user ? user.email || user.id.slice(0, 8) : '로그인 안됨'}</span>
         {profile && <span className="px-2 py-1 rounded-full bg-terra-100 text-terra-700">@{profile.nickname}</span>}
       </div>
 
@@ -250,7 +252,7 @@ export default function DevDiag() {
         disabled={running}
         className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra mb-5 disabled:opacity-50"
       >
-        {running ? '테스트 실행 중...' : '전체 진단 실행'}
+        {running ? t('devDiag.running') : t('devDiag.runAll')}
       </button>
 
       {results.length > 0 && (
@@ -283,7 +285,7 @@ export default function DevDiag() {
 
       {failed > 0 && (
         <div className="mt-5 bg-amber-50 border border-amber-200 rounded-2xl p-4">
-          <div className="text-sm font-bold text-amber-800 mb-2">수정 방법</div>
+          <div className="text-sm font-bold text-amber-800 mb-2">{t('devDiag.fixTitle')}</div>
           <div className="text-xs text-amber-700 leading-relaxed space-y-1.5">
             <p><b>테이블/함수 없음:</b> Supabase Dashboard → SQL Editor에서 <code>barupick-dev-db-setup.sql</code> 전체 실행</p>
             <p><b>Storage 버킷 없음:</b> Dashboard → Storage → New Bucket → 이름: <code>community</code> (Public), <code>avatars</code> (Public)</p>
@@ -295,8 +297,8 @@ export default function DevDiag() {
       {passed > 0 && failed === 0 && !running && (
         <div className="mt-5 bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
           <div className="text-2xl mb-2">🎉</div>
-          <div className="text-sm font-bold text-green-800">모든 테스트 통과!</div>
-          <div className="text-xs text-green-600 mt-1">Supabase 연결이 정상입니다. Vercel 배포를 진행해도 됩니다.</div>
+          <div className="text-sm font-bold text-green-800">{t('devDiag.allPassed')}</div>
+          <div className="text-xs text-green-600 mt-1">{t('devDiag.allPassedDesc')}</div>
         </div>
       )}
     </div>

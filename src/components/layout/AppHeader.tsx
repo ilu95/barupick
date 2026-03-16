@@ -1,54 +1,55 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ChevronLeft, Home, User, Bell } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 
-// 정확한 경로 매핑 (우선)
-const TITLES: Record<string, string> = {
-  '/home': '바루픽',
-  '/closet': '옷장',
-  '/record': 'OOTD 기록',
-  '/community': '커뮤니티',
-  '/shop': '샵',
-  '/profile': '마이',
-  '/profile/settings': '설정',
-  '/profile/level': '내 레벨',
-  '/profile/badges': '배지 컬렉션',
-  '/profile/personal-color': '퍼스널컬러',
-  '/profile/personal-color/light': '퍼스널컬러 진단',
-  '/profile/posts': '내 게시물',
-  '/profile/insights': '인사이트',
-  '/profile/color-ranking': '컬러 랭킹',
-  '/profile/color-pattern': '색상 패턴',
-  '/profile/challenges': '주간 챌린지',
-  '/profile/title-exam': '칭호 시험',
-  '/profile/block-list': '차단 목록',
-  '/auth/login': '로그인',
-  '/auth/signup': '회원가입',
-  '/home/build': '코디 만들기',
-  '/home/recommend': '코디 추천받기',
-  '/home/weather': '오늘 뭐 입지?',
-  '/home/saved': '저장한 코디',
-  '/home/quiz': '스타일 퀴즈',
-  '/home/fabric': '소재 가이드',
-  '/home/body': '체형별 코디 가이드',
-  '/notifications': '알림',
-  '/terms': '이용약관',
-  '/privacy': '개인정보처리방침',
-  '/closet/add': '아이템 등록',
-  '/closet/coord': '내 옷 코디',
-  '/closet/calendar': '코디 캘린더',
-  '/closet/best': '베스트 코디',
-  '/community/post': '코디 공유',
-  '/community/discover': '유저 탐색',
+// 정확한 경로 매핑 (우선) — i18n key
+const TITLE_KEYS: Record<string, string> = {
+  '/home': 'header.home',
+  '/closet': 'header.closet',
+  '/record': 'header.record',
+  '/community': 'header.community',
+  '/shop': 'header.shop',
+  '/profile': 'header.profile',
+  '/profile/settings': 'header.settings',
+  '/profile/level': 'header.myLevel',
+  '/profile/badges': 'header.myBadges',
+  '/profile/personal-color': 'header.personalColor',
+  '/profile/personal-color/light': 'header.personalColorLight',
+  '/profile/posts': 'header.myPosts',
+  '/profile/insights': 'header.insights',
+  '/profile/color-ranking': 'header.colorRanking',
+  '/profile/color-pattern': 'header.colorPattern',
+  '/profile/challenges': 'header.challenges',
+  '/profile/title-exam': 'header.titleExam',
+  '/profile/block-list': 'header.blockList',
+  '/auth/login': 'auth.loginTitle',
+  '/auth/signup': 'auth.signupTitle',
+  '/home/build': 'header.build',
+  '/home/recommend': 'header.recommend',
+  '/home/weather': 'header.weather',
+  '/home/saved': 'header.saved',
+  '/home/quiz': 'header.quiz',
+  '/home/fabric': 'header.fabricGuide',
+  '/home/body': 'header.bodyGuide',
+  '/notifications': 'header.notifications',
+  '/terms': 'header.terms',
+  '/privacy': 'header.privacy',
+  '/closet/add': 'header.closetAdd',
+  '/closet/coord': 'header.closetCoord',
+  '/closet/calendar': 'header.calendar',
+  '/closet/best': 'header.closetBest',
+  '/community/post': 'header.communityPost',
+  '/community/discover': 'header.userDiscover',
 }
 
 // 동적 라우트 (startsWith 매칭, 길이 내림차순으로 우선순위)
-const PREFIX_TITLES: [string, string][] = [
-  ['/profile/insights/', '인사이트'],
-  ['/community/event/', '이벤트'],
-  ['/community/', '코디 상세'],
-  ['/closet/ootd/', 'OOTD 상세'],
-  ['/user/', '프로필'],
+const PREFIX_TITLE_KEYS: [string, string][] = [
+  ['/profile/insights/', 'header.insights'],
+  ['/community/event/', 'header.eventDetail'],
+  ['/community/', 'communityDetail.like'],
+  ['/closet/ootd/', 'header.record'],
+  ['/user/', 'header.profile'],
 ]
 
 // 헤더 숨김 화면
@@ -57,26 +58,27 @@ const HIDDEN_ROUTES = ['/onboarding', '/pc-light']
 // 뒤로가기 시 홈으로 보낼 최상위 탭 경로
 const ROOT_PATHS = ['/', '/home', '/closet', '/record', '/community', '/shop', '/profile']
 
-function resolveTitle(pathname: string): string {
+function resolveTitleKey(pathname: string): string {
   // 1. 정확한 매핑
-  if (TITLES[pathname]) return TITLES[pathname]
+  if (TITLE_KEYS[pathname]) return TITLE_KEYS[pathname]
   // 2. prefix 매칭
-  for (const [prefix, title] of PREFIX_TITLES) {
-    if (pathname.startsWith(prefix)) return title
+  for (const [prefix, key] of PREFIX_TITLE_KEYS) {
+    if (pathname.startsWith(prefix)) return key
   }
-  return '바루픽'
+  return 'header.home'
 }
 
 export default function AppHeader() {
   const navigate = useNavigate()
   const location = useLocation()
   const { profile } = useAuth()
+  const { t } = useTranslation()
 
   if (HIDDEN_ROUTES.some(r => location.pathname.startsWith(r))) return null
 
   const pathname = location.pathname
   const isHome = pathname === '/home' || pathname === '/'
-  const title = resolveTitle(pathname)
+  const title = t(resolveTitleKey(pathname))
 
   // 최상위 탭이 아니면 항상 뒤로가기 표시
   const isRootTab = ROOT_PATHS.includes(pathname)
@@ -103,7 +105,7 @@ export default function AppHeader() {
       {showBack && (
         <button
           onClick={handleBack}
-          aria-label="뒤로가기"
+          aria-label={t('common.back')}
           className="w-9 h-9 rounded-full bg-white/80 dark:bg-warm-800/80 flex items-center justify-center shadow-warm-sm active:scale-90 transition-transform"
         >
           <ChevronLeft size={20} strokeWidth={2.5} />
@@ -118,7 +120,7 @@ export default function AppHeader() {
       {/* 알림 */}
       <button
         onClick={() => navigate('/notifications')}
-        aria-label="알림"
+        aria-label={t('header.notifications')}
         className="w-9 h-9 rounded-full bg-white/80 dark:bg-warm-800/80 flex items-center justify-center shadow-warm-sm active:scale-90 transition-transform relative"
       >
         <Bell size={17} strokeWidth={2} />
@@ -127,11 +129,11 @@ export default function AppHeader() {
       {/* 프로필 */}
       <button
         onClick={() => navigate('/profile')}
-        aria-label="프로필"
+        aria-label={t('header.profile')}
         className="w-9 h-9 rounded-full bg-terra-100 flex items-center justify-center shadow-warm-sm active:scale-90 transition-transform overflow-hidden flex-shrink-0"
       >
         {profile?.avatar_url ? (
-          <img src={profile.avatar_url} className="w-9 h-9 rounded-full object-cover" alt="프로필" />
+          <img src={profile.avatar_url} className="w-9 h-9 rounded-full object-cover" alt={t('header.profile')} />
         ) : (
           <User size={18} strokeWidth={2} className="text-terra-600" />
         )}

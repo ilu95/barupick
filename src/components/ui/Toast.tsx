@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
 import { Check, AlertTriangle, Info, X, Undo2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // ═══════════════════════════════════════
 // Types
@@ -100,6 +101,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 // Single Toast Item
 // ═══════════════════════════════════════
 function ToastItem({ item, onDismiss }: { item: ToastItem; onDismiss: (id: string) => void }) {
+  const { t } = useTranslation()
   const icons: Record<ToastVariant, React.ReactNode> = {
     success: <Check size={16} className="text-sage" />,
     error: <AlertTriangle size={16} className="text-red-500" />,
@@ -135,7 +137,7 @@ function ToastItem({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
           className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-white/15 dark:bg-warm-900/15 rounded-lg text-[11px] font-bold active:scale-95 transition-transform"
         >
           <Undo2 size={12} />
-          {item.undoLabel || '되돌리기'}
+          {item.undoLabel || t('common.undo')}
         </button>
       )}
 

@@ -4,8 +4,10 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
 import { COLORS_60 } from '@/lib/colors'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import { useTranslation } from 'react-i18next'
 
 export default function OotdCalendar() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { getRecords } = useOotd()
   const [month, setMonth] = useState(() => {
@@ -54,7 +56,7 @@ export default function OotdCalendar() {
     return days
   }, [month, recordsByDate])
 
-  const monthLabel = `${month.year}년 ${month.month + 1}월`
+  const monthLabel = t('ootdCalendar.yearMonth', { year: month.year, month: month.month + 1 })
   const prevMonth = () => setMonth(m => m.month === 0 ? { year: m.year - 1, month: 11 } : { ...m, month: m.month - 1 })
   const nextMonth = () => setMonth(m => m.month === 11 ? { year: m.year + 1, month: 0 } : { ...m, month: m.month + 1 })
 
@@ -83,7 +85,7 @@ export default function OotdCalendar() {
         </button>
         <div className="text-center">
           <div className="font-display text-lg font-bold text-warm-900">{monthLabel}</div>
-          <div className="text-[11px] text-warm-600">{daysWithRecords}일 기록 · {monthRecords.length}개 코디</div>
+          <div className="text-[11px] text-warm-600">{t('ootdCalendar.monthSummary', { days: daysWithRecords, coords: monthRecords.length })}</div>
         </div>
         <button onClick={nextMonth} className="w-9 h-9 rounded-full bg-white border border-warm-400 flex items-center justify-center active:scale-90 transition-transform">
           <ChevronRight size={18} />
@@ -92,7 +94,7 @@ export default function OotdCalendar() {
 
       {/* 요일 헤더 */}
       <div className="grid grid-cols-7 gap-1 mb-1">
-        {['일', '월', '화', '수', '목', '금', '토'].map((d, i) => (
+        {(t('ootdCalendar.weekDays', { returnObjects: true }) as string[]).map((d, i) => (
           <div key={d} className={`text-center text-[11px] font-semibold py-1 ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-warm-500'}`}>
             {d}
           </div>
@@ -132,7 +134,7 @@ export default function OotdCalendar() {
                 </div>
               )}
               {hasRecords && bestRecord && (
-                <div className="text-[7px] font-bold text-terra-600 dark:text-terra-400 mt-[1px]">{bestRecord.score}점</div>
+                <div className="text-[7px] font-bold text-terra-600 dark:text-terra-400 mt-[1px]">{t('common.score', { score: bestRecord.score })}</div>
               )}
 
               {day.records.length > 1 && (
@@ -165,14 +167,14 @@ export default function OotdCalendar() {
         return (
           <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-3.5">
             <div className="text-[12px] text-amber-800 dark:text-amber-300 font-medium mb-1">
-              이번 주 비슷한 컬러가 {streakDays + 1}일 이어지고 있어요
+              {t('ootdCalendar.colorStreakMessage', { days: streakDays + 1 })}
             </div>
-            <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-2">다른 조합도 확인해볼까요?</div>
+            <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-2">{t('ootdCalendar.tryOtherCombos')}</div>
             <button
               onClick={() => navigate('/closet/combos')}
               className="w-full py-2 bg-white dark:bg-warm-800 border border-amber-200 dark:border-amber-700 rounded-xl text-[11px] font-semibold text-amber-700 dark:text-amber-300 active:scale-[0.98] transition-all"
             >
-              다른 조합 보기 →
+              {t('ootdCalendar.viewOtherCombos')}
             </button>
           </div>
         )
@@ -182,7 +184,7 @@ export default function OotdCalendar() {
       {monthRecords.length > 0 && (
         <div className="mt-6">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">
-            {month.month + 1}월 기록 ({monthRecords.length})
+            {t('ootdCalendar.monthRecordTitle', { month: month.month + 1, count: monthRecords.length })}
           </div>
 
           {/* 필터 */}
@@ -190,13 +192,13 @@ export default function OotdCalendar() {
             {(['all', 'photo', 'mannequin'] as const).map(f => (
               <button key={f} onClick={() => setTypeFilter(f)}
                 className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${typeFilter === f ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-600 dark:text-warm-300 active:scale-95'}`}>
-                {f === 'all' ? '전체' : f === 'photo' ? '📷 사진' : '👤 마네킹'}
+                {f === 'all' ? t('ootdCalendar.filterAll') : f === 'photo' ? `📷 ${t('ootdCalendar.filterPhoto')}` : `👤 ${t('ootdCalendar.filterMannequin')}`}
               </button>
             ))}
             <div className="flex-1" />
             <button onClick={() => setSortOrder(s => s === 'newest' ? 'oldest' : 'newest')}
               className="px-3 py-1.5 rounded-full text-[11px] font-medium bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-600 dark:text-warm-300 active:scale-95 transition-all">
-              {sortOrder === 'newest' ? '최신순 ↓' : '오래된순 ↑'}
+              {sortOrder === 'newest' ? `${t('ootdCalendar.sortNewest')} ↓` : `${t('ootdCalendar.sortOldest')} ↑`}
             </button>
           </div>
 
@@ -209,7 +211,7 @@ export default function OotdCalendar() {
 
           {filteredRecords.length === 0 && (
             <div className="text-center py-8 text-sm text-warm-500 dark:text-warm-400">
-              {typeFilter === 'photo' ? '사진이 있는 기록이 없어요' : '마네킹만 있는 기록이 없어요'}
+              {typeFilter === 'photo' ? t('ootdCalendar.filterPhoto') : t('ootdCalendar.filterMannequin')}
             </div>
           )}
         </div>
@@ -220,13 +222,15 @@ export default function OotdCalendar() {
 
 // ─── 캘린더용 기록 카드 (Closet RecordCard 기반, 날짜 표시 변경) ───
 function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate: any }) {
+  const { t } = useTranslation()
   const outfitHex: Record<string, string> = {}
   Object.entries(record.colors || {}).forEach(([k, v]) => {
     if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
   })
 
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
-  const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][new Date(ry, rm - 1, rd).getDay()]
+  const weekDays = t('ootdCalendar.weekDays', { returnObjects: true }) as string[]
+  const dayOfWeek = weekDays[new Date(ry, rm - 1, rd).getDay()]
   const dateLabel = `${rm}/${rd} ${dayOfWeek}`
 
   const hasPhoto = record.photos && record.photos.length > 0
@@ -241,7 +245,7 @@ function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate
         <div className="px-2.5 py-2">
           <div className="flex items-center justify-between mb-0.5">
             <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
-            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+            <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{t('common.score', { score: record.score })}</span>
           </div>
           <div className="flex gap-0.5">
             {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {
@@ -265,7 +269,7 @@ function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate
       <div className="px-2.5 py-2">
         <div className="flex items-center justify-between mb-0.5">
           <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{dateLabel}</span>
-          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{record.score}점</span>
+          <span className="font-display text-[10px] font-bold text-terra-600 bg-terra-100 dark:bg-terra-900/30 px-1.5 py-0.5 rounded-full">{t('common.score', { score: record.score })}</span>
         </div>
         <div className="flex gap-0.5">
           {Object.values(record.colors || {}).filter(Boolean).slice(0, 5).map((colorKey, i) => {

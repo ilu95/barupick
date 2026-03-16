@@ -4,8 +4,10 @@ import { Trophy } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { useOotd } from '@/hooks/useOotd'
+import { useTranslation } from 'react-i18next'
 
 export default function BestCoord() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { getRecords } = useOotd()
 
@@ -27,8 +29,8 @@ export default function BestCoord() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">베스트 코디</h2>
-      <p className="text-sm text-warm-600 mb-5">높은 점수순으로 정렬했어요</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('closet.bestCoordTitle')}</h2>
+      <p className="text-sm text-warm-600 mb-5">{t('closet.sortByScore')}</p>
 
       <div className="flex flex-col gap-3">
         {bestRecords.map((record, idx) => {

@@ -11,6 +11,7 @@ import { CATEGORY_NAMES } from '@/lib/categories'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/components/ui/Toast'
+import { useTranslation } from 'react-i18next'
 
 const PARTS = ['outer', 'top', 'middleware', 'bottom', 'shoes'] as const
 
@@ -19,6 +20,7 @@ export default function EventSubmit() {
   const { eventId } = useParams<{ eventId: string }>()
   const { user, profile } = useAuth()
   const toast = useToast()
+  const { t } = useTranslation()
 
   const [event, setEvent] = useState<any>(null)
   const [colors, setColors] = useState<Record<string, string | null>>({ outer: null, top: null, middleware: null, bottom: null, shoes: null })
@@ -87,14 +89,14 @@ export default function EventSubmit() {
       setDone(true)
       setTimeout(() => navigate(`/community/event/${eventId}`, { replace: true }), 2000)
     } catch (e: any) {
-      if (e.code === '23505') toast.error('이미 이 이벤트에 참여했어요')
-      else toast.error('제출 실패: ' + (e.message || ''))
+      if (e.code === '23505') toast.error(t('eventSubmit.alreadySubmitted'))
+      else toast.error(t('eventSubmit.submitFailed', { error: e.message || '' }))
     } finally {
       setSubmitting(false)
     }
   }
 
-  if (!user) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">로그인이 필요합니다</div>
+  if (!user) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('common.loginRequired')}</div>
 
   if (done) {
     return (
@@ -103,8 +105,8 @@ export default function EventSubmit() {
           <div className="w-16 h-16 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-4">
             <Check size={32} className="text-sage" />
           </div>
-          <div className="font-display text-lg font-bold text-warm-900">참여 완료!</div>
-          <div className="text-sm text-warm-600 mt-1">결과 발표를 기다려주세요</div>
+          <div className="font-display text-lg font-bold text-warm-900">{t('eventSubmit.participationDone')}</div>
+          <div className="text-sm text-warm-600 mt-1">{t('eventSubmit.waitResult')}</div>
         </div>
       </div>
     )
@@ -123,7 +125,7 @@ export default function EventSubmit() {
       {/* 경고 */}
       <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-5 text-xs text-red-700 leading-relaxed flex items-start gap-2">
         <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-        <span><b>얼굴이 보이지 않는 사진만</b> 제출해주세요. 제출 후에는 수정/삭제가 불가합니다.</span>
+        <span>{t('eventSubmit.warning')}</span>
       </div>
 
       {/* 마네킹 미리보기 */}
@@ -134,9 +136,9 @@ export default function EventSubmit() {
       )}
 
       {/* 코디 색상 */}
-      <div className="text-sm font-bold text-warm-800 mb-1">🎨 코디 색상</div>
+      <div className="text-sm font-bold text-warm-800 mb-1">{t('eventSubmit.coordColors')}</div>
       <div className="text-xs text-warm-500 mb-3">
-        최소 2색 이상 선택해주세요{' '}
+        {t('eventSubmit.minColors')}{' '}
         <span className="px-1.5 py-0.5 rounded-full bg-terra-100 text-terra-600 text-[10px] font-semibold">{filledCount}/5</span>
       </div>
 
@@ -176,9 +178,9 @@ export default function EventSubmit() {
 
       {/* 착용샷 */}
       <div className="text-sm font-bold text-warm-800 mb-1 mt-5">
-        📷 착용샷 <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">필수</span>
+        {t('eventSubmit.wearPhoto')} <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">{t('eventSubmit.required')}</span>
       </div>
-      <div className="text-xs text-warm-500 mb-3">얼굴이 보이지 않도록 촬영해주세요 (최대 2장)</div>
+      <div className="text-xs text-warm-500 mb-3">{t('eventSubmit.wearPhotoDesc')}</div>
       <div className="flex gap-2 mb-5">
         {photos.map((p, i) => (
           <div key={i} className="relative w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 border border-warm-300">
@@ -189,14 +191,14 @@ export default function EventSubmit() {
         ))}
         {photos.length < 2 && (
           <label className="flex items-center justify-center gap-2 py-3 px-4 bg-warm-100 border border-warm-300 rounded-xl text-xs text-warm-600 cursor-pointer active:scale-95 transition-all">
-            <Camera size={16} /> 사진 추가
+            <Camera size={16} /> {t('common.addPhoto')}
             <input type="file" accept="image/*" className="hidden" onChange={handlePhotoAdd} />
           </label>
         )}
       </div>
 
       {/* 스타일 */}
-      <div className="text-sm font-bold text-warm-800 mb-2">👔 스타일 <span className="text-[10px] font-normal text-warm-400">(선택)</span></div>
+      <div className="text-sm font-bold text-warm-800 mb-2">{t('eventSubmit.style')} <span className="text-[10px] font-normal text-warm-400">{t('eventSubmit.optional')}</span></div>
       <div className="flex flex-wrap gap-1.5 mb-5">
         {Object.entries(STYLE_GUIDE).map(([k, v]) => (
           <button key={k} onClick={() => setStyle(style === k ? null : k)}
@@ -207,13 +209,13 @@ export default function EventSubmit() {
       </div>
 
       {/* 인스타그램 ID (필수) */}
-      <div className="text-sm font-bold text-warm-800 mb-1">📸 인스타그램 ID <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">필수</span></div>
-      <div className="text-xs text-warm-500 mb-2">당첨 시 연락을 위해 필요해요</div>
+      <div className="text-sm font-bold text-warm-800 mb-1">{t('eventSubmit.instagramId')} <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">{t('eventSubmit.required')}</span></div>
+      <div className="text-xs text-warm-500 mb-2">{t('eventSubmit.instagramIdDesc')}</div>
       <input
         type="text"
         value={instagramId}
         onChange={e => setInstagramId(e.target.value.replace(/[^a-zA-Z0-9._]/g, ''))}
-        placeholder="인스타그램 ID (@제외)"
+        placeholder={t('eventSubmit.instagramPlaceholder')}
         className="w-full px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-all mb-5"
       />
 
@@ -223,14 +225,14 @@ export default function EventSubmit() {
         disabled={!canSubmit || submitting}
         className={`w-full py-3.5 ${canSubmit ? 'bg-terra-500 shadow-terra' : 'bg-warm-400'} text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50`}
       >
-        {submitting ? '제출 중...' : '🎨 참여하기'}
+        {submitting ? t('eventSubmit.submitting') : t('eventSubmit.submit')}
       </button>
 
       {!canSubmit && (
         <div className="text-center text-[11px] text-warm-500 mt-2">
-          {filledCount < 2 ? '색상 2개 이상' : ''}{' '}
-          {photos.length === 0 ? '착용샷 필수' : ''}{' '}
-          {!instagramId.trim() ? '인스타 ID 필수' : ''}
+          {filledCount < 2 ? t('eventSubmit.needColors') : ''}{' '}
+          {photos.length === 0 ? t('eventSubmit.needPhoto') : ''}{' '}
+          {!instagramId.trim() ? t('eventSubmit.needInstagram') : ''}
         </div>
       )}
 

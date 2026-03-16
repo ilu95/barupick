@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { COLORS_60, COLOR_TABS } from '@/lib/colors'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   selected: string | null
@@ -28,6 +29,7 @@ function addRecentColor(key: string) {
 export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn }: Props) {
   const [tab, setTab] = useState(COLOR_TABS[0].id)
   const [recent, setRecent] = useState<string[]>([])
+  const { t } = useTranslation()
   const group = COLOR_TABS.find(t => t.id === tab) || COLOR_TABS[0]
 
   useEffect(() => { setRecent(getRecentColors()) }, [])
@@ -60,7 +62,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
       {/* 최근 사용 */}
       {recent.length > 0 && (
         <>
-          <div className="text-[9px] font-semibold text-warm-400 dark:text-warm-500 tracking-wider uppercase mb-1.5">최근 사용</div>
+          <div className="text-[9px] font-semibold text-warm-400 dark:text-warm-500 tracking-wider uppercase mb-1.5">{t('common.recentColors')}</div>
           <div className="flex gap-1.5 mb-2.5 pb-2.5 border-b border-warm-300 dark:border-warm-600">
             {recent.map(k => {
               const c = COLORS_60[k]
@@ -122,7 +124,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 
       {/* 탭 정보 */}
       <div className="text-center text-[10px] text-warm-400 dark:text-warm-500 mt-2">
-        {group.emoji} {group.label} · {group.keys.length}색
+        {group.emoji} {group.label} · {t('common.colorCount', { count: group.keys.length })}
       </div>
     </div>
   )
@@ -131,16 +133,16 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 
   // 바텀시트 모드
   return (
-    <div className="fixed inset-0 bg-black/40 z-[300] flex items-end justify-center" onClick={onClose} role="dialog" aria-modal="true" aria-label="색상 선택">
+    <div className="fixed inset-0 bg-black/40 z-[300] flex items-end justify-center" onClick={onClose} role="dialog" aria-modal="true" aria-label={t('colorPicker.title')}>
       <div className="w-full max-w-[480px] bg-white dark:bg-warm-800 rounded-t-3xl p-5 pb-8 animate-screen-enter" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">색상 선택</h3>
+          <h3 className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{t('colorPicker.title')}</h3>
           <div className="flex gap-2">
             {selected && onClear && (
-              <button onClick={onClear} className="text-xs text-warm-600 dark:text-warm-400 active:opacity-70 py-1">초기화</button>
+              <button onClick={onClear} className="text-xs text-warm-600 dark:text-warm-400 active:opacity-70 py-1">{t('colorPicker.reset')}</button>
             )}
             {onClose && (
-              <button onClick={onClose} aria-label="닫기" className="w-9 h-9 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center active:scale-90">
+              <button onClick={onClose} aria-label={t('colorPicker.closeLabel')} className="w-9 h-9 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center active:scale-90">
                 <X size={16} />
               </button>
             )}

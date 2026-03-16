@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Shirt, Archive, Plus, Users, ShoppingBag } from 'lucide-react'
 
-const TABS = [
-  { path: '/home', label: '코디', icon: Shirt },
-  { path: '/closet', label: '옷장', icon: Archive },
-  { path: '/record', label: '기록', icon: Plus, center: true },
-  { path: '/community', label: '커뮤', icon: Users },
-  { path: '/shop', label: '샵', icon: ShoppingBag },
+const TAB_KEYS = [
+  { path: '/home', labelKey: 'nav.coord', icon: Shirt },
+  { path: '/closet', labelKey: 'nav.closet', icon: Archive },
+  { path: '/record', labelKey: 'nav.record', icon: Plus, center: true },
+  { path: '/community', labelKey: 'nav.community', icon: Users },
+  { path: '/shop', labelKey: 'nav.shop', icon: ShoppingBag },
 ]
 
 // 네비 숨김 화면
@@ -25,6 +26,7 @@ const HIDDEN_ROUTES = [
 export default function BottomNav() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   // 숨김 판별
   const shouldHide = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r))
@@ -45,29 +47,30 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white/92 dark:bg-[#1C1917]/95 backdrop-blur-[20px] border-t border-warm-400/60 dark:border-[#44403C]/60 flex items-center justify-around z-[200] px-1"
-      aria-label="메인 내비게이션"
+      aria-label={t('nav.coord')}
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         height: 'calc(68px + env(safe-area-inset-bottom, 0px))',
       }}
     >
-      {TABS.map(tab => {
+      {TAB_KEYS.map(tab => {
         const isActive = activeTab === tab.path
         const Icon = tab.icon
+        const label = t(tab.labelKey)
 
         if (tab.center) {
           return (
             <button
               key={tab.path}
               onClick={() => navigate(tab.path)}
-              aria-label={tab.label}
+              aria-label={label}
               aria-current={isActive ? 'page' : undefined}
               className="flex flex-col items-center justify-center flex-1 h-full gap-[3px] relative"
             >
               <div className="w-[46px] h-[46px] rounded-full bg-terra-500 flex items-center justify-center -mt-5 shadow-terra transition-transform active:scale-[0.92]">
                 <Icon size={24} color="#fff" strokeWidth={2} />
               </div>
-              <span className="text-[10px] font-semibold text-terra-500 mt-[2px]">{tab.label}</span>
+              <span className="text-[10px] font-semibold text-terra-500 mt-[2px]">{label}</span>
             </button>
           )
         }
@@ -76,7 +79,7 @@ export default function BottomNav() {
           <button
             key={tab.path}
             onClick={() => navigate(tab.path)}
-            aria-label={tab.label}
+            aria-label={label}
             aria-current={isActive ? 'page' : undefined}
             className={`flex flex-col items-center justify-center flex-1 h-full gap-[3px] transition-all ${
               isActive ? 'text-terra-500' : 'text-warm-600'
@@ -88,7 +91,7 @@ export default function BottomNav() {
               className={`transition-transform ${isActive ? 'scale-[1.08]' : ''}`}
             />
             <span className={`text-[10px] ${isActive ? 'font-bold text-terra-500' : 'font-medium'}`}>
-              {tab.label}
+              {label}
             </span>
           </button>
         )

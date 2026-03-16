@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // ═══════════════════════════════════════
 // Types
@@ -8,16 +9,16 @@ import { X } from 'lucide-react'
 interface ModalAlertOptions {
   title: string
   message?: string
-  confirmLabel?: string   // default '확인'
+  confirmLabel?: string
   onConfirm?: () => void
 }
 
 interface ModalConfirmOptions {
   title: string
   message?: string
-  confirmLabel?: string   // default '확인'
-  cancelLabel?: string    // default '취소'
-  variant?: 'default' | 'danger'  // danger = 빨간 확인 버튼 (삭제 등)
+  confirmLabel?: string
+  cancelLabel?: string
+  variant?: 'default' | 'danger'
   onConfirm: () => void
   onCancel?: () => void
 }
@@ -28,9 +29,9 @@ interface ModalPromptOptions {
   placeholder?: string
   defaultValue?: string
   maxLength?: number
-  confirmLabel?: string   // default '확인'
-  cancelLabel?: string    // default '취소'
-  validate?: (value: string) => string | null  // 에러 메시지 반환, null = 유효
+  confirmLabel?: string
+  cancelLabel?: string
+  validate?: (value: string) => string | null
   onConfirm: (value: string) => void
   onCancel?: () => void
 }
@@ -149,6 +150,7 @@ function ModalOverlay({
 // Alert Content (replaces window.alert)
 // ═══════════════════════════════════════
 function AlertContent({ options, close }: { options: ModalAlertOptions; close: () => void }) {
+  const { t } = useTranslation()
   const handleConfirm = () => {
     options.onConfirm?.()
     close()
@@ -169,7 +171,7 @@ function AlertContent({ options, close }: { options: ModalAlertOptions; close: (
         autoFocus
         className="w-full py-2.5 bg-terra-500 text-white rounded-xl text-sm font-semibold active:scale-[0.98] transition-all shadow-terra"
       >
-        {options.confirmLabel || '확인'}
+        {options.confirmLabel || t('modal.defaultConfirm')}
       </button>
     </>
   )
@@ -179,6 +181,7 @@ function AlertContent({ options, close }: { options: ModalAlertOptions; close: (
 // Confirm Content (replaces window.confirm)
 // ═══════════════════════════════════════
 function ConfirmContent({ options, close }: { options: ModalConfirmOptions; close: () => void }) {
+  const { t } = useTranslation()
   const isDanger = options.variant === 'danger'
 
   const handleConfirm = () => {
@@ -206,7 +209,7 @@ function ConfirmContent({ options, close }: { options: ModalConfirmOptions; clos
           onClick={handleCancel}
           className="flex-1 py-2.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-xl text-sm font-medium active:scale-[0.98] transition-all"
         >
-          {options.cancelLabel || '취소'}
+          {options.cancelLabel || t('modal.defaultCancel')}
         </button>
         <button
           onClick={handleConfirm}
@@ -217,7 +220,7 @@ function ConfirmContent({ options, close }: { options: ModalConfirmOptions; clos
               : 'bg-terra-500 text-white shadow-terra'
           }`}
         >
-          {options.confirmLabel || '확인'}
+          {options.confirmLabel || t('modal.defaultConfirm')}
         </button>
       </div>
     </>
@@ -228,6 +231,7 @@ function ConfirmContent({ options, close }: { options: ModalConfirmOptions; clos
 // Prompt Content (replaces window.prompt)
 // ═══════════════════════════════════════
 function PromptContent({ options, close }: { options: ModalPromptOptions; close: () => void }) {
+  const { t } = useTranslation()
   const [value, setValue] = useState(options.defaultValue || '')
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -301,13 +305,13 @@ function PromptContent({ options, close }: { options: ModalPromptOptions; close:
           onClick={handleCancel}
           className="flex-1 py-2.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-xl text-sm font-medium active:scale-[0.98] transition-all"
         >
-          {options.cancelLabel || '취소'}
+          {options.cancelLabel || t('modal.defaultCancel')}
         </button>
         <button
           onClick={handleConfirm}
           className="flex-1 py-2.5 bg-terra-500 text-white rounded-xl text-sm font-semibold active:scale-[0.98] transition-all shadow-terra"
         >
-          {options.confirmLabel || '확인'}
+          {options.confirmLabel || t('modal.defaultConfirm')}
         </button>
       </div>
     </>
