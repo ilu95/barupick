@@ -6,7 +6,7 @@ import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import ColorPicker from '@/components/ui/ColorPicker'
 import ImageEditor from '@/components/ui/ImageEditor'
 import CropOverlay from '@/components/ui/CropOverlay'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { ITEMS_CATALOG } from '@/lib/styles'
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
@@ -360,7 +360,7 @@ export default function OotdRecord() {
               <div key={id} className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
                 {color && <span className="w-4 h-4 rounded border border-warm-200" style={{ background: color.hex }} />}
                 <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">
-                  {t('categories:itemsCatalog.' + id)}{color ? ` ${color.name}` : ''}
+                  {t('categories:itemsCatalog.' + id)}{colorKey ? ` ${getColorName(colorKey)}` : ''}
                 </span>
                 {!color && <button onClick={() => { setOpenPanel('clothes'); setPendingItem(id) }}
                   className="text-[9px] text-terra-500 font-bold">{t('ootdRecord.color')}</button>}
@@ -375,7 +375,7 @@ export default function OotdRecord() {
             return c ? (
               <div className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
                 <span className="w-4 h-4 rounded border border-warm-200" style={{ background: c.hex }} />
-                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('ootdRecord.bottom')} {c.name}</span>
+                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('ootdRecord.bottom')} {getColorName(ootd.colors.bottom)}</span>
                 <button onClick={() => removeFixed('bottom')} className="ml-0.5 text-warm-400"><X size={10} /></button>
               </div>
             ) : null
@@ -387,7 +387,7 @@ export default function OotdRecord() {
             return c ? (
               <div className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
                 <span className="w-4 h-4 rounded border border-warm-200" style={{ background: c.hex }} />
-                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('ootdRecord.shoes')} {c.name}</span>
+                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('ootdRecord.shoes')} {getColorName(ootd.colors.shoes)}</span>
                 <button onClick={() => removeFixed('shoes')} className="ml-0.5 text-warm-400"><X size={10} /></button>
               </div>
             ) : null

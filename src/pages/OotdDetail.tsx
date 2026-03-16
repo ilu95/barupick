@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, Trash2, Share, Globe, Calendar, Tag, Smile, Cloud, ArrowLeft, Image } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
@@ -197,11 +197,11 @@ export default function OotdDetail() {
       {record.photos && record.photos.length > 0 && (
         <div className="mb-4 -mx-5">
           {record.photos.length === 1 ? (
-            <img src={record.photos[0]} className="w-full aspect-[4/5] object-cover" alt="코디 사진" />
+            <img src={record.photos[0]} className="w-full aspect-[4/5] object-cover" alt="outfit photo" />
           ) : (
             <div className="flex gap-1.5 overflow-x-auto pb-2 hide-scrollbar px-5">
               {record.photos.map((photo, idx) => (
-                <img key={idx} src={photo} className="w-[80vw] max-w-[380px] aspect-[4/5] rounded-xl object-cover flex-shrink-0" alt={`코디 사진 ${idx + 1}`} />
+                <img key={idx} src={photo} className="w-[80vw] max-w-[380px] aspect-[4/5] rounded-xl object-cover flex-shrink-0" alt={`outfit photo ${idx + 1}`} />
               ))}
             </div>
           )}
@@ -214,7 +214,7 @@ export default function OotdDetail() {
           <MannequinSVG outfit={outfitHex} size={record.photos?.length > 0 ? 80 : 120} />
         </div>
         <div className="flex-1">
-          <div className="font-display text-3xl font-bold text-warm-900 mb-1">{record.score}<span className="text-lg text-warm-500">점</span>
+          <div className="font-display text-3xl font-bold text-warm-900 mb-1">{t('common.score', { score: record.score })}
             {(() => { const p = getScorePercentile(record.score); return p ? <span className="ml-2 text-[10px] font-semibold bg-terra-100 text-terra-600 dark:bg-terra-900/30 dark:text-terra-400 px-2 py-0.5 rounded-full align-middle">{p.label}</span> : null })()}
           </div>
           <div className="text-sm text-warm-600 mb-3">{dateLabel}</div>
@@ -228,7 +228,7 @@ export default function OotdDetail() {
                 <div key={part} className="flex items-center gap-1.5 text-xs">
                   <span className="w-3.5 h-3.5 rounded border border-warm-400" style={{ background: c.hex }} />
                   <span className="text-warm-500 w-7">{t('categories:names.' + part)}</span>
-                  <span className="text-warm-800">{c.name}</span>
+                  <span className="text-warm-800">{getColorName(colorKey as string)}</span>
                 </div>
               )
             })}

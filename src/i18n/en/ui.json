@@ -466,7 +466,21 @@
     "fabricDesc": "Select fabrics for each part to check compatibility",
     "points": "pts",
     "alreadyGood": "Already a great combo!",
-    "feelsLabel": "feels"
+    "feelsLabel": "feels",
+    "slot": {
+      "outer": "Outer",
+      "middleware": "Mid",
+      "top": "Inner",
+      "inner": "Inner(base)"
+    },
+    "reason": {
+      "pcAndBody": "Personal Color + Body",
+      "pc": "Personal Color",
+      "body": "Body Complement",
+      "style": "Style Pick",
+      "basic": "Basic Item",
+      "harmony": "Color Harmony"
+    }
   },
   "ootdRecord": {
     "situations": {
@@ -663,6 +677,12 @@
       "instagramPlaceholder": "Without @",
       "avatar": "Profile Photo",
       "saveSuccess": "Profile updated"
+    },
+    "fitLabel": {
+      "pcAndBody": "Apply Personal Color + Body Complement",
+      "pcOnly": "Apply Personal Color",
+      "bodyOnly": "Apply Body Complement",
+      "setup": "Set up preferences"
     }
   },
   "profileSub": {

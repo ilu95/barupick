@@ -6,6 +6,7 @@
 
 import { PERSONAL_COLOR_12 } from './personalColor'
 import { BODY_GUIDE_DATA } from './bodyType'
+import i18n from '@/i18n'
 
 export const profile = {
     get() {
@@ -33,10 +34,10 @@ export const profile = {
     getFitLabel() {
         const pc = this.getPersonalColor();
         const bt = this.getBodyType();
-        if (pc && bt) return '퍼스널 컬러 + 체형 보완 적용하기';
-        if (pc) return '퍼스널 컬러 적용하기';
-        if (bt) return '체형 보완 적용하기';
-        return '맞춤 설정하기';
+        if (pc && bt) return i18n.t('profile.fitLabel.pcAndBody');
+        if (pc) return i18n.t('profile.fitLabel.pcOnly');
+        if (bt) return i18n.t('profile.fitLabel.bodyOnly');
+        return i18n.t('profile.fitLabel.setup');
     },
     getFitSummary() {
         const parts = [];
