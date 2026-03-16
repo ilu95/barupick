@@ -36,9 +36,9 @@ export default function OotdDetail() {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
         <div className="text-4xl mb-3">📝</div>
-        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">기록을 찾을 수 없어요</div>
+        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('ootdDetail.notFound')}</div>
         <button onClick={() => navigate('/closet')} className="px-5 py-2 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all">
-          옷장으로
+          {t('ootdDetail.goToCloset')}
         </button>
       </div>
     )
@@ -77,7 +77,7 @@ export default function OotdDetail() {
     if (sharing) return
     // 사진 없으면 안내
     if (!record.photos || record.photos.length === 0) {
-      setShareMsg('착용샷을 추가하면 커뮤니티에 공유할 수 있어요')
+      setShareMsg(t('ootdDetail.addPhotoToShare'))
       setTimeout(() => setShareMsg(''), 3000)
       return
     }
@@ -100,7 +100,7 @@ export default function OotdDetail() {
       } catch {}
 
       if (record.postId && record.visibility !== 'private') {
-        setShareMsg('이미 공유된 기록이에요')
+        setShareMsg(t('ootdDetail.alreadyShared'))
       } else if (record.postId && record.visibility === 'private') {
         // 비공개→다시 공개: 기존 게시물 visibility 업데이트
         await supabase.from('posts').update({
@@ -120,7 +120,7 @@ export default function OotdDetail() {
       } else {
         const { data: inserted } = await supabase.from('posts').insert({
           user_id: userId,
-          title: record.memo?.slice(0, 100) || '오늘의 코디',
+          title: record.memo?.slice(0, 100) || t('ootdDetail.todaysCoord'),
           outfit,
           score: record.score,
           style: autoStyle,
@@ -147,7 +147,7 @@ export default function OotdDetail() {
       }
     } catch (e) {
       console.error('Share error:', e)
-      setShareMsg('공유 중 오류가 발생했어요')
+      setShareMsg(t('ootdDetail.shareError'))
     } finally {
       setSharing(false)
       setTimeout(() => setShareMsg(''), 3000)
@@ -159,7 +159,7 @@ export default function OotdDetail() {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
         <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{dateLabel}</h2>
-        <p className="text-sm text-warm-600 mb-5">{records.length}개의 기록</p>
+        <p className="text-sm text-warm-600 mb-5">{t('ootdDetail.recordCount', { count: records.length })}</p>
         <div className="flex flex-col gap-2.5">
           {records.map(r => {
             const hex: Record<string, string> = {}

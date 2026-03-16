@@ -277,7 +277,7 @@ function Signup() {
             className="mt-0.5 w-4 h-4 rounded border-warm-400 text-terra-500 focus:ring-terra-400"
           />
           <span className="text-xs text-warm-600 leading-relaxed">
-            <button onClick={() => navigate('/terms')} className="text-terra-600 underline">{t('settings.terms')}</button> {t('auth.agreement').includes('및') ? '및' : '&'}{' '}
+            <button onClick={() => navigate('/terms')} className="text-terra-600 underline">{t('settings.terms')}</button> {t('auth.and')}{' '}
             <button onClick={() => navigate('/privacy')} className="text-terra-600 underline">{t('settings.privacy')}</button>
           </span>
         </label>

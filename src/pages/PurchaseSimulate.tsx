@@ -15,11 +15,11 @@ import { useTranslation } from 'react-i18next'
 type PageMode = 'select' | 'recommend' | 'manual'
 
 const CATEGORIES = [
-  { key: 'outer', label: '아우터', emoji: '🧥' },
-  { key: 'middleware', label: '미들웨어', emoji: '🧶' },
-  { key: 'top', label: '상의', emoji: '👔' },
-  { key: 'bottom', label: '하의', emoji: '👖' },
-  { key: 'shoes', label: '신발', emoji: '👞' },
+  { key: 'outer', labelKey: 'categories.outer', emoji: '🧥' },
+  { key: 'middleware', labelKey: 'categories.middleware', emoji: '🧶' },
+  { key: 'top', labelKey: 'categories.top', emoji: '👔' },
+  { key: 'bottom', labelKey: 'categories.bottom', emoji: '👖' },
+  { key: 'shoes', labelKey: 'categories.shoes', emoji: '👞' },
 ]
 
 // 추천 스캔용 대표 색상 (옷장에 없는 것만 필터)
@@ -101,7 +101,7 @@ export default function PurchaseSimulate() {
         try {
           const sim = wardrobe.simulatePurchase(cand.category, cand.color)
           if (sim.comboDelta > 0) {
-            const catLabel = CATEGORIES.find(c => c.key === cand.category)?.label || cand.category
+            const catLabel = t(CATEGORIES.find(c => c.key === cand.category)?.labelKey || '') || cand.category
             const colorName = COLORS_60[cand.color]?.name || cand.color
             results.push({
               ...sim, category: cand.category, color: cand.color,
@@ -290,7 +290,7 @@ export default function PurchaseSimulate() {
                   className="flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-5 py-4 active:scale-[0.98] transition-all shadow-warm-sm">
                   <span className="text-2xl">{cat.emoji}</span>
                   <div className="flex-1 text-left">
-                    <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{cat.label}</div>
+                    <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t(cat.labelKey)}</div>
                     <div className="text-[11px] text-warm-500 dark:text-warm-400">{t('purchaseSimulate.currentCount', { count })}</div>
                   </div>
                   <ChevronRight size={16} className="text-warm-400" />
@@ -307,7 +307,7 @@ export default function PurchaseSimulate() {
           <button onClick={() => setManualStep('category')} className="flex items-center gap-1 text-sm text-warm-500 mb-3 active:opacity-70">
             <ArrowLeft size={16} /> {t('purchaseSimulate.reselectPart')}
           </button>
-          <p className="text-sm text-warm-500 dark:text-warm-400 mb-4">{t('purchaseSimulate.selectColor', { category: CATEGORIES.find(c => c.key === category)?.label })}</p>
+          <p className="text-sm text-warm-500 dark:text-warm-400 mb-4">{t('purchaseSimulate.selectColor', { category: t(CATEGORIES.find(c => c.key === category)?.labelKey || '') })}</p>
           <ColorPicker onSelect={handleColor} selected={color} inline={true} />
         </div>
       )}
@@ -320,7 +320,7 @@ export default function PurchaseSimulate() {
             <div className="w-10 h-10 rounded-xl border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: color ? COLORS_60[color]?.hex || '#ddd' : '#ddd' }} />
             <div className="flex-1">
               <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{COLORS_60[color]?.name || color}</div>
-              <div className="text-[11px] text-warm-500 dark:text-warm-400">{CATEGORIES.find(c => c.key === category)?.label}</div>
+              <div className="text-[11px] text-warm-500 dark:text-warm-400">{t(CATEGORIES.find(c => c.key === category)?.labelKey || '')}</div>
             </div>
             <button onClick={() => { setCategory(null); setColor(null); setSimResult(null); setManualStep('category') }} className="text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">{t('purchaseSimulate.reselect')}</button>
           </div>

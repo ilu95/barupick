@@ -402,14 +402,14 @@ export default function AllCombos() {
               {/* 배색 이론 */}
               {combo.theory.length > 0 && (
                 <div className="px-4 pb-1">
-                  <span className="text-[10px] bg-terra-50 dark:bg-terra-900/20 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">🎨 {combo.theory[0]} 배색</span>
+                  <span className="text-[10px] bg-terra-50 dark:bg-terra-900/20 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">🎨 {t('allCombos.colorScheme', { theory: combo.theory[0] })}</span>
                 </div>
               )}
 
               {/* 최근 착용 */}
               {lastWorn && (
                 <div className="px-4 pb-1">
-                  <span className="text-[10px] text-warm-400 dark:text-warm-500">📅 마지막 착용: {lastWorn}</span>
+                  <span className="text-[10px] text-warm-400 dark:text-warm-500">📅 {t('allCombos.lastWorn', { date: lastWorn })}</span>
                 </div>
               )}
 
@@ -428,9 +428,8 @@ export default function AllCombos() {
                     return (
                       <div key={i} className="text-[10px] text-warm-600 dark:text-warm-400 flex items-center gap-1">
                         <span>{imp.icon || '💡'}</span>
-                        <span>{(CATEGORY_NAMES as any)?.[imp.item]?.slice(0, 2)}을 </span>
+                        <span>{t('allCombos.improveSuggestion', { part: (CATEGORY_NAMES as any)?.[imp.item]?.slice(0, 2), color: newC?.name || imp.newColor, score: imp.newScore })}</span>
                         {newC && <span className="w-2.5 h-2.5 rounded inline-block border border-warm-300" style={{ background: newC.hex }} />}
-                        <span>{newC?.name || imp.newColor}로 바꾸면 {imp.newScore}점</span>
                       </div>
                     )
                   })}
@@ -445,7 +444,7 @@ export default function AllCombos() {
                   </div>
                 ) : isDup ? (
                   <div className="flex-1 py-2 bg-warm-100 dark:bg-warm-700 rounded-xl text-center text-[11px] text-warm-500">
-                    이미 오늘 기록된 조합이에요
+                    {t('allCombos.alreadyRecordedToday')}
                   </div>
                 ) : (
                   <>
@@ -480,7 +479,7 @@ export default function AllCombos() {
                     disabled={!datePickerValue}
                     className="py-2 px-4 bg-terra-500 text-white rounded-xl text-[11px] font-semibold disabled:opacity-40 active:scale-[0.97] transition-all"
                   >
-                    기록
+                    {t('allCombos.record')}
                   </button>
                   <button
                     onClick={() => setDatePickerFor(null)}
@@ -501,20 +500,20 @@ export default function AllCombos() {
           onClick={() => setShowCount(prev => prev + 20)}
           className="w-full mt-3 py-3 bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-600 dark:text-warm-400 active:scale-[0.98] transition-all"
         >
-          더 보기 ({filtered.length - showCount}개 남음)
+          {t('allCombos.showMore', { count: filtered.length - showCount })}
         </button>
       )}
 
       {/* 결과 적을 때 추가 안내 */}
       {combos.length > 0 && combos.length <= 5 && (
         <div className="mt-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-4">
-          <div className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">코디가 {combos.length}개뿐이에요</div>
-          <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-3">옷장에 아이템을 추가하면 조합이 늘어나요</div>
+          <div className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">{t('allCombos.fewCombos', { count: combos.length })}</div>
+          <div className="text-[11px] text-warm-600 dark:text-warm-400 mb-3">{t('allCombos.addItemsHint')}</div>
           <button
             onClick={() => navigate('/closet/simulate')}
             className="w-full py-2.5 bg-white dark:bg-warm-800 border border-amber-300 dark:border-amber-700 rounded-xl text-[12px] font-semibold text-amber-700 dark:text-amber-300 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
           >
-            <ShoppingBag size={14} /> 뭘 사면 좋을지 확인하기
+            <ShoppingBag size={14} /> {t('allCombos.checkWhatToBuy')}
           </button>
         </div>
       )}

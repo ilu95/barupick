@@ -45,13 +45,13 @@ export function Weather() {
   }, [])
 
   const getAdvice = (feels: number) => {
-    if (feels >= 28) return { layer: 'simple', title: '한여름 코디', desc: '반팔 + 반바지 or 린넨 팬츠', emoji: '☀️', detail: '얇고 통기성 좋은 소재를 선택하세요. 린넨, 코튼 저지, 시어서커가 좋아요.', items: ['반팔 티셔츠', '린넨 셔츠', '숏팬츠', '린넨 팬츠', '샌들/슬리퍼'], colorTip: '화이트, 아이보리, 파스텔 톤으로 시원한 인상을' }
-    if (feels >= 23) return { layer: 'simple', title: '초여름 코디', desc: '반팔 + 면바지 · 가벼운 원피스', emoji: '🌤️', detail: '낮에는 반팔, 실내 냉방 대비 얇은 가디건 하나 챙기면 완벽해요.', items: ['반팔 셔츠', '얇은 가디건', '코튼 치노', '면바지', '스니커즈/로퍼'], colorTip: '베이지 + 네이비, 화이트 + 카키 조합 추천' }
-    if (feels >= 17) return { layer: 'basic', title: '간절기 코디', desc: '긴팔 + 긴바지 · 가벼운 아우터', emoji: '⛅', detail: '일교차가 큰 시기. 레이어드하기 좋은 셔츠 + 니트 조합이 활용도 높아요.', items: ['옥스포드 셔츠', '얇은 니트', '면바지/데님', '라이트 자켓', '로퍼/더비슈즈'], colorTip: '어스톤 계열 — 베이지, 카키, 올리브가 계절감에 맞아요' }
-    if (feels >= 12) return { layer: 'basic', title: '초가을 코디', desc: '자켓 or 가디건 + 긴바지', emoji: '🍂', detail: '바람막이 역할을 하는 아우터가 필요해요. 맨투맨 위에 자켓을 걸치면 깔끔해요.', items: ['블레이저/치노 자켓', '가디건', '맨투맨', '울 팬츠', '첼시 부츠'], colorTip: '브라운, 테라코타, 머스타드로 가을 무드를' }
-    if (feels >= 5) return { layer: 'mid_inner', title: '겨울 코디', desc: '코트 + 니트 · 머플러 추천', emoji: '🧥', detail: '보온이 중요해요. 이너는 얇게 여러 겹, 아우터는 방풍 기능 있는 걸로 선택하세요.', items: ['울 코트', '두꺼운 니트', '기모 팬츠', '머플러', '워커/부츠'], colorTip: '차콜, 네이비, 캐멀 — 겨울 클래식 3색' }
-    if (feels >= -5) return { layer: 'layered', title: '한겨울 코디', desc: '패딩 + 기모 · 방한 필수', emoji: '❄️', detail: '발열 내의 → 니트/맨투맨 → 패딩의 3단 레이어링이 기본. 목, 손, 발 보온에 신경 쓰세요.', items: ['롱패딩/숏패딩', '기모 맨투맨', '기모 팬츠', '비니/장갑', '방한 부츠'], colorTip: '블랙, 네이비 베이스에 머플러로 포인트' }
-    return { layer: 'layered', title: '극한 방한', desc: '완전무장 · 노출 최소화', emoji: '🥶', detail: '야외 활동을 최소화하세요. 방풍 + 방수 소재 필수.', items: ['헤비 패딩', '기모 내의', '방풍 바지', '넥워머', '방한화'], colorTip: '기능성 우선' }
+    if (feels >= 28) return { layer: 'simple', title: t('weather.advice.hotSummer.title'), desc: t('weather.advice.hotSummer.desc'), emoji: '☀️', detail: t('weather.advice.hotSummer.detail'), items: t('weather.advice.hotSummer.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.hotSummer.colorTip') }
+    if (feels >= 23) return { layer: 'simple', title: t('weather.advice.earlySummer.title'), desc: t('weather.advice.earlySummer.desc'), emoji: '🌤️', detail: t('weather.advice.earlySummer.detail'), items: t('weather.advice.earlySummer.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.earlySummer.colorTip') }
+    if (feels >= 17) return { layer: 'basic', title: t('weather.advice.midSeason.title'), desc: t('weather.advice.midSeason.desc'), emoji: '⛅', detail: t('weather.advice.midSeason.detail'), items: t('weather.advice.midSeason.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.midSeason.colorTip') }
+    if (feels >= 12) return { layer: 'basic', title: t('weather.advice.earlyFall.title'), desc: t('weather.advice.earlyFall.desc'), emoji: '🍂', detail: t('weather.advice.earlyFall.detail'), items: t('weather.advice.earlyFall.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.earlyFall.colorTip') }
+    if (feels >= 5) return { layer: 'mid_inner', title: t('weather.advice.winter.title'), desc: t('weather.advice.winter.desc'), emoji: '🧥', detail: t('weather.advice.winter.detail'), items: t('weather.advice.winter.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.winter.colorTip') }
+    if (feels >= -5) return { layer: 'layered', title: t('weather.advice.deepWinter.title'), desc: t('weather.advice.deepWinter.desc'), emoji: '❄️', detail: t('weather.advice.deepWinter.detail'), items: t('weather.advice.deepWinter.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.deepWinter.colorTip') }
+    return { layer: 'layered', title: t('weather.advice.extreme.title'), desc: t('weather.advice.extreme.desc'), emoji: '🥶', detail: t('weather.advice.extreme.detail'), items: t('weather.advice.extreme.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.extreme.colorTip') }
   }
 
   const weatherEmojiLocal = (code: number) => code === 0 ? '☀️' : code <= 3 ? '⛅' : code <= 48 ? '🌫️' : code <= 67 ? '🌧️' : code <= 77 ? '❄️' : code <= 82 ? '🌧️' : '⛈️'
@@ -715,10 +715,10 @@ export function Shop() {
                   <div className="w-full h-full rounded-full bg-warm-900 flex items-center justify-center text-white font-display font-bold text-2xl">B</div>
                 </div>
                 <div className="font-bold text-warm-900 dark:text-warm-100 mb-0.5">@barusa_vintage</div>
-                <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">BARUSA · 프레피 & 올드머니 빈티지</div>
+                <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">{t('shop.brandDesc')}</div>
                 <div className="flex gap-6 text-center">
-                  <div><div className="font-bold text-sm text-warm-900 dark:text-warm-100">3,000+</div><div className="text-[10px] text-warm-500">게시물</div></div>
-                  <div><div className="font-bold text-sm text-warm-900 dark:text-warm-100">30K</div><div className="text-[10px] text-warm-500">팔로워</div></div>
+                  <div><div className="font-bold text-sm text-warm-900 dark:text-warm-100">3,000+</div><div className="text-[10px] text-warm-500">{t('shop.posts')}</div></div>
+                  <div><div className="font-bold text-sm text-warm-900 dark:text-warm-100">30K</div><div className="text-[10px] text-warm-500">{t('shop.followers')}</div></div>
                 </div>
               </div>
             )}

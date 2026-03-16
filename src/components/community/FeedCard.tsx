@@ -34,7 +34,7 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
   const photoUrl = hasPhoto ? post.photo_urls![0] : null
   const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
-  const styleName = post.style ? (STYLE_GUIDE[post.style]?.name?.replace(/ 룩$/, '') || post.style) : ''
+  const styleName = post.style ? (STYLE_GUIDE[post.style]?.name?.replace(/ 룩$/, '').replace(/ Look$/i, '') || post.style) : ''
   const title = post.caption || post.title || ''
   const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' }) : ''
 
@@ -52,7 +52,7 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
       className="bg-white rounded-[14px] border border-warm-400 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm"
       onClick={() => navigate(`/community/${post.id}`)}
       role="article"
-      aria-label={`${nick}의 코디${title ? ': ' + title : ''}`}
+      aria-label={t('community.feedCardLabel', { nick, title: title || '' })}
     >
       {/* 이미지/마네킹 영역 */}
       <div className="bg-warm-100 flex items-center justify-center" style={{ aspectRatio: '4/5' }}>

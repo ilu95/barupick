@@ -15,7 +15,7 @@ import { useToast } from '@/components/ui/Toast'
 import { useTranslation } from 'react-i18next'
 
 // ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 ───
-function getPickedPartLabel(partKey: string, pickedItems: string[]): string {
+function getPickedPartLabel(partKey: string, pickedItems: string[], t?: any): string {
   for (const id of pickedItems) {
     const item = ITEMS_CATALOG.find(i => i.id === id)
     if (!item) continue
@@ -25,8 +25,9 @@ function getPickedPartLabel(partKey: string, pickedItems: string[]): string {
     if (partKey === 'hat' && item.slot === 'hat') return item.label
     if (partKey === 'top' && !item.outerType && !item.midType && !item.slot) return item.label
   }
-  const fallbacks: Record<string, string> = { top: '이너', bottom: '하의', shoes: '신발', outer: '아우터', middleware: '미들웨어', scarf: '목도리', hat: '모자' }
-  return fallbacks[partKey] || partKey
+  const fallbackKeys: Record<string, string> = { top: 'recommend.partTop', bottom: 'recommend.partBottom', shoes: 'recommend.partShoes', outer: 'recommend.partOuter', middleware: 'recommend.partMiddleware', scarf: 'recommend.partScarf', hat: 'recommend.partHat' }
+  if (t && fallbackKeys[partKey]) return t(fallbackKeys[partKey])
+  return partKey
 }
 
 export default function RecommendCoord() {
@@ -54,7 +55,7 @@ function StepMood({ rec }: { rec: RecHook }) {
   return (
     <div className="animate-screen-fade">
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('recommend.moodTitle')}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">무드를 선택하면 해당 스타일의 코디를 추천해 드려요.</p>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('recommend.moodDesc')}</p>
 
       <div className="grid grid-cols-2 gap-2.5 mb-5">
         {Object.entries(MOOD_GROUPS).map(([key, group]) => (
@@ -68,7 +69,7 @@ function StepMood({ rec }: { rec: RecHook }) {
       </div>
       <button onClick={() => rec.selectMood(null)}
         className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
-        전체 스타일에서 추천 →
+        {t('recommend.allStyles')}
       </button>
     </div>
   )
@@ -107,7 +108,7 @@ function StepStyle({ rec }: { rec: RecHook }) {
       </div>
       <button onClick={() => rec.selectStyle(null)}
         className="text-sm text-terra-600 font-medium w-full text-center py-2 active:opacity-70">
-        전체에서 추천 →
+        {t('recommend.allRecommend')}
       </button>
     </div>
   )
@@ -135,10 +136,10 @@ function StepPick({ rec }: { rec: RecHook }) {
       </button>
 
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">
-        이건 꼭 입고 싶다!
+        {t('recommend.mustWear')}
       </h2>
       <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">
-        하는 옷이 있으면 골라주세요. 없으면 바로 넘어가도 돼요.
+        {t('recommend.mustWearDesc')}
       </p>
 
       {/* 마네킹 미리보기 */}
@@ -148,11 +149,11 @@ function StepPick({ rec }: { rec: RecHook }) {
 
       {/* 기본 포함 안내 */}
       <div className="flex items-center gap-2 mb-3 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-50 dark:bg-warm-800 rounded-xl px-3 py-2">
-        <span>👕 이너 + 👖 하의 + 👟 신발은 항상 포함돼요</span>
+        <span>{t('recommend.alwaysIncluded')}</span>
       </div>
 
       {/* 아이템 그리드 — 의류 */}
-      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">의류</div>
+      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('recommend.clothing')}</div>
       <div className="grid grid-cols-4 gap-2 mb-4">
         {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
           const selected = picked.includes(item.id)
@@ -171,7 +172,7 @@ function StepPick({ rec }: { rec: RecHook }) {
       </div>
 
       {/* 아이템 그리드 — 악세서리 */}
-      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">악세서리</div>
+      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('recommend.accessory')}</div>
       <div className="grid grid-cols-4 gap-2 mb-6">
         {ITEMS_CATALOG.filter(i => i.slot).map(item => {
           const selected = picked.includes(item.id)
@@ -192,14 +193,14 @@ function StepPick({ rec }: { rec: RecHook }) {
       {/* 선택된 구성 요약 */}
       {picked.length > 0 && (
         <div className="mb-4 text-center text-xs text-warm-600 dark:text-warm-400">
-          {picked.map(id => ITEMS_CATALOG.find(i => i.id === id)?.label).filter(Boolean).join(' + ')} + 이너 + 하의 + 신발
+          {picked.map(id => ITEMS_CATALOG.find(i => i.id === id)?.label).filter(Boolean).join(' + ')} {t('recommend.plusBasics')}
         </div>
       )}
 
       {/* CTA */}
       <button onClick={rec.generateFromPick}
         className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
-        {picked.length === 0 ? '전체 추천받기' : '이 옷으로 추천받기'} <ArrowRight size={18} />
+        {picked.length === 0 ? t('recommend.getAll') : t('recommend.getWithPicked')} <ArrowRight size={18} />
       </button>
     </div>
   )
@@ -253,7 +254,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
             <button key={part} onClick={() => rec.clearPin(part)}
               className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-semibold text-warm-700 dark:text-warm-300 active:scale-95">
               <span className="w-3 h-3 rounded-full border border-warm-300" style={{ background: c.hex }} />
-              {partName} 고정 <X size={10} />
+              {t('recommend.pinned', { part: partName })} <X size={10} />
             </button>
           )
         })}
@@ -261,20 +262,20 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
         {/* 옷 추가 버튼 */}
         <button onClick={() => setShowItemPicker(!showItemPicker)}
           className="flex items-center gap-1 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-medium text-warm-600 dark:text-warm-400 active:scale-95">
-          + 옷 변경
+          {t('recommend.changeClothes')}
         </button>
 
         {/* 컬러 고정 버튼 */}
         <button onClick={() => setPinPart(pinPart ? null : partKeys[0])}
           className="flex items-center gap-1 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-medium text-warm-600 dark:text-warm-400 active:scale-95">
-          <Pin size={10} /> 컬러 고정
+          <Pin size={10} /> {t('recommend.pinColor')}
         </button>
       </div>
 
       {/* ─── 인라인 아이템 피커 ─── */}
       {showItemPicker && (
         <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
-          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">옷 추가/제거 (탭하면 바로 반영)</div>
+          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">{t('recommend.addRemoveClothes')}</div>
           <div className="grid grid-cols-4 gap-1.5">
             {ITEMS_CATALOG.map(item => {
               const sel = picked.includes(item.id)
@@ -296,7 +297,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {/* ─── 인라인 컬러 고정 ─── */}
       {pinPart && (
         <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
-          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">고정할 부위를 선택하세요</div>
+          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">{t('recommend.selectPartToPin')}</div>
           <div className="flex gap-1.5 mb-3">
             {partKeys.map((pk: string) => {
               // 유저가 선택한 아이템명으로 표시 (코트, 니트 등)
@@ -310,8 +311,8 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
                   if (pk === 'hat' && item.slot === 'hat') return item.label
                   if (pk === 'top' && !item.outerType && !item.midType && !item.slot) return item.label
                 }
-                const fallbacks: Record<string, string> = { top: '이너', bottom: '하의', shoes: '신발', outer: '아우터', middleware: '미들웨어', scarf: '목도리', hat: '모자' }
-                return fallbacks[pk] || pk
+                const fallbackKeys: Record<string, string> = { top: 'recommend.partTop', bottom: 'recommend.partBottom', shoes: 'recommend.partShoes', outer: 'recommend.partOuter', middleware: 'recommend.partMiddleware', scarf: 'recommend.partScarf', hat: 'recommend.partHat' }
+                return fallbackKeys[pk] ? t(fallbackKeys[pk]) : pk
               })()
               return (
               <button key={pk} onClick={() => setPinPart(pk)}
@@ -333,7 +334,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
           <div className="flex gap-2 mt-2">
             <button onClick={() => setPinPart(null)} className="flex-1 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">{t('common.close')}</button>
             {Object.keys(pinned).length > 0 && (
-              <button onClick={() => { rec.clearAllPins(); setPinPart(null) }} className="text-[11px] text-red-500 py-1">전체 해제</button>
+              <button onClick={() => { rec.clearAllPins(); setPinPart(null) }} className="text-[11px] text-red-500 py-1">{t('recommend.clearAll')}</button>
             )}
           </div>
         </div>
@@ -342,7 +343,7 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {/* ─── 셔플 ─── */}
       <div className="flex justify-end mb-3">
         <button onClick={rec.regenerate} className="flex items-center gap-1 text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">
-          <RefreshCw size={13} /> 다시 섞기
+          <RefreshCw size={13} /> {t('recommend.reshuffle')}
         </button>
       </div>
 
@@ -440,7 +441,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   return (
     <div className="animate-screen-enter">
       <button onClick={() => setVizCollapsed(!vizCollapsed)} className="w-full text-center text-xs text-warm-600 dark:text-warm-400 py-2 mb-2 active:opacity-70">
-        {vizCollapsed ? '👤 마네킹 보기 ▼' : '👤 마네킹 접기 ▲'}
+        {vizCollapsed ? t('recommend.showMannequin') : t('recommend.hideMannequin')}
       </button>
 
       {!vizCollapsed && (
@@ -453,7 +454,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       <div className="flex flex-wrap gap-1.5 mb-4">
         <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-terra-100 dark:bg-terra-900/30 text-terra-700 dark:text-terra-400">{combo.name}</span>
         {combo.tags?.[0] && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{combo.tags[0]}</span>}
-        {evalResult?.hasPersonalColor && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400">퍼스널컬러✓</span>}
+        {evalResult?.hasPersonalColor && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400">{t('recommend.pcCheck')}</span>}
       </div>
 
       {/* 점수 원형 + 부위 컬러 */}
@@ -475,7 +476,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
             return (
               <div key={k} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
-                <span className="text-warm-500 dark:text-warm-400 w-10">{getPickedPartLabel(k, rec.state.pickedItems)}</span>
+                <span className="text-warm-500 dark:text-warm-400 w-10">{getPickedPartLabel(k, rec.state.pickedItems, t)}</span>
                 <span className="text-warm-800 dark:text-warm-200 font-medium">{c?.name || ''}</span>
               </div>
             )
@@ -536,7 +537,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
           <div className="bg-white dark:bg-warm-800 rounded-2xl p-5 w-full max-w-sm shadow-warm-lg" onClick={e => e.stopPropagation()}>
             <div className="text-lg font-bold text-warm-900 dark:text-warm-100 mb-3">{t('recommend.save')}</div>
             <input type="text" value={saveName} onChange={e => setSaveName(e.target.value)} maxLength={30} autoFocus
-              placeholder="코디 이름을 입력하세요"
+              placeholder={t('recommend.coordNamePlaceholder')}
               className="w-full px-4 py-3 bg-warm-100 dark:bg-warm-700 border border-warm-400 dark:border-warm-600 rounded-xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 focus:outline-none focus:border-terra-400 mb-4" />
             <div className="flex gap-2">
               <button onClick={() => setSaveModal(false)} className="flex-1 py-2.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-xl text-sm font-medium active:scale-[0.98]">{t('common.cancel')}</button>
@@ -551,7 +552,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
         <div className="flex items-center gap-1.5 text-sm font-bold text-warm-900 dark:text-warm-100 mb-1">
           <Palette size={16} className="text-terra-500" /> {t('recommend.colorImprove')}
         </div>
-        <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">부위를 탭하면 색상을 교체할 수 있어요</div>
+        <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">{t('recommend.tapToChangeColor')}</div>
         <div className="flex gap-2 flex-wrap justify-center py-1 pb-2">
           {Object.entries(currentOutfit).filter(([_, v]) => v).map(([cat, colorKey]) => {
             const c = COLORS_60[colorKey as string]
@@ -565,7 +566,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
                   <span style={{ color: c.hcl[2] > 60 ? '#1C1917' : '#ffffff' }}>{c.name}</span>
                 </div>
                 <div className={`text-[10px] whitespace-nowrap ${isEditing ? 'text-terra-600 dark:text-terra-400 font-semibold' : 'text-warm-700 dark:text-warm-300'}`}>
-                  {getPickedPartLabel(cat, rec.state.pickedItems)}
+                  {getPickedPartLabel(cat, rec.state.pickedItems, t)}
                 </div>
               </button>
             )
@@ -588,14 +589,14 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
           return (
           <div className="mt-2 animate-screen-fade">
             <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">
-              {getPickedPartLabel(editingPart, rec.state.pickedItems)} 색상 변경
+              {t('recommend.colorChange', { part: getPickedPartLabel(editingPart, rec.state.pickedItems, t) })}
             </div>
 
             {/* 추천 색상 */}
             {topColors.length > 0 && (
               <>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">추천 색상</div>
+                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">{t('recommend.recommendedColors')}</div>
                 </div>
                 <div className="grid grid-cols-5 gap-1.5 mb-3">
                   {topColors.map(rec => {
@@ -620,7 +621,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
               </>
             )}
 
-            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{topColors.length > 0 ? '전체 색상' : '색상'}</div>
+            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{topColors.length > 0 ? t('recommend.allColors') : t('recommend.colors')}</div>
             <ColorPicker
               inline
               selected={currentOutfit[editingPart]}
@@ -640,9 +641,9 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
             {editedOutfit && (
               <div className="flex gap-2 mt-2">
                 <button onClick={() => { setEditedOutfit(null); setEditingPart(null) }}
-                  className="flex-1 py-2 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-700 rounded-xl active:scale-[0.98]">원래대로</button>
+                  className="flex-1 py-2 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-700 rounded-xl active:scale-[0.98]">{t('recommend.revert')}</button>
                 <button onClick={() => setEditingPart(null)}
-                  className="flex-1 py-2 text-[11px] text-white bg-terra-500 rounded-xl font-semibold active:scale-[0.98]">적용</button>
+                  className="flex-1 py-2 text-[11px] text-white bg-terra-500 rounded-xl font-semibold active:scale-[0.98]">{t('recommend.apply')}</button>
               </div>
             )}
           </div>
@@ -653,7 +654,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {/* 뒤로 */}
       <button onClick={rec.goBack}
         className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm flex items-center justify-center gap-1.5 mb-12 active:scale-[0.98] transition-all">
-        <ArrowLeft size={16} /> 목록으로
+        <ArrowLeft size={16} /> {t('recommend.backToList')}
       </button>
     </div>
   )

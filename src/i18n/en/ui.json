@@ -57,7 +57,6 @@
     "generateFailed": "Generation failed",
     "addPhoto": "Add photo"
   },
-
   "nav": {
     "coord": "Coord",
     "closet": "Closet",
@@ -65,7 +64,6 @@
     "community": "Community",
     "shop": "Shop"
   },
-
   "header": {
     "home": "BaruPick",
     "closet": "Closet",
@@ -112,7 +110,6 @@
     "eventDetail": "Event",
     "eventSubmit": "Join Event"
   },
-
   "onboarding": {
     "slide1Title": "AI Color Coordination",
     "slide1Desc": "Our color harmony algorithm recommends the best outfits for you",
@@ -125,7 +122,6 @@
     "start": "Get Started",
     "skip": "Skip"
   },
-
   "home": {
     "greetingMorning": "Good morning",
     "greetingAfternoon": "Good afternoon",
@@ -149,7 +145,6 @@
       "quiz": "Quiz"
     }
   },
-
   "auth": {
     "loginTitle": "Sign In",
     "signupTitle": "Sign Up",
@@ -173,9 +168,9 @@
     "loginFailed": "Sign in failed",
     "signupFailed": "Sign up failed",
     "signupSuccess": "Account created! Please check your email",
-    "forgotPassword": "Forgot your password?"
+    "forgotPassword": "Forgot your password?",
+    "and": "&"
   },
-
   "settings": {
     "display": "Display",
     "language": "Language",
@@ -211,7 +206,6 @@
     "deleteAccountSuccess": "Your account has been deleted. Thank you for using BaruPick.",
     "deleteAccountError": "Error deleting account: {{error}}"
   },
-
   "feedbackModal": {
     "title": "Send Feedback",
     "typeBug": "🐛 Bug",
@@ -224,7 +218,6 @@
     "sendSuccess": "Thank you for your feedback!",
     "sendFailed": "Send failed: {{error}}"
   },
-
   "closet": {
     "myCloset": "My Closet",
     "coordRecord": "Coord Records",
@@ -236,7 +229,6 @@
     "bestCoordTitle": "Best Coords",
     "sortByScore": "Sorted by highest score"
   },
-
   "closetAdd": {
     "photoMode": "Add by Photo",
     "manualMode": "Add Manually",
@@ -249,7 +241,6 @@
     "namePlaceholder": "Item name (optional)",
     "colorExtract": "Extracting colors from photo..."
   },
-
   "closetCoord": {
     "title": "My Coord Hub",
     "subtitle": "Check outfits with your closet items",
@@ -260,7 +251,6 @@
     "wardrobeReport": "My Wardrobe Story",
     "wardrobeReportDesc": "Top items, hidden potential, color balance"
   },
-
   "allCombos": {
     "title": "All Closet Combos",
     "sortScore": "By Score",
@@ -271,6 +261,32 @@
     "filterNoOuter": "No Outer",
     "woreToday": "Wore today",
     "selectDate": "Select date",
+    "weatherHot": "{{temp}}°C — Great day for light clothing",
+    "weatherWarm": "{{temp}}°C — Perfect for transitional outfits",
+    "weatherMild": "{{temp}}°C — A jacket or cardigan recommended",
+    "weatherCool": "{{temp}}°C — You'll need an outer layer",
+    "weatherCold": "{{temp}}°C — Layer up and stay warm",
+    "catTop": "Top",
+    "catBottom": "Bottom",
+    "catShoes": "Shoes",
+    "closetStatus": "Current closet status",
+    "itemCountN": "{{count}}",
+    "noneMissing": "None — needed!",
+    "none": "None",
+    "registerToSee": "Add {{items}} to see outfit combos",
+    "reference": "(ref)",
+    "includes": "{{name}} included",
+    "comboCount": "{{count}} combos",
+    "showingCount": "showing {{count}}",
+    "colorScheme": "{{theory}} scheme",
+    "lastWorn": "Last worn: {{date}}",
+    "improveSuggestion": "Change {{part}} to {{color}} for {{score}} pts",
+    "alreadyRecordedToday": "This combo was already recorded today",
+    "record": "Record",
+    "showMore": "Show more ({{count}} remaining)",
+    "fewCombos": "Only {{count}} combos available",
+    "addItemsHint": "Add more items to your closet for more combos",
+    "checkWhatToBuy": "Check what to buy",
     "subScoreLabels": {
       "colorPlacement": "Color Placement",
       "colorRatio": "Color Ratio",
@@ -281,7 +297,6 @@
       "bodyFit": "Body Fit"
     }
   },
-
   "todayCoord": {
     "title": "What to Wear Today?",
     "subtitle": "AI picks from your closet",
@@ -294,20 +309,55 @@
     "recordThis": "Record this outfit",
     "best": "BEST"
   },
-
   "recommend": {
     "moodTitle": "What mood are you going for?",
+    "moodDesc": "Choose a mood and we'll recommend outfits in that style.",
+    "allStyles": "Recommend from all styles →",
     "styleTitle": "Select Style",
+    "allRecommend": "Recommend from all →",
+    "mustWear": "I must wear this!",
+    "mustWearDesc": "Pick items you want to include. Skip if none.",
+    "alwaysIncluded": "👕 Top + 👖 Bottom + 👟 Shoes are always included",
+    "clothing": "Clothing",
+    "accessory": "Accessories",
+    "plusBasics": "+ Top + Bottom + Shoes",
+    "getAll": "Get all recommendations",
+    "getWithPicked": "Recommend with these items",
     "resultTitle": "Recommended Coords",
     "resultSubtitle": "Color combinations analyzed",
     "noResults": "No matching combos found for these criteria",
+    "pinned": "{{part}} pinned",
+    "changeClothes": "+ Change clothes",
+    "pinColor": "Pin color",
+    "addRemoveClothes": "Add/remove clothes (tap to apply)",
+    "selectPartToPin": "Select a part to pin",
+    "clearAll": "Clear all",
+    "reshuffle": "Reshuffle",
+    "showMannequin": "👤 Show mannequin ▼",
+    "hideMannequin": "👤 Hide mannequin ▲",
+    "pcCheck": "Personal Color ✓",
+    "coordNamePlaceholder": "Enter coord name",
+    "tapToChangeColor": "Tap a part to change its color",
+    "colorChange": "{{part}} color change",
+    "recommendedColors": "Recommended colors",
+    "allColors": "All colors",
+    "colors": "Colors",
+    "revert": "Revert",
+    "apply": "Apply",
+    "backToList": "Back to list",
+    "partTop": "Top",
+    "partBottom": "Bottom",
+    "partShoes": "Shoes",
+    "partOuter": "Outer",
+    "partMiddleware": "Middleware",
+    "partScarf": "Scarf",
+    "partHat": "Hat",
     "save": "Save",
     "share": "Share",
     "communityShare": "Share to Community",
     "saveSuccess": "Coord saved",
     "colorImprove": "Changing this color would improve the score"
   },
-
   "build": {
     "stepStyle": "Select Style",
     "stepColor": "Select Colors",
@@ -324,7 +374,6 @@
     "saveCoord": "Save Coord",
     "shareCoord": "Share"
   },
-
   "ootdRecord": {
     "situations": {
       "commute": "Work",
@@ -346,19 +395,63 @@
     },
     "memoPlaceholder": "A note about today's outfit (optional)",
     "saveComplete": "Recorded!",
-    "streakMessage": "{{count}}-day streak!"
+    "streakMessage": "{{count}}-day streak!",
+    "selectAllRequired": "Please select at least 1 clothing item + bottoms + shoes",
+    "photoRequiredPublic": "A photo is required for public posts",
+    "saveFailed": "Failed to save",
+    "saveError": "An error occurred while saving",
+    "savedMessage": "Today's outfit has been saved",
+    "whatDidYouWear": "What did you wear today?",
+    "addClothes": "Add clothes",
+    "accessoryBtn": "🧣 Accessories",
+    "bottomBtn": "👖 Bottoms",
+    "shoesBtn": "👟 Shoes",
+    "whatClothes": "What clothes did you wear?",
+    "selectColorFor": "Pick a color for {{item}}",
+    "accessoryLabel": "Accessories",
+    "colorOf": "Color of {{item}}",
+    "bottomColor": "👖 Bottom color",
+    "shoesColor": "👟 Shoe color",
+    "color": "Color",
+    "bottom": "Bottoms",
+    "shoes": "Shoes",
+    "guideSelectClothesAndColor": "Select clothes and a color",
+    "guideSelectBottomAndShoes": "Select bottoms and shoes",
+    "guideSelectBottom": "Select bottoms",
+    "guideSelectShoes": "Select shoes",
+    "guideAddClothes": "Add at least 1 clothing item",
+    "photoPublicRequired": "(Required for public posts)",
+    "situationLabel": "📍 Occasion",
+    "customInput": "✏️ Custom",
+    "customPlaceholder": "e.g. blind date, wedding...",
+    "moodLabel": "Mood",
+    "visibilityLabel": "Visibility",
+    "publicNotice": "🌐 Shared to community immediately · Photo required",
+    "viewCalendar": "View coord calendar"
   },
-
   "ootdCalendar": {
-    "weekDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "weekDays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
     "filterAll": "All",
     "filterPhoto": "Photo",
     "filterMannequin": "Mannequin",
     "sortNewest": "Newest",
     "sortOldest": "Oldest",
-    "colorStreakWarning": "You've been wearing the same color in a row"
+    "colorStreakWarning": "You've been wearing the same color in a row",
+    "yearMonth": "{{month}}/{{year}}",
+    "monthSummary": "{{days}} days recorded · {{coords}} outfits",
+    "colorStreakMessage": "Similar colors for {{days}} days this week",
+    "tryOtherCombos": "Want to check other combos?",
+    "viewOtherCombos": "View other combos →",
+    "monthRecordTitle": "{{month}} records ({{count}})"
   },
-
   "ootdDetail": {
     "editRecord": "Edit",
     "deleteRecord": "Delete",
@@ -367,9 +460,15 @@
     "shareCard": "Share Card",
     "shareTitle": "BaruPick Coord",
     "communityShare": "Share to Community",
-    "communityShareSuccess": "Shared to community!"
+    "communityShareSuccess": "Shared to community!",
+    "notFound": "Record not found",
+    "goToCloset": "Go to closet",
+    "addPhotoToShare": "Add a photo to share on the community",
+    "alreadyShared": "This record is already shared",
+    "todaysCoord": "Today's Outfit",
+    "shareError": "An error occurred while sharing",
+    "recordCount": "{{count}} records"
   },
-
   "community": {
     "tabs": {
       "all": "All",
@@ -394,9 +493,9 @@
       "users": "Users",
       "events": "Events"
     },
-    "empty": "No posts yet"
+    "empty": "No posts yet",
+    "feedCardLabel": "{{nick}}'s outfit{{title}}"
   },
-
   "communityDetail": {
     "like": "Like",
     "unlikeLabel": "Unlike",
@@ -416,7 +515,6 @@
     "likeSuccess": "Liked!",
     "saveSuccess": "Saved"
   },
-
   "communityPost": {
     "title": "Share Coord",
     "caption": "Caption",
@@ -431,7 +529,6 @@
     "postSuccess": "Post shared!",
     "postFailed": "Post failed: {{error}}"
   },
-
   "profile": {
     "defaultLevel": "Beginner",
     "stats": {
@@ -474,7 +571,6 @@
       "saveSuccess": "Profile updated"
     }
   },
-
   "profileSub": {
     "myLevel": {
       "title": "My Level",
@@ -523,7 +619,6 @@
       "title": "Saved Coords"
     }
   },
-
   "blockList": {
     "title": "Block List",
     "subtitle": "Posts from blocked users won't appear",
@@ -531,21 +626,18 @@
     "unblockConfirm": "Unblock @{{nickname}}?",
     "unblockFailed": "Unblock failed: {{error}}"
   },
-
   "notifications": {
     "title": "Notifications",
     "clearAll": "Clear all",
     "clearConfirm": "Clear all notifications?",
     "empty": "No new notifications"
   },
-
   "followList": {
     "followers": "Followers",
     "following": "Following",
     "noFollowers": "No followers yet",
     "noFollowing": "Not following anyone yet"
   },
-
   "userDiscover": {
     "searchPlaceholder": "Search by nickname or Instagram ID",
     "searchButton": "Search",
@@ -556,7 +648,6 @@
     "suggestedUsers": "Suggested Users",
     "noUsers": "No users yet"
   },
-
   "userProfile": {
     "publicCoords": "Public Coords",
     "noPublicCoords": "No public coords yet",
@@ -565,7 +656,6 @@
     "blockedToast": "User blocked",
     "unblockedToast": "User unblocked"
   },
-
   "postInsight": {
     "title": "Post Insight",
     "views": "Views",
@@ -582,7 +672,6 @@
     "avgViewsPerDay": "Avg {{count}} views/day",
     "notFound": "Post not found"
   },
-
   "eventSubmit": {
     "participationDone": "Submitted!",
     "waitResult": "Please wait for the results",
@@ -605,7 +694,6 @@
     "alreadySubmitted": "You already joined this event",
     "submitFailed": "Submission failed: {{error}}"
   },
-
   "eventDetail": {
     "active": "🔥 Active",
     "ended": "⏳ Ended",
@@ -614,7 +702,6 @@
     "participate": "🎨 Join Event",
     "notFound": "Event not found"
   },
-
   "purchaseSimulate": {
     "title": "What Should I Buy?",
     "subtitle": "We'll analyze your closet and recommend",
@@ -647,7 +734,6 @@
     "avgScoreLabel": "Avg {{score}} pts",
     "bestScoreLabel": "Best {{score}} pts"
   },
-
   "wardrobeReport": {
     "title": "My Wardrobe Story",
     "analyzingCloset": "Analyzing closet...",
@@ -671,7 +757,6 @@
     "viewAllCombos": "View All Combos",
     "checkPurchase": "Check what to buy"
   },
-
   "weather": {
     "title": "What to Wear Today?",
     "loadingWeather": "Loading weather...",
@@ -694,35 +779,97 @@
     "advice": {
       "hotSummer": {
         "title": "Hot Summer Outfit",
-        "desc": "T-shirt + shorts or linen pants"
+        "desc": "T-shirt + shorts or linen pants",
+        "detail": "Choose thin, breathable fabrics. Linen, cotton jersey, and seersucker are great choices.",
+        "items": [
+          "T-shirt",
+          "Linen shirt",
+          "Shorts",
+          "Linen pants",
+          "Sandals/Slides"
+        ],
+        "colorTip": "White, ivory, and pastel tones for a cool impression"
       },
       "earlySummer": {
         "title": "Early Summer Outfit",
-        "desc": "T-shirt + cotton pants or light dress"
+        "desc": "T-shirt + cotton pants or light dress",
+        "detail": "Short sleeves during the day, and a thin cardigan for indoor AC — perfect combo.",
+        "items": [
+          "Short-sleeve shirt",
+          "Thin cardigan",
+          "Cotton chinos",
+          "Cotton pants",
+          "Sneakers/Loafers"
+        ],
+        "colorTip": "Beige + navy, white + khaki combos recommended"
       },
       "midSeason": {
         "title": "Transitional Outfit",
-        "desc": "Long sleeve + pants and a light jacket"
+        "desc": "Long sleeve + pants and a light jacket",
+        "detail": "Big temperature swings. A shirt + knit layering combo is highly versatile.",
+        "items": [
+          "Oxford shirt",
+          "Thin knit",
+          "Cotton pants/Denim",
+          "Light jacket",
+          "Loafers/Derby shoes"
+        ],
+        "colorTip": "Earth tones — beige, khaki, olive match the seasonal feel"
       },
       "earlyFall": {
         "title": "Early Fall Outfit",
-        "desc": "Jacket or cardigan + long pants"
+        "desc": "Jacket or cardigan + long pants",
+        "detail": "You need a windbreaker-style outer. A jacket over a sweatshirt looks clean.",
+        "items": [
+          "Blazer/Chino jacket",
+          "Cardigan",
+          "Sweatshirt",
+          "Wool pants",
+          "Chelsea boots"
+        ],
+        "colorTip": "Brown, terracotta, mustard for autumn vibes"
       },
       "winter": {
         "title": "Winter Outfit",
-        "desc": "Coat + knit sweater and scarf"
+        "desc": "Coat + knit sweater and scarf",
+        "detail": "Warmth is key. Layer thin inners, and choose a windproof outer.",
+        "items": [
+          "Wool coat",
+          "Thick knit",
+          "Fleece-lined pants",
+          "Scarf",
+          "Boots"
+        ],
+        "colorTip": "Charcoal, navy, camel — the 3 winter classics"
       },
       "deepWinter": {
         "title": "Deep Winter Outfit",
-        "desc": "Puffer + fleece-lined layers"
+        "desc": "Puffer + fleece-lined layers",
+        "detail": "Base layer → knit/sweatshirt → puffer: the 3-layer system. Keep neck, hands, and feet warm.",
+        "items": [
+          "Long/Short puffer",
+          "Fleece sweatshirt",
+          "Fleece-lined pants",
+          "Beanie/Gloves",
+          "Winter boots"
+        ],
+        "colorTip": "Black or navy base with a scarf as accent"
       },
       "extreme": {
         "title": "Extreme Cold",
-        "desc": "Full layers — minimize exposed skin"
+        "desc": "Full layers — minimize exposed skin",
+        "detail": "Minimize outdoor activity. Windproof + waterproof materials are essential.",
+        "items": [
+          "Heavy puffer",
+          "Thermal base layer",
+          "Windproof pants",
+          "Neck warmer",
+          "Insulated boots"
+        ],
+        "colorTip": "Function over fashion"
       }
     }
   },
-
   "quiz": {
     "q1": "What do you usually do on weekends?",
     "q1a1": "Cafe hopping ☕",
@@ -749,7 +896,6 @@
     "prevQuestion": "Previous question",
     "retake": "Take again"
   },
-
   "fabricGuide": {
     "title": "Fabric Compatibility Check",
     "subtitle": "Select items and we'll show you how well they pair",
@@ -771,7 +917,6 @@
     "guide2items": "Select 2 or more items to\ncheck fabric compatibility",
     "guideExample": "e.g.) Denim jacket + Wool knit → Recommended!\nSilk blouse + Fleece → Formality clash"
   },
-
   "bodyGuide": {
     "title": "Body Type Style Guide",
     "subtitle": "Find the right color placement and styling tips for your body type",
@@ -795,7 +940,6 @@
     "saveSuccess": "Body type saved! It will be reflected in recommendations.",
     "getRecommend": "Get recommendations for this body type"
   },
-
   "pcSelect": {
     "title": "Personal Color",
     "currentSetting": "Current: {{name}}",
@@ -810,7 +954,6 @@
     "saveAndApply": "Apply this personal color",
     "select12Season": "Choose from the 12 seasonal personal colors"
   },
-
   "pcLight": {
     "title": "Light Diagnosis",
     "guideTitle": "Natural Light Diagnosis",
@@ -820,9 +963,83 @@
     "resultTitle": "Diagnosis Result",
     "bestColors": "Best Colors",
     "worstColors": "Colors to Avoid",
-    "applyResult": "Apply this result"
+    "applyResult": "Apply this result",
+    "disclaimer": "This is a quick self-test. For an accurate diagnosis, consult a professional.",
+    "selectA": "Select A · {{desc}}",
+    "selectB": "Select B · {{desc}}",
+    "similar": "They look similar (hard to tell)",
+    "similarHint": "If it's hard to tell, you can tap \"They look similar\"",
+    "screenLayout": "Screen Layout",
+    "screenLayoutDesc": "Same color family, only the tone differs · The black area in the middle prevents light overlap",
+    "rememberTitle": "💡 Remember this",
+    "matchingTone": "✅ Matching tone:",
+    "matchingToneDesc": "Skin looks clear and even",
+    "wrongTone": "❌ Wrong tone:",
+    "wrongToneDesc": "Skin looks dull or rough",
+    "beforeStartTitle": "📱 Before you start",
+    "beforeStart1": "Turn off night mode / blue light filter",
+    "beforeStart2": "Set screen brightness to maximum",
+    "beforeStart3": "Best done without makeup",
+    "guide": {
+      "step1Title": "Go to a dark room",
+      "step1Desc": "Turn off the lights or go to a dark room",
+      "step2Title": "Flip your phone upside down",
+      "step2Desc": "Flip the screen facing down and tilt at 45°",
+      "step3Title": "Place your hand under the screen",
+      "step3Desc": "Let the light from the screen shine on the back of your hand",
+      "step4Title": "Pick the side where skin looks cleaner!",
+      "step4Desc": "Compare both sides and choose"
+    },
+    "steps": {
+      "phaseUndertone": "Undertone Test",
+      "phaseValue": "Value Test",
+      "phaseChroma": "Chroma Test",
+      "u1Inst": "Same pink, different tone\nWhich side makes your skin look cleaner?",
+      "u1Tip": "💡 Pick the side where YOUR SKIN looks better, not the prettier color",
+      "u1Left": "Warm Pink",
+      "u1Right": "Cool Pink",
+      "u2Inst": "Same green, different tone\nWhich side makes your skin look cleaner?",
+      "u2Tip": "💡 Not the prettier color — the one that makes YOUR SKIN look better!",
+      "u2Left": "Warm Green",
+      "u2Right": "Cool Green",
+      "u3Inst": "Subtle difference\nWhich side makes your skin look cleaner?",
+      "u3Tip": "💡 If they look similar, tap \"They look similar\" — that's OK",
+      "u3Left": "Ivory Light",
+      "u3Right": "Blue-White Light",
+      "wv4Inst": "You're warm-toned! 🌅\nBright light vs deep light\nWhich makes your skin look cleaner?",
+      "wv4Tip": "💡 Brighter isn't always better — pick the one where skin looks comfortable!",
+      "wv4Left": "Light Peach",
+      "wv4Right": "Rich Amber",
+      "wv5Inst": "One more time!\nWhich makes your skin look cleaner?",
+      "wv5Tip": "💡 If skin looks washed out or dull, that tone doesn't match",
+      "wv5Left": "Light Gold",
+      "wv5Right": "Deep Gold",
+      "cv4Inst": "You're cool-toned! ❄️\nBright light vs deep light\nWhich makes your skin look cleaner?",
+      "cv4Tip": "💡 Brighter isn't always better — pick the one where skin looks comfortable!",
+      "cv4Left": "Powder Blue",
+      "cv4Right": "Deep Blue",
+      "cv5Inst": "One more time!\nWhich makes your skin look cleaner?",
+      "cv5Tip": "💡 If skin looks washed out or dull, that tone doesn't match",
+      "cv5Left": "Light Lilac",
+      "cv5Right": "Deep Lilac",
+      "wc6Inst": "Almost there!\nVivid light vs muted light\nWhich makes your skin look cleaner?",
+      "wc6Tip": "💡 If blemishes stand out under vivid light, muted tone is your match",
+      "wc6Left": "Vivid Coral",
+      "wc6Right": "Dusty Salmon",
+      "wc7Inst": "Last one!\nWhich makes your skin look cleaner?",
+      "wc7Tip": "💡 This is the last step — trust your gut!",
+      "wc7Left": "Vivid Green",
+      "wc7Right": "Sage",
+      "cc6Inst": "Almost there!\nVivid light vs soft light\nWhich makes your skin look cleaner?",
+      "cc6Tip": "💡 If blemishes stand out under vivid light, soft tone is your match",
+      "cc6Left": "Vivid Pink",
+      "cc6Right": "Dusty Rose",
+      "cc7Inst": "Last one!\nWhich makes your skin look cleaner?",
+      "cc7Tip": "💡 This is the last step — trust your gut!",
+      "cc7Left": "Vivid Blue",
+      "cc7Right": "Gray Blue"
+    }
   },
-
   "shop": {
     "heroSubtitle": "Preppy & Old Money Vintage Shop",
     "devBadge": "Vintage shop by the BaruPick developer",
@@ -830,9 +1047,11 @@
     "visitStore": "Visit BARUSA Store",
     "partnerTitle": "Shop Partnership",
     "partnerDesc": "Want to list your shop on BaruPick?\nContact us below.",
-    "partnerCta": "Contact Us"
+    "partnerCta": "Contact Us",
+    "brandDesc": "BARUSA · Preppy & Old Money Vintage",
+    "posts": "Posts",
+    "followers": "Followers"
   },
-
   "terms": {
     "title": "Terms of Service",
     "article1Title": "Article 1 (Purpose)",
@@ -844,7 +1063,6 @@
     "article4Title": "Article 4 (Disclaimer)",
     "article4Content": "Coordination recommendations are for reference only. The Service is not responsible for the results of recommendations."
   },
-
   "privacy": {
     "title": "Privacy Policy",
     "section1Title": "1. Personal Information Collected",
@@ -858,7 +1076,6 @@
     "section5Title": "5. Contact",
     "section5Content": "barusa.official@gmail.com"
   },
-
   "devDiag": {
     "title": "Supabase Connection Test",
     "subtitle": "Check connection status of dev DB (ywqaxxcv...)",
@@ -868,23 +1085,19 @@
     "allPassed": "All tests passed!",
     "allPassedDesc": "Supabase connection is working. Ready for Vercel deployment."
   },
-
   "placeholder": {
     "comingSoon": "This screen is coming soon"
   },
-
   "shareCard": {
     "shareTitle": "BaruPick Coord",
     "shareButton": "Share",
     "iosSaveHint": "Long press the image to save"
   },
-
   "colorPicker": {
     "title": "Select Color",
     "reset": "Reset",
     "closeLabel": "Close"
   },
-
   "cropOverlay": {
     "profilePhoto": "Profile Photo",
     "photoCrop": "Crop Photo",
@@ -892,7 +1105,6 @@
     "cancel": "Cancel",
     "done": "Done"
   },
-
   "imageEditor": {
     "title": "Edit Photo",
     "cancel": "Cancel",
@@ -907,9 +1119,15 @@
     "colorLabel": "Color:",
     "touchHint": "Tap: Select · Drag: Move · Pinch: Resize/Rotate"
   },
-
   "modal": {
     "defaultConfirm": "OK",
     "defaultCancel": "Cancel"
+  },
+  "categories": {
+    "outer": "Outer",
+    "middleware": "Middleware",
+    "top": "Top",
+    "bottom": "Bottom",
+    "shoes": "Shoes"
   }
 }
