@@ -723,7 +723,7 @@ export function Shop() {
               </div>
             )}
             <div className="text-center py-2.5 text-xs text-warm-500 border-t border-warm-300 dark:border-warm-600 flex items-center justify-center gap-1">
-              📸 인스타그램에서 보기 →
+              {t('shop.viewOnInstagram')}
             </div>
           </div>
         </button>
@@ -735,23 +735,23 @@ export function Shop() {
           onClick={() => window.open('https://barusa.co.kr', '_blank')}
           className="w-full py-4 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-warm"
         >
-          <ExternalLink size={18} /> BARUSA 스토어 방문하기
+          <ExternalLink size={18} /> {t('shop.visitStore')}
         </button>
       </div>
 
       {/* 입점 안내 */}
       <div className="bg-warm-300 dark:bg-warm-700 rounded-2xl p-5 text-center">
         <div className="flex items-center justify-center gap-1.5 font-semibold text-warm-900 dark:text-warm-100 text-sm mb-2">
-          <ShoppingBag size={16} /> 빈티지샵 입점 안내
+          <ShoppingBag size={16} /> {t('shop.partnerTitle')}
         </div>
-        <div className="text-xs text-warm-700 dark:text-warm-300 leading-relaxed mb-3">
-          바루픽에 샵을 등록하고 싶으신가요?<br />입점 문의는 아래 버튼으로 연락주세요.
+        <div className="text-xs text-warm-700 dark:text-warm-300 leading-relaxed mb-3 whitespace-pre-line">
+          {t('shop.partnerDesc')}
         </div>
         <button
           onClick={() => window.open('https://forms.gle/placeholder', '_blank')}
           className="px-5 py-2.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full text-xs font-semibold text-warm-800 dark:text-warm-200 active:scale-95 transition-all"
         >
-          입점 문의하기
+          {t('shop.partnerCta')}
         </button>
       </div>
     </div>
@@ -760,14 +760,15 @@ export function Shop() {
 
 // ─── 이용약관 ───
 export function Terms() {
+  const { t } = useTranslation()
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">이용약관</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('terms.title')}</h2>
       <div className="bg-white border border-warm-400 rounded-2xl p-5 shadow-warm-sm text-sm text-warm-700 leading-relaxed space-y-3">
-        <p><strong>제1조 (목적)</strong> 이 약관은 바루픽(이하 "서비스")의 이용 조건 및 절차를 규정합니다.</p>
-        <p><strong>제2조 (서비스 내용)</strong> 서비스는 AI 기반 컬러 코디네이션 추천, OOTD 기록, 커뮤니티 기능을 제공합니다.</p>
-        <p><strong>제3조 (이용자 의무)</strong> 이용자는 타인의 권리를 침해하거나 부적절한 콘텐츠를 게시해서는 안 됩니다.</p>
-        <p><strong>제4조 (면책조항)</strong> 서비스에서 제공하는 코디 추천은 참고용이며, 서비스는 추천 결과에 대한 책임을 지지 않습니다.</p>
+        <p><strong>{t('terms.article1Title')}</strong> {t('terms.article1Content')}</p>
+        <p><strong>{t('terms.article2Title')}</strong> {t('terms.article2Content')}</p>
+        <p><strong>{t('terms.article3Title')}</strong> {t('terms.article3Content')}</p>
+        <p><strong>{t('terms.article4Title')}</strong> {t('terms.article4Content')}</p>
       </div>
     </div>
   )
