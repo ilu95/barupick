@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Check, Sparkles } from 'lucide-react'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { PERSONAL_COLOR_12 } from '@/lib/personalColor'
 import { profile } from '@/lib/profile'
 import { useTranslation } from 'react-i18next'
@@ -162,7 +162,7 @@ export default function PcLight() {
           <div className="mb-6">
             <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('pcLight.bestColors')}</div>
             <div className="flex flex-wrap gap-2 justify-center">
-              {bestColors.map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30" style={{ background: c.hex }} /><span className="text-[10px] text-warm-600 dark:text-warm-400">{c.name}</span></div> : null })}
+              {bestColors.map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30" style={{ background: c.hex }} /><span className="text-[10px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span></div> : null })}
             </div>
           </div>
         )}
@@ -170,7 +170,7 @@ export default function PcLight() {
           <div className="mb-6">
             <div className="text-xs font-semibold text-red-500 dark:text-red-400 tracking-widest uppercase mb-3">{t('pcLight.worstColors')}</div>
             <div className="flex flex-wrap gap-2 justify-center">
-              {pc.worstColors.slice(0, 6).map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30 relative" style={{ background: c.hex }}><span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold drop-shadow">✕</span></div><span className="text-[10px] text-warm-600 dark:text-warm-400">{c.name}</span></div> : null })}
+              {pc.worstColors.slice(0, 6).map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30 relative" style={{ background: c.hex }}><span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold drop-shadow">✕</span></div><span className="text-[10px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span></div> : null })}
             </div>
           </div>
         )}

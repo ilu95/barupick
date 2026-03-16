@@ -5,10 +5,11 @@ import i18n from '@/i18n';
 // 원본: 바루픽_최신본.html 6161~6403행
 // ================================================================
 
-export const CATEGORY_NAMES = {
-    outer: '아우터', middleware: '미들웨어', top: '상의', inner: '이너',
-    bottom: '하의', scarf: '목도리', hat: '모자', shoes: '신발'
-};
+export const CATEGORY_NAMES: Record<string, string> = new Proxy({} as Record<string, string>, {
+    get(_, key: string) {
+        return i18n.t(`categories:names.${key}`, key);
+    }
+});
 
 export const PART_ICONS = {
     outer: '🧥', middleware: '🧶', top: '👔', inner: '👕',

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import i18n from '@/i18n'
 
 // 동기화 대상 localStorage 키
 const SYNC_KEYS = [
@@ -217,8 +218,10 @@ export function useLastSyncTime(): string | null {
   const ts = parseInt(localStorage.getItem('_sync_ts') || '0', 10)
   if (!ts) return null
   const diff = (Date.now() - ts) / 1000
-  if (diff < 60) return '방금 동기화됨'
-  if (diff < 3600) return Math.floor(diff / 60) + '분 전 동기화'
-  if (diff < 86400) return Math.floor(diff / 3600) + '시간 전 동기화'
-  return new Date(ts).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) + ' 동기화'
+  if (diff < 60) return i18n.t('ui:settings.syncJustNow')
+  if (diff < 3600) return i18n.t('ui:settings.syncMinutesAgo', { count: Math.floor(diff / 60) })
+  if (diff < 86400) return i18n.t('ui:settings.syncHoursAgo', { count: Math.floor(diff / 3600) })
+  const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
+  const dateStr = new Date(ts).toLocaleDateString(locale, { month: 'short', day: 'numeric' })
+  return i18n.t('ui:settings.syncDateFormat', { date: dateStr })
 }
