@@ -577,6 +577,14 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
                 setEditedOutfit(prev => ({ ...(prev || combo.outfit), [editingPart]: k }))
               }}
               onClear={() => setEditingPart(null)}
+              scoreDeltaFn={(k) => {
+                try {
+                  const testOutfit = { ...currentOutfit, [editingPart]: k }
+                  const pc = profile.getPersonalColor()
+                  const newScore = evaluationSystem.evaluate(testOutfit, pc).total
+                  return Math.round(newScore - finalScore)
+                } catch { return 0 }
+              }}
             />
             {editedOutfit && (
               <div className="flex gap-2 mt-2">
