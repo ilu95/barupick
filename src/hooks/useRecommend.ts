@@ -124,7 +124,9 @@ function saveSession(step: RecStep, state: RecState, history: RecStep[]) {
 
 export function useRecommend() {
   const [searchParams] = useSearchParams()
-  const cached = useRef(loadSession()).current
+  // URL 파라미터가 있으면 캐시 무시 (새 추천 플로우 시작)
+  const hasUrlParams = searchParams.has('style') || searchParams.has('layer')
+  const cached = useRef(hasUrlParams ? null : loadSession()).current
   const [step, setStep] = useState<RecStep>(cached?.step || 'mood')
   const [state, setState] = useState<RecState>(cached?.state || initialState)
   const [history, setHistory] = useState<RecStep[]>(cached?.history || [])
