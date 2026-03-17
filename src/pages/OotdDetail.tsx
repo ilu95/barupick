@@ -14,6 +14,75 @@ import { evaluationSystem } from '@/lib/evaluation'
 import { getScorePercentile } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
+import { weatherEmoji } from '@/hooks/useOotd'
+
+const SITUATION_KEYS = ['commute', 'date', 'casual', 'interview', 'travel', 'exercise'] as const
+const MOOD_KEYS = ['satisfied', 'okay', 'regret'] as const
+const MOOD_EMOJIS: Record<string, string> = { satisfied: '😊', okay: '😐', regret: '😕' }
+
+/** 한국어로 저장된 기존 상황 데이터 → key 역매핑 */
+const SITUATION_KO_MAP: Record<string, string> = {
+  '출근': 'commute', '데이트': 'date', '캐주얼': 'casual',
+  '면접': 'interview', '여행': 'travel', '운동': 'exercise',
+}
+
+/** 한국어로 저장된 기존 기분 데이터 → key 역매핑 */
+const MOOD_KO_MAP: Record<string, string> = {
+  '만족': 'satisfied', '그저그럭': 'okay', '아쉬움': 'regret',
+}
+
+function resolveSituation(raw: string | null, t: any): string | null {
+  if (!raw) return null
+  // 새 형식: key값 (commute, date 등)
+  if (SITUATION_KEYS.includes(raw as any)) return t(`ootdRecord.situations.${raw}`)
+  // 구 형식: 한국어 역매핑
+  const key = SITUATION_KO_MAP[raw]
+  if (key) return t(`ootdRecord.situations.${key}`)
+  // 사용자 직접 입력
+  return raw
+}
+
+function resolveMood(raw: string | null, t: any): string | null {
+  if (!raw) return null
+  // 새 형식: key값 (satisfied, okay 등)
+  if (MOOD_KEYS.includes(raw as any)) {
+    return MOOD_EMOJIS[raw] + ' ' + t(`ootdRecord.moods.${raw}`)
+  }
+  // 구 형식: "😊 만족" → 이모지 + 한국어
+  const match = raw.match(/^(.+?)\s+(.+)$/)
+  if (match) {
+    const koText = match[2]
+    const key = MOOD_KO_MAP[koText]
+    if (key) return match[1] + ' ' + t(`ootdRecord.moods.${key}`)
+  }
+  return raw
+}
+
+function resolveWeather(record: any, t: any): string | null {
+  // weatherData가 있으면 다국어 표시
+  if (record.weatherData) {
+    const wd = record.weatherData
+    const code = wd.code ?? 0
+    const emoji = weatherEmoji(code)
+    const textKey = getWeatherTextKey(code)
+    return `${emoji} ${wd.temp}°C ${t('weatherConditions.' + textKey)}`
+  }
+  // weatherData 없이 weather 문자열만 있는 경우 (아주 오래된 데이터)
+  return record.weather || null
+}
+
+function getWeatherTextKey(code: number): string {
+  if (code === 0) return 'clear'
+  if (code <= 3) return 'partlyCloudy'
+  if (code <= 48) return 'fog'
+  if (code <= 57) return 'drizzle'
+  if (code <= 67) return 'rain'
+  if (code <= 77) return 'snow'
+  if (code <= 82) return 'showers'
+  if (code <= 86) return 'heavySnow'
+  if (code <= 99) return 'thunderstorm'
+  return 'cloudy'
+}
 
 export default function OotdDetail() {
   const { t } = useTranslation()
@@ -224,10 +293,12 @@ export default function OotdDetail() {
             {Object.entries(record.colors || {}).filter(([_, v]) => v).map(([part, colorKey]) => {
               const c = COLORS_60[colorKey as string]
               if (!c) return null
+              const itemId = record.itemTypes?.[part]
+              const partLabel = itemId ? t('categories:itemsCatalog.' + itemId) : t('categories:names.' + part)
               return (
                 <div key={part} className="flex items-center gap-1.5 text-xs">
-                  <span className="w-3.5 h-3.5 rounded border border-warm-400" style={{ background: c.hex }} />
-                  <span className="text-warm-500 w-7">{t('categories:names.' + part)}</span>
+                  <span className="w-3.5 h-3.5 rounded flex-shrink-0 border border-warm-400" style={{ background: c.hex }} />
+                  <span className="text-warm-500 w-16 flex-shrink-0">{partLabel}</span>
                   <span className="text-warm-800">{getColorName(colorKey as string)}</span>
                 </div>
               )
@@ -241,19 +312,19 @@ export default function OotdDetail() {
         {record.situation && (
           <div className="flex items-center gap-2 text-sm">
             <Tag size={14} className="text-warm-500" />
-            <span className="text-warm-800">{record.situation}</span>
+            <span className="text-warm-800">{resolveSituation(record.situation, t)}</span>
           </div>
         )}
         {record.mood && (
           <div className="flex items-center gap-2 text-sm">
             <Smile size={14} className="text-warm-500" />
-            <span className="text-warm-800">{record.mood}</span>
+            <span className="text-warm-800">{resolveMood(record.mood, t)}</span>
           </div>
         )}
-        {record.weather && (
+        {(record.weather || record.weatherData) && (
           <div className="flex items-center gap-2 text-sm">
             <Cloud size={14} className="text-warm-500" />
-            <span className="text-warm-800">{record.weather}</span>
+            <span className="text-warm-800">{resolveWeather(record, t)}</span>
           </div>
         )}
         {record.memo && (

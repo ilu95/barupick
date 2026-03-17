@@ -496,6 +496,18 @@
       "harmony": "色彩协调"
     }
   },
+  "weatherConditions": {
+    "clear": "晴",
+    "partlyCloudy": "多云",
+    "fog": "雾",
+    "drizzle": "毛毛雨",
+    "rain": "雨",
+    "snow": "雪",
+    "showers": "阵雨",
+    "heavySnow": "暴雪",
+    "thunderstorm": "雷暴",
+    "cloudy": "阴"
+  },
   "ootdRecord": {
     "situations": {
       "commute": "通勤",

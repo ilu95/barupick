@@ -104,6 +104,8 @@ export default function OotdRecord() {
       const without = prev.filter(id => itemToSlot(id) !== slot)
       return [...without, itemId]
     })
+    // slot→itemId 매핑 저장
+    ootd.setItemTypes((prev: Record<string, string>) => ({ ...prev, [slot]: itemId }))
     setPendingItem(itemId)
   }
 
@@ -117,7 +119,14 @@ export default function OotdRecord() {
   // 칩 제거
   const removeItem = (itemId: string) => {
     const slot = itemToSlot(itemId)
-    if (slot) ootd.clearColor(slot)
+    if (slot) {
+      ootd.clearColor(slot)
+      ootd.setItemTypes((prev: Record<string, string>) => {
+        const next = { ...prev }
+        delete next[slot]
+        return next
+      })
+    }
     setPickedItems(prev => prev.filter(id => id !== itemId))
   }
   const removeFixed = (slot: string) => {
@@ -453,9 +462,9 @@ export default function OotdRecord() {
           {SITUATION_KEYS.map(key => {
             const label = t(`ootdRecord.situations.${key}`)
             return (
-            <button key={key} onClick={() => { setCustomSit(false); ootd.setSituation(ootd.situation === label ? null : label) }}
+            <button key={key} onClick={() => { setCustomSit(false); ootd.setSituation(ootd.situation === key ? null : key) }}
               className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                ootd.situation === label ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+                ootd.situation === key ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
               }`}>{label}</button>
             )
           })}
@@ -477,12 +486,12 @@ export default function OotdRecord() {
         <div className="flex gap-1.5">
           {MOOD_KEYS.map(m => {
             const text = t(`ootdRecord.moods.${m.key}`)
-            const val = m.emoji + ' ' + text
+            const displayVal = m.emoji + ' ' + text
             return (
-              <button key={m.key} onClick={() => ootd.setMood(ootd.mood === val ? null : val)}
+              <button key={m.key} onClick={() => ootd.setMood(ootd.mood === m.key ? null : m.key)}
                 className={`flex-1 py-2 rounded-xl text-[11px] font-medium text-center transition-all ${
-                  ootd.mood === val ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-                }`}>{val}</button>
+                  ootd.mood === m.key ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+                }`}>{displayVal}</button>
             )
           })}
         </div>

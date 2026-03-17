@@ -402,7 +402,7 @@ export default function AllCombos() {
               {/* 배색 이론 */}
               {combo.theory.length > 0 && (
                 <div className="px-4 pb-1">
-                  <span className="text-[10px] bg-terra-50 dark:bg-terra-900/20 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">🎨 {t('allCombos.colorScheme', { theory: combo.theory[0] })}</span>
+                  <span className="text-[10px] bg-terra-50 dark:bg-terra-900/20 text-terra-600 dark:text-terra-400 px-2 py-0.5 rounded-full">🎨 {t('allCombos.colorScheme', { theory: t(combo.theory[0]) })}</span>
                 </div>
               )}
 

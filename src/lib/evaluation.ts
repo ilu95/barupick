@@ -454,13 +454,13 @@ export const evaluationSystem = {
         return normalizedScore;
     },
 
-    // 이론 탐지
+    // 이론 탐지 — returns i18n keys for display
     detectTheory(outfit) {
         const colors = Object.values(outfit).filter(c => c);
         const theories = new Set();
 
         const hclValues = colors.map(c => COLORS_60[c]?.hcl).filter(Boolean);
-        if (hclValues.length < 2) return [i18n.t('colorTheory.monochrome')];
+        if (hclValues.length < 2) return ['colorTheory.monochrome'];
 
         const lValues = hclValues.map(v => v[2]);
         const hValues = hclValues.map(v => v[0]);
@@ -481,13 +481,13 @@ export const evaluationSystem = {
             }
         }
 
-        if (hclValues.every(v => v[1] < 15)) theories.add(i18n.t('colorTheory.all_neutral'));
-        if (maxHDiff < 30) theories.add(i18n.t('colorTheory.tone_on_tone'));
-        if (lDiff < 20 && cDiff < 20 && maxHDiff > 35) theories.add(i18n.t('colorTheory.tone_in_tone'));
-        if (maxHDiff > 30 && maxHDiff < 60) theories.add(i18n.t('colorTheory.analogous'));
-        if (maxHDiff > 150 && maxHDiff < 210) theories.add(i18n.t('colorTheory.complementary'));
+        if (hclValues.every(v => v[1] < 15)) theories.add('colorTheory.all_neutral');
+        if (maxHDiff < 30) theories.add('colorTheory.tone_on_tone');
+        if (lDiff < 20 && cDiff < 20 && maxHDiff > 35) theories.add('colorTheory.tone_in_tone');
+        if (maxHDiff > 30 && maxHDiff < 60) theories.add('colorTheory.analogous');
+        if (maxHDiff > 150 && maxHDiff < 210) theories.add('colorTheory.complementary');
 
-        return theories.size > 0 ? Array.from(theories) : [i18n.t('evaluation.freeColor')];
+        return theories.size > 0 ? Array.from(theories) : ['evaluation.freeColor'];
     },
 
     // 피드백 생성

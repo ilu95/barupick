@@ -4,11 +4,14 @@ import { COLORS_60 } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
+import i18n from '@/i18n'
 
 export interface OotdRecord {
   id: string
   date: string
   colors: Record<string, string | null>
+  /** Maps slot (outer, top, etc.) to item id (padding, tshirt, etc.) */
+  itemTypes?: Record<string, string>
   photos: string[]
   score: number
   weather: string
@@ -38,6 +41,21 @@ function weatherEmoji(code: number): string {
   return '🌤️'
 }
 
+/** Returns i18n key for weather code */
+function weatherTextKey(code: number): string {
+  if (code === 0) return 'clear'
+  if (code <= 3) return 'partlyCloudy'
+  if (code <= 48) return 'fog'
+  if (code <= 57) return 'drizzle'
+  if (code <= 67) return 'rain'
+  if (code <= 77) return 'snow'
+  if (code <= 82) return 'showers'
+  if (code <= 86) return 'heavySnow'
+  if (code <= 99) return 'thunderstorm'
+  return 'cloudy'
+}
+
+/** @deprecated For backward compat with old Korean data */
 function weatherText(code: number): string {
   if (code === 0) return '맑음'
   if (code <= 3) return '구름 조금'
@@ -61,6 +79,7 @@ export function useOotd() {
   const [memo, setMemo] = useState('')
   const [visibility, setVisibility] = useState<'private' | 'friends' | 'public'>('private')
   const [showInstagram, setShowInstagram] = useState(false)
+  const [itemTypes, setItemTypes] = useState<Record<string, string>>({})
   const [openPicker, setOpenPicker] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
   const [weatherData, setWeatherData] = useState<any>(null)
@@ -150,6 +169,7 @@ export function useOotd() {
       id: editId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
       date: dateStr,
       colors: { ...colors },
+      itemTypes: Object.keys(itemTypes).length > 0 ? { ...itemTypes } : undefined,
       photos: [...photos],
       score,
       weather: weatherStr,
@@ -195,7 +215,7 @@ export function useOotd() {
           } else {
             // 신규
             const { data: inserted } = await supabase.from('posts').insert({
-              user_id: userId, title: record.memo?.slice(0,100) || '오늘의 코디',
+              user_id: userId, title: record.memo?.slice(0,100) || i18n.t('ootdDetail.todaysCoord'),
               outfit, score: record.score, style: null, layer_type: 'basic',
               caption: record.memo?.slice(0,200) || null, photo_urls: record.photos.length > 0 ? record.photos : null,
               status: 'approved', visibility: record.visibility,
@@ -243,6 +263,7 @@ export function useOotd() {
 
   const resetForm = useCallback(() => {
     setColors({ top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null })
+    setItemTypes({})
     setPhotos([])
     setSituation(null)
     setMood(null)
@@ -258,6 +279,7 @@ export function useOotd() {
     setEditId(record.id)
     const c: Record<string, string | null> = { top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null }
     Object.entries(record.colors || {}).forEach(([k, v]) => { if (v) c[k] = v })
+    setItemTypes(record.itemTypes || {})
     setColors(c)
     setPhotos(record.photos || [])
     setSituation(record.situation)
@@ -276,8 +298,8 @@ export function useOotd() {
 
   return {
     colors, photos, situation, mood, memo, visibility, showInstagram,
-    openPicker, editId, filledCount, canSave, needsPhoto, weatherData,
-    setOpenPicker, selectColor, clearColor,
+    itemTypes, openPicker, editId, filledCount, canSave, needsPhoto, weatherData,
+    setOpenPicker, selectColor, clearColor, setItemTypes,
     addPhoto, removePhoto, replacePhoto,
     setSituation, setMood, setMemo, setVisibility, setShowInstagram,
     saveRecord, deleteRecord, resetForm, startEdit, getRecords,
