@@ -519,7 +519,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
             return (
               <div key={k} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
-                <span className="text-warm-500 dark:text-warm-400 w-10">{getPickedPartLabel(k, rec.state.pickedItems, t)}</span>
+                <span className="text-warm-500 dark:text-warm-400 whitespace-nowrap">{getPickedPartLabel(k, rec.state.pickedItems, t)}</span>
                 <span className="text-warm-800 dark:text-warm-200 font-medium">{colorKey ? getColorName(colorKey) : ''}</span>
               </div>
             )
