@@ -1,0 +1,3 @@
+/* English */
+"CFBundleDisplayName" = "BaruPick";
+"NSLocationWhenInUseUsageDescription" = "Location access is needed to suggest outfits based on the weather.";
