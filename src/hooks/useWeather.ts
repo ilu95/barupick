@@ -40,7 +40,7 @@ export function weatherText(code: number): string {
 export function getLayerAdvice(feels: number) {
   const t = i18n.t.bind(i18n)
   const adviceKey = feels >= 28 ? 'hotSummer' : feels >= 23 ? 'earlySummer' : feels >= 17 ? 'midSeason' : feels >= 12 ? 'earlyFall' : feels >= 5 ? 'winter' : feels >= -5 ? 'deepWinter' : 'extreme'
-  const layerMap: Record<string, string> = { hotSummer: 'simple', earlySummer: 'simple', midSeason: 'basic', earlyFall: 'basic', winter: 'mid_inner', deepWinter: 'layered', extreme: 'layered' }
+  const layerMap: Record<string, string> = { hotSummer: 'simple', earlySummer: 'simple', midSeason: 'mid_inner', earlyFall: 'basic', winter: 'basic', deepWinter: 'layered', extreme: 'full' }
   const emojiMap: Record<string, string> = { hotSummer: '☀️', earlySummer: '🌤️', midSeason: '⛅', earlyFall: '🍂', winter: '🧥', deepWinter: '❄️', extreme: '🥶' }
 
   return {
