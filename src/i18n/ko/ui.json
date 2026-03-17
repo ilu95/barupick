@@ -243,7 +243,10 @@
     "deleteItem": "삭제하시겠어요?",
     "deleteSuccess": "삭제되었어요",
     "bestCoordTitle": "베스트 코디",
-    "sortByScore": "높은 점수순으로 정렬했어요"
+    "sortByScore": "높은 점수순으로 정렬했어요",
+    "noRecordsYet": "아직 기록이 없어요",
+    "firstOotdRecord": "첫 OOTD 기록하기",
+    "scoreSuffix": "점"
   },
   "closetAdd": {
     "photoMode": "사진으로 등록",

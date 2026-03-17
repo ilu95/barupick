@@ -243,7 +243,10 @@
     "deleteItem": "削除しますか？",
     "deleteSuccess": "削除しました",
     "bestCoordTitle": "ベストコーデ",
-    "sortByScore": "高スコア順に並べました"
+    "sortByScore": "高スコア順に並べました",
+    "noRecordsYet": "まだ記録がありません",
+    "firstOotdRecord": "最初のOOTDを記録する",
+    "scoreSuffix": "点"
   },
   "closetAdd": {
     "photoMode": "写真で登録",

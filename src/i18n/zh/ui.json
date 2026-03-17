@@ -243,7 +243,10 @@
     "deleteItem": "确定删除吗？",
     "deleteSuccess": "已删除",
     "bestCoordTitle": "最佳搭配",
-    "sortByScore": "已按高分排序"
+    "sortByScore": "已按高分排序",
+    "noRecordsYet": "暂无记录",
+    "firstOotdRecord": "记录第一个OOTD",
+    "scoreSuffix": "分"
   },
   "closetAdd": {
     "photoMode": "拍照添加",

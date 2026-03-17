@@ -243,7 +243,10 @@
     "deleteItem": "Delete this item?",
     "deleteSuccess": "Deleted",
     "bestCoordTitle": "Best Coords",
-    "sortByScore": "Sorted by highest score"
+    "sortByScore": "Sorted by highest score",
+    "noRecordsYet": "No records yet",
+    "firstOotdRecord": "Record your first OOTD",
+    "scoreSuffix": "pts"
   },
   "closetAdd": {
     "photoMode": "Add by Photo",
