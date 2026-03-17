@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Polished Ivy League sophistication", "keywords": ["Knit Vest", "Oxford Shirt", "Chino Pants", "Loafers"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Classic East Coast campus style", "keywords": ["Blazer", "Button-Down Shirt", "Loafers"] },
+    "dandy": { "name": "Dandy", "subtitle": "Refined gentlemanly elegance", "keywords": ["Wool Coat", "Turtleneck", "Chelsea Boots"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "The art of quiet luxury", "keywords": ["Cashmere", "Corduroy", "Loafers"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "American traditional à la Ralph Lauren", "keywords": ["Polo Shirt", "Cable Knit", "Chinos"] },
+    "minimal": { "name": "Minimal", "subtitle": "Maximum sophistication with minimal elements", "keywords": ["Plain Tee", "Wide Pants", "Minimal Sneakers"] },
+    "casual": { "name": "Casual", "subtitle": "Comfortable yet stylish everyday outfits", "keywords": ["Sweatshirt", "Jeans", "Sneakers"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Urban freedom with natural pastels", "keywords": ["Oversized Shirt", "Wide Pants", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "The art of intentional simplicity", "keywords": ["Plain Tee", "Straight Jeans", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Where activewear meets everyday style", "keywords": ["Jogger Pants", "Zip-Up Hoodie", "Running Shoes"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Vintage vibes with denim and work boots", "keywords": ["Denim Jacket", "Work Boots", "Check Shirt"] },
+    "workwear": { "name": "Workwear", "subtitle": "The aesthetics of practical labor", "keywords": ["Coveralls", "Work Pants", "Boots"] },
+    "military": { "name": "Military", "subtitle": "Tough style inspired by military uniforms", "keywords": ["MA-1 Jacket", "Cargo Pants", "Combat Boots"] },
+    "british": { "name": "British Heritage", "subtitle": "Distinguished British countryside outdoor", "keywords": ["Barbour Jacket", "Tweed", "Chelsea Boots"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Outdoor brands styled for the city", "keywords": ["Fleece", "Hiking Boots", "Cargo Pants"] },
+    "street": { "name": "Streetwear", "subtitle": "Freedom from hip-hop and skate culture", "keywords": ["Hoodie", "Cargo Pants", "High-Tops"] },
+    "grunge": { "name": "Grunge", "subtitle": "90s alternative rock rebellion", "keywords": ["Check Flannel", "Distressed Jeans", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporary", "subtitle": "Urban experimentation, modern avant-garde", "keywords": ["Structured Jacket", "Asymmetric Cut", "Monotone"] },
+    "techwear": { "name": "Techwear", "subtitle": "Urban futurism with technical fabrics", "keywords": ["Gore-Tex", "Cargo Pants", "Tech Runners"] },
+    "genderless": { "name": "Genderless", "subtitle": "Free style beyond gender boundaries", "keywords": ["Oversized Shirt", "Wide Pants", "Unisex"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Semi-Formal", "description": "Styles with formality and sophistication" },
+    "casual": { "name": "Casual", "description": "Comfortable yet stylish everyday looks" },
+    "work_outdoor": { "name": "Work & Outdoor", "description": "Practical styles with rugged appeal" },
+    "street": { "name": "Street", "description": "Free-spirited street culture with personality" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Simple", "parts": ["Top", "Bottom", "Shoes"] },
+    "basic": { "name": "Outer + Inner", "parts": ["Outerwear", "Inner", "Bottom", "Shoes"] },
+    "mid_inner": { "name": "Mid Layer + Inner", "parts": ["Mid Layer", "Inner", "Bottom", "Shoes"] },
+    "scarf_top": { "name": "Scarf + Top", "parts": ["Scarf", "Top", "Bottom", "Shoes"] },
+    "layered": { "name": "Outer + Mid + Inner", "parts": ["Outerwear", "Mid Layer", "Inner", "Bottom", "Shoes"] },
+    "scarf_basic": { "name": "Scarf + Outer + Inner", "parts": ["Scarf", "Outerwear", "Inner", "Bottom", "Shoes"] },
+    "scarf_mid": { "name": "Scarf + Mid + Inner", "parts": ["Scarf", "Mid Layer", "Inner", "Bottom", "Shoes"] },
+    "full": { "name": "Full Layered", "parts": ["Scarf", "Outerwear", "Mid Layer", "Inner", "Bottom", "Shoes"] }
+  }
+}

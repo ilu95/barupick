@@ -1,0 +1,124 @@
+{
+  "seasons": {
+    "spring": { "name": "Spring Warm" },
+    "summer": { "name": "Summer Cool" },
+    "autumn": { "name": "Autumn Warm" },
+    "winter": { "name": "Winter Cool" }
+  },
+  "types": {
+    "spring_light": {
+      "name": "Spring Light",
+      "description": "Bright, clear pastel warm tones suit you best. We recommend light and radiant colors.",
+      "keywords": ["bright", "clear", "light", "radiant"]
+    },
+    "spring_bright": {
+      "name": "Spring Bright",
+      "description": "Vivid, vibrant warm tones suit you best. We recommend lively, energetic colors.",
+      "keywords": ["vivid", "vibrant", "lively", "energetic"]
+    },
+    "spring_true": {
+      "name": "Spring True",
+      "description": "Warm, clear medium tones suit you best. We recommend natural, healthy-looking colors.",
+      "keywords": ["warm", "clear", "natural", "healthy"]
+    },
+    "summer_light": {
+      "name": "Summer Light",
+      "description": "Bright, soft pastel cool tones suit you. We recommend elegant and feminine colors.",
+      "keywords": ["soft", "delicate", "elegant", "feminine"]
+    },
+    "summer_muted": {
+      "name": "Summer Muted",
+      "description": "Calm, greyish tones suit you. We recommend sophisticated and dignified colors.",
+      "keywords": ["calm", "greyish", "sophisticated", "dignified"]
+    },
+    "summer_true": {
+      "name": "Summer True",
+      "description": "Cool, soft medium cool tones suit you. We recommend refreshing and clean colors.",
+      "keywords": ["cool", "soft", "refreshing", "clean"]
+    },
+    "autumn_soft": {
+      "name": "Autumn Soft",
+      "description": "Soft, warm muted tones suit you. We recommend natural and comfortable colors.",
+      "keywords": ["soft", "muted", "natural", "comfortable"]
+    },
+    "autumn_deep": {
+      "name": "Autumn Deep",
+      "description": "Deep, rich earth tones suit you. We recommend luxurious and profound colors.",
+      "keywords": ["deep", "rich", "luxurious", "profound"]
+    },
+    "autumn_true": {
+      "name": "Autumn True",
+      "description": "Warm, natural earth tones suit you. We recommend classic and stable colors.",
+      "keywords": ["warm", "natural", "classic", "stable"]
+    },
+    "winter_bright": {
+      "name": "Winter Bright",
+      "description": "Vivid, cool bold tones suit you. We recommend intense, eye-catching colors.",
+      "keywords": ["vivid", "bold", "intense", "eye-catching"]
+    },
+    "winter_deep": {
+      "name": "Winter Deep",
+      "description": "Deep, dark tones suit you. We recommend chic and sophisticated colors.",
+      "keywords": ["deep", "chic", "sophisticated", "modern"]
+    },
+    "winter_true": {
+      "name": "Winter True",
+      "description": "Cool, vivid high-contrast colors suit you. We recommend modern and urban colors.",
+      "keywords": ["contrast", "vivid", "modern", "urban"]
+    }
+  },
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "What color are the veins on the inside of your wrist?",
+        "options": ["Mostly greenish", "Mostly blue/purple", "Both look similar"]
+      },
+      {
+        "question": "How does your skin react to sunlight?",
+        "options": ["Burns easily and turns red", "Tans easily and turns brown", "Tans moderately"]
+      },
+      {
+        "question": "Which accessories suit you better — gold or silver?",
+        "options": ["Gold looks better", "Silver looks better", "Both look similar"]
+      },
+      {
+        "question": "When wearing white, which shade suits you more?",
+        "options": ["Ivory/cream white suits me better", "Pure/blue-tinted white suits me better", "Both work fine"]
+      },
+      {
+        "question": "What color are your eyes and hair?",
+        "options": ["Light brown/lighter shades", "Medium brown tones", "Dark brown/black"]
+      },
+      {
+        "question": "What is your overall image or impression?",
+        "options": ["Bright and radiant", "Soft and subtle", "Calm and deep", "Vivid and clear"]
+      },
+      {
+        "question": "Which suits you better — vivid primary colors or calm muted colors?",
+        "options": ["Vivid, bold colors suit me", "Calm, muted colors suit me", "Both are similar"]
+      },
+      {
+        "question": "How much contrast is there in your features? (between eyes, hair, and skin)",
+        "options": ["Low contrast — features blend together", "Medium contrast", "High contrast — features are distinct"]
+      }
+    ],
+    "results": {
+      "spring_warm": {
+        "name": "Spring Warm",
+        "description": "Warm, bright colors suit you best. We recommend radiant colors like peach, coral, light orange, and soft yellow."
+      },
+      "summer_cool": {
+        "name": "Summer Cool",
+        "description": "Cool, soft colors suit you best. We recommend pastel cool tones like lavender, rose, sky blue, and mint."
+      },
+      "autumn_warm": {
+        "name": "Autumn Warm",
+        "description": "Warm, deep colors suit you best. We recommend autumnal colors like camel, burgundy, olive, and mustard."
+      },
+      "winter_cool": {
+        "name": "Winter Cool",
+        "description": "Cool, vivid colors suit you best. We recommend high-contrast colors like black, white, navy, and royal blue."
+      }
+    }
+  }
+}

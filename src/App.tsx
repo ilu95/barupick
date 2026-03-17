@@ -20,6 +20,7 @@ import Profile from '@/pages/Profile'
 import Auth from '@/pages/Auth'
 import AuthCallback from '@/pages/AuthCallback'
 import Settings from '@/pages/Settings'
+import LanguageSettings from '@/pages/LanguageSettings'
 import OotdRecord from '@/pages/OotdRecord'
 import Closet from '@/pages/Closet'
 import ClosetAdd from '@/pages/ClosetAdd'
@@ -125,6 +126,7 @@ export default function App() {
                   <Route path="/profile/insights" element={<Insights />} />
                   <Route path="/profile/insights/:postId" element={<PostInsight />} />
                   <Route path="/profile/settings" element={<Settings />} />
+                  <Route path="/profile/settings/language" element={<LanguageSettings />} />
                   <Route path="/profile/color-ranking" element={<ColorRanking />} />
                   <Route path="/profile/color-pattern" element={<ColorPattern />} />
                   <Route path="/profile/challenges" element={<Challenges />} />

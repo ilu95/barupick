@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Compare your shoulder and hip width:",
+        "options": [
+          "My shoulders are wider",
+          "My hips are wider",
+          "They're about the same"
+        ]
+      },
+      {
+        "question": "How is your waistline?",
+        "options": [
+          "My waist is well-defined",
+          "My waist and hips are straight",
+          "My belly area protrudes"
+        ]
+      },
+      {
+        "question": "What area concerns you most?",
+        "options": [
+          "My shoulders look narrow",
+          "My shoulders look wide",
+          "My belly looks prominent",
+          "My legs look short",
+          "I look short overall",
+          "No particular concern"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Make Shoulders Look Wider",
+        "description": "Use light-colored tops and boat neck/puff sleeves to emphasize the shoulder line."
+      },
+      "shoulder-narrow": {
+        "name": "Make Shoulders Look Narrower",
+        "description": "Use dark-colored tops to visually reduce shoulders, and light bottoms to distribute attention."
+      },
+      "belly": {
+        "name": "Minimize Belly Appearance",
+        "description": "Use dark-colored tops/mid layers to visually conceal the belly area."
+      },
+      "legs-long": {
+        "name": "Make Legs Look Longer",
+        "description": "Match bottom and shoe colors to create a longer leg line."
+      },
+      "height-tall": {
+        "name": "Look Taller",
+        "description": "Emphasize vertical lines with solid colors or similar tones."
+      },
+      "none": {
+        "name": "Color Harmony Only",
+        "description": "Focus purely on color harmony without body shape compensation."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Inverted Triangle",
+      "subtitle": "Wide shoulders, narrow hips",
+      "colorSummary": "Dark tops, light bottoms",
+      "female": {
+        "desc": "You have broad shoulders/chest and relatively slim lower body. Adding volume to the lower body and softening the upper body creates balance.",
+        "doList": [
+          "Deep V-neck, narrow scoop neck, U-neck, or asymmetric neckline to narrow shoulders",
+          "Light colors and patterns on bottoms to add lower body volume",
+          "Keep tops simple with wrap or empire waist styles",
+          "A-line, pleated, tulip, or voluminous skirts for lower body emphasis",
+          "Wide-leg, bootcut, or boyfriend-fit pants for lower body volume",
+          "Define waistline with belts or wrap jackets",
+          "Raglan, kimono, or dolman sleeves to soften shoulder line"
+        ],
+        "dontList": [
+          "Off-shoulder, boat neck, square neck — makes shoulders look wider",
+          "Shoulder pads, puff sleeves, shoulder embellishments",
+          "Light tops with dark bottoms (counterproductive)",
+          "Skinny jeans alone (makes lower body look thinner)",
+          "Horizontal stripes or large patterns on tops"
+        ]
+      },
+      "male": {
+        "desc": "You have broad shoulders and a developed upper body. Adding volume to the lower body improves balance.",
+        "doList": [
+          "V-neck to visually reduce shoulders and emphasize vertical lines",
+          "Light-colored bottoms to emphasize lower body volume",
+          "Dark solid colors on tops to visually reduce shoulders",
+          "Cargo pants or wide pants for lower body volume",
+          "Raglan sleeves to soften shoulder line",
+          "Single-breasted, slim lapel jackets",
+          "Straight-fit or bootcut pants"
+        ],
+        "dontList": [
+          "Padded shoulders, puff sleeves",
+          "Light tops with dark bottoms (counterproductive)",
+          "Boat neck — makes shoulders look wider",
+          "Horizontal stripes on tops",
+          "Skinny jeans alone (breaks balance)",
+          "Boxy tees, thick bulky jackets"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Triangle",
+      "subtitle": "Narrow shoulders, wide hips",
+      "colorSummary": "Light tops, dark bottoms",
+      "female": {
+        "desc": "Your lower body is wider than your upper body. Drawing attention to the upper body and streamlining the lower body improves overall proportions.",
+        "doList": [
+          "Boat neck, off-shoulder, square neck to widen shoulder line",
+          "Light colors, patterns, and embellishments on tops to draw eyes up",
+          "Jackets and blazers with shoulder pads",
+          "A-line, tulip, full circle, bias-cut skirts",
+          "High-waist bootcut, wide-leg, or straight pants",
+          "Crop jackets, trench coats with waist tie",
+          "Wrap dresses, fit-and-flare dresses"
+        ],
+        "dontList": [
+          "Light colors, patterns, or embellishments on lower body",
+          "Skinny jeans alone (emphasizes hip line)",
+          "Hip-length tops (highlights widest point)",
+          "Horizontal stripes on bottoms",
+          "Tight pencil skirts (emphasizes hips)"
+        ]
+      },
+      "male": {
+        "desc": "Your lower body is wider than your upper body. Adding focal points to the upper body improves overall proportions.",
+        "doList": [
+          "Structured blazers and shoulder-padded jackets to widen shoulders",
+          "Light colors and patterns on tops to draw eyes up",
+          "Chest details (pockets, epaulettes, horizontal stripes)",
+          "Dark solid colors on bottoms to streamline",
+          "Straight-fit, flat-front pants",
+          "V-neck or crew neck sweaters",
+          "Medium lapel single-breasted jackets"
+        ],
+        "dontList": [
+          "Unstructured tops (deconstructed jackets, etc.)",
+          "Skinny pants or tight bottoms",
+          "Light bottoms with dark tops",
+          "Horizontal stripes on lower body",
+          "Baggy pants (throws off balance)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Rectangle",
+      "subtitle": "Straight silhouette with similar shoulders, waist, and hips",
+      "colorSummary": "Create proportions with top-bottom color contrast",
+      "female": {
+        "desc": "You have a generally straight body shape. Creating a waistline or adding curves makes a great look.",
+        "doList": [
+          "V-neck, scoop neck, sweetheart neck for vertical lines and curves",
+          "Wrap tops, peplum, belted blouses to define waist",
+          "Wrap dresses, fit-and-flare, belted dresses",
+          "A-line, wrap, asymmetric skirts",
+          "High-waist bootcut or wide-leg pants",
+          "Puff, flutter, balloon sleeves for volume",
+          "Texture mixing (knit + denim, etc.) layering",
+          "Belt to accentuate waistline (slim to medium width)"
+        ],
+        "dontList": [
+          "Boxy or loose fit alone (hides body lines even more)",
+          "Turtleneck or high neck (emphasizes straight lines)",
+          "Same-color top and bottom worn straight (looks flat)",
+          "Volume only at waist (breaks overall balance)",
+          "Shapeless items worn alone"
+        ]
+      },
+      "male": {
+        "desc": "You have a generally straight body shape. Creating dimension through layering and color contrast makes a great look.",
+        "doList": [
+          "Create depth and dimension through layering",
+          "Accentuate waistline with belts or tuck-in",
+          "Divide proportions with top-bottom color contrast",
+          "Texture mixing (knit + denim, etc.)",
+          "Create vertical lines with jackets and cardigans",
+          "Crew neck t-shirts, V-neck sweaters",
+          "Structured blazers (with shoulder pads)"
+        ],
+        "dontList": [
+          "Same-color top and bottom worn straight (looks flat)",
+          "Boxy fit alone (hides body lines even more)",
+          "Vertical stripes (emphasizes straight lines more)",
+          "Loose trousers or wide-leg pants",
+          "Long-line tops or coats (emphasizes straight vertical line)",
+          "Flat, shapeless shirts"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Hourglass",
+      "subtitle": "Balanced shoulders and hips with a defined waist",
+      "colorSummary": "Wear anything! Just accentuate the waist",
+      "female": {
+        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your natural lines looks amazing.",
+        "doList": [
+          "Fits that accentuate the waistline (tuck-in, belt, wrap)",
+          "V-neck, scoop neck, sweetheart neck (natural bust line)",
+          "Wrap dresses, fit-and-flare, belted dresses",
+          "Pencil skirt (for curves) or full skirt (with tuck-in)",
+          "Medium fit flatters best",
+          "Draping fabrics (jersey, silk, cotton blend)",
+          "Single-breasted, short jackets, belted coats"
+        ],
+        "dontList": [
+          "Overly boxy oversized fits (hides your lines)",
+          "Too-tight all-over fit (overdoes it)",
+          "Long outerwear that hides the waist",
+          "Thick knits or chunky fabrics (adds bulk)",
+          "Double-breasted, drop waist",
+          "Thick belts (over 4.5cm)"
+        ]
+      },
+      "male": {
+        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your lines looks amazing.",
+        "doList": [
+          "Fits that accentuate the waistline (tuck-in, belt)",
+          "Medium fit flatters best",
+          "Solid colors with accent items",
+          "Fabrics that drape naturally on the body",
+          "Both V-neck and crew neck work well",
+          "Slim-fit shirts, high-waist trousers",
+          "Single-breasted jacket (waist suppression)",
+          "Medium belt (contrasting color for accent)"
+        ],
+        "dontList": [
+          "Overly boxy oversized fits (hides your lines)",
+          "Too-tight all-over fit (overdoes it)",
+          "Low-rise pants",
+          "Bold patterns or colors",
+          "Oversized jackets or coats"
+        ]
+      }
+    },
+    "round": {
+      "name": "Round",
+      "subtitle": "Belly-centered, rounded silhouette",
+      "colorSummary": "Overall dark tones with vertical line emphasis",
+      "female": {
+        "desc": "You carry volume in the midsection. Creating vertical lines and drawing attention to neckline, arms, and legs creates a slimmer look.",
+        "doList": [
+          "Deep V-neck, wide V, scoop neck, cowl neck to distribute attention",
+          "Empire waist, wrap tops, flowing draped tops",
+          "Empire waist, A-line, wrap, fit-and-flare dresses",
+          "3/4 sleeves for visually slimmer arms and detail focus",
+          "A-line, flare, knee-length+ skirts",
+          "High-waist straight or bootcut pants",
+          "Slim belt below bust or at high waist (tonal matching)",
+          "Single-breasted, open-front, structured jackets (hip length+)",
+          "Well-fitting bra is essential (foundation for silhouette)"
+        ],
+        "dontList": [
+          "Clingy fabrics or tight midsection",
+          "Horizontal details or embellishments at waist",
+          "Double-breasted or crop jackets",
+          "Tight shorts",
+          "Light-colored tops alone (emphasizes belly)",
+          "Horizontal stripes, large patterns"
+        ]
+      },
+      "male": {
+        "desc": "You carry volume in the midsection. Vertical lines and dark center colors create a slimmer appearance.",
+        "doList": [
+          "Dark colors on tops and mid layers for a slim center",
+          "Emphasize vertical lines (open jackets, cardigans)",
+          "Monochrome or similar tone outfits for a longer look",
+          "V-neck or deep crew neck to distribute attention",
+          "Structured jackets to organize the silhouette",
+          "Single-breasted, open jackets",
+          "Straight or slightly tapered pants"
+        ],
+        "dontList": [
+          "Light-colored tops alone (emphasizes belly)",
+          "Horizontal stripes, large patterns",
+          "Short-length tops (exposes waistline)",
+          "Too-tight fits",
+          "Double-breasted jackets",
+          "Pleated or high-waist pants",
+          "Colorful belts",
+          "Baggy or oversized (adds bulk)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "Compare your shoulder and hip width:",
+        "options": ["My shoulders are wider", "My hips are wider", "They're about the same"]
+      },
+      {
+        "question": "How is your waistline?",
+        "options": ["My waist is well-defined", "My waist and hips are straight", "My belly area protrudes"]
+      },
+      {
+        "question": "Where do you carry more volume — upper or lower body?",
+        "options": ["More volume in upper body", "More volume in lower body", "About the same"]
+      },
+      {
+        "question": "What concerns you most when choosing clothes?",
+        "options": ["Worried about top fit due to wide shoulders", "Hips and thighs bother me", "My belly area bothers me", "I look flat overall", "No particular concern (well-balanced)"]
+      },
+      {
+        "question": "Which top fit suits you best?",
+        "options": ["Slim fit (body-hugging)", "Regular fit (moderate)", "Oversized fit (roomy)"]
+      }
+    ]
+  }
+}
