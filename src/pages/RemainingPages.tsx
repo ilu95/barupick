@@ -47,11 +47,11 @@ export function Weather() {
   const getAdvice = (feels: number) => {
     if (feels >= 28) return { layer: 'simple', title: t('weather.advice.hotSummer.title'), desc: t('weather.advice.hotSummer.desc'), emoji: '☀️', detail: t('weather.advice.hotSummer.detail'), items: t('weather.advice.hotSummer.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.hotSummer.colorTip') }
     if (feels >= 23) return { layer: 'simple', title: t('weather.advice.earlySummer.title'), desc: t('weather.advice.earlySummer.desc'), emoji: '🌤️', detail: t('weather.advice.earlySummer.detail'), items: t('weather.advice.earlySummer.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.earlySummer.colorTip') }
-    if (feels >= 17) return { layer: 'basic', title: t('weather.advice.midSeason.title'), desc: t('weather.advice.midSeason.desc'), emoji: '⛅', detail: t('weather.advice.midSeason.detail'), items: t('weather.advice.midSeason.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.midSeason.colorTip') }
+    if (feels >= 17) return { layer: 'mid_inner', title: t('weather.advice.midSeason.title'), desc: t('weather.advice.midSeason.desc'), emoji: '⛅', detail: t('weather.advice.midSeason.detail'), items: t('weather.advice.midSeason.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.midSeason.colorTip') }
     if (feels >= 12) return { layer: 'basic', title: t('weather.advice.earlyFall.title'), desc: t('weather.advice.earlyFall.desc'), emoji: '🍂', detail: t('weather.advice.earlyFall.detail'), items: t('weather.advice.earlyFall.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.earlyFall.colorTip') }
-    if (feels >= 5) return { layer: 'mid_inner', title: t('weather.advice.winter.title'), desc: t('weather.advice.winter.desc'), emoji: '🧥', detail: t('weather.advice.winter.detail'), items: t('weather.advice.winter.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.winter.colorTip') }
+    if (feels >= 5) return { layer: 'basic', title: t('weather.advice.winter.title'), desc: t('weather.advice.winter.desc'), emoji: '🧥', detail: t('weather.advice.winter.detail'), items: t('weather.advice.winter.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.winter.colorTip') }
     if (feels >= -5) return { layer: 'layered', title: t('weather.advice.deepWinter.title'), desc: t('weather.advice.deepWinter.desc'), emoji: '❄️', detail: t('weather.advice.deepWinter.detail'), items: t('weather.advice.deepWinter.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.deepWinter.colorTip') }
-    return { layer: 'layered', title: t('weather.advice.extreme.title'), desc: t('weather.advice.extreme.desc'), emoji: '🥶', detail: t('weather.advice.extreme.detail'), items: t('weather.advice.extreme.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.extreme.colorTip') }
+    return { layer: 'full', title: t('weather.advice.extreme.title'), desc: t('weather.advice.extreme.desc'), emoji: '🥶', detail: t('weather.advice.extreme.detail'), items: t('weather.advice.extreme.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.extreme.colorTip') }
   }
 
   const weatherEmojiLocal = (code: number) => code === 0 ? '☀️' : code <= 3 ? '⛅' : code <= 48 ? '🌫️' : code <= 67 ? '🌧️' : code <= 77 ? '❄️' : code <= 82 ? '🌧️' : '⛈️'
@@ -663,7 +663,7 @@ export function BodyGuide() {
         <button onClick={() => { handleSave(); toast.success(t('bodyGuide.saveSuccess')) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
           {t('bodyGuide.saveBodyType')}
         </button>
-        <button onClick={() => navigate('/home/recommend')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
+        <button onClick={() => { sessionStorage.removeItem('rec_session'); navigate('/home/recommend') }} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
           {t('bodyGuide.getRecommend')}
         </button>
       </div>

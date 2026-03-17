@@ -19,9 +19,9 @@ export default function BestCoord() {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
         <Trophy size={40} className="text-warm-400 mx-auto mb-3" />
-        <div className="text-sm text-warm-600 mb-4">아직 기록이 없어요</div>
+        <div className="text-sm text-warm-600 mb-4">{t('closet.noRecordsYet')}</div>
         <button onClick={() => navigate('/record')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">
-          첫 OOTD 기록하기
+          {t('closet.firstOotdRecord')}
         </button>
       </div>
     )
@@ -50,7 +50,7 @@ export default function BestCoord() {
               <MannequinSVG outfit={outfitHex} size={65} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="font-display text-lg font-bold text-terra-600">{record.score}<span className="text-xs text-warm-500">점</span></span>
+                  <span className="font-display text-lg font-bold text-terra-600">{record.score}<span className="text-xs text-warm-500">{t('closet.scoreSuffix')}</span></span>
                 </div>
                 <div className="text-[11px] text-warm-600">{record.date}</div>
                 {record.situation && <div className="text-[11px] text-warm-500 mt-0.5">{record.situation}</div>}

@@ -5,6 +5,7 @@ import { Eye, Heart, Bookmark, MessageSquare, Target, TrendingUp, TrendingDown, 
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 
 export default function PostInsight() {
   const navigate = useNavigate()
@@ -54,7 +55,7 @@ export default function PostInsight() {
       for (let i = 13; i >= 0; i--) {
         const d = new Date(Date.now() - i * 86400000)
         const key = d.toISOString().slice(0, 10)
-        dayMap[key] = { likes: 0, comments: 0, label: (d.getMonth() + 1) + '/' + d.getDate() }
+        dayMap[key] = { likes: 0, comments: 0, label: d.toLocaleDateString(getLocale(), { month: 'numeric', day: 'numeric' }) }
       }
       ;(likes14 || []).forEach((l: any) => { const k = (l.created_at || '').slice(0, 10); if (dayMap[k]) dayMap[k].likes++ })
       comments14.forEach((c: any) => { const k = (c.created_at || '').slice(0, 10); if (dayMap[k]) dayMap[k].comments++ })

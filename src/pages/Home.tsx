@@ -6,7 +6,7 @@ import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
-import i18n from '@/i18n'
+import i18n, { getLocale } from '@/i18n'
 
 import { profile as profileLib } from '@/lib/profile'
 
@@ -100,8 +100,7 @@ export default function Home() {
             if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
           })
           const d = new Date(recentOotd.date)
-          const locale = i18n.language === 'en' ? 'en-US' : 'ko-KR'
-          const dayLabel = d.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
+          const dayLabel = d.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })
           return (
             <button onClick={() => navigate(`/closet/ootd/${recentOotd.date}?id=${recentOotd.id}`)} className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-4 py-3 shadow-warm-sm active:scale-[0.98] transition-all">
               <MannequinSVG outfit={outfitHex} size={44} />
@@ -169,7 +168,7 @@ export default function Home() {
       {/* 메인 CTA */}
       <div className="flex flex-col gap-3 mb-6">
         {/* 히어로 — 코디 추천받기 */}
-        <button onClick={() => navigate('/home/recommend')} className="group w-full bg-gradient-to-br from-terra-50 to-terra-100 border-[1.5px] border-terra-300 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
+        <button onClick={() => { sessionStorage.removeItem('rec_session'); navigate('/home/recommend') }} className="group w-full bg-gradient-to-br from-terra-50 to-terra-100 border-[1.5px] border-terra-300 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
           <div className="w-14 h-14 rounded-2xl bg-terra-200 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
             <Wand2 size={26} className="text-terra-600" />
           </div>

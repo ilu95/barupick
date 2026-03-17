@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import i18n from '@/i18n'
 
 export function useSocial() {
   const { user } = useAuth()
@@ -53,7 +54,7 @@ export function useSocial() {
           p_user_id: userId,
           p_actor_id: user.id,
           p_type: 'follow',
-          p_message: '님이 회원님을 팔로우했어요',
+          p_message: i18n.t('notifications.followMessage'),
           p_related_id: userId,
         })
       } catch {}

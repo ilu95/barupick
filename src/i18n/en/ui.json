@@ -55,7 +55,9 @@
     "score": "{{score}} pts",
     "itemRegister": "Add item",
     "generateFailed": "Generation failed",
-    "addPhoto": "Add photo"
+    "addPhoto": "Add photo",
+    "loadError": "Failed to load",
+    "rankingLoadError": "Failed to load rankings"
   },
   "nav": {
     "coord": "Coord",
@@ -241,7 +243,10 @@
     "deleteItem": "Delete this item?",
     "deleteSuccess": "Deleted",
     "bestCoordTitle": "Best Coords",
-    "sortByScore": "Sorted by highest score"
+    "sortByScore": "Sorted by highest score",
+    "noRecordsYet": "No records yet",
+    "firstOotdRecord": "Record your first OOTD",
+    "scoreSuffix": "pts"
   },
   "closetAdd": {
     "photoMode": "Add by Photo",
@@ -393,7 +398,10 @@
       "tip4": "Sophisticated styling with {{color}} as a point",
       "tip5": "A {{technique}} coord with depth using {{count}} layers"
     },
-    "stylePrefix": "Style"
+    "stylePrefix": "Style",
+    "fallbackName": "Basic Outfit {{num}}",
+    "fallbackTag": "Basic",
+    "fallbackTip": "A basic neutral color combination"
   },
   "build": {
     "stepStyle": "Select Style",
@@ -770,7 +778,8 @@
     "title": "Notifications",
     "clearAll": "Clear all",
     "clearConfirm": "Clear all notifications?",
-    "empty": "No new notifications"
+    "empty": "No new notifications",
+    "followMessage": "started following you"
   },
   "followList": {
     "followers": "Followers",
@@ -872,7 +881,11 @@
     },
     "comboDelta": "+{{count}} combos",
     "avgScoreLabel": "Avg {{score}} pts",
-    "bestScoreLabel": "Best {{score}} pts"
+    "bestScoreLabel": "Best {{score}} pts",
+    "reasonStrongBuy": "Highly recommended! {{count}} high-score outfits now possible",
+    "reasonBuy": "Great choice! {{count}} combos work well with your closet",
+    "reasonWeak": "Only {{count}} matching combos. Consider carefully",
+    "reasonSkip": "Doesn't match well with your closet"
   },
   "wardrobeReport": {
     "title": "My Wardrobe Story",
@@ -919,94 +932,94 @@
     "advice": {
       "hotSummer": {
         "title": "Hot Summer Outfit",
-        "desc": "T-shirt + shorts or linen pants",
-        "detail": "Choose thin, breathable fabrics. Linen, cotton jersey, and seersucker are great choices.",
+        "desc": "Tees & tank tops + shorts or linen pants",
+        "detail": "Breathability and moisture-wicking are key. Linen has low thermal conductivity — the coolest natural fabric. Seersucker's textured surface keeps fabric off your skin. Tencel (Lyocell) adds stretch for active days.",
         "items": [
-          "T-shirt",
           "Linen shirt",
-          "Shorts",
-          "Linen pants",
-          "Sandals/Slides"
+          "Seersucker tee",
+          "Shorts/Linen pants",
+          "Tencel tee",
+          "Sandals/Mesh sneakers"
         ],
-        "colorTip": "White, ivory, and pastel tones for a cool impression"
+        "colorTip": "White, ivory, and pastels feel cooler. Light colors reflect sunlight — they're actually cooler to wear"
       },
       "earlySummer": {
         "title": "Early Summer Outfit",
-        "desc": "T-shirt + cotton pants or light dress",
-        "detail": "Short sleeves during the day, and a thin cardigan for indoor AC — perfect combo.",
+        "desc": "Short sleeves + cotton pants · light cardigan for AC",
+        "detail": "Short sleeves are enough outdoors, but indoor AC can be chilly — bring a thin cardigan or open shirt. Cotton-linen blends resist wrinkles while staying breathable.",
         "items": [
-          "Short-sleeve shirt",
+          "Short-sleeve shirt/Polo",
           "Thin cardigan",
           "Cotton chinos",
-          "Cotton pants",
+          "Linen-blend pants",
           "Sneakers/Loafers"
         ],
-        "colorTip": "Beige + navy, white + khaki combos recommended"
+        "colorTip": "Beige + navy or white + khaki for a clean look. Try a striped shirt for extra freshness"
       },
       "midSeason": {
         "title": "Transitional Outfit",
-        "desc": "Long sleeve + pants and a light jacket",
-        "detail": "Big temperature swings. A shirt + knit layering combo is highly versatile.",
+        "desc": "Knit sweater · sweatshirt + long pants",
+        "detail": "Big daily temperature swings. A thin knit or sweatshirt is enough during the day. For evenings, layer a cardigan or knit over a shirt for easy temperature control. No need for heavy outerwear yet.",
         "items": [
+          "Thin knit/Cardigan",
+          "Sweatshirt/Hoodie",
           "Oxford shirt",
-          "Thin knit",
           "Cotton pants/Denim",
-          "Light jacket",
           "Loafers/Derby shoes"
         ],
-        "colorTip": "Earth tones — beige, khaki, olive match the seasonal feel"
+        "colorTip": "Earth tones — beige, khaki, olive perfectly match the seasonal mood"
       },
       "earlyFall": {
-        "title": "Early Fall Outfit",
-        "desc": "Jacket or cardigan + long pants",
-        "detail": "You need a windbreaker-style outer. A jacket over a sweatshirt looks clean.",
+        "title": "Early Fall/Spring Outfit",
+        "desc": "Jacket · trench coat + knit + long pants",
+        "detail": "Time for wind-blocking outerwear. A trench coat, denim jacket, or blazer paired with a sweatshirt or thin knit underneath balances warmth and mobility.",
         "items": [
-          "Blazer/Chino jacket",
-          "Cardigan",
-          "Sweatshirt",
-          "Wool pants",
-          "Chelsea boots"
+          "Trench coat/Field jacket",
+          "Blazer/Denim jacket",
+          "Thin knit/Sweatshirt",
+          "Slacks/Denim",
+          "Chelsea boots/Derby shoes"
         ],
-        "colorTip": "Brown, terracotta, mustard for autumn vibes"
+        "colorTip": "Brown, terracotta, burgundy for seasonal vibes. Mustard accessories add a nice accent"
       },
       "winter": {
         "title": "Winter Outfit",
-        "desc": "Coat + knit sweater and scarf",
-        "detail": "Warmth is key. Layer thin inners, and choose a windproof outer.",
+        "desc": "Wool coat · light puffer + knit layering",
+        "detail": "Wool and cashmere coats offer both warmth and style. For the inner layers, multiple thin pieces (shirt + knit) trap air better than one thick layer. Wrapping your neck raises perceived temperature by 3°C.",
         "items": [
-          "Wool coat",
-          "Thick knit",
-          "Fleece-lined pants",
+          "Wool/Cashmere coat",
+          "Thick knit sweater",
+          "Fleece-lined/Wool pants",
           "Scarf",
-          "Boots"
+          "Ankle boots/Walkers"
         ],
-        "colorTip": "Charcoal, navy, camel — the 3 winter classics"
+        "colorTip": "Charcoal, navy, camel — the 3 winter classics. Tone-on-tone styling is the most foolproof elegant look"
       },
       "deepWinter": {
         "title": "Deep Winter Outfit",
-        "desc": "Puffer + fleece-lined layers",
-        "detail": "Base layer → knit/sweatshirt → puffer: the 3-layer system. Keep neck, hands, and feet warm.",
+        "desc": "Puffer + thermal base · 3-layer system essential",
+        "detail": "Thermal base layer → knit/fleece sweatshirt → puffer: the 3-layer system. Moisture-wicking base layers prevent heat loss from sweat. Puffers with 80%+ down fill give the best insulation. Keeping neck, hands, and feet warm makes the biggest difference.",
         "items": [
           "Long/Short puffer",
-          "Fleece sweatshirt",
+          "Thermal base layer",
+          "Fleece sweatshirt/Thick knit",
           "Fleece-lined pants",
-          "Beanie/Gloves",
-          "Winter boots"
+          "Beanie/Gloves/Scarf"
         ],
-        "colorTip": "Black or navy base with a scarf as accent"
+        "colorTip": "Black or navy base with a bright scarf or beanie as accent. Tone-on-tone (ivory-beige-cream) feels cozy too"
       },
       "extreme": {
-        "title": "Extreme Cold",
-        "desc": "Full layers — minimize exposed skin",
-        "detail": "Minimize outdoor activity. Windproof + waterproof materials are essential.",
+        "title": "Extreme Cold Outfit",
+        "desc": "Full layering · windproof + waterproof essential",
+        "detail": "Minimize exposed skin. Windproof outerwear is critical — wind strips body heat fastest. Layer: thermal base → fleece/knit mid-layer → heavy puffer. Use a balaclava or neck warmer for face and neck. Thick wool socks + insulated boots block cold from the ground.",
         "items": [
-          "Heavy puffer",
-          "Thermal base layer",
-          "Windproof pants",
-          "Neck warmer",
-          "Insulated boots"
+          "Heavy puffer (windproof)",
+          "Thermal base + Fleece mid-layer",
+          "Fleece-lined/Windproof pants",
+          "Balaclava/Neck warmer/Gloves",
+          "Insulated boots/Wool socks"
         ],
-        "colorTip": "Function over fashion"
+        "colorTip": "Function first, but a bright scarf or beanie breaks the monotony without sacrificing warmth"
       }
     }
   },
@@ -1302,36 +1315,114 @@
       "7": "Style Master"
     },
     "badges": {
-      "first_step": { "name": "First Step", "desc": "First OOTD record" },
-      "recorder": { "name": "Recorder", "desc": "10 OOTD records" },
-      "streak3": { "name": "3-Day Streak", "desc": "3-day streak achieved" },
-      "streak7": { "name": "7-Day Streak", "desc": "7-day streak achieved" },
-      "streak30": { "name": "30-Day Streak", "desc": "30-day streak!" },
-      "closet_start": { "name": "Closet Start", "desc": "First item in closet" },
-      "closet10": { "name": "Closet Collector", "desc": "10+ items in closet" },
-      "saver": { "name": "Coord Collector", "desc": "5+ coords saved" },
-      "photo_lover": { "name": "Photo Logger", "desc": "5 records with photos" },
-      "color_variety": { "name": "Color Explorer", "desc": "10+ colors used" },
-      "quiz_master": { "name": "Fashion Expert", "desc": "Fashion quiz completed" },
-      "pc_diagnosed": { "name": "Personal Color", "desc": "Personal color diagnosed" },
-      "title_holder": { "name": "Title Holder", "desc": "Passed 1 title exam" },
-      "challenger": { "name": "Challenger", "desc": "3 challenges completed" },
-      "master100": { "name": "Style Master", "desc": "100 OOTD records" }
+      "first_step": {
+        "name": "First Step",
+        "desc": "First OOTD record"
+      },
+      "recorder": {
+        "name": "Recorder",
+        "desc": "10 OOTD records"
+      },
+      "streak3": {
+        "name": "3-Day Streak",
+        "desc": "3-day streak achieved"
+      },
+      "streak7": {
+        "name": "7-Day Streak",
+        "desc": "7-day streak achieved"
+      },
+      "streak30": {
+        "name": "30-Day Streak",
+        "desc": "30-day streak!"
+      },
+      "closet_start": {
+        "name": "Closet Start",
+        "desc": "First item in closet"
+      },
+      "closet10": {
+        "name": "Closet Collector",
+        "desc": "10+ items in closet"
+      },
+      "saver": {
+        "name": "Coord Collector",
+        "desc": "5+ coords saved"
+      },
+      "photo_lover": {
+        "name": "Photo Logger",
+        "desc": "5 records with photos"
+      },
+      "color_variety": {
+        "name": "Color Explorer",
+        "desc": "10+ colors used"
+      },
+      "quiz_master": {
+        "name": "Fashion Expert",
+        "desc": "Fashion quiz completed"
+      },
+      "pc_diagnosed": {
+        "name": "Personal Color",
+        "desc": "Personal color diagnosed"
+      },
+      "title_holder": {
+        "name": "Title Holder",
+        "desc": "Passed 1 title exam"
+      },
+      "challenger": {
+        "name": "Challenger",
+        "desc": "3 challenges completed"
+      },
+      "master100": {
+        "name": "Style Master",
+        "desc": "100 OOTD records"
+      }
     },
     "challenges": {
-      "pastel_3": { "name": "Pastel Week", "desc": "3 pastel color coords" },
-      "dark_3": { "name": "Dark Mood", "desc": "3 dark-tone coords" },
-      "mono_2": { "name": "Monotone Challenge", "desc": "2 monochrome coords" },
-      "photo_5": { "name": "Photogenic", "desc": "5 records with photos" },
-      "streak_5": { "name": "5-Day Streak", "desc": "5 consecutive OOTD records" },
-      "variety_7": { "name": "Colorful Week", "desc": "7+ different colors used" },
-      "earth_3": { "name": "Earth Tone Week", "desc": "3 earth-tone coords" },
-      "record_7": { "name": "Weekly Recorder", "desc": "Record all 7 days this week" }
+      "pastel_3": {
+        "name": "Pastel Week",
+        "desc": "3 pastel color coords"
+      },
+      "dark_3": {
+        "name": "Dark Mood",
+        "desc": "3 dark-tone coords"
+      },
+      "mono_2": {
+        "name": "Monotone Challenge",
+        "desc": "2 monochrome coords"
+      },
+      "photo_5": {
+        "name": "Photogenic",
+        "desc": "5 records with photos"
+      },
+      "streak_5": {
+        "name": "5-Day Streak",
+        "desc": "5 consecutive OOTD records"
+      },
+      "variety_7": {
+        "name": "Colorful Week",
+        "desc": "7+ different colors used"
+      },
+      "earth_3": {
+        "name": "Earth Tone Week",
+        "desc": "3 earth-tone coords"
+      },
+      "record_7": {
+        "name": "Weekly Recorder",
+        "desc": "Record all 7 days this week"
+      }
     },
     "titleExams": {
-      "beginner": { "name": "Beginner Coordinator", "desc": "Basic color combo understanding" },
-      "intermediate": { "name": "Intermediate Coordinator", "desc": "Color harmony theory" },
-      "advanced": { "name": "Advanced Coordinator", "desc": "Expert styling sense" }
+      "beginner": {
+        "name": "Beginner Coordinator",
+        "desc": "Basic color combo understanding"
+      },
+      "intermediate": {
+        "name": "Intermediate Coordinator",
+        "desc": "Color harmony theory"
+      },
+      "advanced": {
+        "name": "Advanced Coordinator",
+        "desc": "Expert styling sense"
+      }
     }
   },
   "categories": {

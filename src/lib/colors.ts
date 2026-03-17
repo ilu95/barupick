@@ -17,7 +17,13 @@ export interface ColorDef {
 export function getColorName(key: string): string {
   const def = COLORS_60[key]
   if (!def) return key
-  return i18n.language === 'ko' ? def.name : def.nameEn
+  if (i18n.language === 'ko') return def.name
+  // ja, zh 등은 colors 네임스페이스 번역 사용
+  if (i18n.language !== 'en') {
+    const translated = i18n.t(`colors:names.${key}`, { defaultValue: '' })
+    if (translated && translated !== `names.${key}`) return translated
+  }
+  return def.nameEn
 }
 
 export const COLORS_60: Record<string, ColorDef> = {
