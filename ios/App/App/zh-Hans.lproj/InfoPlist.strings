@@ -1,0 +1,3 @@
+/* Chinese Simplified */
+"CFBundleDisplayName" = "BaruPick";
+"NSLocationWhenInUseUsageDescription" = "需要位置信息以根据天气推荐穿搭。";
