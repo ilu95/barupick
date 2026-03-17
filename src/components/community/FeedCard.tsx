@@ -47,7 +47,7 @@ function timeAgo(dt: string, t: (key: string, opts?: any) => string): string {
   if (diff < 86400) return t('common.hoursAgo', { count: Math.floor(diff / 3600) })
   if (diff < 604800) return t('common.daysAgo', { count: Math.floor(diff / 86400) })
   const d = new Date(dt)
-  return (d.getMonth() + 1) + '/' + d.getDate()
+  return d.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })
 }
 
 function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink, Pencil } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60, getColorName } from '@/lib/colors'
@@ -498,7 +499,7 @@ export default function CommunityDetail() {
                 const isPostOwner = user && post.user_id === user.id
                 const canDelete = isMyComment || isPostOwner
                 const commentDate = c.created_at ? new Date(c.created_at) : null
-                const dateStr = commentDate ? `${commentDate.getMonth() + 1}/${commentDate.getDate()}` : ''
+                const dateStr = commentDate ? commentDate.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' }) : ''
 
                 return (
                   <div key={c.id} className="flex items-start gap-2.5">

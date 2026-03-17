@@ -5,6 +5,7 @@ import { useOotd, type OotdRecord } from '@/hooks/useOotd'
 import { COLORS_60 } from '@/lib/colors'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 
 export default function OotdCalendar() {
   const { t } = useTranslation()
@@ -231,7 +232,7 @@ function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
   const weekDays = t('ootdCalendar.weekDays', { returnObjects: true }) as string[]
   const dayOfWeek = weekDays[new Date(ry, rm - 1, rd).getDay()]
-  const dateLabel = `${rm}/${rd} ${dayOfWeek}`
+  const dateLabel = new Date(ry, rm - 1, rd).toLocaleDateString(getLocale(), { month: 'numeric', day: 'numeric' }) + ' ' + dayOfWeek
 
   const hasPhoto = record.photos && record.photos.length > 0
 

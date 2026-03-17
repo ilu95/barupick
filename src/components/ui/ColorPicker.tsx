@@ -156,9 +156,11 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 
 function breakName(name: string): string {
   if (name.length <= 5) return name
-  // 공백이 있으면 공백 기준으로 줄바꿈 (영어)
+  // 공백이 있으면 공백 기준으로 줄바꿈 (영어 등)
   if (name.includes(' ')) return name.replace(' ', '\n')
-  // 한국어 등 공백 없는 짧은 이름은 중간에서 줄바꿈
+  // CJK 문자(한국어/일본어/중국어)만 중간에서 줄바꿈, 라틴 단어는 그대로
+  const hasCJK = /[\u3000-\u9FFF\uAC00-\uD7AF\u30A0-\u30FF\u3040-\u309F]/.test(name)
+  if (!hasCJK) return name
   const mid = Math.ceil(name.length / 2)
   return name.slice(0, mid) + '\n' + name.slice(mid)
 }

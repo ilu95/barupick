@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import i18n from '@/i18n'
+import i18n, { getLocale } from '@/i18n'
 
 // 동기화 대상 localStorage 키
 const SYNC_KEYS = [
@@ -221,7 +221,6 @@ export function useLastSyncTime(): string | null {
   if (diff < 60) return i18n.t('ui:settings.syncJustNow')
   if (diff < 3600) return i18n.t('ui:settings.syncMinutesAgo', { count: Math.floor(diff / 60) })
   if (diff < 86400) return i18n.t('ui:settings.syncHoursAgo', { count: Math.floor(diff / 3600) })
-  const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
-  const dateStr = new Date(ts).toLocaleDateString(locale, { month: 'short', day: 'numeric' })
+  const dateStr = new Date(ts).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })
   return i18n.t('ui:settings.syncDateFormat', { date: dateStr })
 }

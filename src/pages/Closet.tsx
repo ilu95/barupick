@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getLocale } from '@/i18n'
 import { Plus, Calendar, Star, ChevronLeft, ChevronRight, Shirt, Trash2, Wand2, ShoppingBag, BarChart3 } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useModal } from '@/components/ui/Modal'
@@ -107,7 +108,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
     const colorKey = getColor(item)
     const c = colorKey ? COLORS_60[colorKey] : null
     const displayName = item.name || (colorKey ? getColorName(colorKey) : '') || colorKey || ''
-    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' }) : ''
+    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString(getLocale(), { month: 'numeric', day: 'numeric' }) : ''
 
     return (
       <div key={item.id} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-4 py-3 mb-2 shadow-warm-sm">
@@ -300,7 +301,7 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
     if (diff === 0) return t('common.today')
     if (diff === 1) return t('common.yesterday')
     if (diff < 7) return t('common.daysAgoShort', { count: diff })
-    return new Date(ry, rm - 1, rd).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+    return new Date(ry, rm - 1, rd).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })
   })()
 
   const hasPhoto = record.photos && record.photos.length > 0
