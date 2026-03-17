@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Keanggunan Ivy League yang rapi", "keywords": ["Rompi Rajut", "Kemeja Oxford", "Celana Chino", "Loafer"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Gaya kampus klasik East Coast", "keywords": ["Blazer", "Kemeja Button-Down", "Loafer"] },
+    "dandy": { "name": "Dandy", "subtitle": "Keeleganan pria yang berkelas", "keywords": ["Mantel Wol", "Turtleneck", "Chelsea Boots"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "Seni kemewahan yang tenang", "keywords": ["Kasmir", "Korduroy", "Loafer"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "Tradisional Amerika ala Ralph Lauren", "keywords": ["Polo Shirt", "Rajut Kepang", "Chino"] },
+    "minimal": { "name": "Minimal", "subtitle": "Kecanggihan maksimal dengan elemen minimal", "keywords": ["Kaos Polos", "Celana Lebar", "Sneakers Minimal"] },
+    "casual": { "name": "Casual", "subtitle": "Outfit harian yang nyaman namun stylish", "keywords": ["Sweatshirt", "Jeans", "Sneakers"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Kebebasan urban dengan warna pastel alami", "keywords": ["Kemeja Oversized", "Celana Lebar", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "Seni kesederhanaan yang disengaja", "keywords": ["Kaos Polos", "Jeans Lurus", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Perpaduan pakaian olahraga dan gaya sehari-hari", "keywords": ["Celana Jogger", "Hoodie Zip-Up", "Sepatu Lari"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Nuansa vintage dengan denim dan sepatu kerja", "keywords": ["Jaket Denim", "Sepatu Kerja", "Kemeja Kotak"] },
+    "workwear": { "name": "Workwear", "subtitle": "Estetika pakaian kerja yang praktis", "keywords": ["Coverall", "Celana Kerja", "Boots"] },
+    "military": { "name": "Military", "subtitle": "Gaya tangguh terinspirasi seragam militer", "keywords": ["Jaket MA-1", "Celana Cargo", "Combat Boots"] },
+    "british": { "name": "British Heritage", "subtitle": "Gaya outdoor pedesaan Inggris yang berkelas", "keywords": ["Jaket Barbour", "Tweed", "Chelsea Boots"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Brand outdoor yang dipadukan untuk kota", "keywords": ["Fleece", "Sepatu Hiking", "Celana Cargo"] },
+    "street": { "name": "Streetwear", "subtitle": "Kebebasan dari budaya hip-hop dan skate", "keywords": ["Hoodie", "Celana Cargo", "High-Tops"] },
+    "grunge": { "name": "Grunge", "subtitle": "Pemberontakan rock alternatif 90-an", "keywords": ["Flanel Kotak", "Jeans Robek", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporary", "subtitle": "Eksperimen urban, avant-garde modern", "keywords": ["Jaket Terstruktur", "Potongan Asimetris", "Monoton"] },
+    "techwear": { "name": "Techwear", "subtitle": "Futurisme urban dengan kain teknis", "keywords": ["Gore-Tex", "Celana Cargo", "Tech Runners"] },
+    "genderless": { "name": "Genderless", "subtitle": "Gaya bebas melampaui batas gender", "keywords": ["Kemeja Oversized", "Celana Lebar", "Unisex"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Semi-Formal", "description": "Gaya dengan formalitas dan kecanggihan" },
+    "casual": { "name": "Casual", "description": "Tampilan sehari-hari yang nyaman namun stylish" },
+    "work_outdoor": { "name": "Kerja & Outdoor", "description": "Gaya praktis dengan daya tarik tangguh" },
+    "street": { "name": "Street", "description": "Budaya jalanan yang bebas dan penuh kepribadian" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Simpel", "parts": ["Atasan", "Bawahan", "Sepatu"] },
+    "basic": { "name": "Outer + Inner", "parts": ["Outerwear", "Inner", "Bawahan", "Sepatu"] },
+    "mid_inner": { "name": "Lapisan Tengah + Inner", "parts": ["Lapisan Tengah", "Inner", "Bawahan", "Sepatu"] },
+    "scarf_top": { "name": "Syal + Atasan", "parts": ["Syal", "Atasan", "Bawahan", "Sepatu"] },
+    "layered": { "name": "Outer + Tengah + Inner", "parts": ["Outerwear", "Lapisan Tengah", "Inner", "Bawahan", "Sepatu"] },
+    "scarf_basic": { "name": "Syal + Outer + Inner", "parts": ["Syal", "Outerwear", "Inner", "Bawahan", "Sepatu"] },
+    "scarf_mid": { "name": "Syal + Tengah + Inner", "parts": ["Syal", "Lapisan Tengah", "Inner", "Bawahan", "Sepatu"] },
+    "full": { "name": "Layering Lengkap", "parts": ["Syal", "Outerwear", "Lapisan Tengah", "Inner", "Bawahan", "Sepatu"] }
+  }
+}

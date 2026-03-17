@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Elegante Ivy-League-Raffinesse", "keywords": ["Strickweste", "Oxford-Hemd", "Chinohose", "Loafer"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Klassischer Ostküsten-Campus-Stil", "keywords": ["Blazer", "Button-Down-Hemd", "Loafer"] },
+    "dandy": { "name": "Dandy", "subtitle": "Raffinierte gentlemanhafte Eleganz", "keywords": ["Wollmantel", "Rollkragenpullover", "Chelsea Boots"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "Die Kunst des stillen Luxus", "keywords": ["Kaschmir", "Cord", "Loafer"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "Amerikanische Tradition à la Ralph Lauren", "keywords": ["Poloshirt", "Zopfstrick", "Chinos"] },
+    "minimal": { "name": "Minimal", "subtitle": "Maximale Raffinesse mit minimalen Elementen", "keywords": ["Basic-T-Shirt", "Weite Hose", "Minimale Sneaker"] },
+    "casual": { "name": "Casual", "subtitle": "Bequeme und stilvolle Alltagsoutfits", "keywords": ["Sweatshirt", "Jeans", "Sneaker"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Urbane Freiheit mit natürlichen Pastelltönen", "keywords": ["Oversized-Hemd", "Weite Hose", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "Die Kunst der bewussten Schlichtheit", "keywords": ["Basic-T-Shirt", "Straight Jeans", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Wo Sportswear auf Alltagsstil trifft", "keywords": ["Jogginghose", "Zip-Up-Hoodie", "Laufschuhe"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Vintage-Vibes mit Denim und Arbeitsschuhen", "keywords": ["Jeansjacke", "Arbeitsstiefel", "Karohemd"] },
+    "workwear": { "name": "Workwear", "subtitle": "Die Ästhetik praktischer Arbeit", "keywords": ["Overall", "Arbeitshose", "Stiefel"] },
+    "military": { "name": "Military", "subtitle": "Harter Stil inspiriert von Militäruniformen", "keywords": ["MA-1-Jacke", "Cargohose", "Kampfstiefel"] },
+    "british": { "name": "British Heritage", "subtitle": "Vornehmer britischer Landhausstil", "keywords": ["Barbour-Jacke", "Tweed", "Chelsea Boots"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Outdoor-Marken für die Stadt gestylt", "keywords": ["Fleece", "Wanderschuhe", "Cargohose"] },
+    "street": { "name": "Streetwear", "subtitle": "Freiheit aus Hip-Hop- und Skatekultur", "keywords": ["Hoodie", "Cargohose", "High-Tops"] },
+    "grunge": { "name": "Grunge", "subtitle": "90er Alternative-Rock-Rebellion", "keywords": ["Flanellhemd", "Destroyed Jeans", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporary", "subtitle": "Urbane Experimente, moderne Avantgarde", "keywords": ["Strukturierte Jacke", "Asymmetrischer Schnitt", "Monoton"] },
+    "techwear": { "name": "Techwear", "subtitle": "Urbaner Futurismus mit technischen Stoffen", "keywords": ["Gore-Tex", "Cargohose", "Tech-Runner"] },
+    "genderless": { "name": "Genderless", "subtitle": "Freier Stil jenseits von Geschlechtergrenzen", "keywords": ["Oversized-Hemd", "Weite Hose", "Unisex"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Semi-Formal", "description": "Stile mit Formalität und Eleganz" },
+    "casual": { "name": "Casual", "description": "Bequeme und stilvolle Alltagslooks" },
+    "work_outdoor": { "name": "Work & Outdoor", "description": "Praktische Stile mit robustem Charme" },
+    "street": { "name": "Street", "description": "Freigeistige Straßenkultur mit Persönlichkeit" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Einfach", "parts": ["Oberteil", "Unterteil", "Schuhe"] },
+    "basic": { "name": "Jacke + Innen", "parts": ["Oberbekleidung", "Innen", "Unterteil", "Schuhe"] },
+    "mid_inner": { "name": "Mittelschicht + Innen", "parts": ["Mittelschicht", "Innen", "Unterteil", "Schuhe"] },
+    "scarf_top": { "name": "Schal + Oberteil", "parts": ["Schal", "Oberteil", "Unterteil", "Schuhe"] },
+    "layered": { "name": "Jacke + Mittel + Innen", "parts": ["Oberbekleidung", "Mittelschicht", "Innen", "Unterteil", "Schuhe"] },
+    "scarf_basic": { "name": "Schal + Jacke + Innen", "parts": ["Schal", "Oberbekleidung", "Innen", "Unterteil", "Schuhe"] },
+    "scarf_mid": { "name": "Schal + Mittel + Innen", "parts": ["Schal", "Mittelschicht", "Innen", "Unterteil", "Schuhe"] },
+    "full": { "name": "Voll geschichtet", "parts": ["Schal", "Oberbekleidung", "Mittelschicht", "Innen", "Unterteil", "Schuhe"] }
+  }
+}

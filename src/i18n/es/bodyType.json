@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Compara el ancho de tus hombros y caderas:",
+        "options": [
+          "Mis hombros son más anchos",
+          "Mis caderas son más anchas",
+          "Son aproximadamente iguales"
+        ]
+      },
+      {
+        "question": "¿Cómo es tu cintura?",
+        "options": [
+          "Mi cintura está bien definida",
+          "Mi cintura y caderas son rectas",
+          "Mi zona abdominal sobresale"
+        ]
+      },
+      {
+        "question": "¿Qué área te preocupa más?",
+        "options": [
+          "Mis hombros se ven angostos",
+          "Mis hombros se ven anchos",
+          "Mi abdomen se ve prominente",
+          "Mis piernas se ven cortas",
+          "Me veo bajo/a en general",
+          "Sin preocupación particular"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Hacer que los Hombros se Vean Más Anchos",
+        "description": "Usa prendas superiores de colores claros y cuellos barco/mangas abullonadas para enfatizar la línea del hombro."
+      },
+      "shoulder-narrow": {
+        "name": "Hacer que los Hombros se Vean Más Angostos",
+        "description": "Usa prendas superiores oscuras para reducir visualmente los hombros, y prendas inferiores claras para distribuir la atención."
+      },
+      "belly": {
+        "name": "Minimizar la Apariencia del Abdomen",
+        "description": "Usa prendas superiores/capas medias de colores oscuros para disimular visualmente la zona abdominal."
+      },
+      "legs-long": {
+        "name": "Hacer que las Piernas se Vean Más Largas",
+        "description": "Combina los colores del pantalón y el calzado para crear una línea de pierna más larga."
+      },
+      "height-tall": {
+        "name": "Verse Más Alto/a",
+        "description": "Enfatiza líneas verticales con colores sólidos o tonos similares."
+      },
+      "none": {
+        "name": "Solo Armonía de Color",
+        "description": "Enfócate únicamente en la armonía de color sin compensación de tipo de cuerpo."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Triángulo Invertido",
+      "subtitle": "Hombros anchos, caderas angostas",
+      "colorSummary": "Prendas superiores oscuras, inferiores claras",
+      "female": {
+        "desc": "Tienes hombros/pecho amplios y una parte inferior relativamente delgada. Agregar volumen a la parte inferior y suavizar la superior crea equilibrio.",
+        "doList": [
+          "Escote en V profundo, cuello redondo estrecho, cuello en U o escote asimétrico para estrechar hombros",
+          "Colores claros y estampados en la parte inferior para agregar volumen",
+          "Mantener las prendas superiores simples con estilos cruzados o corte imperio",
+          "Faldas en A, plisadas, tulipán o con volumen para enfatizar la parte inferior",
+          "Pantalones de pierna ancha, bootcut o boyfriend para volumen inferior",
+          "Definir la cintura con cinturones o chaquetas cruzadas",
+          "Mangas raglán, kimono o dolman para suavizar la línea del hombro"
+        ],
+        "dontList": [
+          "Hombros descubiertos, cuello barco, cuello cuadrado — hace que los hombros se vean más anchos",
+          "Hombreras, mangas abullonadas, adornos en los hombros",
+          "Prendas superiores claras con inferiores oscuras (contraproducente)",
+          "Jeans ajustados solos (hace que la parte inferior se vea más delgada)",
+          "Rayas horizontales o estampados grandes en la parte superior"
+        ]
+      },
+      "male": {
+        "desc": "Tienes hombros amplios y un tren superior desarrollado. Agregar volumen a la parte inferior mejora el equilibrio.",
+        "doList": [
+          "Cuello en V para reducir visualmente los hombros y enfatizar líneas verticales",
+          "Pantalones de colores claros para enfatizar el volumen inferior",
+          "Colores sólidos oscuros en la parte superior para reducir visualmente los hombros",
+          "Pantalones cargo o anchos para volumen en la parte inferior",
+          "Mangas raglán para suavizar la línea del hombro",
+          "Sacos de un solo botón con solapas delgadas",
+          "Pantalones de corte recto o bootcut"
+        ],
+        "dontList": [
+          "Hombreras, mangas abullonadas",
+          "Prendas superiores claras con inferiores oscuras (contraproducente)",
+          "Cuello barco — hace que los hombros se vean más anchos",
+          "Rayas horizontales en la parte superior",
+          "Jeans ajustados solos (rompe el equilibrio)",
+          "Camisetas boxy, chaquetas gruesas y voluminosas"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Triángulo",
+      "subtitle": "Hombros angostos, caderas anchas",
+      "colorSummary": "Prendas superiores claras, inferiores oscuras",
+      "female": {
+        "desc": "Tu parte inferior es más ancha que la superior. Dirigir la atención a la parte superior y estilizar la inferior mejora las proporciones generales.",
+        "doList": [
+          "Cuello barco, hombros descubiertos, cuello cuadrado para ampliar la línea del hombro",
+          "Colores claros, estampados y adornos en la parte superior para atraer la mirada hacia arriba",
+          "Chaquetas y blazers con hombreras",
+          "Faldas en A, tulipán, circulares o al bies",
+          "Pantalones de cintura alta bootcut, pierna ancha o rectos",
+          "Chaquetas cortas, gabardinas con cinturón",
+          "Vestidos cruzados, vestidos fit-and-flare"
+        ],
+        "dontList": [
+          "Colores claros, estampados o adornos en la parte inferior",
+          "Jeans ajustados solos (enfatiza la línea de cadera)",
+          "Prendas superiores a la cadera (resalta el punto más ancho)",
+          "Rayas horizontales en la parte inferior",
+          "Faldas lápiz ajustadas (enfatiza caderas)"
+        ]
+      },
+      "male": {
+        "desc": "Tu parte inferior es más ancha que la superior. Agregar puntos focales en la parte superior mejora las proporciones generales.",
+        "doList": [
+          "Blazers estructurados y chaquetas con hombreras para ampliar hombros",
+          "Colores claros y estampados en la parte superior para atraer la mirada hacia arriba",
+          "Detalles en el pecho (bolsillos, charreteras, rayas horizontales)",
+          "Colores sólidos oscuros en la parte inferior para estilizar",
+          "Pantalones rectos con frente plano",
+          "Suéteres cuello en V o cuello redondo",
+          "Sacos de un solo botón con solapa mediana"
+        ],
+        "dontList": [
+          "Prendas superiores sin estructura (chaquetas desestructuradas, etc.)",
+          "Pantalones ajustados o prendas inferiores ceñidas",
+          "Prendas inferiores claras con superiores oscuras",
+          "Rayas horizontales en la parte inferior",
+          "Pantalones holgados (desequilibra la proporción)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Rectángulo",
+      "subtitle": "Silueta recta con hombros, cintura y caderas similares",
+      "colorSummary": "Crea proporciones con contraste de color arriba-abajo",
+      "female": {
+        "desc": "Tienes un cuerpo generalmente recto. Crear una cintura o agregar curvas logra un gran look.",
+        "doList": [
+          "Cuello en V, cuello redondo, cuello corazón para líneas verticales y curvas",
+          "Tops cruzados, peplum, blusas con cinturón para definir la cintura",
+          "Vestidos cruzados, fit-and-flare, vestidos con cinturón",
+          "Faldas en A, cruzadas, asimétricas",
+          "Pantalones de cintura alta bootcut o pierna ancha",
+          "Mangas abullonadas, flutter, globo para volumen",
+          "Mezcla de texturas (punto + denim, etc.) en capas",
+          "Cinturón para acentuar la cintura (ancho delgado a mediano)"
+        ],
+        "dontList": [
+          "Corte boxy o suelto solo (oculta aún más las líneas del cuerpo)",
+          "Cuello de tortuga o cuello alto (enfatiza las líneas rectas)",
+          "Mismo color arriba y abajo usado recto (se ve plano)",
+          "Volumen solo en la cintura (rompe el equilibrio general)",
+          "Prendas sin forma usadas solas"
+        ]
+      },
+      "male": {
+        "desc": "Tienes un cuerpo generalmente recto. Crear dimensión a través de capas y contraste de color logra un gran look.",
+        "doList": [
+          "Crear profundidad y dimensión a través de capas",
+          "Acentuar la cintura con cinturones o metiendo la camisa",
+          "Dividir proporciones con contraste de color arriba-abajo",
+          "Mezcla de texturas (punto + denim, etc.)",
+          "Crear líneas verticales con chaquetas y cárdigans",
+          "Camisetas cuello redondo, suéteres cuello en V",
+          "Blazers estructurados (con hombreras)"
+        ],
+        "dontList": [
+          "Mismo color arriba y abajo usado recto (se ve plano)",
+          "Corte boxy solo (oculta aún más las líneas del cuerpo)",
+          "Rayas verticales (enfatiza más las líneas rectas)",
+          "Pantalones sueltos o de pierna ancha",
+          "Prendas superiores o abrigos largos (enfatiza la línea vertical recta)",
+          "Camisas planas y sin forma"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Reloj de Arena",
+      "subtitle": "Hombros y caderas equilibrados con cintura definida",
+      "colorSummary": "¡Usa lo que quieras! Solo acentúa la cintura",
+      "female": {
+        "desc": "Tienes hombros y caderas equilibrados con una cintura bien definida. Resaltar tus líneas naturales se ve increíble.",
+        "doList": [
+          "Cortes que acentúen la cintura (meter la camisa, cinturón, cruzado)",
+          "Cuello en V, cuello redondo, cuello corazón (línea natural del busto)",
+          "Vestidos cruzados, fit-and-flare, vestidos con cinturón",
+          "Falda lápiz (para curvas) o falda amplia (con camisa adentro)",
+          "El corte medio favorece más",
+          "Telas con caída (jersey, seda, mezcla de algodón)",
+          "Sacos de un solo botón, chaquetas cortas, abrigos con cinturón"
+        ],
+        "dontList": [
+          "Cortes oversized demasiado boxy (oculta tus líneas)",
+          "Corte demasiado ceñido en todo el cuerpo (exagera)",
+          "Abrigos largos que ocultan la cintura",
+          "Punto grueso o telas voluminosas (agrega volumen)",
+          "Doble botonadura, cintura baja",
+          "Cinturones gruesos (más de 4.5cm)"
+        ]
+      },
+      "male": {
+        "desc": "Tienes hombros y caderas equilibrados con una cintura bien definida. Resaltar tus líneas se ve increíble.",
+        "doList": [
+          "Cortes que acentúen la cintura (meter la camisa, cinturón)",
+          "El corte medio favorece más",
+          "Colores sólidos con prendas de acento",
+          "Telas que caigan naturalmente sobre el cuerpo",
+          "Tanto cuello en V como cuello redondo funcionan bien",
+          "Camisas slim-fit, pantalones de cintura alta",
+          "Saco de un solo botón (entallado en cintura)",
+          "Cinturón mediano (color contrastante como acento)"
+        ],
+        "dontList": [
+          "Cortes oversized demasiado boxy (oculta tus líneas)",
+          "Corte demasiado ceñido en todo el cuerpo (exagera)",
+          "Pantalones de tiro bajo",
+          "Estampados o colores llamativos",
+          "Chaquetas o abrigos oversized"
+        ]
+      }
+    },
+    "round": {
+      "name": "Redondo",
+      "subtitle": "Silueta redondeada centrada en el abdomen",
+      "colorSummary": "Tonos oscuros generales con énfasis en líneas verticales",
+      "female": {
+        "desc": "Llevas volumen en la sección media. Crear líneas verticales y dirigir la atención al escote, brazos y piernas crea un look más estilizado.",
+        "doList": [
+          "Cuello en V profundo, V amplio, cuello redondo, cuello drapeado para distribuir la atención",
+          "Cintura imperio, tops cruzados, tops con caída fluida",
+          "Vestidos cintura imperio, en A, cruzados, fit-and-flare",
+          "Mangas 3/4 para brazos visualmente más delgados y foco en detalles",
+          "Faldas en A, acampanadas, hasta la rodilla o más",
+          "Pantalones de cintura alta rectos o bootcut",
+          "Cinturón delgado debajo del busto o en cintura alta (en tono similar)",
+          "Sacos de un solo botón, frente abierto, estructurados (largo hasta la cadera+)",
+          "Un sostén bien ajustado es esencial (base para la silueta)"
+        ],
+        "dontList": [
+          "Telas ceñidas o sección media ajustada",
+          "Detalles horizontales o adornos en la cintura",
+          "Sacos de doble botonadura o chaquetas cortas",
+          "Shorts ajustados",
+          "Prendas superiores de colores claros solas (enfatiza el abdomen)",
+          "Rayas horizontales, estampados grandes"
+        ]
+      },
+      "male": {
+        "desc": "Llevas volumen en la sección media. Las líneas verticales y colores oscuros en el centro crean una apariencia más delgada.",
+        "doList": [
+          "Colores oscuros en prendas superiores y capas medias para un centro delgado",
+          "Enfatizar líneas verticales (chaquetas abiertas, cárdigans)",
+          "Outfits monocromáticos o en tonos similares para un look más largo",
+          "Cuello en V o cuello redondo profundo para distribuir la atención",
+          "Chaquetas estructuradas para organizar la silueta",
+          "Sacos de un solo botón, chaquetas abiertas",
+          "Pantalones rectos o ligeramente cónicos"
+        ],
+        "dontList": [
+          "Prendas superiores de colores claros solas (enfatiza el abdomen)",
+          "Rayas horizontales, estampados grandes",
+          "Prendas superiores cortas (expone la cintura)",
+          "Cortes demasiado ajustados",
+          "Sacos de doble botonadura",
+          "Pantalones plisados o de cintura alta",
+          "Cinturones coloridos",
+          "Prendas holgadas u oversized (agrega volumen)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "Compara el ancho de tus hombros y caderas:",
+        "options": ["Mis hombros son más anchos", "Mis caderas son más anchas", "Son aproximadamente iguales"]
+      },
+      {
+        "question": "¿Cómo es tu cintura?",
+        "options": ["Mi cintura está bien definida", "Mi cintura y caderas son rectas", "Mi zona abdominal sobresale"]
+      },
+      {
+        "question": "¿Dónde llevas más volumen — parte superior o inferior?",
+        "options": ["Más volumen en la parte superior", "Más volumen en la parte inferior", "Aproximadamente igual"]
+      },
+      {
+        "question": "¿Qué te preocupa más al elegir ropa?",
+        "options": ["Me preocupa el ajuste superior por hombros anchos", "Las caderas y muslos me molestan", "Mi zona abdominal me molesta", "Me veo plano/a en general", "Sin preocupación particular (bien equilibrado/a)"]
+      },
+      {
+        "question": "¿Qué ajuste de prenda superior te queda mejor?",
+        "options": ["Slim fit (ceñido al cuerpo)", "Regular fit (moderado)", "Oversized fit (holgado)"]
+      }
+    ]
+  }
+}

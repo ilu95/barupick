@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Élégance soignée façon Ivy League", "keywords": ["Pull sans manches", "Chemise Oxford", "Chino", "Mocassins"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Style classique des campus de la côte Est", "keywords": ["Blazer", "Chemise à col boutonné", "Mocassins"] },
+    "dandy": { "name": "Dandy", "subtitle": "Élégance raffinée de gentleman", "keywords": ["Manteau en laine", "Col roulé", "Chelsea boots"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "L'art du luxe discret", "keywords": ["Cachemire", "Velours côtelé", "Mocassins"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "Classique américain à la Ralph Lauren", "keywords": ["Polo", "Tricot torsadé", "Chinos"] },
+    "minimal": { "name": "Minimal", "subtitle": "Sophistication maximale, éléments minimaux", "keywords": ["T-shirt uni", "Pantalon large", "Baskets minimalistes"] },
+    "casual": { "name": "Casual", "subtitle": "Tenues du quotidien confortables et stylées", "keywords": ["Sweatshirt", "Jean", "Baskets"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Liberté urbaine aux tons pastels naturels", "keywords": ["Chemise oversize", "Pantalon large", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "L'art de la simplicité assumée", "keywords": ["T-shirt uni", "Jean droit", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Quand le sportswear rencontre le quotidien", "keywords": ["Jogging", "Sweat zippé", "Chaussures de running"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Ambiance vintage avec denim et boots de travail", "keywords": ["Veste en jean", "Boots de travail", "Chemise à carreaux"] },
+    "workwear": { "name": "Workwear", "subtitle": "L'esthétique du travail manuel", "keywords": ["Bleu de travail", "Pantalon de travail", "Boots"] },
+    "military": { "name": "Militaire", "subtitle": "Style robuste inspiré des uniformes militaires", "keywords": ["Blouson MA-1", "Pantalon cargo", "Rangers"] },
+    "british": { "name": "British Heritage", "subtitle": "L'élégance distinguée de la campagne britannique", "keywords": ["Veste Barbour", "Tweed", "Chelsea boots"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Marques outdoor stylées pour la ville", "keywords": ["Polaire", "Chaussures de randonnée", "Pantalon cargo"] },
+    "street": { "name": "Streetwear", "subtitle": "Liberté issue du hip-hop et du skate", "keywords": ["Sweat à capuche", "Pantalon cargo", "Montantes"] },
+    "grunge": { "name": "Grunge", "subtitle": "Rébellion rock alternatif des années 90", "keywords": ["Flanelle à carreaux", "Jean déchiré", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporain", "subtitle": "Expérimentation urbaine, avant-garde moderne", "keywords": ["Veste structurée", "Coupe asymétrique", "Monotone"] },
+    "techwear": { "name": "Techwear", "subtitle": "Futurisme urbain en tissus techniques", "keywords": ["Gore-Tex", "Pantalon cargo", "Baskets techniques"] },
+    "genderless": { "name": "Genderless", "subtitle": "Style libre au-delà des genres", "keywords": ["Chemise oversize", "Pantalon large", "Unisexe"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Semi-formel", "description": "Styles empreints de formalité et de sophistication" },
+    "casual": { "name": "Casual", "description": "Looks du quotidien confortables et stylés" },
+    "work_outdoor": { "name": "Travail & Outdoor", "description": "Styles pratiques au charme robuste" },
+    "street": { "name": "Street", "description": "Culture de rue libre et pleine de personnalité" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Simple", "parts": ["Haut", "Bas", "Chaussures"] },
+    "basic": { "name": "Vêtement d'extérieur + Intérieur", "parts": ["Vêtement d'extérieur", "Intérieur", "Bas", "Chaussures"] },
+    "mid_inner": { "name": "Couche intermédiaire + Intérieur", "parts": ["Couche intermédiaire", "Intérieur", "Bas", "Chaussures"] },
+    "scarf_top": { "name": "Écharpe + Haut", "parts": ["Écharpe", "Haut", "Bas", "Chaussures"] },
+    "layered": { "name": "Extérieur + Intermédiaire + Intérieur", "parts": ["Vêtement d'extérieur", "Couche intermédiaire", "Intérieur", "Bas", "Chaussures"] },
+    "scarf_basic": { "name": "Écharpe + Extérieur + Intérieur", "parts": ["Écharpe", "Vêtement d'extérieur", "Intérieur", "Bas", "Chaussures"] },
+    "scarf_mid": { "name": "Écharpe + Intermédiaire + Intérieur", "parts": ["Écharpe", "Couche intermédiaire", "Intérieur", "Bas", "Chaussures"] },
+    "full": { "name": "Superposition complète", "parts": ["Écharpe", "Vêtement d'extérieur", "Couche intermédiaire", "Intérieur", "Bas", "Chaussures"] }
+  }
+}

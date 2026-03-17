@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe } from 'lucide-react'
+import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useAutoSync, useLastSyncTime } from '@/hooks/useAutoSync'
@@ -8,12 +8,7 @@ import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { useTranslation } from 'react-i18next'
 
-const LANGUAGES = [
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
-]
+import { SUPPORTED_LANGUAGES } from '@/i18n'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -41,11 +36,6 @@ export default function Settings() {
     const next = !hideCounts
     setHideCounts(next)
     localStorage.setItem('sp_hide_counts', next ? '1' : '0')
-  }
-
-  const changeLanguage = (code: string) => {
-    i18n.changeLanguage(code)
-    localStorage.setItem('sp_language', code)
   }
 
   const syncData = async () => {
@@ -96,30 +86,20 @@ export default function Settings() {
       <SectionHeader icon={<Eye size={14} />} title={t('settings.display')} />
 
       {/* 언어 선택 */}
-      <div className="flex items-center justify-between py-3.5 border-b border-warm-300">
-        <div className="flex items-center gap-2.5">
-          <span className="text-warm-600"><Globe size={18} /></span>
-          <div>
-            <span className="text-[15px] text-warm-900 dark:text-warm-100">{t('settings.language')}</span>
-            <div className="text-[11px] text-warm-500">{t('settings.languageDesc')}</div>
-          </div>
+      <button
+        onClick={() => navigate('/profile/settings/language')}
+        className="w-full flex items-center gap-2.5 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 dark:active:bg-warm-700/50 rounded-lg transition-colors"
+      >
+        <Globe size={18} className="text-warm-600" />
+        <div className="flex-1">
+          <span className="text-[15px] text-warm-900 dark:text-warm-100">{t('settings.language')}</span>
+          <div className="text-[11px] text-warm-500">{t('settings.languageDesc')}</div>
         </div>
-        <div className="flex gap-1">
-          {LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              onClick={() => changeLanguage(lang.code)}
-              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                i18n.language === lang.code
-                  ? 'bg-terra-500 text-white'
-                  : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-300 active:scale-95'
-              }`}
-            >
-              {lang.flag} {lang.label}
-            </button>
-          ))}
-        </div>
-      </div>
+        <span className="text-sm text-warm-500 mr-1">
+          {SUPPORTED_LANGUAGES.find(l => l.code === i18n.language)?.flag} {SUPPORTED_LANGUAGES.find(l => l.code === i18n.language)?.nativeName}
+        </span>
+        <ChevronRight size={16} className="text-warm-400" />
+      </button>
 
       <ToggleItem
         icon={<Moon size={18} />}

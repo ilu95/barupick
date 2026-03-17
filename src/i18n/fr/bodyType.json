@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Comparez la largeur de vos épaules et de vos hanches :",
+        "options": [
+          "Mes épaules sont plus larges",
+          "Mes hanches sont plus larges",
+          "C'est à peu près pareil"
+        ]
+      },
+      {
+        "question": "Comment est votre tour de taille ?",
+        "options": [
+          "Ma taille est bien marquée",
+          "Ma taille et mes hanches sont alignées",
+          "Mon ventre est proéminent"
+        ]
+      },
+      {
+        "question": "Quelle zone vous préoccupe le plus ?",
+        "options": [
+          "Mes épaules ont l'air étroites",
+          "Mes épaules ont l'air larges",
+          "Mon ventre est visible",
+          "Mes jambes ont l'air courtes",
+          "Je parais petit(e) dans l'ensemble",
+          "Pas de préoccupation particulière"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Élargir les épaules",
+        "description": "Utilisez des hauts clairs et des encolures bateau/manches bouffantes pour souligner la ligne d'épaules."
+      },
+      "shoulder-narrow": {
+        "name": "Affiner les épaules",
+        "description": "Utilisez des hauts foncés pour réduire visuellement les épaules, et des bas clairs pour répartir l'attention."
+      },
+      "belly": {
+        "name": "Minimiser le ventre",
+        "description": "Utilisez des hauts/couches intermédiaires foncés pour camoufler visuellement la zone du ventre."
+      },
+      "legs-long": {
+        "name": "Allonger les jambes",
+        "description": "Assortissez les couleurs du bas et des chaussures pour créer une ligne de jambe plus longue."
+      },
+      "height-tall": {
+        "name": "Paraître plus grand(e)",
+        "description": "Accentuez les lignes verticales avec des couleurs unies ou des tons similaires."
+      },
+      "none": {
+        "name": "Harmonie des couleurs uniquement",
+        "description": "Se concentrer uniquement sur l'harmonie des couleurs sans compensation morphologique."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Triangle inversé",
+      "subtitle": "Épaules larges, hanches étroites",
+      "colorSummary": "Hauts foncés, bas clairs",
+      "female": {
+        "desc": "Vous avez des épaules/poitrine larges et un bas du corps relativement fin. Ajouter du volume en bas et adoucir le haut du corps crée un équilibre.",
+        "doList": [
+          "Col en V profond, encolure étroite arrondie, col en U ou encolure asymétrique pour affiner les épaules",
+          "Couleurs claires et motifs sur le bas pour ajouter du volume en bas",
+          "Garder les hauts simples avec des styles portefeuille ou taille empire",
+          "Jupes évasées, plissées, tulipe ou volumineuses pour mettre en valeur le bas",
+          "Pantalons larges, bootcut ou coupe boyfriend pour le volume en bas",
+          "Marquer la taille avec des ceintures ou des vestes portefeuille",
+          "Manches raglan, kimono ou chauve-souris pour adoucir la ligne d'épaules"
+        ],
+        "dontList": [
+          "Épaules dénudées, col bateau, col carré — élargit les épaules",
+          "Épaulettes, manches bouffantes, ornements aux épaules",
+          "Hauts clairs avec bas foncés (contre-productif)",
+          "Jean skinny seul (amincit davantage le bas du corps)",
+          "Rayures horizontales ou grands motifs sur le haut"
+        ]
+      },
+      "male": {
+        "desc": "Vous avez des épaules larges et un haut du corps développé. Ajouter du volume en bas améliore l'équilibre.",
+        "doList": [
+          "Col en V pour réduire visuellement les épaules et accentuer les lignes verticales",
+          "Bas de couleur claire pour mettre en valeur le volume du bas du corps",
+          "Couleurs unies foncées sur le haut pour réduire visuellement les épaules",
+          "Pantalon cargo ou pantalon large pour le volume en bas",
+          "Manches raglan pour adoucir la ligne d'épaules",
+          "Vestes à boutonnage simple, revers fins",
+          "Pantalon droit ou bootcut"
+        ],
+        "dontList": [
+          "Épaules rembourrées, manches bouffantes",
+          "Hauts clairs avec bas foncés (contre-productif)",
+          "Col bateau — élargit les épaules",
+          "Rayures horizontales sur le haut",
+          "Jean skinny seul (rompt l'équilibre)",
+          "T-shirts boxy, vestes volumineuses épaisses"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Triangle",
+      "subtitle": "Épaules étroites, hanches larges",
+      "colorSummary": "Hauts clairs, bas foncés",
+      "female": {
+        "desc": "Votre bas du corps est plus large que le haut. Attirer l'attention vers le haut et affiner le bas améliore les proportions.",
+        "doList": [
+          "Col bateau, épaules dénudées, col carré pour élargir la ligne d'épaules",
+          "Couleurs claires, motifs et ornements sur le haut pour attirer le regard vers le haut",
+          "Vestes et blazers avec épaulettes",
+          "Jupes évasées, tulipe, corolle, coupées en biais",
+          "Pantalon taille haute bootcut, large ou droit",
+          "Vestes courtes, trench avec ceinture à la taille",
+          "Robes portefeuille, robes ajustées-évasées"
+        ],
+        "dontList": [
+          "Couleurs claires, motifs ou ornements sur le bas",
+          "Jean skinny seul (accentue la ligne des hanches)",
+          "Hauts mi-longs (met en valeur le point le plus large)",
+          "Rayures horizontales sur le bas",
+          "Jupes crayon ajustées (accentue les hanches)"
+        ]
+      },
+      "male": {
+        "desc": "Votre bas du corps est plus large que le haut. Ajouter des points d'attention sur le haut améliore les proportions.",
+        "doList": [
+          "Blazers structurés et vestes avec épaulettes pour élargir les épaules",
+          "Couleurs claires et motifs sur le haut pour attirer le regard vers le haut",
+          "Détails sur la poitrine (poches, épaulettes, rayures horizontales)",
+          "Couleurs unies foncées sur le bas pour affiner",
+          "Pantalon droit, devant plat",
+          "Pulls col V ou col rond",
+          "Vestes boutonnage simple, revers moyens"
+        ],
+        "dontList": [
+          "Hauts déstructurés (vestes déconstruites, etc.)",
+          "Pantalons skinny ou bas ajustés",
+          "Bas clairs avec hauts foncés",
+          "Rayures horizontales sur le bas",
+          "Pantalons amples (déséquilibre les proportions)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Rectangle",
+      "subtitle": "Silhouette droite avec épaules, taille et hanches similaires",
+      "colorSummary": "Créer des proportions avec le contraste de couleur haut-bas",
+      "female": {
+        "desc": "Vous avez une silhouette globalement droite. Créer une taille ou ajouter des courbes donne un superbe résultat.",
+        "doList": [
+          "Col en V, col arrondi, col cœur pour des lignes verticales et des courbes",
+          "Hauts portefeuille, péplum, blouses ceinturées pour marquer la taille",
+          "Robes portefeuille, ajustées-évasées, ceinturées",
+          "Jupes évasées, portefeuille, asymétriques",
+          "Pantalon taille haute bootcut ou large",
+          "Manches bouffantes, volantées, ballon pour le volume",
+          "Superposition de textures (maille + denim, etc.)",
+          "Ceinture pour souligner la taille (fine à moyenne)"
+        ],
+        "dontList": [
+          "Coupe boxy ou ample seule (cache encore plus les formes)",
+          "Col roulé ou col montant (accentue les lignes droites)",
+          "Haut et bas de même couleur portés droits (effet plat)",
+          "Volume uniquement à la taille (rompt l'équilibre général)",
+          "Vêtements informes portés seuls"
+        ]
+      },
+      "male": {
+        "desc": "Vous avez une silhouette globalement droite. Créer de la profondeur par la superposition et le contraste de couleurs donne un superbe résultat.",
+        "doList": [
+          "Créer profondeur et dimension par la superposition",
+          "Souligner la taille avec ceintures ou en rentrant le haut",
+          "Diviser les proportions avec le contraste de couleur haut-bas",
+          "Mélange de textures (maille + denim, etc.)",
+          "Créer des lignes verticales avec vestes et cardigans",
+          "T-shirts col rond, pulls col V",
+          "Blazers structurés (avec épaulettes)"
+        ],
+        "dontList": [
+          "Haut et bas de même couleur portés droits (effet plat)",
+          "Coupe boxy seule (cache encore plus les formes)",
+          "Rayures verticales (accentue encore les lignes droites)",
+          "Pantalons amples ou larges",
+          "Hauts ou manteaux longs (accentue la ligne verticale droite)",
+          "Chemises plates et informes"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Sablier",
+      "subtitle": "Épaules et hanches équilibrées avec une taille marquée",
+      "colorSummary": "Tout vous va ! Soulignez simplement la taille",
+      "female": {
+        "desc": "Vous avez des épaules et hanches équilibrées avec une taille bien marquée. Mettre en valeur vos lignes naturelles est superbe.",
+        "doList": [
+          "Coupes qui soulignent la taille (rentrer le haut, ceinture, portefeuille)",
+          "Col en V, col arrondi, col cœur (ligne de buste naturelle)",
+          "Robes portefeuille, ajustées-évasées, ceinturées",
+          "Jupe crayon (pour les courbes) ou jupe ample (avec le haut rentré)",
+          "Coupe ajustée modérée pour un effet optimal",
+          "Tissus fluides (jersey, soie, mélange coton)",
+          "Vestes boutonnage simple, vestes courtes, manteaux ceinturés"
+        ],
+        "dontList": [
+          "Coupes oversize trop amples (cache vos formes)",
+          "Ajustement trop serré partout (en fait trop)",
+          "Vêtements d'extérieur longs qui cachent la taille",
+          "Mailles épaisses ou tissus volumineux (ajoute du volume)",
+          "Boutonnage double, taille basse",
+          "Ceintures épaisses (plus de 4,5 cm)"
+        ]
+      },
+      "male": {
+        "desc": "Vous avez des épaules et hanches équilibrées avec une taille bien marquée. Mettre en valeur vos lignes est superbe.",
+        "doList": [
+          "Coupes qui soulignent la taille (rentrer le haut, ceinture)",
+          "Coupe ajustée modérée pour un effet optimal",
+          "Couleurs unies avec pièces d'accent",
+          "Tissus qui tombent naturellement sur le corps",
+          "Col en V et col rond fonctionnent tous les deux",
+          "Chemises ajustées, pantalon taille haute",
+          "Veste boutonnage simple (cintrée à la taille)",
+          "Ceinture moyenne (couleur contrastée pour l'accent)"
+        ],
+        "dontList": [
+          "Coupes oversize trop amples (cache vos formes)",
+          "Ajustement trop serré partout (en fait trop)",
+          "Pantalon taille basse",
+          "Motifs ou couleurs trop voyants",
+          "Vestes ou manteaux oversize"
+        ]
+      }
+    },
+    "round": {
+      "name": "Rond",
+      "subtitle": "Silhouette arrondie centrée sur le ventre",
+      "colorSummary": "Tons foncés dans l'ensemble avec accent sur les lignes verticales",
+      "female": {
+        "desc": "Vous portez du volume au niveau du ventre. Créer des lignes verticales et attirer l'attention vers l'encolure, les bras et les jambes affine la silhouette.",
+        "doList": [
+          "Col en V profond, large V, col arrondi, col bénitier pour répartir l'attention",
+          "Hauts taille empire, portefeuille, drapés fluides",
+          "Robes taille empire, évasées, portefeuille, ajustées-évasées",
+          "Manches 3/4 pour des bras visuellement plus fins et un point de détail",
+          "Jupes évasées, évasées, longueur genou ou plus",
+          "Pantalon taille haute droit ou bootcut",
+          "Ceinture fine sous la poitrine ou à la taille haute (ton sur ton)",
+          "Vestes boutonnage simple, ouvertes, structurées (longueur hanches ou plus)",
+          "Un soutien-gorge bien ajusté est essentiel (base de la silhouette)"
+        ],
+        "dontList": [
+          "Tissus moulants ou serrés au niveau du ventre",
+          "Détails horizontaux ou ornements à la taille",
+          "Vestes à boutonnage double ou courtes",
+          "Shorts ajustés",
+          "Hauts clairs seuls (accentue le ventre)",
+          "Rayures horizontales, grands motifs"
+        ]
+      },
+      "male": {
+        "desc": "Vous portez du volume au niveau du ventre. Les lignes verticales et les couleurs foncées au centre affinent la silhouette.",
+        "doList": [
+          "Couleurs foncées sur les hauts et couches intermédiaires pour un centre affiné",
+          "Accentuer les lignes verticales (vestes ouvertes, cardigans)",
+          "Tenues monochromes ou dans des tons similaires pour un effet allongeant",
+          "Col en V ou col rond profond pour répartir l'attention",
+          "Vestes structurées pour organiser la silhouette",
+          "Vestes boutonnage simple, ouvertes",
+          "Pantalon droit ou légèrement fuselé"
+        ],
+        "dontList": [
+          "Hauts clairs seuls (accentue le ventre)",
+          "Rayures horizontales, grands motifs",
+          "Hauts courts (expose la taille)",
+          "Coupes trop ajustées",
+          "Vestes à boutonnage double",
+          "Pantalon à pinces ou taille haute",
+          "Ceintures colorées",
+          "Coupes amples ou oversize (ajoute du volume)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "Comparez la largeur de vos épaules et de vos hanches :",
+        "options": ["Mes épaules sont plus larges", "Mes hanches sont plus larges", "C'est à peu près pareil"]
+      },
+      {
+        "question": "Comment est votre tour de taille ?",
+        "options": ["Ma taille est bien marquée", "Ma taille et mes hanches sont alignées", "Mon ventre est proéminent"]
+      },
+      {
+        "question": "Où portez-vous plus de volume — haut ou bas du corps ?",
+        "options": ["Plus de volume en haut", "Plus de volume en bas", "À peu près pareil"]
+      },
+      {
+        "question": "Qu'est-ce qui vous préoccupe le plus en choisissant vos vêtements ?",
+        "options": ["Le haut m'inquiète à cause de mes épaules larges", "Mes hanches et cuisses me gênent", "Mon ventre me gêne", "J'ai l'air plat(e) dans l'ensemble", "Pas de préoccupation particulière (bien proportionné(e))"]
+      },
+      {
+        "question": "Quelle coupe de haut vous convient le mieux ?",
+        "options": ["Coupe ajustée (près du corps)", "Coupe classique (modérée)", "Coupe oversize (ample)"]
+      }
+    ]
+  }
+}

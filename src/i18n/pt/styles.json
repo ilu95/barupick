@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Sofisticação polida estilo Ivy League", "keywords": ["Colete de Tricô", "Camisa Oxford", "Calça Chino", "Mocassins"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Estilo clássico de campus da costa leste", "keywords": ["Blazer", "Camisa com Botão", "Mocassins"] },
+    "dandy": { "name": "Dandy", "subtitle": "Elegância refinada de cavalheiro", "keywords": ["Casaco de Lã", "Gola Alta", "Botas Chelsea"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "A arte do luxo discreto", "keywords": ["Caxemira", "Veludo Cotelê", "Mocassins"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "Tradicional americano à la Ralph Lauren", "keywords": ["Polo", "Tricô Trançado", "Chinos"] },
+    "minimal": { "name": "Minimal", "subtitle": "Máxima sofisticação com elementos mínimos", "keywords": ["Camiseta Lisa", "Calça Wide", "Tênis Minimalista"] },
+    "casual": { "name": "Casual", "subtitle": "Looks confortáveis e estilosos para o dia a dia", "keywords": ["Moletom", "Jeans", "Tênis"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Liberdade urbana com tons pastéis naturais", "keywords": ["Camisa Oversized", "Calça Wide", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "A arte da simplicidade intencional", "keywords": ["Camiseta Lisa", "Jeans Reto", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Onde o esportivo encontra o estilo do dia a dia", "keywords": ["Calça Jogger", "Moletom com Zíper", "Tênis de Corrida"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Vibes vintage com jeans e botas de trabalho", "keywords": ["Jaqueta Jeans", "Botas de Trabalho", "Camisa Xadrez"] },
+    "workwear": { "name": "Workwear", "subtitle": "A estética do trabalho prático", "keywords": ["Macacão", "Calça de Trabalho", "Botas"] },
+    "military": { "name": "Military", "subtitle": "Estilo robusto inspirado em uniformes militares", "keywords": ["Jaqueta MA-1", "Calça Cargo", "Coturnos"] },
+    "british": { "name": "British Heritage", "subtitle": "Distinto estilo outdoor britânico do campo", "keywords": ["Jaqueta Barbour", "Tweed", "Botas Chelsea"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Marcas outdoor estilizadas para a cidade", "keywords": ["Fleece", "Botas de Trilha", "Calça Cargo"] },
+    "street": { "name": "Streetwear", "subtitle": "Liberdade da cultura hip-hop e skate", "keywords": ["Moletom", "Calça Cargo", "Tênis Cano Alto"] },
+    "grunge": { "name": "Grunge", "subtitle": "Rebeldia do rock alternativo dos anos 90", "keywords": ["Flanela Xadrez", "Jeans Destroyed", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporary", "subtitle": "Experimentação urbana, vanguarda moderna", "keywords": ["Jaqueta Estruturada", "Corte Assimétrico", "Monotom"] },
+    "techwear": { "name": "Techwear", "subtitle": "Futurismo urbano com tecidos técnicos", "keywords": ["Gore-Tex", "Calça Cargo", "Tênis Tech"] },
+    "genderless": { "name": "Genderless", "subtitle": "Estilo livre além das fronteiras de gênero", "keywords": ["Camisa Oversized", "Calça Wide", "Unissex"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Semi-Formal", "description": "Estilos com formalidade e sofisticação" },
+    "casual": { "name": "Casual", "description": "Looks confortáveis e estilosos para o dia a dia" },
+    "work_outdoor": { "name": "Trabalho & Outdoor", "description": "Estilos práticos com apelo rústico" },
+    "street": { "name": "Street", "description": "Cultura de rua com liberdade e personalidade" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Simples", "parts": ["Top", "Bottom", "Calçado"] },
+    "basic": { "name": "Casaco + Interior", "parts": ["Casaco", "Interior", "Bottom", "Calçado"] },
+    "mid_inner": { "name": "Camada Média + Interior", "parts": ["Camada Média", "Interior", "Bottom", "Calçado"] },
+    "scarf_top": { "name": "Cachecol + Top", "parts": ["Cachecol", "Top", "Bottom", "Calçado"] },
+    "layered": { "name": "Casaco + Média + Interior", "parts": ["Casaco", "Camada Média", "Interior", "Bottom", "Calçado"] },
+    "scarf_basic": { "name": "Cachecol + Casaco + Interior", "parts": ["Cachecol", "Casaco", "Interior", "Bottom", "Calçado"] },
+    "scarf_mid": { "name": "Cachecol + Média + Interior", "parts": ["Cachecol", "Camada Média", "Interior", "Bottom", "Calçado"] },
+    "full": { "name": "Camadas Completas", "parts": ["Cachecol", "Casaco", "Camada Média", "Interior", "Bottom", "Calçado"] }
+  }
+}

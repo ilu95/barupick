@@ -1,0 +1,124 @@
+{
+  "seasons": {
+    "spring": { "name": "Frühling Warm" },
+    "summer": { "name": "Sommer Kühl" },
+    "autumn": { "name": "Herbst Warm" },
+    "winter": { "name": "Winter Kühl" }
+  },
+  "types": {
+    "spring_light": {
+      "name": "Frühling Hell",
+      "description": "Helle, klare pastellige Warmtöne stehen dir am besten. Wir empfehlen leichte und strahlende Farben.",
+      "keywords": ["hell", "klar", "leicht", "strahlend"]
+    },
+    "spring_bright": {
+      "name": "Frühling Leuchtend",
+      "description": "Lebhafte, kräftige Warmtöne stehen dir am besten. Wir empfehlen lebendige, energiegeladene Farben.",
+      "keywords": ["lebhaft", "kräftig", "lebendig", "energiegeladen"]
+    },
+    "spring_true": {
+      "name": "Frühling Pur",
+      "description": "Warme, klare Mitteltöne stehen dir am besten. Wir empfehlen natürliche, gesund wirkende Farben.",
+      "keywords": ["warm", "klar", "natürlich", "gesund"]
+    },
+    "summer_light": {
+      "name": "Sommer Hell",
+      "description": "Helle, sanfte pastellige Kühltöne stehen dir. Wir empfehlen elegante und feminine Farben.",
+      "keywords": ["sanft", "zart", "elegant", "feminin"]
+    },
+    "summer_muted": {
+      "name": "Sommer Gedämpft",
+      "description": "Ruhige, gräuliche Töne stehen dir. Wir empfehlen raffinierte und würdevolle Farben.",
+      "keywords": ["ruhig", "gräulich", "raffiniert", "würdevoll"]
+    },
+    "summer_true": {
+      "name": "Sommer Pur",
+      "description": "Kühle, weiche mittlere Kühltöne stehen dir. Wir empfehlen erfrischende und klare Farben.",
+      "keywords": ["kühl", "weich", "erfrischend", "klar"]
+    },
+    "autumn_soft": {
+      "name": "Herbst Sanft",
+      "description": "Weiche, warme gedämpfte Töne stehen dir. Wir empfehlen natürliche und behagliche Farben.",
+      "keywords": ["weich", "gedämpft", "natürlich", "behaglich"]
+    },
+    "autumn_deep": {
+      "name": "Herbst Tief",
+      "description": "Tiefe, satte Erdtöne stehen dir. Wir empfehlen luxuriöse und tiefgründige Farben.",
+      "keywords": ["tief", "satt", "luxuriös", "tiefgründig"]
+    },
+    "autumn_true": {
+      "name": "Herbst Pur",
+      "description": "Warme, natürliche Erdtöne stehen dir. Wir empfehlen klassische und beständige Farben.",
+      "keywords": ["warm", "natürlich", "klassisch", "beständig"]
+    },
+    "winter_bright": {
+      "name": "Winter Leuchtend",
+      "description": "Lebhafte, kühle kräftige Töne stehen dir. Wir empfehlen intensive, auffällige Farben.",
+      "keywords": ["lebhaft", "kräftig", "intensiv", "auffällig"]
+    },
+    "winter_deep": {
+      "name": "Winter Tief",
+      "description": "Tiefe, dunkle Töne stehen dir. Wir empfehlen schicke und raffinierte Farben.",
+      "keywords": ["tief", "schick", "raffiniert", "modern"]
+    },
+    "winter_true": {
+      "name": "Winter Pur",
+      "description": "Kühle, lebhafte kontrastreiche Farben stehen dir. Wir empfehlen moderne und urbane Farben.",
+      "keywords": ["Kontrast", "lebhaft", "modern", "urban"]
+    }
+  },
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Welche Farbe haben die Adern an deinem Handgelenk-Innenseite?",
+        "options": ["Eher grünlich", "Eher blau/lila", "Beides sieht ähnlich aus"]
+      },
+      {
+        "question": "Wie reagiert deine Haut auf Sonnenlicht?",
+        "options": ["Verbrennt leicht und wird rot", "Bräunt leicht und wird braun", "Bräunt mäßig"]
+      },
+      {
+        "question": "Welches Accessoire steht dir besser — Gold oder Silber?",
+        "options": ["Gold sieht besser aus", "Silber sieht besser aus", "Beides sieht ähnlich aus"]
+      },
+      {
+        "question": "Wenn du Weiß trägst, welcher Farbton steht dir besser?",
+        "options": ["Elfenbein/Cremeweiß steht mir besser", "Reines/Blaustichiges Weiß steht mir besser", "Beides geht gut"]
+      },
+      {
+        "question": "Welche Farbe haben deine Augen und Haare?",
+        "options": ["Hellbraun/hellere Nuancen", "Mittelbraune Töne", "Dunkelbraun/Schwarz"]
+      },
+      {
+        "question": "Was ist dein Gesamteindruck?",
+        "options": ["Hell und strahlend", "Sanft und dezent", "Ruhig und tiefgründig", "Lebendig und klar"]
+      },
+      {
+        "question": "Was steht dir besser — kräftige Grundfarben oder ruhige gedämpfte Farben?",
+        "options": ["Kräftige, auffällige Farben stehen mir", "Ruhige, gedämpfte Farben stehen mir", "Beides ist ähnlich"]
+      },
+      {
+        "question": "Wie stark ist der Kontrast in deinen Gesichtszügen? (zwischen Augen, Haaren und Haut)",
+        "options": ["Geringer Kontrast — Züge verschmelzen", "Mittlerer Kontrast", "Hoher Kontrast — Züge sind markant"]
+      }
+    ],
+    "results": {
+      "spring_warm": {
+        "name": "Frühling Warm",
+        "description": "Warme, helle Farben stehen dir am besten. Wir empfehlen strahlende Farben wie Pfirsich, Koralle, helles Orange und zartes Gelb."
+      },
+      "summer_cool": {
+        "name": "Sommer Kühl",
+        "description": "Kühle, sanfte Farben stehen dir am besten. Wir empfehlen pastellige Kühltöne wie Lavendel, Rosé, Himmelblau und Mint."
+      },
+      "autumn_warm": {
+        "name": "Herbst Warm",
+        "description": "Warme, tiefe Farben stehen dir am besten. Wir empfehlen herbstliche Farben wie Camel, Burgunder, Oliv und Senfgelb."
+      },
+      "winter_cool": {
+        "name": "Winter Kühl",
+        "description": "Kühle, lebhafte Farben stehen dir am besten. Wir empfehlen kontrastreiche Farben wie Schwarz, Weiß, Marineblau und Königsblau."
+      }
+    }
+  }
+}

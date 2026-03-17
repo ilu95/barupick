@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Vergleiche deine Schulter- und Hüftbreite:",
+        "options": [
+          "Meine Schultern sind breiter",
+          "Meine Hüften sind breiter",
+          "Sie sind ungefähr gleich"
+        ]
+      },
+      {
+        "question": "Wie ist deine Taille?",
+        "options": [
+          "Meine Taille ist gut definiert",
+          "Meine Taille und Hüften sind gerade",
+          "Mein Bauchbereich steht hervor"
+        ]
+      },
+      {
+        "question": "Welcher Bereich stört dich am meisten?",
+        "options": [
+          "Meine Schultern wirken schmal",
+          "Meine Schultern wirken breit",
+          "Mein Bauch ist auffällig",
+          "Meine Beine wirken kurz",
+          "Ich wirke insgesamt klein",
+          "Keine besonderen Bedenken"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Schultern breiter wirken lassen",
+        "description": "Verwende helle Oberteile und U-Boot-/Puffärmel, um die Schulterlinie zu betonen."
+      },
+      "shoulder-narrow": {
+        "name": "Schultern schmaler wirken lassen",
+        "description": "Verwende dunkle Oberteile, um die Schultern optisch zu reduzieren, und helle Unterteile, um die Aufmerksamkeit zu verteilen."
+      },
+      "belly": {
+        "name": "Bauch kaschieren",
+        "description": "Verwende dunkle Oberteile/Mittelschichten, um den Bauchbereich optisch zu verbergen."
+      },
+      "legs-long": {
+        "name": "Beine länger wirken lassen",
+        "description": "Stimme Hosen- und Schuhfarben ab, um eine längere Beinlinie zu erzeugen."
+      },
+      "height-tall": {
+        "name": "Größer wirken",
+        "description": "Betone vertikale Linien mit einfarbigen oder ähnlichen Tönen."
+      },
+      "none": {
+        "name": "Nur Farbharmonie",
+        "description": "Konzentriere dich rein auf Farbharmonie ohne Körperformkompensation."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Umgekehrtes Dreieck",
+      "subtitle": "Breite Schultern, schmale Hüften",
+      "colorSummary": "Dunkle Oberteile, helle Unterteile",
+      "female": {
+        "desc": "Du hast breite Schultern/Brust und einen relativ schlanken Unterkörper. Mehr Volumen im Unterkörper und ein weicherer Oberkörper schaffen Balance.",
+        "doList": [
+          "Tiefer V-Ausschnitt, schmaler Rundhals, U-Ausschnitt oder asymmetrischer Ausschnitt für schmalere Schultern",
+          "Helle Farben und Muster am Unterteil für mehr Volumen im Unterkörper",
+          "Oberteile schlicht halten mit Wickel- oder Empire-Schnitten",
+          "A-Linie, Falten-, Tulpen- oder voluminöse Röcke für Betonung des Unterkörpers",
+          "Weite Hosen, Bootcut oder Boyfriend-Schnitt für mehr Volumen im Unterkörper",
+          "Taille mit Gürteln oder Wickeljacken betonen",
+          "Raglan-, Kimono- oder Fledermausärmel, um die Schulterlinie zu mildern"
+        ],
+        "dontList": [
+          "Schulterfrei, U-Boot-Ausschnitt, eckiger Ausschnitt — lässt Schultern breiter wirken",
+          "Schulterpolster, Puffärmel, Schulterdetails",
+          "Helle Oberteile mit dunklen Unterteilen (kontraproduktiv)",
+          "Skinny Jeans allein (lässt den Unterkörper schmaler wirken)",
+          "Horizontale Streifen oder große Muster auf Oberteilen"
+        ]
+      },
+      "male": {
+        "desc": "Du hast breite Schultern und einen kräftigen Oberkörper. Mehr Volumen im Unterkörper verbessert die Balance.",
+        "doList": [
+          "V-Ausschnitt, um Schultern optisch zu reduzieren und vertikale Linien zu betonen",
+          "Helle Unterteile, um das Volumen im Unterkörper zu betonen",
+          "Dunkle einfarbige Oberteile, um die Schultern optisch zu reduzieren",
+          "Cargohosen oder weite Hosen für Volumen im Unterkörper",
+          "Raglanärmel, um die Schulterlinie zu mildern",
+          "Einreihige, schmale Revers-Jacken",
+          "Straight-Fit- oder Bootcut-Hosen"
+        ],
+        "dontList": [
+          "Gepolsterte Schultern, Puffärmel",
+          "Helle Oberteile mit dunklen Unterteilen (kontraproduktiv)",
+          "U-Boot-Ausschnitt — lässt Schultern breiter wirken",
+          "Horizontale Streifen auf Oberteilen",
+          "Skinny Jeans allein (stört die Balance)",
+          "Kastige T-Shirts, dicke klobige Jacken"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Dreieck",
+      "subtitle": "Schmale Schultern, breite Hüften",
+      "colorSummary": "Helle Oberteile, dunkle Unterteile",
+      "female": {
+        "desc": "Dein Unterkörper ist breiter als dein Oberkörper. Aufmerksamkeit auf den Oberkörper zu lenken und den Unterkörper zu verschlanken verbessert die Gesamtproportionen.",
+        "doList": [
+          "U-Boot-Ausschnitt, schulterfreie Tops, eckiger Ausschnitt, um die Schulterlinie zu verbreitern",
+          "Helle Farben, Muster und Verzierungen auf Oberteilen lenken den Blick nach oben",
+          "Jacken und Blazer mit Schulterpolstern",
+          "A-Linie-, Tulpen-, Tellerröcke, Schrägschnitt",
+          "High-Waist-Bootcut, weite oder gerade Hosen",
+          "Kurze Jacken, Trenchcoats mit Taillengürtel",
+          "Wickelkleider, Fit-and-Flare-Kleider"
+        ],
+        "dontList": [
+          "Helle Farben, Muster oder Verzierungen am Unterkörper",
+          "Skinny Jeans allein (betont die Hüftlinie)",
+          "Hüftlange Tops (hebt die breiteste Stelle hervor)",
+          "Horizontale Streifen am Unterteil",
+          "Enge Bleistiftröcke (betont die Hüften)"
+        ]
+      },
+      "male": {
+        "desc": "Dein Unterkörper ist breiter als dein Oberkörper. Blickpunkte am Oberkörper verbessern die Gesamtproportionen.",
+        "doList": [
+          "Strukturierte Blazer und Jacken mit Schulterpolstern für breitere Schultern",
+          "Helle Farben und Muster auf Oberteilen lenken den Blick nach oben",
+          "Brustdetails (Taschen, Schulterklappen, horizontale Streifen)",
+          "Dunkle einfarbige Unterteile für eine schlanke Linie",
+          "Straight-Fit, flache Fronthosen",
+          "V-Ausschnitt- oder Rundhals-Pullover",
+          "Mittelgroße Revers, einreihige Jacken"
+        ],
+        "dontList": [
+          "Unstrukturierte Oberteile (dekonstruierte Jacken etc.)",
+          "Skinny-Hosen oder enge Unterteile",
+          "Helle Unterteile mit dunklen Oberteilen",
+          "Horizontale Streifen am Unterkörper",
+          "Weite Hosen (stören die Balance)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Rechteck",
+      "subtitle": "Gerade Silhouette mit ähnlichen Schultern, Taille und Hüften",
+      "colorSummary": "Proportionen durch Farbkontrast Ober-/Unterteil schaffen",
+      "female": {
+        "desc": "Du hast eine insgesamt gerade Körperform. Eine Taille zu kreieren oder Kurven hinzuzufügen ergibt einen tollen Look.",
+        "doList": [
+          "V-Ausschnitt, Rundhals, Herzausschnitt für vertikale Linien und Kurven",
+          "Wickeltops, Schößchen, Gürtel-Blusen, um die Taille zu definieren",
+          "Wickelkleider, Fit-and-Flare, Gürtelkleider",
+          "A-Linie-, Wickel-, asymmetrische Röcke",
+          "High-Waist-Bootcut oder weite Hosen",
+          "Puff-, Flatter-, Ballonärmel für Volumen",
+          "Texturmix (Strick + Denim etc.) Layering",
+          "Gürtel zur Betonung der Taille (schmal bis mittelbreit)"
+        ],
+        "dontList": [
+          "Kastige oder weite Passformen allein (verbirgt die Körperlinien noch mehr)",
+          "Rollkragen oder hoher Ausschnitt (betont gerade Linien)",
+          "Gleiche Farbe oben und unten gerade getragen (wirkt flach)",
+          "Volumen nur an der Taille (stört die Gesamtbalance)",
+          "Formlose Teile allein tragen"
+        ]
+      },
+      "male": {
+        "desc": "Du hast eine insgesamt gerade Körperform. Durch Layering und Farbkontraste Dimensionen zu schaffen ergibt einen tollen Look.",
+        "doList": [
+          "Tiefe und Dimension durch Layering schaffen",
+          "Taille mit Gürteln oder Einstecken betonen",
+          "Proportionen durch Farbkontrast Ober-/Unterteil schaffen",
+          "Texturmix (Strick + Denim etc.)",
+          "Vertikale Linien mit Jacken und Strickjacken schaffen",
+          "Rundhals-T-Shirts, V-Ausschnitt-Pullover",
+          "Strukturierte Blazer (mit Schulterpolstern)"
+        ],
+        "dontList": [
+          "Gleiche Farbe oben und unten gerade getragen (wirkt flach)",
+          "Kastige Passform allein (verbirgt Körperlinien noch mehr)",
+          "Vertikale Streifen (betonen gerade Linien noch mehr)",
+          "Weite Hosen oder Wide-Leg-Hosen",
+          "Lange Tops oder Mäntel (betonen gerade vertikale Linie)",
+          "Flache, formlose Hemden"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Sanduhr",
+      "subtitle": "Ausgewogene Schultern und Hüften mit definierter Taille",
+      "colorSummary": "Alles möglich! Einfach die Taille betonen",
+      "female": {
+        "desc": "Du hast ausgewogene Schultern und Hüften mit einer gut definierten Taille. Deine natürlichen Linien hervorzuheben sieht fantastisch aus.",
+        "doList": [
+          "Passformen, die die Taille betonen (Einstecken, Gürtel, Wickel)",
+          "V-Ausschnitt, Rundhals, Herzausschnitt (natürliche Büstenlinie)",
+          "Wickelkleider, Fit-and-Flare, Gürtelkleider",
+          "Bleistiftrock (für Kurven) oder Tellerrock (mit Einstecken)",
+          "Mittlere Passform schmeichelt am besten",
+          "Fließende Stoffe (Jersey, Seide, Baumwollmischung)",
+          "Einreihige, kurze Jacken, Gürtelmäntel"
+        ],
+        "dontList": [
+          "Zu kastige Oversized-Passformen (verbirgt deine Linien)",
+          "Zu enge Gesamtpassform (übertreibt es)",
+          "Lange Oberbekleidung, die die Taille verbirgt",
+          "Dicke Strickwaren oder klobige Stoffe (tragen auf)",
+          "Zweireihig, tief sitzende Taille",
+          "Dicke Gürtel (über 4,5 cm)"
+        ]
+      },
+      "male": {
+        "desc": "Du hast ausgewogene Schultern und Hüften mit einer gut definierten Taille. Deine Linien hervorzuheben sieht fantastisch aus.",
+        "doList": [
+          "Passformen, die die Taille betonen (Einstecken, Gürtel)",
+          "Mittlere Passform schmeichelt am besten",
+          "Einfarbig mit Akzent-Teilen",
+          "Stoffe, die natürlich am Körper fallen",
+          "Sowohl V-Ausschnitt als auch Rundhals funktionieren gut",
+          "Slim-Fit-Hemden, High-Waist-Hosen",
+          "Einreihige Jacke (tailliert)",
+          "Mittlerer Gürtel (Kontrastfarbe als Akzent)"
+        ],
+        "dontList": [
+          "Zu kastige Oversized-Passformen (verbirgt deine Linien)",
+          "Zu enge Gesamtpassform (übertreibt es)",
+          "Low-Rise-Hosen",
+          "Auffällige Muster oder Farben",
+          "Oversized-Jacken oder -Mäntel"
+        ]
+      }
+    },
+    "round": {
+      "name": "Rund",
+      "subtitle": "Bauchbetonte, gerundete Silhouette",
+      "colorSummary": "Insgesamt dunkle Töne mit Betonung vertikaler Linien",
+      "female": {
+        "desc": "Du trägst Volumen in der Körpermitte. Vertikale Linien zu schaffen und Aufmerksamkeit auf Ausschnitt, Arme und Beine zu lenken ergibt eine schlankere Optik.",
+        "doList": [
+          "Tiefer V-Ausschnitt, weiter V, Rundhals, Wasserfallkragen zur Verteilung der Aufmerksamkeit",
+          "Empire-Taille, Wickeltops, fließende drapierte Oberteile",
+          "Empire-Taille, A-Linie, Wickel-, Fit-and-Flare-Kleider",
+          "3/4-Ärmel für optisch schlankere Arme und Detailbetonung",
+          "A-Linie, ausgestellte, knielange+ Röcke",
+          "High-Waist-Straight- oder Bootcut-Hosen",
+          "Schmaler Gürtel unter der Brust oder an der hohen Taille (farblich abgestimmt)",
+          "Einreihige, offene, strukturierte Jacken (hüftlang+)",
+          "Gut sitzender BH ist essenziell (Grundlage für die Silhouette)"
+        ],
+        "dontList": [
+          "Anliegende Stoffe oder enge Körpermitte",
+          "Horizontale Details oder Verzierungen an der Taille",
+          "Zweireihige oder kurze Jacken",
+          "Enge Shorts",
+          "Helle Oberteile allein (betont den Bauch)",
+          "Horizontale Streifen, große Muster"
+        ]
+      },
+      "male": {
+        "desc": "Du trägst Volumen in der Körpermitte. Vertikale Linien und dunkle Farben in der Mitte schaffen eine schlankere Erscheinung.",
+        "doList": [
+          "Dunkle Farben bei Oberteilen und Mittelschichten für eine schlanke Mitte",
+          "Vertikale Linien betonen (offene Jacken, Strickjacken)",
+          "Monochrome oder Ton-in-Ton-Outfits für einen längeren Look",
+          "V-Ausschnitt oder tiefer Rundhals zur Verteilung der Aufmerksamkeit",
+          "Strukturierte Jacken zur Ordnung der Silhouette",
+          "Einreihige, offene Jacken",
+          "Gerade oder leicht zulaufende Hosen"
+        ],
+        "dontList": [
+          "Helle Oberteile allein (betont den Bauch)",
+          "Horizontale Streifen, große Muster",
+          "Kurze Tops (zeigt die Taille)",
+          "Zu enge Passformen",
+          "Zweireihige Jacken",
+          "Bundfalten- oder High-Waist-Hosen",
+          "Bunte Gürtel",
+          "Weit oder oversized (trägt auf)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "Vergleiche deine Schulter- und Hüftbreite:",
+        "options": ["Meine Schultern sind breiter", "Meine Hüften sind breiter", "Sie sind ungefähr gleich"]
+      },
+      {
+        "question": "Wie ist deine Taille?",
+        "options": ["Meine Taille ist gut definiert", "Meine Taille und Hüften sind gerade", "Mein Bauchbereich steht hervor"]
+      },
+      {
+        "question": "Wo trägst du mehr Volumen — Ober- oder Unterkörper?",
+        "options": ["Mehr Volumen im Oberkörper", "Mehr Volumen im Unterkörper", "Ungefähr gleich"]
+      },
+      {
+        "question": "Was stört dich am meisten bei der Kleiderwahl?",
+        "options": ["Oberteil sitzt wegen breiter Schultern nicht gut", "Hüften und Oberschenkel stören mich", "Mein Bauchbereich stört mich", "Ich wirke insgesamt flach", "Keine besonderen Bedenken (ausgewogen)"]
+      },
+      {
+        "question": "Welche Oberteil-Passform passt am besten zu dir?",
+        "options": ["Slim Fit (körperbetont)", "Regular Fit (moderat)", "Oversized Fit (weit)"]
+      }
+    ]
+  }
+}

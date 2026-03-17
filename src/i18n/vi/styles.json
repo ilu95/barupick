@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Sự tinh tế phong cách Ivy League", "keywords": ["Áo len gile", "Áo sơ mi Oxford", "Quần chino", "Giày loafer"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Phong cách campus kinh điển Bờ Đông", "keywords": ["Áo blazer", "Áo sơ mi cài nút", "Giày loafer"] },
+    "dandy": { "name": "Dandy", "subtitle": "Vẻ lịch lãm quý ông tinh tế", "keywords": ["Áo khoác len", "Áo cổ lọ", "Giày Chelsea"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "Nghệ thuật của sự sang trọng thầm lặng", "keywords": ["Cashmere", "Nhung kẻ", "Giày loafer"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "Phong cách truyền thống Mỹ kiểu Ralph Lauren", "keywords": ["Áo polo", "Len tết", "Quần chino"] },
+    "minimal": { "name": "Minimal", "subtitle": "Tối đa tinh tế với tối thiểu chi tiết", "keywords": ["Áo thun trơn", "Quần ống rộng", "Sneaker tối giản"] },
+    "casual": { "name": "Casual", "subtitle": "Trang phục hàng ngày thoải mái mà vẫn phong cách", "keywords": ["Áo nỉ", "Quần jeans", "Sneaker"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Tự do đô thị với tông pastel tự nhiên", "keywords": ["Áo sơ mi rộng", "Quần ống rộng", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "Nghệ thuật của sự đơn giản có chủ đích", "keywords": ["Áo thun trơn", "Quần jeans suông", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Khi đồ thể thao kết hợp phong cách hàng ngày", "keywords": ["Quần jogger", "Áo hoodie kéo khóa", "Giày chạy bộ"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Phong cách vintage với denim và giày boots", "keywords": ["Áo khoác denim", "Giày boots công nhân", "Áo sơ mi kẻ"] },
+    "workwear": { "name": "Workwear", "subtitle": "Thẩm mỹ của lao động thực dụng", "keywords": ["Áo liền quần", "Quần công nhân", "Giày boots"] },
+    "military": { "name": "Military", "subtitle": "Phong cách mạnh mẽ lấy cảm hứng từ quân đội", "keywords": ["Áo khoác MA-1", "Quần cargo", "Giày combat"] },
+    "british": { "name": "British Heritage", "subtitle": "Phong cách ngoài trời đặc trưng vùng quê Anh", "keywords": ["Áo khoác Barbour", "Tweed", "Giày Chelsea"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Thương hiệu outdoor phối đồ đô thị", "keywords": ["Áo fleece", "Giày leo núi", "Quần cargo"] },
+    "street": { "name": "Streetwear", "subtitle": "Tự do từ văn hóa hip-hop và skateboard", "keywords": ["Áo hoodie", "Quần cargo", "Giày cao cổ"] },
+    "grunge": { "name": "Grunge", "subtitle": "Sự nổi loạn rock thay thế thập niên 90", "keywords": ["Áo flannel kẻ", "Quần jeans rách", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporary", "subtitle": "Thể nghiệm đô thị, tiên phong hiện đại", "keywords": ["Áo khoác cấu trúc", "Đường cắt bất đối xứng", "Đơn sắc"] },
+    "techwear": { "name": "Techwear", "subtitle": "Tương lai đô thị với chất liệu kỹ thuật", "keywords": ["Gore-Tex", "Quần cargo", "Giày tech"] },
+    "genderless": { "name": "Genderless", "subtitle": "Phong cách tự do vượt ranh giới giới tính", "keywords": ["Áo sơ mi rộng", "Quần ống rộng", "Unisex"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Bán trang trọng", "description": "Phong cách lịch sự và tinh tế" },
+    "casual": { "name": "Casual", "description": "Trang phục hàng ngày thoải mái mà vẫn phong cách" },
+    "work_outdoor": { "name": "Work & Outdoor", "description": "Phong cách thực dụng với vẻ mạnh mẽ" },
+    "street": { "name": "Street", "description": "Văn hóa đường phố tự do đầy cá tính" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Đơn giản", "parts": ["Áo", "Quần", "Giày"] },
+    "basic": { "name": "Áo khoác + Áo trong", "parts": ["Áo khoác ngoài", "Áo trong", "Quần", "Giày"] },
+    "mid_inner": { "name": "Lớp giữa + Áo trong", "parts": ["Lớp giữa", "Áo trong", "Quần", "Giày"] },
+    "scarf_top": { "name": "Khăn quàng + Áo", "parts": ["Khăn quàng", "Áo", "Quần", "Giày"] },
+    "layered": { "name": "Khoác + Giữa + Trong", "parts": ["Áo khoác ngoài", "Lớp giữa", "Áo trong", "Quần", "Giày"] },
+    "scarf_basic": { "name": "Khăn + Khoác + Trong", "parts": ["Khăn quàng", "Áo khoác ngoài", "Áo trong", "Quần", "Giày"] },
+    "scarf_mid": { "name": "Khăn + Giữa + Trong", "parts": ["Khăn quàng", "Lớp giữa", "Áo trong", "Quần", "Giày"] },
+    "full": { "name": "Phối lớp đầy đủ", "parts": ["Khăn quàng", "Áo khoác ngoài", "Lớp giữa", "Áo trong", "Quần", "Giày"] }
+  }
+}

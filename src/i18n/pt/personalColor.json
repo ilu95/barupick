@@ -1,0 +1,124 @@
+{
+  "seasons": {
+    "spring": { "name": "Primavera Quente" },
+    "summer": { "name": "Verão Frio" },
+    "autumn": { "name": "Outono Quente" },
+    "winter": { "name": "Inverno Frio" }
+  },
+  "types": {
+    "spring_light": {
+      "name": "Primavera Light",
+      "description": "Tons quentes pastéis brilhantes e claros combinam melhor com você. Recomendamos cores leves e radiantes.",
+      "keywords": ["brilhante", "claro", "leve", "radiante"]
+    },
+    "spring_bright": {
+      "name": "Primavera Bright",
+      "description": "Tons quentes vívidos e vibrantes combinam melhor com você. Recomendamos cores vivas e energéticas.",
+      "keywords": ["vívido", "vibrante", "vivo", "energético"]
+    },
+    "spring_true": {
+      "name": "Primavera True",
+      "description": "Tons médios quentes e claros combinam melhor com você. Recomendamos cores naturais e saudáveis.",
+      "keywords": ["quente", "claro", "natural", "saudável"]
+    },
+    "summer_light": {
+      "name": "Verão Light",
+      "description": "Tons frios pastéis brilhantes e suaves combinam com você. Recomendamos cores elegantes e delicadas.",
+      "keywords": ["suave", "delicado", "elegante", "feminino"]
+    },
+    "summer_muted": {
+      "name": "Verão Muted",
+      "description": "Tons calmos e acinzentados combinam com você. Recomendamos cores sofisticadas e distintas.",
+      "keywords": ["calmo", "acinzentado", "sofisticado", "distinto"]
+    },
+    "summer_true": {
+      "name": "Verão True",
+      "description": "Tons médios frios e suaves combinam com você. Recomendamos cores refrescantes e limpas.",
+      "keywords": ["frio", "suave", "refrescante", "limpo"]
+    },
+    "autumn_soft": {
+      "name": "Outono Soft",
+      "description": "Tons quentes suaves e abafados combinam com você. Recomendamos cores naturais e confortáveis.",
+      "keywords": ["suave", "abafado", "natural", "confortável"]
+    },
+    "autumn_deep": {
+      "name": "Outono Deep",
+      "description": "Tons terrosos profundos e ricos combinam com você. Recomendamos cores luxuosas e intensas.",
+      "keywords": ["profundo", "rico", "luxuoso", "intenso"]
+    },
+    "autumn_true": {
+      "name": "Outono True",
+      "description": "Tons terrosos quentes e naturais combinam com você. Recomendamos cores clássicas e estáveis.",
+      "keywords": ["quente", "natural", "clássico", "estável"]
+    },
+    "winter_bright": {
+      "name": "Inverno Bright",
+      "description": "Tons frios vívidos e marcantes combinam com você. Recomendamos cores intensas e chamativas.",
+      "keywords": ["vívido", "marcante", "intenso", "chamativo"]
+    },
+    "winter_deep": {
+      "name": "Inverno Deep",
+      "description": "Tons profundos e escuros combinam com você. Recomendamos cores chiques e sofisticadas.",
+      "keywords": ["profundo", "chique", "sofisticado", "moderno"]
+    },
+    "winter_true": {
+      "name": "Inverno True",
+      "description": "Cores frias, vívidas e de alto contraste combinam com você. Recomendamos cores modernas e urbanas.",
+      "keywords": ["contraste", "vívido", "moderno", "urbano"]
+    }
+  },
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Qual a cor das veias na parte interna do seu pulso?",
+        "options": ["Predominantemente esverdeadas", "Predominantemente azuis/roxas", "Ambas parecem similares"]
+      },
+      {
+        "question": "Como sua pele reage à luz solar?",
+        "options": ["Queima facilmente e fica vermelha", "Bronzeia facilmente e fica marrom", "Bronzeia moderadamente"]
+      },
+      {
+        "question": "Qual acessório combina mais com você — ouro ou prata?",
+        "options": ["Ouro fica melhor", "Prata fica melhor", "Ambos ficam parecidos"]
+      },
+      {
+        "question": "Ao usar branco, qual tom combina mais com você?",
+        "options": ["Branco marfim/creme combina melhor", "Branco puro/azulado combina melhor", "Ambos ficam bem"]
+      },
+      {
+        "question": "Qual a cor dos seus olhos e cabelo?",
+        "options": ["Castanho claro/tons mais claros", "Tons de castanho médio", "Castanho escuro/preto"]
+      },
+      {
+        "question": "Qual é a sua imagem ou impressão geral?",
+        "options": ["Brilhante e radiante", "Suave e sutil", "Calmo e profundo", "Vívido e nítido"]
+      },
+      {
+        "question": "O que combina mais com você — cores vívidas primárias ou cores suaves e neutras?",
+        "options": ["Cores vívidas e marcantes combinam comigo", "Cores calmas e suaves combinam comigo", "Ambas são parecidas"]
+      },
+      {
+        "question": "Quanto contraste existe nos seus traços? (entre olhos, cabelo e pele)",
+        "options": ["Baixo contraste — os traços se misturam", "Contraste médio", "Alto contraste — os traços são distintos"]
+      }
+    ],
+    "results": {
+      "spring_warm": {
+        "name": "Primavera Quente",
+        "description": "Cores quentes e brilhantes combinam melhor com você. Recomendamos cores radiantes como pêssego, coral, laranja claro e amarelo suave."
+      },
+      "summer_cool": {
+        "name": "Verão Frio",
+        "description": "Cores frias e suaves combinam melhor com você. Recomendamos tons pastéis frios como lavanda, rosa, azul céu e menta."
+      },
+      "autumn_warm": {
+        "name": "Outono Quente",
+        "description": "Cores quentes e profundas combinam melhor com você. Recomendamos cores outonais como camel, borgonha, oliva e mostarda."
+      },
+      "winter_cool": {
+        "name": "Inverno Frio",
+        "description": "Cores frias e vívidas combinam melhor com você. Recomendamos cores de alto contraste como preto, branco, marinho e azul royal."
+      }
+    }
+  }
+}

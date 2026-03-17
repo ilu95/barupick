@@ -34,12 +34,7 @@ const SLIDES = [
   },
 ]
 
-const LANGUAGES = [
-  { code: 'ko', label: '한국어', flag: '🇰🇷', desc: 'Korean' },
-  { code: 'en', label: 'English', flag: '🇺🇸', desc: 'English' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵', desc: 'Japanese' },
-  { code: 'zh', label: '中文', flag: '🇨🇳', desc: 'Chinese' },
-]
+import { SUPPORTED_LANGUAGES } from '@/i18n'
 
 const SWIPE_THRESHOLD = 50
 
@@ -100,36 +95,37 @@ export default function Onboarding() {
   if (step === -1) {
     return (
       <div className="fixed inset-0 bg-[#F7F5F2] z-[500] flex flex-col">
-        <div className="flex-1 flex flex-col items-center justify-center px-8 max-w-[480px] mx-auto w-full">
-          <div className="text-5xl mb-6">🌍</div>
+        <div className="flex-1 flex flex-col items-center px-6 pt-14 pb-6 max-w-[480px] mx-auto w-full">
+          <div className="text-5xl mb-4">🌍</div>
           <h2 className="font-display text-[22px] font-bold text-warm-900 tracking-tight mb-2">
             {t('onboarding.langSelectTitle')}
           </h2>
-          <p className="text-sm text-warm-500 mb-10">{t('onboarding.langSelectDesc')}</p>
+          <p className="text-sm text-warm-500 mb-6">{t('onboarding.langSelectDesc')}</p>
 
-          <div className="w-full flex flex-col gap-3">
-            {LANGUAGES.map(lang => (
-              <button
-                key={lang.code}
-                onClick={() => selectLanguage(lang.code)}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${
-                  i18n.language === lang.code
-                    ? 'border-terra-500 bg-terra-50'
-                    : 'border-warm-300 bg-white hover:border-warm-400'
-                }`}
-              >
-                <span className="text-3xl">{lang.flag}</span>
-                <div className="text-left">
-                  <div className="text-[16px] font-bold text-warm-900">{lang.label}</div>
-                  <div className="text-[12px] text-warm-500">{lang.desc}</div>
-                </div>
-                {i18n.language === lang.code && (
-                  <div className="ml-auto w-5 h-5 rounded-full bg-terra-500 flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <div className="w-full flex-1 overflow-y-auto -mx-1 px-1">
+            <div className="flex flex-col gap-2">
+              {SUPPORTED_LANGUAGES.map(lang => (
+                <button
+                  key={lang.code}
+                  onClick={() => selectLanguage(lang.code)}
+                  className={`w-full flex items-center gap-3.5 px-5 py-3.5 rounded-2xl border-2 transition-all active:scale-[0.98] ${
+                    i18n.language === lang.code
+                      ? 'border-terra-500 bg-terra-50'
+                      : 'border-warm-300 bg-white hover:border-warm-400'
+                  }`}
+                >
+                  <span className="text-2xl">{lang.flag}</span>
+                  <div className="text-left flex-1">
+                    <div className="text-[15px] font-bold text-warm-900">{lang.nativeName}</div>
                   </div>
-                )}
-              </button>
-            ))}
+                  {i18n.language === lang.code && (
+                    <div className="ml-auto w-5 h-5 rounded-full bg-terra-500 flex items-center justify-center flex-shrink-0">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

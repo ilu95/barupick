@@ -1,0 +1,124 @@
+{
+  "seasons": {
+    "spring": { "name": "Primavera Cálida" },
+    "summer": { "name": "Verano Frío" },
+    "autumn": { "name": "Otoño Cálido" },
+    "winter": { "name": "Invierno Frío" }
+  },
+  "types": {
+    "spring_light": {
+      "name": "Primavera Claro",
+      "description": "Los tonos cálidos pastel brillantes y claros te favorecen más. Recomendamos colores luminosos y radiantes.",
+      "keywords": ["brillante", "claro", "luminoso", "radiante"]
+    },
+    "spring_bright": {
+      "name": "Primavera Brillante",
+      "description": "Los tonos cálidos vívidos y vibrantes te favorecen más. Recomendamos colores alegres y enérgicos.",
+      "keywords": ["vívido", "vibrante", "alegre", "enérgico"]
+    },
+    "spring_true": {
+      "name": "Primavera Puro",
+      "description": "Los tonos cálidos medios y claros te favorecen más. Recomendamos colores naturales y saludables.",
+      "keywords": ["cálido", "claro", "natural", "saludable"]
+    },
+    "summer_light": {
+      "name": "Verano Claro",
+      "description": "Los tonos fríos pastel brillantes y suaves te favorecen. Recomendamos colores elegantes y delicados.",
+      "keywords": ["suave", "delicado", "elegante", "delicado"]
+    },
+    "summer_muted": {
+      "name": "Verano Apagado",
+      "description": "Los tonos calmados y grisáceos te favorecen. Recomendamos colores sofisticados y distinguidos.",
+      "keywords": ["calmado", "grisáceo", "sofisticado", "distinguido"]
+    },
+    "summer_true": {
+      "name": "Verano Puro",
+      "description": "Los tonos fríos medios y suaves te favorecen. Recomendamos colores frescos y limpios.",
+      "keywords": ["frío", "suave", "fresco", "limpio"]
+    },
+    "autumn_soft": {
+      "name": "Otoño Suave",
+      "description": "Los tonos cálidos suaves y apagados te favorecen. Recomendamos colores naturales y confortables.",
+      "keywords": ["suave", "apagado", "natural", "confortable"]
+    },
+    "autumn_deep": {
+      "name": "Otoño Profundo",
+      "description": "Los tonos tierra profundos y ricos te favorecen. Recomendamos colores lujosos y profundos.",
+      "keywords": ["profundo", "rico", "lujoso", "profundo"]
+    },
+    "autumn_true": {
+      "name": "Otoño Puro",
+      "description": "Los tonos tierra cálidos y naturales te favorecen. Recomendamos colores clásicos y estables.",
+      "keywords": ["cálido", "natural", "clásico", "estable"]
+    },
+    "winter_bright": {
+      "name": "Invierno Brillante",
+      "description": "Los tonos fríos vívidos y audaces te favorecen. Recomendamos colores intensos y llamativos.",
+      "keywords": ["vívido", "audaz", "intenso", "llamativo"]
+    },
+    "winter_deep": {
+      "name": "Invierno Profundo",
+      "description": "Los tonos profundos y oscuros te favorecen. Recomendamos colores chic y sofisticados.",
+      "keywords": ["profundo", "chic", "sofisticado", "moderno"]
+    },
+    "winter_true": {
+      "name": "Invierno Puro",
+      "description": "Los colores fríos y vívidos de alto contraste te favorecen. Recomendamos colores modernos y urbanos.",
+      "keywords": ["contraste", "vívido", "moderno", "urbano"]
+    }
+  },
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "¿De qué color son las venas en la parte interna de tu muñeca?",
+        "options": ["Mayormente verdosas", "Mayormente azules/moradas", "Ambas se ven similares"]
+      },
+      {
+        "question": "¿Cómo reacciona tu piel a la luz solar?",
+        "options": ["Se quema fácilmente y se pone roja", "Se broncea fácilmente y se pone morena", "Se broncea moderadamente"]
+      },
+      {
+        "question": "¿Qué accesorios te quedan mejor — dorados o plateados?",
+        "options": ["El dorado me queda mejor", "El plateado me queda mejor", "Ambos se ven similares"]
+      },
+      {
+        "question": "Al usar blanco, ¿qué tono te favorece más?",
+        "options": ["El blanco marfil/crema me queda mejor", "El blanco puro/azulado me queda mejor", "Ambos me quedan bien"]
+      },
+      {
+        "question": "¿De qué color son tus ojos y cabello?",
+        "options": ["Marrón claro/tonos más claros", "Tonos marrón medio", "Marrón oscuro/negro"]
+      },
+      {
+        "question": "¿Cuál es tu imagen o impresión general?",
+        "options": ["Brillante y radiante", "Suave y sutil", "Calmado/a y profundo/a", "Vívido/a y claro/a"]
+      },
+      {
+        "question": "¿Qué te favorece más — colores primarios vívidos o colores apagados calmados?",
+        "options": ["Los colores vívidos y audaces me favorecen", "Los colores calmados y apagados me favorecen", "Ambos son similares"]
+      },
+      {
+        "question": "¿Cuánto contraste hay en tus rasgos? (entre ojos, cabello y piel)",
+        "options": ["Bajo contraste — los rasgos se mezclan", "Contraste medio", "Alto contraste — los rasgos son bien definidos"]
+      }
+    ],
+    "results": {
+      "spring_warm": {
+        "name": "Primavera Cálida",
+        "description": "Los colores cálidos y brillantes te favorecen más. Recomendamos colores radiantes como durazno, coral, naranja claro y amarillo suave."
+      },
+      "summer_cool": {
+        "name": "Verano Frío",
+        "description": "Los colores fríos y suaves te favorecen más. Recomendamos tonos fríos pastel como lavanda, rosa, azul cielo y menta."
+      },
+      "autumn_warm": {
+        "name": "Otoño Cálido",
+        "description": "Los colores cálidos y profundos te favorecen más. Recomendamos colores otoñales como camel, borgoña, oliva y mostaza."
+      },
+      "winter_cool": {
+        "name": "Invierno Frío",
+        "description": "Los colores fríos y vívidos te favorecen más. Recomendamos colores de alto contraste como negro, blanco, azul marino y azul real."
+      }
+    }
+  }
+}

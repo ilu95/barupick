@@ -1,0 +1,40 @@
+{
+  "guide": {
+    "preppy": { "name": "Preppy", "subtitle": "Sofisticación pulida estilo Ivy League", "keywords": ["Chaleco de Punto", "Camisa Oxford", "Pantalón Chino", "Mocasines"] },
+    "ivy": { "name": "Ivy League", "subtitle": "Estilo clásico de campus de la Costa Este", "keywords": ["Blazer", "Camisa con Botones", "Mocasines"] },
+    "dandy": { "name": "Dandy", "subtitle": "Elegancia refinada de caballero", "keywords": ["Abrigo de Lana", "Cuello de Tortuga", "Botines Chelsea"] },
+    "oldmoney": { "name": "Old Money", "subtitle": "El arte del lujo discreto", "keywords": ["Cachemira", "Pana", "Mocasines"] },
+    "ralphlook": { "name": "Ralph Look", "subtitle": "Tradicional americano à la Ralph Lauren", "keywords": ["Polo", "Punto Trenzado", "Chinos"] },
+    "minimal": { "name": "Minimal", "subtitle": "Máxima sofisticación con elementos mínimos", "keywords": ["Camiseta Lisa", "Pantalón Ancho", "Zapatillas Minimalistas"] },
+    "casual": { "name": "Casual", "subtitle": "Outfits cómodos y con estilo para el día a día", "keywords": ["Sudadera", "Jeans", "Zapatillas"] },
+    "cityboy": { "name": "City Boy", "subtitle": "Libertad urbana con pasteles naturales", "keywords": ["Camisa Oversized", "Pantalón Ancho", "New Balance"] },
+    "normcore": { "name": "Normcore", "subtitle": "El arte de la simplicidad intencional", "keywords": ["Camiseta Lisa", "Jeans Rectos", "Adidas"] },
+    "athleisure": { "name": "Athleisure", "subtitle": "Donde la ropa deportiva se encuentra con el estilo diario", "keywords": ["Pantalón Jogger", "Sudadera con Cierre", "Zapatillas de Running"] },
+    "amekaji": { "name": "Amekaji", "subtitle": "Vibras vintage con denim y botas de trabajo", "keywords": ["Chaqueta de Denim", "Botas de Trabajo", "Camisa a Cuadros"] },
+    "workwear": { "name": "Workwear", "subtitle": "La estética del trabajo práctico", "keywords": ["Overol", "Pantalón de Trabajo", "Botas"] },
+    "military": { "name": "Military", "subtitle": "Estilo robusto inspirado en uniformes militares", "keywords": ["Chaqueta MA-1", "Pantalón Cargo", "Botas de Combate"] },
+    "british": { "name": "British Heritage", "subtitle": "Distinguido estilo outdoor británico", "keywords": ["Chaqueta Barbour", "Tweed", "Botines Chelsea"] },
+    "gorpcore": { "name": "Gorpcore", "subtitle": "Marcas outdoor con estilo urbano", "keywords": ["Fleece", "Botas de Senderismo", "Pantalón Cargo"] },
+    "street": { "name": "Streetwear", "subtitle": "Libertad del hip-hop y la cultura skate", "keywords": ["Hoodie", "Pantalón Cargo", "Zapatillas Altas"] },
+    "grunge": { "name": "Grunge", "subtitle": "Rebelión del rock alternativo de los 90s", "keywords": ["Franela a Cuadros", "Jeans Rasgados", "Dr. Martens"] },
+    "contemporary": { "name": "Contemporary", "subtitle": "Experimentación urbana, vanguardia moderna", "keywords": ["Chaqueta Estructurada", "Corte Asimétrico", "Monotono"] },
+    "techwear": { "name": "Techwear", "subtitle": "Futurismo urbano con telas técnicas", "keywords": ["Gore-Tex", "Pantalón Cargo", "Zapatillas Tech"] },
+    "genderless": { "name": "Genderless", "subtitle": "Estilo libre más allá de los límites de género", "keywords": ["Camisa Oversized", "Pantalón Ancho", "Unisex"] }
+  },
+  "moodGroups": {
+    "semi_formal": { "name": "Semi-Formal", "description": "Estilos con formalidad y sofisticación" },
+    "casual": { "name": "Casual", "description": "Looks cómodos y con estilo para el día a día" },
+    "work_outdoor": { "name": "Trabajo y Outdoor", "description": "Estilos prácticos con atractivo robusto" },
+    "street": { "name": "Street", "description": "Cultura callejera libre y con personalidad" }
+  },
+  "layerLevels": {
+    "simple": { "name": "Simple", "parts": ["Superior", "Inferior", "Calzado"] },
+    "basic": { "name": "Abrigo + Interior", "parts": ["Abrigo", "Interior", "Inferior", "Calzado"] },
+    "mid_inner": { "name": "Capa Media + Interior", "parts": ["Capa Media", "Interior", "Inferior", "Calzado"] },
+    "scarf_top": { "name": "Bufanda + Superior", "parts": ["Bufanda", "Superior", "Inferior", "Calzado"] },
+    "layered": { "name": "Abrigo + Media + Interior", "parts": ["Abrigo", "Capa Media", "Interior", "Inferior", "Calzado"] },
+    "scarf_basic": { "name": "Bufanda + Abrigo + Interior", "parts": ["Bufanda", "Abrigo", "Interior", "Inferior", "Calzado"] },
+    "scarf_mid": { "name": "Bufanda + Media + Interior", "parts": ["Bufanda", "Capa Media", "Interior", "Inferior", "Calzado"] },
+    "full": { "name": "Capas Completas", "parts": ["Bufanda", "Abrigo", "Capa Media", "Interior", "Inferior", "Calzado"] }
+  }
+}

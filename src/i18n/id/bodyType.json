@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Bandingkan lebar bahu dan pinggul Anda:",
+        "options": [
+          "Bahu saya lebih lebar",
+          "Pinggul saya lebih lebar",
+          "Keduanya hampir sama"
+        ]
+      },
+      {
+        "question": "Bagaimana garis pinggang Anda?",
+        "options": [
+          "Pinggang saya terdefinisi dengan baik",
+          "Pinggang dan pinggul saya lurus",
+          "Area perut saya menonjol"
+        ]
+      },
+      {
+        "question": "Area mana yang paling Anda khawatirkan?",
+        "options": [
+          "Bahu saya terlihat sempit",
+          "Bahu saya terlihat lebar",
+          "Perut saya terlihat menonjol",
+          "Kaki saya terlihat pendek",
+          "Saya terlihat pendek secara keseluruhan",
+          "Tidak ada kekhawatiran khusus"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Buat Bahu Terlihat Lebih Lebar",
+        "description": "Gunakan atasan berwarna terang dan kerah boat neck/lengan puff untuk menegaskan garis bahu."
+      },
+      "shoulder-narrow": {
+        "name": "Buat Bahu Terlihat Lebih Sempit",
+        "description": "Gunakan atasan berwarna gelap untuk mengurangi kesan bahu secara visual, dan bawahan terang untuk mendistribusikan perhatian."
+      },
+      "belly": {
+        "name": "Minimalisasi Tampilan Perut",
+        "description": "Gunakan atasan/lapisan tengah berwarna gelap untuk menyembunyikan area perut secara visual."
+      },
+      "legs-long": {
+        "name": "Buat Kaki Terlihat Lebih Panjang",
+        "description": "Samakan warna bawahan dan sepatu untuk menciptakan garis kaki yang lebih panjang."
+      },
+      "height-tall": {
+        "name": "Terlihat Lebih Tinggi",
+        "description": "Tekankan garis vertikal dengan warna solid atau nada yang serupa."
+      },
+      "none": {
+        "name": "Harmoni Warna Saja",
+        "description": "Fokus murni pada harmoni warna tanpa kompensasi bentuk tubuh."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Segitiga Terbalik",
+      "subtitle": "Bahu lebar, pinggul sempit",
+      "colorSummary": "Atasan gelap, bawahan terang",
+      "female": {
+        "desc": "Anda memiliki bahu/dada yang lebar dan tubuh bagian bawah yang relatif ramping. Menambah volume pada tubuh bagian bawah dan melunakkan tubuh bagian atas menciptakan keseimbangan.",
+        "doList": [
+          "V-neck dalam, scoop neck sempit, U-neck, atau garis leher asimetris untuk menyempitkan bahu",
+          "Warna terang dan motif pada bawahan untuk menambah volume tubuh bawah",
+          "Atasan sederhana dengan gaya wrap atau empire waist",
+          "Rok A-line, plisket, tulip, atau rok bervolume untuk menegaskan tubuh bawah",
+          "Celana wide-leg, bootcut, atau boyfriend-fit untuk volume tubuh bawah",
+          "Definisikan garis pinggang dengan ikat pinggang atau jaket wrap",
+          "Lengan raglan, kimono, atau dolman untuk melunakkan garis bahu"
+        ],
+        "dontList": [
+          "Off-shoulder, boat neck, square neck — membuat bahu terlihat lebih lebar",
+          "Bantalan bahu, lengan puff, hiasan bahu",
+          "Atasan terang dengan bawahan gelap (kontraproduktif)",
+          "Skinny jeans saja (membuat tubuh bawah terlihat lebih kurus)",
+          "Garis horizontal atau motif besar pada atasan"
+        ]
+      },
+      "male": {
+        "desc": "Anda memiliki bahu lebar dan tubuh bagian atas yang berkembang. Menambah volume pada tubuh bagian bawah meningkatkan keseimbangan.",
+        "doList": [
+          "V-neck untuk mengurangi kesan bahu secara visual dan menegaskan garis vertikal",
+          "Bawahan berwarna terang untuk menegaskan volume tubuh bawah",
+          "Warna solid gelap pada atasan untuk mengurangi kesan bahu secara visual",
+          "Celana cargo atau celana lebar untuk volume tubuh bawah",
+          "Lengan raglan untuk melunakkan garis bahu",
+          "Jaket single-breasted, kerah slim",
+          "Celana straight-fit atau bootcut"
+        ],
+        "dontList": [
+          "Bantalan bahu, lengan puff",
+          "Atasan terang dengan bawahan gelap (kontraproduktif)",
+          "Boat neck — membuat bahu terlihat lebih lebar",
+          "Garis horizontal pada atasan",
+          "Skinny jeans saja (merusak keseimbangan)",
+          "Kaos boxy, jaket tebal yang bulky"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Segitiga",
+      "subtitle": "Bahu sempit, pinggul lebar",
+      "colorSummary": "Atasan terang, bawahan gelap",
+      "female": {
+        "desc": "Tubuh bagian bawah Anda lebih lebar dari tubuh bagian atas. Menarik perhatian ke tubuh bagian atas dan merampingkan tubuh bagian bawah memperbaiki proporsi keseluruhan.",
+        "doList": [
+          "Boat neck, off-shoulder, square neck untuk melebarkan garis bahu",
+          "Warna terang, motif, dan hiasan pada atasan untuk menarik perhatian ke atas",
+          "Jaket dan blazer dengan bantalan bahu",
+          "Rok A-line, tulip, full circle, bias-cut",
+          "Celana high-waist bootcut, wide-leg, atau lurus",
+          "Jaket crop, trench coat dengan ikat pinggang",
+          "Dress wrap, dress fit-and-flare"
+        ],
+        "dontList": [
+          "Warna terang, motif, atau hiasan pada tubuh bawah",
+          "Skinny jeans saja (menegaskan garis pinggul)",
+          "Atasan sepanjang pinggul (menyorot titik terlebar)",
+          "Garis horizontal pada bawahan",
+          "Rok pensil ketat (menegaskan pinggul)"
+        ]
+      },
+      "male": {
+        "desc": "Tubuh bagian bawah Anda lebih lebar dari tubuh bagian atas. Menambah titik fokus pada tubuh bagian atas memperbaiki proporsi keseluruhan.",
+        "doList": [
+          "Blazer terstruktur dan jaket dengan bantalan bahu untuk melebarkan bahu",
+          "Warna terang dan motif pada atasan untuk menarik perhatian ke atas",
+          "Detail dada (saku, epaulet, garis horizontal)",
+          "Warna solid gelap pada bawahan untuk merampingkan",
+          "Celana straight-fit, flat-front",
+          "Sweater V-neck atau crew neck",
+          "Jaket single-breasted dengan kerah sedang"
+        ],
+        "dontList": [
+          "Atasan tanpa struktur (jaket deconstructed, dll.)",
+          "Celana skinny atau bawahan ketat",
+          "Bawahan terang dengan atasan gelap",
+          "Garis horizontal pada tubuh bawah",
+          "Celana longgar (merusak keseimbangan)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Persegi Panjang",
+      "subtitle": "Siluet lurus dengan bahu, pinggang, dan pinggul yang serupa",
+      "colorSummary": "Ciptakan proporsi dengan kontras warna atas-bawah",
+      "female": {
+        "desc": "Anda memiliki bentuk tubuh yang umumnya lurus. Menciptakan garis pinggang atau menambah lekukan menghasilkan tampilan yang bagus.",
+        "doList": [
+          "V-neck, scoop neck, sweetheart neck untuk garis vertikal dan lekukan",
+          "Atasan wrap, peplum, blus berikat untuk mendefinisikan pinggang",
+          "Dress wrap, fit-and-flare, dress berikat",
+          "Rok A-line, wrap, asimetris",
+          "Celana high-waist bootcut atau wide-leg",
+          "Lengan puff, flutter, balon untuk volume",
+          "Campuran tekstur (rajut + denim, dll.) layering",
+          "Ikat pinggang untuk menegaskan garis pinggang (lebar slim hingga sedang)"
+        ],
+        "dontList": [
+          "Fit boxy atau longgar saja (menyembunyikan garis tubuh lebih lagi)",
+          "Turtleneck atau high neck (menegaskan garis lurus)",
+          "Atasan dan bawahan warna sama dipakai lurus (terlihat datar)",
+          "Volume hanya di pinggang (merusak keseimbangan keseluruhan)",
+          "Pakaian tanpa bentuk yang dipakai sendiri"
+        ]
+      },
+      "male": {
+        "desc": "Anda memiliki bentuk tubuh yang umumnya lurus. Menciptakan dimensi melalui layering dan kontras warna menghasilkan tampilan yang bagus.",
+        "doList": [
+          "Ciptakan kedalaman dan dimensi melalui layering",
+          "Tegaskan garis pinggang dengan ikat pinggang atau tuck-in",
+          "Bagi proporsi dengan kontras warna atas-bawah",
+          "Campuran tekstur (rajut + denim, dll.)",
+          "Ciptakan garis vertikal dengan jaket dan kardigan",
+          "Kaos crew neck, sweater V-neck",
+          "Blazer terstruktur (dengan bantalan bahu)"
+        ],
+        "dontList": [
+          "Atasan dan bawahan warna sama dipakai lurus (terlihat datar)",
+          "Fit boxy saja (menyembunyikan garis tubuh lebih lagi)",
+          "Garis vertikal (lebih menegaskan garis lurus)",
+          "Celana longgar atau wide-leg",
+          "Atasan atau mantel panjang (menegaskan garis vertikal lurus)",
+          "Kemeja datar tanpa bentuk"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Jam Pasir",
+      "subtitle": "Bahu dan pinggul seimbang dengan pinggang terdefinisi",
+      "colorSummary": "Pakai apa saja! Tinggal tegaskan pinggang",
+      "female": {
+        "desc": "Anda memiliki bahu dan pinggul yang seimbang dengan pinggang yang terdefinisi dengan baik. Menonjolkan garis alami Anda akan terlihat luar biasa.",
+        "doList": [
+          "Fit yang menegaskan garis pinggang (tuck-in, ikat pinggang, wrap)",
+          "V-neck, scoop neck, sweetheart neck (garis dada natural)",
+          "Dress wrap, fit-and-flare, dress berikat",
+          "Rok pensil (untuk lekukan) atau rok full (dengan tuck-in)",
+          "Fit medium paling cocok",
+          "Kain yang jatuh (jersey, sutra, katun campuran)",
+          "Jaket single-breasted, jaket pendek, mantel berikat"
+        ],
+        "dontList": [
+          "Fit oversized yang terlalu boxy (menyembunyikan garis Anda)",
+          "Fit yang terlalu ketat di seluruh tubuh (berlebihan)",
+          "Outerwear panjang yang menyembunyikan pinggang",
+          "Rajutan tebal atau kain chunky (menambah volume)",
+          "Double-breasted, drop waist",
+          "Ikat pinggang tebal (lebih dari 4,5 cm)"
+        ]
+      },
+      "male": {
+        "desc": "Anda memiliki bahu dan pinggul yang seimbang dengan pinggang yang terdefinisi dengan baik. Menonjolkan garis Anda akan terlihat luar biasa.",
+        "doList": [
+          "Fit yang menegaskan garis pinggang (tuck-in, ikat pinggang)",
+          "Fit medium paling cocok",
+          "Warna solid dengan item aksen",
+          "Kain yang jatuh alami pada tubuh",
+          "V-neck dan crew neck keduanya cocok",
+          "Kemeja slim-fit, celana high-waist",
+          "Jaket single-breasted (waist suppression)",
+          "Ikat pinggang sedang (warna kontras sebagai aksen)"
+        ],
+        "dontList": [
+          "Fit oversized yang terlalu boxy (menyembunyikan garis Anda)",
+          "Fit yang terlalu ketat di seluruh tubuh (berlebihan)",
+          "Celana low-rise",
+          "Motif atau warna yang mencolok",
+          "Jaket atau mantel oversized"
+        ]
+      }
+    },
+    "round": {
+      "name": "Bulat",
+      "subtitle": "Siluet membulat dengan pusat di perut",
+      "colorSummary": "Warna gelap keseluruhan dengan penekanan garis vertikal",
+      "female": {
+        "desc": "Anda membawa volume di bagian tengah tubuh. Menciptakan garis vertikal dan menarik perhatian ke garis leher, lengan, dan kaki menciptakan tampilan yang lebih ramping.",
+        "doList": [
+          "V-neck dalam, V lebar, scoop neck, cowl neck untuk mendistribusikan perhatian",
+          "Empire waist, atasan wrap, atasan drape yang mengalir",
+          "Dress empire waist, A-line, wrap, fit-and-flare",
+          "Lengan 3/4 untuk lengan yang lebih ramping secara visual dan fokus detail",
+          "Rok A-line, flare, panjang selutut+",
+          "Celana high-waist lurus atau bootcut",
+          "Ikat pinggang tipis di bawah dada atau high waist (warna senada)",
+          "Jaket single-breasted, depan terbuka, terstruktur (panjang sepinggul+)",
+          "Bra yang pas sangat penting (fondasi untuk siluet)"
+        ],
+        "dontList": [
+          "Kain ketat atau bagian tengah yang sempit",
+          "Detail horizontal atau hiasan di pinggang",
+          "Jaket double-breasted atau crop",
+          "Celana pendek ketat",
+          "Atasan berwarna terang saja (menegaskan perut)",
+          "Garis horizontal, motif besar"
+        ]
+      },
+      "male": {
+        "desc": "Anda membawa volume di bagian tengah tubuh. Garis vertikal dan warna gelap di tengah menciptakan tampilan yang lebih ramping.",
+        "doList": [
+          "Warna gelap pada atasan dan lapisan tengah untuk tengah yang ramping",
+          "Tegaskan garis vertikal (jaket terbuka, kardigan)",
+          "Outfit monokrom atau nada serupa untuk tampilan yang lebih panjang",
+          "V-neck atau crew neck dalam untuk mendistribusikan perhatian",
+          "Jaket terstruktur untuk merapikan siluet",
+          "Jaket single-breasted, terbuka",
+          "Celana lurus atau sedikit meruncing"
+        ],
+        "dontList": [
+          "Atasan berwarna terang saja (menegaskan perut)",
+          "Garis horizontal, motif besar",
+          "Atasan pendek (mengekspos garis pinggang)",
+          "Fit yang terlalu ketat",
+          "Jaket double-breasted",
+          "Celana plisket atau high-waist",
+          "Ikat pinggang berwarna-warni",
+          "Baggy atau oversized (menambah volume)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "Bandingkan lebar bahu dan pinggul Anda:",
+        "options": ["Bahu saya lebih lebar", "Pinggul saya lebih lebar", "Keduanya hampir sama"]
+      },
+      {
+        "question": "Bagaimana garis pinggang Anda?",
+        "options": ["Pinggang saya terdefinisi dengan baik", "Pinggang dan pinggul saya lurus", "Area perut saya menonjol"]
+      },
+      {
+        "question": "Di mana Anda membawa lebih banyak volume — tubuh atas atau bawah?",
+        "options": ["Lebih banyak volume di tubuh atas", "Lebih banyak volume di tubuh bawah", "Hampir sama"]
+      },
+      {
+        "question": "Apa yang paling Anda khawatirkan saat memilih pakaian?",
+        "options": ["Khawatir dengan fit atasan karena bahu lebar", "Pinggul dan paha mengganggu saya", "Area perut mengganggu saya", "Saya terlihat datar secara keseluruhan", "Tidak ada kekhawatiran khusus (seimbang)"]
+      },
+      {
+        "question": "Fit atasan mana yang paling cocok untuk Anda?",
+        "options": ["Slim fit (pas badan)", "Regular fit (sedang)", "Oversized fit (longgar)"]
+      }
+    ]
+  }
+}

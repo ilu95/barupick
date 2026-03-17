@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "So sánh chiều rộng vai và hông của bạn:",
+        "options": [
+          "Vai tôi rộng hơn",
+          "Hông tôi rộng hơn",
+          "Chúng gần như bằng nhau"
+        ]
+      },
+      {
+        "question": "Đường eo của bạn thế nào?",
+        "options": [
+          "Eo tôi thắt rõ ràng",
+          "Eo và hông tôi thẳng",
+          "Vùng bụng tôi nhô ra"
+        ]
+      },
+      {
+        "question": "Vùng nào khiến bạn lo lắng nhất?",
+        "options": [
+          "Vai tôi trông hẹp",
+          "Vai tôi trông rộng",
+          "Bụng tôi trông to",
+          "Chân tôi trông ngắn",
+          "Tôi trông thấp tổng thể",
+          "Không có lo lắng đặc biệt"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Làm vai trông rộng hơn",
+        "description": "Dùng áo màu sáng và cổ thuyền/tay phồng để nhấn mạnh đường vai."
+      },
+      "shoulder-narrow": {
+        "name": "Làm vai trông hẹp hơn",
+        "description": "Dùng áo màu tối để thu nhỏ vai về mặt thị giác, và quần màu sáng để phân tán chú ý."
+      },
+      "belly": {
+        "name": "Che bụng",
+        "description": "Dùng áo/lớp giữa màu tối để che vùng bụng về mặt thị giác."
+      },
+      "legs-long": {
+        "name": "Làm chân trông dài hơn",
+        "description": "Phối cùng màu quần và giày để tạo đường chân dài hơn."
+      },
+      "height-tall": {
+        "name": "Trông cao hơn",
+        "description": "Nhấn mạnh đường dọc với màu đơn sắc hoặc tông tương tự."
+      },
+      "none": {
+        "name": "Chỉ hài hòa màu sắc",
+        "description": "Tập trung thuần túy vào hài hòa màu sắc mà không bù đắp dáng người."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Tam giác ngược",
+      "subtitle": "Vai rộng, hông hẹp",
+      "colorSummary": "Áo tối, quần sáng",
+      "female": {
+        "desc": "Bạn có vai/ngực rộng và phần dưới cơ thể tương đối thon. Thêm khối cho phần dưới và làm mềm phần trên sẽ tạo sự cân bằng.",
+        "doList": [
+          "Cổ chữ V sâu, cổ tròn hẹp, cổ chữ U, hoặc cổ bất đối xứng để thu hẹp vai",
+          "Màu sáng và họa tiết ở quần để tăng khối phần dưới",
+          "Giữ áo đơn giản với kiểu đắp chéo hoặc eo cao",
+          "Chân váy chữ A, xếp ly, tulip, hoặc phồng để nhấn phần dưới",
+          "Quần ống rộng, bootcut, hoặc boyfriend để tăng khối phần dưới",
+          "Xác định đường eo bằng thắt lưng hoặc áo khoác đắp chéo",
+          "Tay raglan, kimono, hoặc dolman để làm mềm đường vai"
+        ],
+        "dontList": [
+          "Trễ vai, cổ thuyền, cổ vuông — làm vai trông rộng hơn",
+          "Đệm vai, tay phồng, trang trí vai",
+          "Áo sáng với quần tối (phản tác dụng)",
+          "Quần skinny đơn lẻ (làm phần dưới trông mỏng hơn)",
+          "Sọc ngang hoặc họa tiết lớn trên áo"
+        ]
+      },
+      "male": {
+        "desc": "Bạn có vai rộng và phần thân trên phát triển. Thêm khối cho phần dưới cơ thể sẽ cải thiện sự cân bằng.",
+        "doList": [
+          "Cổ chữ V để thu nhỏ vai về mặt thị giác và nhấn đường dọc",
+          "Quần màu sáng để nhấn mạnh khối phần dưới",
+          "Áo màu tối đơn sắc để thu nhỏ vai về mặt thị giác",
+          "Quần cargo hoặc quần ống rộng để tăng khối phần dưới",
+          "Tay raglan để làm mềm đường vai",
+          "Áo khoác một hàng nút, ve áo mỏng",
+          "Quần suông hoặc bootcut"
+        ],
+        "dontList": [
+          "Đệm vai, tay phồng",
+          "Áo sáng với quần tối (phản tác dụng)",
+          "Cổ thuyền — làm vai trông rộng hơn",
+          "Sọc ngang trên áo",
+          "Quần skinny đơn lẻ (phá vỡ cân bằng)",
+          "Áo thun boxy, áo khoác dày cồng kềnh"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Tam giác",
+      "subtitle": "Vai hẹp, hông rộng",
+      "colorSummary": "Áo sáng, quần tối",
+      "female": {
+        "desc": "Phần dưới cơ thể bạn rộng hơn phần trên. Thu hút sự chú ý lên phần trên và gọn gàng phần dưới sẽ cải thiện tỷ lệ tổng thể.",
+        "doList": [
+          "Cổ thuyền, trễ vai, cổ vuông để mở rộng đường vai",
+          "Màu sáng, họa tiết, và trang trí trên áo để thu hút mắt lên trên",
+          "Áo khoác và blazer có đệm vai",
+          "Chân váy chữ A, tulip, xoè tròn, cắt xéo",
+          "Quần eo cao bootcut, ống rộng, hoặc suông",
+          "Áo khoác ngắn, áo trench có dây thắt eo",
+          "Váy đắp chéo, váy fit-and-flare"
+        ],
+        "dontList": [
+          "Màu sáng, họa tiết, hoặc trang trí ở phần dưới",
+          "Quần skinny đơn lẻ (nhấn mạnh đường hông)",
+          "Áo dài ngang hông (làm nổi điểm rộng nhất)",
+          "Sọc ngang trên quần",
+          "Chân váy bút chì bó (nhấn mạnh hông)"
+        ]
+      },
+      "male": {
+        "desc": "Phần dưới cơ thể bạn rộng hơn phần trên. Thêm điểm nhấn ở phần trên sẽ cải thiện tỷ lệ tổng thể.",
+        "doList": [
+          "Blazer có cấu trúc và áo khoác đệm vai để mở rộng vai",
+          "Màu sáng và họa tiết trên áo để thu hút mắt lên trên",
+          "Chi tiết ngực (túi, cầu vai, sọc ngang)",
+          "Quần màu tối đơn sắc để gọn gàng",
+          "Quần suông, mặt trước phẳng",
+          "Áo len cổ chữ V hoặc cổ tròn",
+          "Áo khoác một hàng nút ve áo vừa"
+        ],
+        "dontList": [
+          "Áo không có cấu trúc (áo khoác giải cấu trúc, v.v.)",
+          "Quần skinny hoặc quần bó",
+          "Quần sáng với áo tối",
+          "Sọc ngang ở phần dưới",
+          "Quần baggy (phá vỡ cân bằng)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Hình chữ nhật",
+      "subtitle": "Dáng thẳng với vai, eo và hông tương đương",
+      "colorSummary": "Tạo tỷ lệ bằng tương phản màu áo-quần",
+      "female": {
+        "desc": "Bạn có dáng người nhìn chung thẳng. Tạo đường eo hoặc thêm đường cong sẽ rất đẹp.",
+        "doList": [
+          "Cổ chữ V, cổ tròn, cổ trái tim để tạo đường dọc và đường cong",
+          "Áo đắp chéo, peplum, blouse có dây thắt để xác định eo",
+          "Váy đắp chéo, fit-and-flare, váy có dây thắt lưng",
+          "Chân váy chữ A, đắp chéo, bất đối xứng",
+          "Quần eo cao bootcut hoặc ống rộng",
+          "Tay phồng, tay bèo, tay bóng để tạo khối",
+          "Phối chất liệu (len + denim, v.v.) phối lớp",
+          "Thắt lưng để nhấn đường eo (rộng mỏng đến vừa)"
+        ],
+        "dontList": [
+          "Form boxy hoặc rộng đơn lẻ (che đường cơ thể nhiều hơn)",
+          "Cổ lọ hoặc cổ cao (nhấn mạnh đường thẳng)",
+          "Áo và quần cùng màu mặc thẳng (trông phẳng)",
+          "Chỉ tạo khối ở eo (phá vỡ cân bằng tổng thể)",
+          "Đồ không có form mặc đơn lẻ"
+        ]
+      },
+      "male": {
+        "desc": "Bạn có dáng người nhìn chung thẳng. Tạo chiều sâu qua phối lớp và tương phản màu sẽ rất đẹp.",
+        "doList": [
+          "Tạo chiều sâu và chiều qua phối lớp",
+          "Nhấn mạnh đường eo bằng thắt lưng hoặc bỏ áo trong quần",
+          "Chia tỷ lệ bằng tương phản màu áo-quần",
+          "Phối chất liệu (len + denim, v.v.)",
+          "Tạo đường dọc bằng áo khoác và cardigan",
+          "Áo thun cổ tròn, áo len cổ chữ V",
+          "Blazer có cấu trúc (có đệm vai)"
+        ],
+        "dontList": [
+          "Áo và quần cùng màu mặc thẳng (trông phẳng)",
+          "Form boxy đơn lẻ (che đường cơ thể nhiều hơn)",
+          "Sọc dọc (nhấn mạnh đường thẳng hơn)",
+          "Quần rộng hoặc ống rộng",
+          "Áo hoặc khoác dài (nhấn mạnh đường dọc thẳng)",
+          "Áo sơ mi phẳng, không có form"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Đồng hồ cát",
+      "subtitle": "Vai và hông cân bằng với eo thắt rõ",
+      "colorSummary": "Mặc gì cũng được! Chỉ cần nhấn eo",
+      "female": {
+        "desc": "Bạn có vai và hông cân bằng với eo thắt rõ ràng. Làm nổi bật đường cong tự nhiên sẽ rất đẹp.",
+        "doList": [
+          "Trang phục nhấn đường eo (bỏ áo trong quần, thắt lưng, đắp chéo)",
+          "Cổ chữ V, cổ tròn, cổ trái tim (đường ngực tự nhiên)",
+          "Váy đắp chéo, fit-and-flare, váy có dây thắt lưng",
+          "Chân váy bút chì (cho đường cong) hoặc chân váy xoè (bỏ áo trong)",
+          "Form vừa phải đẹp nhất",
+          "Chất liệu rủ (jersey, lụa, pha cotton)",
+          "Áo khoác một hàng nút, áo khoác ngắn, áo khoác có dây thắt lưng"
+        ],
+        "dontList": [
+          "Form oversized quá boxy (che đường cong)",
+          "Quá bó toàn thân (quá mức)",
+          "Áo khoác ngoài dài che eo",
+          "Len dày hoặc chất liệu cồng kềnh (thêm khối)",
+          "Hai hàng nút, eo trễ",
+          "Thắt lưng dày (trên 4,5cm)"
+        ]
+      },
+      "male": {
+        "desc": "Bạn có vai và hông cân bằng với eo thắt rõ ràng. Làm nổi bật đường cơ thể sẽ rất đẹp.",
+        "doList": [
+          "Trang phục nhấn đường eo (bỏ áo trong quần, thắt lưng)",
+          "Form vừa phải đẹp nhất",
+          "Màu đơn sắc với item nhấn",
+          "Chất liệu rủ tự nhiên trên người",
+          "Cả cổ chữ V và cổ tròn đều hợp",
+          "Áo sơ mi ôm, quần eo cao",
+          "Áo khoác một hàng nút (thắt eo)",
+          "Thắt lưng vừa (màu tương phản làm điểm nhấn)"
+        ],
+        "dontList": [
+          "Form oversized quá boxy (che đường cong)",
+          "Quá bó toàn thân (quá mức)",
+          "Quần cạp trễ",
+          "Họa tiết hoặc màu sắc mạnh",
+          "Áo khoác oversized"
+        ]
+      }
+    },
+    "round": {
+      "name": "Tròn",
+      "subtitle": "Dáng tròn, tập trung vùng bụng",
+      "colorSummary": "Tông tối tổng thể với nhấn mạnh đường dọc",
+      "female": {
+        "desc": "Bạn có khối lượng tập trung ở phần giữa cơ thể. Tạo đường dọc và thu hút chú ý đến cổ, tay và chân sẽ tạo vẻ thon gọn hơn.",
+        "doList": [
+          "Cổ chữ V sâu, chữ V rộng, cổ tròn, cổ đổ để phân tán chú ý",
+          "Eo cao, áo đắp chéo, áo rủ nhẹ",
+          "Váy eo cao, chữ A, đắp chéo, fit-and-flare",
+          "Tay 3/4 để tay trông thon hơn và tập trung chi tiết",
+          "Chân váy chữ A, xoè, dài qua gối",
+          "Quần eo cao suông hoặc bootcut",
+          "Thắt lưng mỏng dưới ngực hoặc eo cao (cùng tông màu)",
+          "Áo khoác một hàng nút, hở trước, có cấu trúc (dài qua hông)",
+          "Áo ngực vừa vặn rất quan trọng (nền tảng cho dáng)"
+        ],
+        "dontList": [
+          "Chất liệu bó hoặc siết phần giữa",
+          "Chi tiết ngang hoặc trang trí ở eo",
+          "Áo khoác hai hàng nút hoặc áo khoác ngắn",
+          "Quần short bó",
+          "Áo màu sáng đơn lẻ (nhấn mạnh bụng)",
+          "Sọc ngang, họa tiết lớn"
+        ]
+      },
+      "male": {
+        "desc": "Bạn có khối lượng tập trung ở phần giữa cơ thể. Đường dọc và màu tối ở giữa tạo vẻ thon gọn hơn.",
+        "doList": [
+          "Áo và lớp giữa màu tối để phần giữa trông thon",
+          "Nhấn mạnh đường dọc (áo khoác mở, cardigan)",
+          "Trang phục đơn sắc hoặc cùng tông để trông dài hơn",
+          "Cổ chữ V hoặc cổ tròn sâu để phân tán chú ý",
+          "Áo khoác có cấu trúc để chỉnh dáng",
+          "Áo khoác một hàng nút, mở trước",
+          "Quần suông hoặc hơi thuôn"
+        ],
+        "dontList": [
+          "Áo màu sáng đơn lẻ (nhấn mạnh bụng)",
+          "Sọc ngang, họa tiết lớn",
+          "Áo ngắn (lộ đường eo)",
+          "Quá bó",
+          "Áo khoác hai hàng nút",
+          "Quần xếp ly hoặc eo cao",
+          "Thắt lưng màu sắc",
+          "Quần baggy hoặc oversized (thêm khối)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "So sánh chiều rộng vai và hông của bạn:",
+        "options": ["Vai tôi rộng hơn", "Hông tôi rộng hơn", "Chúng gần như bằng nhau"]
+      },
+      {
+        "question": "Đường eo của bạn thế nào?",
+        "options": ["Eo tôi thắt rõ ràng", "Eo và hông tôi thẳng", "Vùng bụng tôi nhô ra"]
+      },
+      {
+        "question": "Phần nào của bạn có khối lượng nhiều hơn — thân trên hay thân dưới?",
+        "options": ["Thân trên nhiều hơn", "Thân dưới nhiều hơn", "Gần như bằng nhau"]
+      },
+      {
+        "question": "Điều gì khiến bạn lo lắng nhất khi chọn quần áo?",
+        "options": ["Lo về áo vì vai rộng", "Hông và đùi làm tôi phiền", "Vùng bụng làm tôi phiền", "Tôi trông phẳng tổng thể", "Không có lo lắng đặc biệt (cân đối)"]
+      },
+      {
+        "question": "Form áo nào phù hợp nhất với bạn?",
+        "options": ["Ôm (bó sát)", "Vừa vặn (trung bình)", "Rộng (thoải mái)"]
+      }
+    ]
+  }
+}

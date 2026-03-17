@@ -1,0 +1,359 @@
+{
+  "names": {
+    "outer": "Casaco",
+    "middleware": "Camada Média",
+    "top": "Top",
+    "inner": "Interior",
+    "bottom": "Bottom",
+    "scarf": "Cachecol",
+    "hat": "Chapéu",
+    "shoes": "Calçado",
+    "mid_knit": "Tricô",
+    "mid_cardigan": "Cardigã",
+    "mid_vest": "Colete",
+    "outer_coat": "Sobretudo",
+    "outer_jacket": "Jaqueta",
+    "outer_padding": "Puffer"
+  },
+  "seasons": {
+    "spring": "Primavera",
+    "summer": "Verão",
+    "fall": "Outono",
+    "winter": "Inverno"
+  },
+  "fabricItems": {
+    "outer": {
+      "leather_jacket": {
+        "name": "Jaqueta de Couro",
+        "desc": "Jaqueta de couro bovino/cordeiro estilo rider ou blouson"
+      },
+      "denim_jacket": {
+        "name": "Jaqueta Jeans",
+        "desc": "Jaqueta jeans, trucker jacket"
+      },
+      "wool_coat": {
+        "name": "Casaco de Lã",
+        "desc": "Casaco de lã abotoamento simples ou duplo"
+      },
+      "padding": {
+        "name": "Jaqueta Puffer",
+        "desc": "Puffer de pluma de ganso ou poliéster"
+      },
+      "fleece_jacket": {
+        "name": "Jaqueta de Fleece",
+        "desc": "Fleece sherpa ou boa"
+      },
+      "cotton_jacket": {
+        "name": "Jaqueta de Algodão",
+        "desc": "Blazer de chino ou algodão"
+      },
+      "nylon_jacket": {
+        "name": "Jaqueta de Nylon",
+        "desc": "Corta-vento ou coach jacket"
+      },
+      "linen_jacket": {
+        "name": "Jaqueta de Linho",
+        "desc": "Blazer de linho ou cânhamo"
+      },
+      "tweed_jacket": {
+        "name": "Jaqueta de Tweed",
+        "desc": "Blazer de tweed"
+      },
+      "suede_jacket": {
+        "name": "Jaqueta de Camurça",
+        "desc": "Blouson ou jaqueta de camurça"
+      },
+      "waxed_jacket": {
+        "name": "Jaqueta Encerada",
+        "desc": "Jaqueta Barbour ou encerada"
+      }
+    },
+    "middleware": {
+      "wool_knit": {
+        "name": "Tricô de Lã",
+        "desc": "Tricô de lã de cordeiro ou lã merino"
+      },
+      "cotton_knit": {
+        "name": "Tricô de Algodão",
+        "desc": "Tricô de algodão ou cardigã"
+      },
+      "cashmere_knit": {
+        "name": "Tricô de Caxemira",
+        "desc": "Pulôver de caxemira"
+      },
+      "fleece_mid": {
+        "name": "Fleece",
+        "desc": "Fleece de camada média"
+      },
+      "cardigan_wool": {
+        "name": "Cardigã de Lã",
+        "desc": "Cardigã de lã com gola xale"
+      },
+      "vest_padding": {
+        "name": "Colete Puffer",
+        "desc": "Colete puffer leve"
+      },
+      "vest_knit": {
+        "name": "Colete de Tricô",
+        "desc": "Colete de tricô ou suéter sem manga"
+      },
+      "hoodie": {
+        "name": "Moletom com Zíper",
+        "desc": "Moletom com zíper de algodão ou forrado em fleece"
+      },
+      "sweatshirt_mid": {
+        "name": "Moletom",
+        "desc": "Moletom de camada média"
+      }
+    },
+    "top": {
+      "cotton_tee": {
+        "name": "Camiseta de Algodão",
+        "desc": "Camiseta de algodão gola redonda ou gola V"
+      },
+      "oxford_shirt": {
+        "name": "Camisa Oxford",
+        "desc": "Camisa Oxford com botão"
+      },
+      "linen_shirt": {
+        "name": "Camisa de Linho",
+        "desc": "Camisa de linho ou cânhamo"
+      },
+      "flannel_shirt": {
+        "name": "Camisa de Flanela",
+        "desc": "Camisa xadrez escovada"
+      },
+      "denim_shirt": {
+        "name": "Camisa Jeans",
+        "desc": "Camisa chambray ou jeans"
+      },
+      "silk_blouse": {
+        "name": "Blusa de Seda",
+        "desc": "Blusa de seda ou cetim"
+      },
+      "polo_shirt": {
+        "name": "Polo",
+        "desc": "Polo de piquet"
+      },
+      "turtleneck": {
+        "name": "Gola Alta",
+        "desc": "Gola alta de algodão ou modal"
+      },
+      "wool_turtleneck": {
+        "name": "Gola Alta de Lã",
+        "desc": "Tricô gola alta de lã"
+      },
+      "henley": {
+        "name": "Henley",
+        "desc": "Henley waffle ou térmico"
+      }
+    },
+    "bottom": {
+      "raw_denim": {
+        "name": "Calça Jeans",
+        "desc": "Jeans reto ou slim"
+      },
+      "chino": {
+        "name": "Calça Chino",
+        "desc": "Calça chino de algodão"
+      },
+      "wool_slacks": {
+        "name": "Calça Social de Lã",
+        "desc": "Calça social de lã"
+      },
+      "linen_pants": {
+        "name": "Calça de Linho",
+        "desc": "Calça de linho wide ou reta"
+      },
+      "corduroy": {
+        "name": "Calça de Veludo Cotelê",
+        "desc": "Calça de veludo cotelê"
+      },
+      "cotton_shorts": {
+        "name": "Bermuda de Algodão",
+        "desc": "Bermuda chino ou cargo"
+      },
+      "cargo_pants": {
+        "name": "Calça Cargo",
+        "desc": "Calça cargo de algodão ou nylon"
+      },
+      "sweatpants": {
+        "name": "Calça de Moletom",
+        "desc": "Jogger ou calça de treino"
+      },
+      "leather_pants": {
+        "name": "Calça de Couro",
+        "desc": "Calça de couro ou ecocouro"
+      },
+      "nylon_pants": {
+        "name": "Calça de Nylon",
+        "desc": "Calça tech ou outdoor"
+      }
+    },
+    "shoes": {
+      "leather_shoes": {
+        "name": "Sapato de Couro",
+        "desc": "Sapato Oxford ou Derby"
+      },
+      "leather_boots": {
+        "name": "Botas de Couro",
+        "desc": "Botas Chelsea ou com cadarço"
+      },
+      "suede_boots": {
+        "name": "Botas de Camurça",
+        "desc": "Botas Chelsea ou desert de camurça"
+      },
+      "canvas_sneakers": {
+        "name": "Tênis de Lona",
+        "desc": "Converse ou Jack Purcell"
+      },
+      "leather_sneakers": {
+        "name": "Tênis de Couro",
+        "desc": "Tênis branco ou minimalista"
+      },
+      "suede_shoes": {
+        "name": "Sapato de Camurça",
+        "desc": "Mocassins ou Derby de camurça"
+      },
+      "loafer": {
+        "name": "Mocassins",
+        "desc": "Mocassim penny ou com tassel"
+      },
+      "hiking_boots": {
+        "name": "Botas de Trilha",
+        "desc": "Botas Gore-Tex ou trail"
+      },
+      "sandals": {
+        "name": "Sandálias",
+        "desc": "Birkenstock ou sandálias com tiras"
+      }
+    },
+    "scarf": {
+      "wool_scarf": {
+        "name": "Cachecol de Lã",
+        "desc": "Cachecol de lã de cordeiro ou merino"
+      },
+      "cashmere_scarf": {
+        "name": "Cachecol de Caxemira",
+        "desc": "Cachecol de caxemira"
+      },
+      "cotton_scarf": {
+        "name": "Cachecol de Algodão",
+        "desc": "Cachecol de algodão ou gaze"
+      },
+      "silk_scarf": {
+        "name": "Lenço de Seda",
+        "desc": "Lenço de seda para pescoço"
+      },
+      "linen_scarf": {
+        "name": "Cachecol de Linho",
+        "desc": "Cachecol ou xale de linho"
+      }
+    }
+  },
+  "compatRules": {
+    "leather_denim_great": "Couro × Jeans: Uma combinação clássica biker/casual",
+    "leather_wool_great": "Couro × Lã: Equilibra formalidade com textura",
+    "leather_cotton_great": "Couro × Algodão: Combinação casual e sofisticada",
+    "leather_cashmere_great": "Couro × Caxemira: Sobreposição de luxo",
+    "denim_cotton_great": "Jeans × Algodão: A combinação casual mais natural",
+    "denim_flannel_great": "Jeans × Flanela: Essencial do estilo americana/workwear",
+    "denim_wool_great": "Jeans × Lã: Casual encontra aconchego",
+    "wool_cotton_great": "Lã × Algodão: Básico de sobreposição",
+    "wool_silk_great": "Lã × Seda: Contraste de textura elevado",
+    "wool_cashmere_great": "Lã × Caxemira: Combinação de inverno quente e elegante",
+    "linen_cotton_great": "Linho × Algodão: Melhor combinação de verão",
+    "linen_linen_great": "Linho × Linho: Visual fresco e coeso",
+    "cotton_cotton_great": "Algodão × Algodão: Combinação confortável e natural",
+    "cotton_jersey_great": "Camisa de Algodão × Jersey: Sobreposição básica",
+    "suede_denim_great": "Camurça × Jeans: Clima vintage",
+    "suede_wool_great": "Camurça × Lã: Sobreposição de texturas de outono",
+    "suede_cotton_great": "Camurça × Algodão: Mix de texturas naturais",
+    "suede_corduroy_great": "Camurça × Veludo Cotelê: Essencial vintage de outono",
+    "tweed_cotton_great": "Tweed × Algodão: Visual britânico clássico",
+    "tweed_wool_great": "Tweed × Lã: Texturas harmoniosas da mesma família",
+    "tweed_silk_great": "Tweed × Seda: Clássico formal encontra sofisticação",
+    "corduroy_cotton_great": "Veludo Cotelê × Algodão: Essencial casual de outono",
+    "corduroy_wool_great": "Veludo Cotelê × Lã: Sobreposição quente outono/inverno",
+    "corduroy_flannel_great": "Veludo Cotelê × Flanela: Combo vintage workwear",
+    "corduroy_denim_great": "Veludo Cotelê × Jeans: Casual texturizado",
+    "waxed_wool_great": "Encerado × Lã: Essencial do estilo campo britânico",
+    "waxed_denim_great": "Encerado × Jeans: Clima outdoor rústico",
+    "waxed_corduroy_great": "Encerado × Veludo Cotelê: Visual campo britânico",
+    "knit_woven_great": "Tricô × Tecido Plano: Contraste de textura marcante",
+    "knit_denim_great": "Tricô × Jeans: Básico de sobreposição casual",
+    "silk_cotton_great": "Seda × Algodão: Contraste de textura sofisticado",
+    "pique_chino_great": "Piquet × Chino: Combo essencial preppy",
+    "pique_cotton_great": "Piquet × Algodão: Casual clean",
+    "leather_leather_ok": "Couro × Couro: Possível, mas pode ser excessivo. Varie as cores",
+    "leather_nylon_ok": "Couro × Nylon: Funciona para streetwear/techwear",
+    "leather_fleece_ok": "Couro × Fleece: Possível, mas os estilos podem conflitar",
+    "denim_denim_ok": "Jeans × Jeans: OK com lavagens diferentes (tuxedo canadense)",
+    "nylon_cotton_ok": "Nylon × Algodão: Mix esportivo-casual",
+    "nylon_nylon_ok": "Nylon × Nylon: Funciona para techwear/outdoor",
+    "nylon_denim_ok": "Nylon × Jeans: Funciona para street casual",
+    "fleece_denim_ok": "Fleece × Jeans: Casual outdoor",
+    "fleece_cotton_ok": "Fleece × Algodão: Sobreposição prática",
+    "fleece_nylon_great": "Fleece × Nylon: Essencial gorpcore/outdoor",
+    "padding_cotton_ok": "Puffer × Algodão: Combo prático de inverno",
+    "padding_denim_ok": "Puffer × Jeans: Básico casual de inverno",
+    "padding_wool_ok": "Puffer × Lã: Quente, mas cuidado com o volume",
+    "jersey_jersey_ok": "Jersey × Jersey: Confortável, mas pode parecer casual demais",
+    "jersey_denim_great": "Jersey × Jeans: Básico casual do dia a dia",
+    "jersey_wool_ok": "Jersey × Lã: Cuidado com a diferença de formalidade",
+    "synthetic_cotton_ok": "Sintético × Algodão: Função encontra conforto",
+    "canvas_denim_great": "Lona × Jeans: Essencial casual",
+    "canvas_cotton_great": "Lona × Algodão: Casual confortável",
+    "canvas_chino_great": "Lona × Chino: Casual clean",
+    "rubber_cotton_ok": "Borracha × Algodão: Casual de verão",
+    "rubber_linen_ok": "Borracha × Linho: Visual resort de verão",
+    "leather_linen_bad": "Couro × Linho: Conflito de peso e sensação sazonal",
+    "leather_rubber_bad": "Couro × Borracha: Conflito extremo de formalidade",
+    "silk_fleece_bad": "Seda × Fleece: Diferença de formalidade muito grande",
+    "silk_nylon_bad": "Seda × Nylon: Conflito entre formal e esportivo",
+    "silk_rubber_bad": "Seda × Borracha: Conflito extremo entre luxo e casual",
+    "tweed_nylon_bad": "Tweed × Nylon: Conflito entre clássico e esportivo",
+    "tweed_fleece_bad": "Tweed × Fleece: Diferença de formalidade desconfortável",
+    "tweed_jersey_ok": "Tweed × Jersey: Possível como mix-and-match, use com cuidado",
+    "cashmere_nylon_bad": "Caxemira × Nylon: Conflito de qualidade dos materiais",
+    "cashmere_fleece_bad": "Caxemira × Fleece: Conflito entre luxo e utilitário",
+    "cashmere_rubber_bad": "Caxemira × Borracha: Diferença extrema de formalidade",
+    "formal_fleece_bad": "Formal × Fleece: Conflito entre social e outdoor",
+    "formal_rubber_bad": "Formal × Borracha: Conflito extremo de formalidade",
+    "formal_jersey_bad": "Sapato Social × Jersey: Sapato social com moletom é estranho",
+    "semiformal_fleece_bad": "Semi-Formal × Fleece: Conflito de estilos",
+    "linen_wool_bad": "Linho × Lã: Conflito sazonal completo",
+    "linen_padding_bad": "Linho × Puffer: Conflito entre materiais de verão e inverno",
+    "linen_fleece_bad": "Linho × Fleece: Conflito sazonal",
+    "linen_flannel_bad": "Linho × Flanela: Conflito entre fresco e quente",
+    "padding_silk_bad": "Puffer × Seda: Conflito entre formalidade e funcionalidade",
+    "padding_linen_bad": "Puffer × Linho: Estações opostas",
+    "waxed_silk_bad": "Encerado × Seda: Conflito entre rústico e delicado",
+    "waxed_linen_bad": "Encerado × Linho: Incompatibilidade sazonal",
+    "boots_linen_bad": "Botas × Linho: Desequilíbrio entre calçado pesado e tecido leve",
+    "boots_silk_ok": "Botas × Seda: Mix ousado, OK se intencional",
+    "corduroy_linen_bad": "Veludo Cotelê × Linho: Conflito sazonal outono e verão",
+    "flannel_linen_bad": "Flanela × Linho: Conflito entre quente e fresco",
+    "rubber_wool_bad": "Sandália de Borracha × Lã: Conflito sazonal",
+    "rubber_flannel_bad": "Borracha × Flanela: Conflito entre verão e outono",
+    "default_ok": "Sem regra de compatibilidade específica — uma combinação neutra"
+  },
+  "itemsCatalog": {
+    "padding": "Puffer",
+    "coat": "Casaco",
+    "jacket": "Jaqueta",
+    "hood_zip": "Moletom com Zíper",
+    "cardigan": "Cardigã",
+    "knit_zip": "Tricô com Zíper",
+    "vest": "Colete",
+    "hoodie": "Moletom",
+    "knit": "Tricô",
+    "mtm": "Moletom",
+    "shirt": "Camisa",
+    "tshirt": "Camiseta",
+    "scarf": "Cachecol",
+    "hat": "Chapéu",
+    "bottom": "Bottom",
+    "shoes": "Calçado"
+  }
+}

@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
 // i18n/index.ts — i18next initialization for BaruPick
-// Languages: ko (default), en, ja, zh
+// Languages: ko, en, ja, zh, es, th, vi, id, pt, fr, de
 // Namespaces: ui, colors, categories, styles, bodyType, personalColor
 // ═══════════════════════════════════════════════════════
 import i18n from 'i18next'
@@ -38,39 +38,74 @@ import zhStyles from './zh/styles.json'
 import zhBodyType from './zh/bodyType.json'
 import zhPersonalColor from './zh/personalColor.json'
 
+// Spanish
+import esUi from './es/ui.json'
+import esColors from './es/colors.json'
+import esCategories from './es/categories.json'
+import esStyles from './es/styles.json'
+import esBodyType from './es/bodyType.json'
+import esPersonalColor from './es/personalColor.json'
+
+// Thai
+import thUi from './th/ui.json'
+import thColors from './th/colors.json'
+import thCategories from './th/categories.json'
+import thStyles from './th/styles.json'
+import thBodyType from './th/bodyType.json'
+import thPersonalColor from './th/personalColor.json'
+
+// Vietnamese
+import viUi from './vi/ui.json'
+import viColors from './vi/colors.json'
+import viCategories from './vi/categories.json'
+import viStyles from './vi/styles.json'
+import viBodyType from './vi/bodyType.json'
+import viPersonalColor from './vi/personalColor.json'
+
+// Indonesian
+import idUi from './id/ui.json'
+import idColors from './id/colors.json'
+import idCategories from './id/categories.json'
+import idStyles from './id/styles.json'
+import idBodyType from './id/bodyType.json'
+import idPersonalColor from './id/personalColor.json'
+
+// Portuguese
+import ptUi from './pt/ui.json'
+import ptColors from './pt/colors.json'
+import ptCategories from './pt/categories.json'
+import ptStyles from './pt/styles.json'
+import ptBodyType from './pt/bodyType.json'
+import ptPersonalColor from './pt/personalColor.json'
+
+// French
+import frUi from './fr/ui.json'
+import frColors from './fr/colors.json'
+import frCategories from './fr/categories.json'
+import frStyles from './fr/styles.json'
+import frBodyType from './fr/bodyType.json'
+import frPersonalColor from './fr/personalColor.json'
+
+// German
+import deUi from './de/ui.json'
+import deColors from './de/colors.json'
+import deCategories from './de/categories.json'
+import deStyles from './de/styles.json'
+import deBodyType from './de/bodyType.json'
+import dePersonalColor from './de/personalColor.json'
+
 const resources = {
-  ko: {
-    ui: koUi,
-    colors: koColors,
-    categories: koCategories,
-    styles: koStyles,
-    bodyType: koBodyType,
-    personalColor: koPersonalColor,
-  },
-  en: {
-    ui: enUi,
-    colors: enColors,
-    categories: enCategories,
-    styles: enStyles,
-    bodyType: enBodyType,
-    personalColor: enPersonalColor,
-  },
-  ja: {
-    ui: jaUi,
-    colors: jaColors,
-    categories: jaCategories,
-    styles: jaStyles,
-    bodyType: jaBodyType,
-    personalColor: jaPersonalColor,
-  },
-  zh: {
-    ui: zhUi,
-    colors: zhColors,
-    categories: zhCategories,
-    styles: zhStyles,
-    bodyType: zhBodyType,
-    personalColor: zhPersonalColor,
-  },
+  ko: { ui: koUi, colors: koColors, categories: koCategories, styles: koStyles, bodyType: koBodyType, personalColor: koPersonalColor },
+  en: { ui: enUi, colors: enColors, categories: enCategories, styles: enStyles, bodyType: enBodyType, personalColor: enPersonalColor },
+  ja: { ui: jaUi, colors: jaColors, categories: jaCategories, styles: jaStyles, bodyType: jaBodyType, personalColor: jaPersonalColor },
+  zh: { ui: zhUi, colors: zhColors, categories: zhCategories, styles: zhStyles, bodyType: zhBodyType, personalColor: zhPersonalColor },
+  es: { ui: esUi, colors: esColors, categories: esCategories, styles: esStyles, bodyType: esBodyType, personalColor: esPersonalColor },
+  th: { ui: thUi, colors: thColors, categories: thCategories, styles: thStyles, bodyType: thBodyType, personalColor: thPersonalColor },
+  vi: { ui: viUi, colors: viColors, categories: viCategories, styles: viStyles, bodyType: viBodyType, personalColor: viPersonalColor },
+  id: { ui: idUi, colors: idColors, categories: idCategories, styles: idStyles, bodyType: idBodyType, personalColor: idPersonalColor },
+  pt: { ui: ptUi, colors: ptColors, categories: ptCategories, styles: ptStyles, bodyType: ptBodyType, personalColor: ptPersonalColor },
+  fr: { ui: frUi, colors: frColors, categories: frCategories, styles: frStyles, bodyType: frBodyType, personalColor: frPersonalColor },
+  de: { ui: deUi, colors: deColors, categories: deCategories, styles: deStyles, bodyType: deBodyType, personalColor: dePersonalColor },
 }
 
 const storedLang = localStorage.getItem('sp_language')
@@ -110,8 +145,30 @@ export function getLocale(lang?: string): string {
     en: 'en-US',
     ja: 'ja-JP',
     zh: 'zh-CN',
+    es: 'es-ES',
+    th: 'th-TH',
+    vi: 'vi-VN',
+    id: 'id-ID',
+    pt: 'pt-BR',
+    fr: 'fr-FR',
+    de: 'de-DE',
   }
   return map[l] || 'ko-KR'
 }
+
+/** All supported language definitions */
+export const SUPPORTED_LANGUAGES = [
+  { code: 'ko', label: '한국어', flag: '🇰🇷', nativeName: '한국어' },
+  { code: 'en', label: 'English', flag: '🇺🇸', nativeName: 'English' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵', nativeName: '日本語' },
+  { code: 'zh', label: '中文', flag: '🇨🇳', nativeName: '中文' },
+  { code: 'es', label: 'Español', flag: '🇪🇸', nativeName: 'Español' },
+  { code: 'th', label: 'ไทย', flag: '🇹🇭', nativeName: 'ไทย' },
+  { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳', nativeName: 'Tiếng Việt' },
+  { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩', nativeName: 'Bahasa Indonesia' },
+  { code: 'pt', label: 'Português', flag: '🇧🇷', nativeName: 'Português' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷', nativeName: 'Français' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪', nativeName: 'Deutsch' },
+] as const
 
 export default i18n

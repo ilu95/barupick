@@ -1,0 +1,311 @@
+{
+  "diagnosis": {
+    "questions": [
+      {
+        "question": "Compare a largura dos seus ombros e quadril:",
+        "options": [
+          "Meus ombros são mais largos",
+          "Meu quadril é mais largo",
+          "São mais ou menos iguais"
+        ]
+      },
+      {
+        "question": "Como é a sua cintura?",
+        "options": [
+          "Minha cintura é bem definida",
+          "Minha cintura e quadril são retos",
+          "Minha barriga é saliente"
+        ]
+      },
+      {
+        "question": "Qual área mais te incomoda?",
+        "options": [
+          "Meus ombros parecem estreitos",
+          "Meus ombros parecem largos",
+          "Minha barriga parece proeminente",
+          "Minhas pernas parecem curtas",
+          "Pareço baixo(a) no geral",
+          "Nenhuma preocupação especial"
+        ]
+      }
+    ],
+    "effects": {
+      "shoulder-wide": {
+        "name": "Fazer Ombros Parecerem Mais Largos",
+        "description": "Use tops de cores claras e gola canoa/mangas bufantes para destacar a linha dos ombros."
+      },
+      "shoulder-narrow": {
+        "name": "Fazer Ombros Parecerem Mais Estreitos",
+        "description": "Use tops de cores escuras para reduzir visualmente os ombros e bottoms claros para distribuir a atenção."
+      },
+      "belly": {
+        "name": "Minimizar Aparência da Barriga",
+        "description": "Use tops/camadas médias de cores escuras para disfarçar visualmente a região da barriga."
+      },
+      "legs-long": {
+        "name": "Fazer Pernas Parecerem Mais Longas",
+        "description": "Combine as cores da calça e do calçado para criar uma linha de pernas mais longa."
+      },
+      "height-tall": {
+        "name": "Parecer Mais Alto(a)",
+        "description": "Enfatize linhas verticais com cores sólidas ou tons semelhantes."
+      },
+      "none": {
+        "name": "Apenas Harmonia de Cores",
+        "description": "Foque apenas na harmonia de cores sem compensação de tipo corporal."
+      }
+    }
+  },
+  "guide": {
+    "inverted": {
+      "name": "Triângulo Invertido",
+      "subtitle": "Ombros largos, quadril estreito",
+      "colorSummary": "Tops escuros, bottoms claros",
+      "female": {
+        "desc": "Você tem ombros/peito largos e parte inferior relativamente fina. Adicionar volume à parte inferior e suavizar a parte superior cria equilíbrio.",
+        "doList": [
+          "Decote V profundo, U estreito ou assimétrico para estreitar os ombros",
+          "Cores claras e estampas nos bottoms para adicionar volume na parte inferior",
+          "Mantenha tops simples com estilos transpassados ou cintura império",
+          "Saias evasê, plissadas, tulipa ou volumosas para destaque na parte inferior",
+          "Calças pantalona, bootcut ou boyfriend para volume na parte inferior",
+          "Defina a cintura com cintos ou jaquetas transpassadas",
+          "Mangas raglan, quimono ou morcego para suavizar a linha dos ombros"
+        ],
+        "dontList": [
+          "Ombro a ombro, gola canoa, gola quadrada — faz os ombros parecerem mais largos",
+          "Ombreiras, mangas bufantes, detalhes nos ombros",
+          "Tops claros com bottoms escuros (contraproducente)",
+          "Jeans skinny sozinho (faz a parte inferior parecer mais fina)",
+          "Listras horizontais ou estampas grandes nos tops"
+        ]
+      },
+      "male": {
+        "desc": "Você tem ombros largos e parte superior desenvolvida. Adicionar volume à parte inferior melhora o equilíbrio.",
+        "doList": [
+          "Gola V para reduzir visualmente os ombros e enfatizar linhas verticais",
+          "Bottoms de cores claras para enfatizar o volume da parte inferior",
+          "Cores sólidas escuras nos tops para reduzir visualmente os ombros",
+          "Calças cargo ou wide para volume na parte inferior",
+          "Mangas raglan para suavizar a linha dos ombros",
+          "Blazers de abotoamento simples com lapela fina",
+          "Calças retas ou bootcut"
+        ],
+        "dontList": [
+          "Ombreiras, mangas bufantes",
+          "Tops claros com bottoms escuros (contraproducente)",
+          "Gola canoa — faz os ombros parecerem mais largos",
+          "Listras horizontais nos tops",
+          "Jeans skinny sozinho (quebra o equilíbrio)",
+          "Camisetas boxy, jaquetas grossas e volumosas"
+        ]
+      }
+    },
+    "triangle": {
+      "name": "Triângulo",
+      "subtitle": "Ombros estreitos, quadril largo",
+      "colorSummary": "Tops claros, bottoms escuros",
+      "female": {
+        "desc": "Sua parte inferior é mais larga que a superior. Chamar atenção para a parte superior e afinar a inferior melhora as proporções gerais.",
+        "doList": [
+          "Gola canoa, ombro a ombro, gola quadrada para alargar a linha dos ombros",
+          "Cores claras, estampas e detalhes nos tops para atrair o olhar para cima",
+          "Jaquetas e blazers com ombreiras",
+          "Saias evasê, tulipa, godê, evasê enviesada",
+          "Calças cintura alta bootcut, pantalona ou retas",
+          "Jaquetas curtas, trench coats com amarração na cintura",
+          "Vestidos transpassados, vestidos fit-and-flare"
+        ],
+        "dontList": [
+          "Cores claras, estampas ou detalhes na parte inferior",
+          "Jeans skinny sozinho (destaca a linha do quadril)",
+          "Tops na altura do quadril (destaca o ponto mais largo)",
+          "Listras horizontais nos bottoms",
+          "Saias lápis justas (destaca o quadril)"
+        ]
+      },
+      "male": {
+        "desc": "Sua parte inferior é mais larga que a superior. Adicionar pontos focais na parte superior melhora as proporções gerais.",
+        "doList": [
+          "Blazers estruturados e jaquetas com ombreiras para alargar os ombros",
+          "Cores claras e estampas nos tops para atrair o olhar para cima",
+          "Detalhes no peito (bolsos, dragonas, listras horizontais)",
+          "Cores sólidas escuras nos bottoms para afinar",
+          "Calças retas com frente lisa",
+          "Suéteres gola V ou gola redonda",
+          "Blazers de abotoamento simples com lapela média"
+        ],
+        "dontList": [
+          "Tops desestruturados (jaquetas desconstruídas, etc.)",
+          "Calças skinny ou bottoms justos",
+          "Bottoms claros com tops escuros",
+          "Listras horizontais na parte inferior",
+          "Calças largas demais (prejudica o equilíbrio)"
+        ]
+      }
+    },
+    "rectangle": {
+      "name": "Retângulo",
+      "subtitle": "Silhueta reta com ombros, cintura e quadril semelhantes",
+      "colorSummary": "Crie proporções com contraste de cores entre cima e baixo",
+      "female": {
+        "desc": "Você tem um corpo geralmente reto. Criar uma cintura ou adicionar curvas faz um visual incrível.",
+        "doList": [
+          "Gola V, U, coração para linhas verticais e curvas",
+          "Tops transpassados, peplum, blusas com cinto para definir a cintura",
+          "Vestidos transpassados, fit-and-flare, com cinto",
+          "Saias evasê, transpassadas, assimétricas",
+          "Calças cintura alta bootcut ou pantalona",
+          "Mangas bufantes, flutter, balão para volume",
+          "Mix de texturas (tricô + jeans, etc.) em camadas",
+          "Cinto para acentuar a cintura (largura fina a média)"
+        ],
+        "dontList": [
+          "Caimento boxy ou solto sozinho (esconde as linhas do corpo ainda mais)",
+          "Gola alta (enfatiza linhas retas)",
+          "Mesma cor em cima e embaixo usado reto (fica chapado)",
+          "Volume apenas na cintura (quebra o equilíbrio geral)",
+          "Peças sem forma usadas sozinhas"
+        ]
+      },
+      "male": {
+        "desc": "Você tem um corpo geralmente reto. Criar dimensão através de camadas e contraste de cores faz um visual incrível.",
+        "doList": [
+          "Crie profundidade e dimensão através de camadas",
+          "Acentue a cintura com cintos ou tuck-in",
+          "Divida as proporções com contraste de cores entre cima e baixo",
+          "Mix de texturas (tricô + jeans, etc.)",
+          "Crie linhas verticais com jaquetas e cardigãs",
+          "Camisetas gola redonda, suéteres gola V",
+          "Blazers estruturados (com ombreiras)"
+        ],
+        "dontList": [
+          "Mesma cor em cima e embaixo usado reto (fica chapado)",
+          "Caimento boxy sozinho (esconde as linhas do corpo ainda mais)",
+          "Listras verticais (enfatiza linhas retas ainda mais)",
+          "Calças soltas ou pantalona",
+          "Tops ou casacos longos (enfatiza a linha vertical reta)",
+          "Camisas chapadas e sem forma"
+        ]
+      }
+    },
+    "hourglass": {
+      "name": "Ampulheta",
+      "subtitle": "Ombros e quadril equilibrados com cintura definida",
+      "colorSummary": "Use qualquer coisa! Apenas acentue a cintura",
+      "female": {
+        "desc": "Você tem ombros e quadril equilibrados com uma cintura bem definida. Destacar suas linhas naturais fica incrível.",
+        "doList": [
+          "Caimentos que acentuam a cintura (tuck-in, cinto, transpassado)",
+          "Gola V, U, coração (linha natural do busto)",
+          "Vestidos transpassados, fit-and-flare, com cinto",
+          "Saia lápis (para curvas) ou saia godê (com tuck-in)",
+          "Caimento médio é o mais favorecedor",
+          "Tecidos com caimento (jersey, seda, blend de algodão)",
+          "Abotoamento simples, jaquetas curtas, casacos com cinto"
+        ],
+        "dontList": [
+          "Caimentos oversized excessivamente boxy (esconde suas linhas)",
+          "Caimento muito justo no corpo todo (exagera)",
+          "Casacos longos que escondem a cintura",
+          "Tricôs grossos ou tecidos pesados (adiciona volume)",
+          "Abotoamento duplo, cintura baixa",
+          "Cintos grossos (acima de 4,5cm)"
+        ]
+      },
+      "male": {
+        "desc": "Você tem ombros e quadril equilibrados com uma cintura bem definida. Destacar suas linhas fica incrível.",
+        "doList": [
+          "Caimentos que acentuam a cintura (tuck-in, cinto)",
+          "Caimento médio é o mais favorecedor",
+          "Cores sólidas com itens de destaque",
+          "Tecidos que caem naturalmente no corpo",
+          "Tanto gola V quanto gola redonda funcionam bem",
+          "Camisas slim-fit, calças cintura alta",
+          "Blazer de abotoamento simples (com supressão na cintura)",
+          "Cinto médio (cor contrastante para destaque)"
+        ],
+        "dontList": [
+          "Caimentos oversized excessivamente boxy (esconde suas linhas)",
+          "Caimento muito justo no corpo todo (exagera)",
+          "Calças de cintura baixa",
+          "Estampas ou cores chamativas",
+          "Jaquetas ou casacos oversized"
+        ]
+      }
+    },
+    "round": {
+      "name": "Redondo",
+      "subtitle": "Silhueta arredondada centrada na barriga",
+      "colorSummary": "Tons escuros no geral com ênfase em linhas verticais",
+      "female": {
+        "desc": "Você carrega volume na região do abdômen. Criar linhas verticais e chamar atenção para o decote, braços e pernas cria um visual mais esbelto.",
+        "doList": [
+          "Gola V profunda, V larga, U, drapeada para distribuir a atenção",
+          "Cintura império, tops transpassados, tops fluidos drapeados",
+          "Vestidos cintura império, evasê, transpassados, fit-and-flare",
+          "Mangas 3/4 para braços visualmente mais finos e foco em detalhes",
+          "Saias evasê, godê, acima do joelho ou mais longas",
+          "Calças cintura alta retas ou bootcut",
+          "Cinto fino abaixo do busto ou na cintura alta (combinando tom)",
+          "Blazers de abotoamento simples, abertos na frente, estruturados (comprimento do quadril+)",
+          "Sutiã bem ajustado é essencial (base para a silhueta)"
+        ],
+        "dontList": [
+          "Tecidos aderentes ou região do abdômen justa",
+          "Detalhes ou aplicações horizontais na cintura",
+          "Blazers de abotoamento duplo ou curtos",
+          "Bermudas justas",
+          "Tops de cores claras sozinhos (destaca a barriga)",
+          "Listras horizontais, estampas grandes"
+        ]
+      },
+      "male": {
+        "desc": "Você carrega volume na região do abdômen. Linhas verticais e cores escuras no centro criam uma aparência mais esbelta.",
+        "doList": [
+          "Cores escuras nos tops e camadas médias para centro mais fino",
+          "Enfatize linhas verticais (jaquetas abertas, cardigãs)",
+          "Looks monocromáticos ou tons similares para visual mais longo",
+          "Gola V ou gola redonda profunda para distribuir a atenção",
+          "Blazers estruturados para organizar a silhueta",
+          "Blazers de abotoamento simples, abertos",
+          "Calças retas ou levemente afuniladas"
+        ],
+        "dontList": [
+          "Tops de cores claras sozinhos (destaca a barriga)",
+          "Listras horizontais, estampas grandes",
+          "Tops curtos (expõe a cintura)",
+          "Caimentos muito justos",
+          "Blazers de abotoamento duplo",
+          "Calças pregas ou cintura alta",
+          "Cintos coloridos",
+          "Roupas largas ou oversized (adiciona volume)"
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "questions": [
+      {
+        "question": "Compare a largura dos seus ombros e quadril:",
+        "options": ["Meus ombros são mais largos", "Meu quadril é mais largo", "São mais ou menos iguais"]
+      },
+      {
+        "question": "Como é a sua cintura?",
+        "options": ["Minha cintura é bem definida", "Minha cintura e quadril são retos", "Minha barriga é saliente"]
+      },
+      {
+        "question": "Onde você tem mais volume — parte superior ou inferior?",
+        "options": ["Mais volume na parte superior", "Mais volume na parte inferior", "Mais ou menos igual"]
+      },
+      {
+        "question": "O que mais te incomoda ao escolher roupas?",
+        "options": ["Me preocupo com o caimento por causa dos ombros largos", "Quadril e coxas me incomodam", "A região da barriga me incomoda", "Pareço chapado(a) no geral", "Sem preocupação especial (bem equilibrado)"]
+      },
+      {
+        "question": "Qual caimento de top combina mais com você?",
+        "options": ["Slim fit (justo ao corpo)", "Regular fit (moderado)", "Oversized (folgado)"]
+      }
+    ]
+  }
+}
