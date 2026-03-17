@@ -2,284 +2,284 @@
   "diagnosis": {
     "questions": [
       {
-        "question": "Compare your shoulder and hip width:",
+        "question": "เปรียบเทียบความกว้างของไหล่และสะโพก:",
         "options": [
-          "My shoulders are wider",
-          "My hips are wider",
-          "They're about the same"
+          "ไหล่กว้างกว่า",
+          "สะโพกกว้างกว่า",
+          "ใกล้เคียงกัน"
         ]
       },
       {
-        "question": "How is your waistline?",
+        "question": "เอวของคุณเป็นอย่างไร?",
         "options": [
-          "My waist is well-defined",
-          "My waist and hips are straight",
-          "My belly area protrudes"
+          "เอวเว้าชัดเจน",
+          "เอวกับสะโพกตรงเสมอกัน",
+          "บริเวณหน้าท้องยื่นออกมา"
         ]
       },
       {
-        "question": "What area concerns you most?",
+        "question": "บริเวณไหนที่คุณกังวลมากที่สุด?",
         "options": [
-          "My shoulders look narrow",
-          "My shoulders look wide",
-          "My belly looks prominent",
-          "My legs look short",
-          "I look short overall",
-          "No particular concern"
+          "ไหล่ดูแคบ",
+          "ไหล่ดูกว้าง",
+          "หน้าท้องดูเด่น",
+          "ขาดูสั้น",
+          "ดูเตี้ยโดยรวม",
+          "ไม่มีข้อกังวลเป็นพิเศษ"
         ]
       }
     ],
     "effects": {
       "shoulder-wide": {
-        "name": "Make Shoulders Look Wider",
-        "description": "Use light-colored tops and boat neck/puff sleeves to emphasize the shoulder line."
+        "name": "ทำให้ไหล่ดูกว้างขึ้น",
+        "description": "ใช้เสื้อสีอ่อนและคอเรือ/แขนพอง เพื่อเน้นแนวไหล่"
       },
       "shoulder-narrow": {
-        "name": "Make Shoulders Look Narrower",
-        "description": "Use dark-colored tops to visually reduce shoulders, and light bottoms to distribute attention."
+        "name": "ทำให้ไหล่ดูแคบลง",
+        "description": "ใช้เสื้อสีเข้มเพื่อลดขนาดไหล่ด้วยสายตา และกางเกงสีอ่อนเพื่อกระจายจุดสนใจ"
       },
       "belly": {
-        "name": "Minimize Belly Appearance",
-        "description": "Use dark-colored tops/mid layers to visually conceal the belly area."
+        "name": "ลดความเด่นของหน้าท้อง",
+        "description": "ใช้เสื้อ/ชั้นกลางสีเข้มเพื่อซ่อนบริเวณหน้าท้องด้วยสายตา"
       },
       "legs-long": {
-        "name": "Make Legs Look Longer",
-        "description": "Match bottom and shoe colors to create a longer leg line."
+        "name": "ทำให้ขาดูยาวขึ้น",
+        "description": "ใช้สีกางเกงและรองเท้าเข้าชุดกันเพื่อสร้างแนวขาที่ยาวขึ้น"
       },
       "height-tall": {
-        "name": "Look Taller",
-        "description": "Emphasize vertical lines with solid colors or similar tones."
+        "name": "ดูสูงขึ้น",
+        "description": "เน้นเส้นแนวตั้งด้วยสีพื้นหรือโทนสีคล้ายกัน"
       },
       "none": {
-        "name": "Color Harmony Only",
-        "description": "Focus purely on color harmony without body shape compensation."
+        "name": "ความกลมกลืนของสีเท่านั้น",
+        "description": "เน้นเฉพาะความกลมกลืนของสีโดยไม่ต้องชดเชยรูปร่าง"
       }
     }
   },
   "guide": {
     "inverted": {
-      "name": "Inverted Triangle",
-      "subtitle": "Wide shoulders, narrow hips",
-      "colorSummary": "Dark tops, light bottoms",
+      "name": "สามเหลี่ยมกลับหัว",
+      "subtitle": "ไหล่กว้าง สะโพกแคบ",
+      "colorSummary": "เสื้อสีเข้ม กางเกงสีอ่อน",
       "female": {
-        "desc": "You have broad shoulders/chest and relatively slim lower body. Adding volume to the lower body and softening the upper body creates balance.",
+        "desc": "คุณมีไหล่/หน้าอกกว้างและช่วงล่างค่อนข้างเพรียว การเพิ่มวอลลุ่มให้ช่วงล่างและทำให้ช่วงบนนุ่มนวลขึ้นจะสร้างสมดุล",
         "doList": [
-          "Deep V-neck, narrow scoop neck, U-neck, or asymmetric neckline to narrow shoulders",
-          "Light colors and patterns on bottoms to add lower body volume",
-          "Keep tops simple with wrap or empire waist styles",
-          "A-line, pleated, tulip, or voluminous skirts for lower body emphasis",
-          "Wide-leg, bootcut, or boyfriend-fit pants for lower body volume",
-          "Define waistline with belts or wrap jackets",
-          "Raglan, kimono, or dolman sleeves to soften shoulder line"
+          "คอวีลึก คอกลมแคบ คอยู หรือคอเฉียงเพื่อทำให้ไหล่ดูแคบลง",
+          "สีอ่อนและลายที่กางเกงเพื่อเพิ่มวอลลุ่มช่วงล่าง",
+          "เสื้อเรียบง่ายทรงแร็พหรือเอวจักรวรรดิ",
+          "กระโปรงเอไลน์ จีบ ทิวลิป หรือพองเพื่อเน้นช่วงล่าง",
+          "กางเกงขากว้าง บูทคัท หรือบอยเฟรนด์เพื่อเพิ่มวอลลุ่มช่วงล่าง",
+          "เน้นเอวด้วยเข็มขัดหรือแจ็คเก็ตแร็พ",
+          "แขนแร็กแลน กิโมโน หรือดอลแมนเพื่อทำให้แนวไหล่นุ่มนวล"
         ],
         "dontList": [
-          "Off-shoulder, boat neck, square neck — makes shoulders look wider",
-          "Shoulder pads, puff sleeves, shoulder embellishments",
-          "Light tops with dark bottoms (counterproductive)",
-          "Skinny jeans alone (makes lower body look thinner)",
-          "Horizontal stripes or large patterns on tops"
+          "ออฟชูลเดอร์ คอเรือ คอสี่เหลี่ยม — ทำให้ไหล่ดูกว้างขึ้น",
+          "บ่ารอง แขนพอง ตกแต่งไหล่",
+          "เสื้อสีอ่อนกับกางเกงสีเข้ม (สวนทาง)",
+          "ยีนส์สกินนี่อย่างเดียว (ทำให้ช่วงล่างดูผอมลง)",
+          "ลายขวางหรือลายใหญ่บนเสื้อ"
         ]
       },
       "male": {
-        "desc": "You have broad shoulders and a developed upper body. Adding volume to the lower body improves balance.",
+        "desc": "คุณมีไหล่กว้างและช่วงบนพัฒนาแล้ว การเพิ่มวอลลุ่มให้ช่วงล่างจะช่วยสร้างสมดุล",
         "doList": [
-          "V-neck to visually reduce shoulders and emphasize vertical lines",
-          "Light-colored bottoms to emphasize lower body volume",
-          "Dark solid colors on tops to visually reduce shoulders",
-          "Cargo pants or wide pants for lower body volume",
-          "Raglan sleeves to soften shoulder line",
-          "Single-breasted, slim lapel jackets",
-          "Straight-fit or bootcut pants"
+          "คอวีเพื่อลดขนาดไหล่ด้วยสายตาและเน้นเส้นแนวตั้ง",
+          "กางเกงสีอ่อนเพื่อเน้นวอลลุ่มช่วงล่าง",
+          "สีเข้มพื้นบนเสื้อเพื่อลดขนาดไหล่ด้วยสายตา",
+          "กางเกงคาร์โก้หรือกางเกงขากว้างเพื่อเพิ่มวอลลุ่มช่วงล่าง",
+          "แขนแร็กแลนเพื่อทำให้แนวไหล่นุ่มนวล",
+          "แจ็คเก็ตแถวเดียว ปกเรียวเล็ก",
+          "กางเกงทรงตรงหรือบูทคัท"
         ],
         "dontList": [
-          "Padded shoulders, puff sleeves",
-          "Light tops with dark bottoms (counterproductive)",
-          "Boat neck — makes shoulders look wider",
-          "Horizontal stripes on tops",
-          "Skinny jeans alone (breaks balance)",
-          "Boxy tees, thick bulky jackets"
+          "บ่ารอง แขนพอง",
+          "เสื้อสีอ่อนกับกางเกงสีเข้ม (สวนทาง)",
+          "คอเรือ — ทำให้ไหล่ดูกว้างขึ้น",
+          "ลายขวางบนเสื้อ",
+          "ยีนส์สกินนี่อย่างเดียว (เสียสมดุล)",
+          "เสื้อยืดทรงกล่อง แจ็คเก็ตหนาเทอะทะ"
         ]
       }
     },
     "triangle": {
-      "name": "Triangle",
-      "subtitle": "Narrow shoulders, wide hips",
-      "colorSummary": "Light tops, dark bottoms",
+      "name": "สามเหลี่ยม",
+      "subtitle": "ไหล่แคบ สะโพกกว้าง",
+      "colorSummary": "เสื้อสีอ่อน กางเกงสีเข้ม",
       "female": {
-        "desc": "Your lower body is wider than your upper body. Drawing attention to the upper body and streamlining the lower body improves overall proportions.",
+        "desc": "ช่วงล่างกว้างกว่าช่วงบน การดึงความสนใจไปที่ช่วงบนและทำให้ช่วงล่างเพรียวขึ้นจะปรับสัดส่วนโดยรวม",
         "doList": [
-          "Boat neck, off-shoulder, square neck to widen shoulder line",
-          "Light colors, patterns, and embellishments on tops to draw eyes up",
-          "Jackets and blazers with shoulder pads",
-          "A-line, tulip, full circle, bias-cut skirts",
-          "High-waist bootcut, wide-leg, or straight pants",
-          "Crop jackets, trench coats with waist tie",
-          "Wrap dresses, fit-and-flare dresses"
+          "คอเรือ ออฟชูลเดอร์ คอสี่เหลี่ยมเพื่อขยายแนวไหล่",
+          "สีอ่อน ลาย และตกแต่งบนเสื้อเพื่อดึงสายตาขึ้น",
+          "แจ็คเก็ตและเบลเซอร์ที่มีบ่ารอง",
+          "กระโปรงเอไลน์ ทิวลิป วงกลม ตัดเฉียง",
+          "กางเกงเอวสูงทรงบูทคัท ขากว้าง หรือทรงตรง",
+          "แจ็คเก็ตครอป เทรนช์โค้ทผูกเอว",
+          "ชุดแร็พ ชุดฟิตแอนด์แฟลร์"
         ],
         "dontList": [
-          "Light colors, patterns, or embellishments on lower body",
-          "Skinny jeans alone (emphasizes hip line)",
-          "Hip-length tops (highlights widest point)",
-          "Horizontal stripes on bottoms",
-          "Tight pencil skirts (emphasizes hips)"
+          "สีอ่อน ลาย หรือตกแต่งที่ช่วงล่าง",
+          "ยีนส์สกินนี่อย่างเดียว (เน้นแนวสะโพก)",
+          "เสื้อยาวระดับสะโพก (เน้นจุดที่กว้างที่สุด)",
+          "ลายขวางบนกางเกง",
+          "กระโปรงดินสอรัดรูป (เน้นสะโพก)"
         ]
       },
       "male": {
-        "desc": "Your lower body is wider than your upper body. Adding focal points to the upper body improves overall proportions.",
+        "desc": "ช่วงล่างกว้างกว่าช่วงบน การเพิ่มจุดเด่นให้ช่วงบนจะปรับสัดส่วนโดยรวม",
         "doList": [
-          "Structured blazers and shoulder-padded jackets to widen shoulders",
-          "Light colors and patterns on tops to draw eyes up",
-          "Chest details (pockets, epaulettes, horizontal stripes)",
-          "Dark solid colors on bottoms to streamline",
-          "Straight-fit, flat-front pants",
-          "V-neck or crew neck sweaters",
-          "Medium lapel single-breasted jackets"
+          "เบลเซอร์ทรงโครงสร้างและแจ็คเก็ตมีบ่ารองเพื่อขยายไหล่",
+          "สีอ่อนและลายบนเสื้อเพื่อดึงสายตาขึ้น",
+          "ดีเทลหน้าอก (กระเป๋า แถบไหล่ ลายขวาง)",
+          "สีเข้มพื้นบนกางเกงเพื่อทำให้เพรียว",
+          "กางเกงทรงตรง หน้าเรียบ",
+          "สเวตเตอร์คอวีหรือคอกลม",
+          "แจ็คเก็ตแถวเดียวปกขนาดกลาง"
         ],
         "dontList": [
-          "Unstructured tops (deconstructed jackets, etc.)",
-          "Skinny pants or tight bottoms",
-          "Light bottoms with dark tops",
-          "Horizontal stripes on lower body",
-          "Baggy pants (throws off balance)"
+          "เสื้อไม่มีโครงสร้าง (แจ็คเก็ตดีคอนสตรัคชั่น ฯลฯ)",
+          "กางเกงสกินนี่หรือรัดรูป",
+          "กางเกงสีอ่อนกับเสื้อสีเข้ม",
+          "ลายขวางที่ช่วงล่าง",
+          "กางเกงหลวมโคร่ง (เสียสมดุล)"
         ]
       }
     },
     "rectangle": {
-      "name": "Rectangle",
-      "subtitle": "Straight silhouette with similar shoulders, waist, and hips",
-      "colorSummary": "Create proportions with top-bottom color contrast",
+      "name": "สี่เหลี่ยมผืนผ้า",
+      "subtitle": "ซิลูเอตตรง ไหล่ เอว และสะโพกใกล้เคียงกัน",
+      "colorSummary": "สร้างสัดส่วนด้วยคอนทราสต์สีเสื้อ-กางเกง",
       "female": {
-        "desc": "You have a generally straight body shape. Creating a waistline or adding curves makes a great look.",
+        "desc": "คุณมีรูปร่างตรงโดยทั่วไป การสร้างเอวหรือเพิ่มเส้นโค้งจะสร้างลุคที่ดี",
         "doList": [
-          "V-neck, scoop neck, sweetheart neck for vertical lines and curves",
-          "Wrap tops, peplum, belted blouses to define waist",
-          "Wrap dresses, fit-and-flare, belted dresses",
-          "A-line, wrap, asymmetric skirts",
-          "High-waist bootcut or wide-leg pants",
-          "Puff, flutter, balloon sleeves for volume",
-          "Texture mixing (knit + denim, etc.) layering",
-          "Belt to accentuate waistline (slim to medium width)"
+          "คอวี คอกลมเว้า คอสวีทฮาร์ทเพื่อเส้นแนวตั้งและโค้ง",
+          "เสื้อแร็พ เพปลัม เบลาส์ผูกเข็มขัดเพื่อเน้นเอว",
+          "ชุดแร็พ ฟิตแอนด์แฟลร์ ชุดผูกเข็มขัด",
+          "กระโปรงเอไลน์ แร็พ อสมมาตร",
+          "กางเกงเอวสูงทรงบูทคัทหรือขากว้าง",
+          "แขนพอง แขนเฟลทเทอร์ แขนบอลลูนเพื่อเพิ่มวอลลุ่ม",
+          "มิกซ์เท็กซ์เจอร์ (นิต + เดนิม ฯลฯ) เลเยอร์ริ่ง",
+          "เข็มขัดเน้นเอว (กว้างเรียวถึงปานกลาง)"
         ],
         "dontList": [
-          "Boxy or loose fit alone (hides body lines even more)",
-          "Turtleneck or high neck (emphasizes straight lines)",
-          "Same-color top and bottom worn straight (looks flat)",
-          "Volume only at waist (breaks overall balance)",
-          "Shapeless items worn alone"
+          "ทรงกล่องหรือหลวมอย่างเดียว (ซ่อนเส้นรูปร่างยิ่งขึ้น)",
+          "คอเต่าหรือคอสูง (เน้นเส้นตรง)",
+          "เสื้อกางเกงสีเดียวกันสวมตรงๆ (ดูแบน)",
+          "วอลลุ่มเฉพาะที่เอว (เสียสมดุลโดยรวม)",
+          "เสื้อผ้าไร้ทรงสวมเดี่ยวๆ"
         ]
       },
       "male": {
-        "desc": "You have a generally straight body shape. Creating dimension through layering and color contrast makes a great look.",
+        "desc": "คุณมีรูปร่างตรงโดยทั่วไป การสร้างมิติผ่านเลเยอร์ริ่งและคอนทราสต์สีจะสร้างลุคที่ดี",
         "doList": [
-          "Create depth and dimension through layering",
-          "Accentuate waistline with belts or tuck-in",
-          "Divide proportions with top-bottom color contrast",
-          "Texture mixing (knit + denim, etc.)",
-          "Create vertical lines with jackets and cardigans",
-          "Crew neck t-shirts, V-neck sweaters",
-          "Structured blazers (with shoulder pads)"
+          "สร้างความลึกและมิติผ่านเลเยอร์ริ่ง",
+          "เน้นเอวด้วยเข็มขัดหรือทับใน",
+          "แบ่งสัดส่วนด้วยคอนทราสต์สีเสื้อ-กางเกง",
+          "มิกซ์เท็กซ์เจอร์ (นิต + เดนิม ฯลฯ)",
+          "สร้างเส้นแนวตั้งด้วยแจ็คเก็ตและคาร์ดิแกน",
+          "เสื้อยืดคอกลม สเวตเตอร์คอวี",
+          "เบลเซอร์ทรงโครงสร้าง (มีบ่ารอง)"
         ],
         "dontList": [
-          "Same-color top and bottom worn straight (looks flat)",
-          "Boxy fit alone (hides body lines even more)",
-          "Vertical stripes (emphasizes straight lines more)",
-          "Loose trousers or wide-leg pants",
-          "Long-line tops or coats (emphasizes straight vertical line)",
-          "Flat, shapeless shirts"
+          "เสื้อกางเกงสีเดียวกันสวมตรงๆ (ดูแบน)",
+          "ทรงกล่องอย่างเดียว (ซ่อนเส้นรูปร่างยิ่งขึ้น)",
+          "ลายตั้ง (เน้นเส้นตรงยิ่งขึ้น)",
+          "กางเกงทรงหลวมหรือขากว้าง",
+          "เสื้อหรือโค้ทยาว (เน้นเส้นตั้งตรง)",
+          "เสื้อเชิ้ตแบนไร้ทรง"
         ]
       }
     },
     "hourglass": {
-      "name": "Hourglass",
-      "subtitle": "Balanced shoulders and hips with a defined waist",
-      "colorSummary": "Wear anything! Just accentuate the waist",
+      "name": "นาฬิกาทราย",
+      "subtitle": "ไหล่และสะโพกสมดุลพร้อมเอวเว้า",
+      "colorSummary": "ใส่ได้ทุกอย่าง! แค่เน้นเอว",
       "female": {
-        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your natural lines looks amazing.",
+        "desc": "คุณมีไหล่และสะโพกสมดุลพร้อมเอวเว้าชัด การเน้นเส้นธรรมชาติจะดูสวยมาก",
         "doList": [
-          "Fits that accentuate the waistline (tuck-in, belt, wrap)",
-          "V-neck, scoop neck, sweetheart neck (natural bust line)",
-          "Wrap dresses, fit-and-flare, belted dresses",
-          "Pencil skirt (for curves) or full skirt (with tuck-in)",
-          "Medium fit flatters best",
-          "Draping fabrics (jersey, silk, cotton blend)",
-          "Single-breasted, short jackets, belted coats"
+          "ทรงที่เน้นเอว (ทับใน เข็มขัด แร็พ)",
+          "คอวี คอกลมเว้า คอสวีทฮาร์ท (แนวอกธรรมชาติ)",
+          "ชุดแร็พ ฟิตแอนด์แฟลร์ ชุดผูกเข็มขัด",
+          "กระโปรงดินสอ (โชว์เส้นโค้ง) หรือกระโปรงบาน (กับทับใน)",
+          "ทรงพอดีตัวปานกลางจะสวยที่สุด",
+          "ผ้าพลิ้ว (เจอร์ซีย์ ผ้าไหม คอตตอนเบลนด์)",
+          "แจ็คเก็ตแถวเดียว แจ็คเก็ตสั้น โค้ทผูกเข็มขัด"
         ],
         "dontList": [
-          "Overly boxy oversized fits (hides your lines)",
-          "Too-tight all-over fit (overdoes it)",
-          "Long outerwear that hides the waist",
-          "Thick knits or chunky fabrics (adds bulk)",
-          "Double-breasted, drop waist",
-          "Thick belts (over 4.5cm)"
+          "โอเวอร์ไซส์ทรงกล่องมากเกินไป (ซ่อนเส้นรูปร่าง)",
+          "รัดรูปทั้งตัวมากเกินไป (ดูมากเกินไป)",
+          "เสื้อคลุมยาวที่ซ่อนเอว",
+          "นิตหนาหรือผ้าชิ้นใหญ่ (เพิ่มวอลลุ่ม)",
+          "แถวคู่ เอวดรอป",
+          "เข็มขัดหนา (กว่า 4.5 ซม.)"
         ]
       },
       "male": {
-        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your lines looks amazing.",
+        "desc": "คุณมีไหล่และสะโพกสมดุลพร้อมเอวเว้าชัด การเน้นเส้นรูปร่างจะดูดีมาก",
         "doList": [
-          "Fits that accentuate the waistline (tuck-in, belt)",
-          "Medium fit flatters best",
-          "Solid colors with accent items",
-          "Fabrics that drape naturally on the body",
-          "Both V-neck and crew neck work well",
-          "Slim-fit shirts, high-waist trousers",
-          "Single-breasted jacket (waist suppression)",
-          "Medium belt (contrasting color for accent)"
+          "ทรงที่เน้นเอว (ทับใน เข็มขัด)",
+          "ทรงพอดีตัวปานกลางจะสวยที่สุด",
+          "สีพื้นกับไอเท็มแต่งจุดเด่น",
+          "ผ้าที่พลิ้วเข้ารูปตามร่างกายอย่างเป็นธรรมชาติ",
+          "คอวีและคอกลมเข้ากันทั้งคู่",
+          "เสื้อเชิ้ตสลิมฟิต กางเกงเอวสูง",
+          "แจ็คเก็ตแถวเดียว (เข้าเอว)",
+          "เข็มขัดกว้างปานกลาง (สีตัดเป็นจุดเด่น)"
         ],
         "dontList": [
-          "Overly boxy oversized fits (hides your lines)",
-          "Too-tight all-over fit (overdoes it)",
-          "Low-rise pants",
-          "Bold patterns or colors",
-          "Oversized jackets or coats"
+          "โอเวอร์ไซส์ทรงกล่องมากเกินไป (ซ่อนเส้นรูปร่าง)",
+          "รัดรูปทั้งตัวมากเกินไป (ดูมากเกินไป)",
+          "กางเกงเอวต่ำ",
+          "ลายหรือสีฉูดฉาดมากเกินไป",
+          "แจ็คเก็ตหรือโค้ทโอเวอร์ไซส์"
         ]
       }
     },
     "round": {
-      "name": "Round",
-      "subtitle": "Belly-centered, rounded silhouette",
-      "colorSummary": "Overall dark tones with vertical line emphasis",
+      "name": "ทรงกลม",
+      "subtitle": "ซิลูเอตกลมที่เน้นหน้าท้อง",
+      "colorSummary": "โทนเข้มโดยรวมเน้นเส้นแนวตั้ง",
       "female": {
-        "desc": "You carry volume in the midsection. Creating vertical lines and drawing attention to neckline, arms, and legs creates a slimmer look.",
+        "desc": "คุณมีวอลลุ่มบริเวณช่วงกลาง การสร้างเส้นแนวตั้งและดึงความสนใจไปที่คอ แขน และขาจะสร้างลุคเพรียว",
         "doList": [
-          "Deep V-neck, wide V, scoop neck, cowl neck to distribute attention",
-          "Empire waist, wrap tops, flowing draped tops",
-          "Empire waist, A-line, wrap, fit-and-flare dresses",
-          "3/4 sleeves for visually slimmer arms and detail focus",
-          "A-line, flare, knee-length+ skirts",
-          "High-waist straight or bootcut pants",
-          "Slim belt below bust or at high waist (tonal matching)",
-          "Single-breasted, open-front, structured jackets (hip length+)",
-          "Well-fitting bra is essential (foundation for silhouette)"
+          "คอวีลึก คอวีกว้าง คอกลมเว้า คอตก เพื่อกระจายจุดสนใจ",
+          "เอวจักรวรรดิ เสื้อแร็พ เสื้อพลิ้ว",
+          "ชุดเอวจักรวรรดิ เอไลน์ แร็พ ฟิตแอนด์แฟลร์",
+          "แขนสามส่วนเพื่อแขนดูเพรียวและเน้นรายละเอียด",
+          "กระโปรงเอไลน์ แฟลร์ ยาวเลยเข่า",
+          "กางเกงเอวสูงทรงตรงหรือบูทคัท",
+          "เข็มขัดเรียวใต้อกหรือเอวสูง (เข้าโทนสี)",
+          "แจ็คเก็ตแถวเดียว ด้านหน้าเปิด ทรงโครงสร้าง (ยาวถึงสะโพก+)",
+          "บราที่พอดีตัวสำคัญมาก (เป็นพื้นฐานซิลูเอต)"
         ],
         "dontList": [
-          "Clingy fabrics or tight midsection",
-          "Horizontal details or embellishments at waist",
-          "Double-breasted or crop jackets",
-          "Tight shorts",
-          "Light-colored tops alone (emphasizes belly)",
-          "Horizontal stripes, large patterns"
+          "ผ้ารัดรูปหรือรัดช่วงกลางลำตัว",
+          "ดีเทลแนวนอนหรือตกแต่งที่เอว",
+          "แจ็คเก็ตแถวคู่หรือแจ็คเก็ตครอป",
+          "กางเกงขาสั้นรัดรูป",
+          "เสื้อสีอ่อนเดี่ยวๆ (เน้นหน้าท้อง)",
+          "ลายขวาง ลายใหญ่"
         ]
       },
       "male": {
-        "desc": "You carry volume in the midsection. Vertical lines and dark center colors create a slimmer appearance.",
+        "desc": "คุณมีวอลลุ่มบริเวณช่วงกลาง เส้นแนวตั้งและสีเข้มตรงกลางจะสร้างลุคเพรียวขึ้น",
         "doList": [
-          "Dark colors on tops and mid layers for a slim center",
-          "Emphasize vertical lines (open jackets, cardigans)",
-          "Monochrome or similar tone outfits for a longer look",
-          "V-neck or deep crew neck to distribute attention",
-          "Structured jackets to organize the silhouette",
-          "Single-breasted, open jackets",
-          "Straight or slightly tapered pants"
+          "สีเข้มบนเสื้อและชั้นกลางเพื่อช่วงกลางเพรียว",
+          "เน้นเส้นแนวตั้ง (แจ็คเก็ตเปิด คาร์ดิแกน)",
+          "ชุดโมโนโครมหรือโทนใกล้เคียงเพื่อดูยาวขึ้น",
+          "คอวีหรือคอกลมลึกเพื่อกระจายจุดสนใจ",
+          "แจ็คเก็ตทรงโครงสร้างเพื่อจัดระเบียบซิลูเอต",
+          "แจ็คเก็ตแถวเดียว เปิดด้านหน้า",
+          "กางเกงทรงตรงหรือเรียวเล็กน้อย"
         ],
         "dontList": [
-          "Light-colored tops alone (emphasizes belly)",
-          "Horizontal stripes, large patterns",
-          "Short-length tops (exposes waistline)",
-          "Too-tight fits",
-          "Double-breasted jackets",
-          "Pleated or high-waist pants",
-          "Colorful belts",
-          "Baggy or oversized (adds bulk)"
+          "เสื้อสีอ่อนเดี่ยวๆ (เน้นหน้าท้อง)",
+          "ลายขวาง ลายใหญ่",
+          "เสื้อสั้น (เผยเอว)",
+          "ทรงรัดรูปเกินไป",
+          "แจ็คเก็ตแถวคู่",
+          "กางเกงจีบหรือเอวสูง",
+          "เข็มขัดสีสดใส",
+          "หลวมโคร่งหรือโอเวอร์ไซส์ (เพิ่มวอลลุ่ม)"
         ]
       }
     }
@@ -287,24 +287,24 @@
   "quiz": {
     "questions": [
       {
-        "question": "Compare your shoulder and hip width:",
-        "options": ["My shoulders are wider", "My hips are wider", "They're about the same"]
+        "question": "เปรียบเทียบความกว้างของไหล่และสะโพก:",
+        "options": ["ไหล่กว้างกว่า", "สะโพกกว้างกว่า", "ใกล้เคียงกัน"]
       },
       {
-        "question": "How is your waistline?",
-        "options": ["My waist is well-defined", "My waist and hips are straight", "My belly area protrudes"]
+        "question": "เอวของคุณเป็นอย่างไร?",
+        "options": ["เอวเว้าชัดเจน", "เอวกับสะโพกตรงเสมอกัน", "บริเวณหน้าท้องยื่นออกมา"]
       },
       {
-        "question": "Where do you carry more volume — upper or lower body?",
-        "options": ["More volume in upper body", "More volume in lower body", "About the same"]
+        "question": "ช่วงบนหรือช่วงล่างมีวอลลุ่มมากกว่า?",
+        "options": ["ช่วงบนมีวอลลุ่มมากกว่า", "ช่วงล่างมีวอลลุ่มมากกว่า", "ใกล้เคียงกัน"]
       },
       {
-        "question": "What concerns you most when choosing clothes?",
-        "options": ["Worried about top fit due to wide shoulders", "Hips and thighs bother me", "My belly area bothers me", "I look flat overall", "No particular concern (well-balanced)"]
+        "question": "อะไรที่คุณกังวลที่สุดเวลาเลือกเสื้อผ้า?",
+        "options": ["กังวลเรื่องทรงเสื้อเพราะไหล่กว้าง", "สะโพกและต้นขารบกวน", "บริเวณหน้าท้องรบกวน", "ดูแบนโดยรวม", "ไม่มีข้อกังวลเป็นพิเศษ (สมดุลดี)"]
       },
       {
-        "question": "Which top fit suits you best?",
-        "options": ["Slim fit (body-hugging)", "Regular fit (moderate)", "Oversized fit (roomy)"]
+        "question": "ทรงเสื้อแบบไหนเหมาะกับคุณที่สุด?",
+        "options": ["สลิมฟิต (รัดรูป)", "เรกูลาร์ฟิต (พอดีตัว)", "โอเวอร์ไซส์ฟิต (หลวมสบาย)"]
       }
     ]
   }

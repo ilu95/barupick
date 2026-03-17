@@ -1,123 +1,123 @@
 {
   "seasons": {
-    "spring": { "name": "Spring Warm" },
-    "summer": { "name": "Summer Cool" },
-    "autumn": { "name": "Autumn Warm" },
-    "winter": { "name": "Winter Cool" }
+    "spring": { "name": "Xuân Ấm" },
+    "summer": { "name": "Hạ Lạnh" },
+    "autumn": { "name": "Thu Ấm" },
+    "winter": { "name": "Đông Lạnh" }
   },
   "types": {
     "spring_light": {
-      "name": "Spring Light",
-      "description": "Bright, clear pastel warm tones suit you best. We recommend light and radiant colors.",
-      "keywords": ["bright", "clear", "light", "radiant"]
+      "name": "Xuân Sáng",
+      "description": "Tông ấm pastel sáng và trong trẻo phù hợp nhất với bạn. Chúng tôi gợi ý những màu sáng và rạng rỡ.",
+      "keywords": ["sáng", "trong trẻo", "nhẹ nhàng", "rạng rỡ"]
     },
     "spring_bright": {
-      "name": "Spring Bright",
-      "description": "Vivid, vibrant warm tones suit you best. We recommend lively, energetic colors.",
-      "keywords": ["vivid", "vibrant", "lively", "energetic"]
+      "name": "Xuân Tươi",
+      "description": "Tông ấm sống động và rực rỡ phù hợp nhất với bạn. Chúng tôi gợi ý những màu tươi vui, đầy năng lượng.",
+      "keywords": ["sống động", "rực rỡ", "tươi vui", "năng lượng"]
     },
     "spring_true": {
-      "name": "Spring True",
-      "description": "Warm, clear medium tones suit you best. We recommend natural, healthy-looking colors.",
-      "keywords": ["warm", "clear", "natural", "healthy"]
+      "name": "Xuân Thuần",
+      "description": "Tông ấm trung bình, ấm và trong trẻo phù hợp nhất với bạn. Chúng tôi gợi ý những màu tự nhiên, khỏe mạnh.",
+      "keywords": ["ấm", "trong trẻo", "tự nhiên", "khỏe mạnh"]
     },
     "summer_light": {
-      "name": "Summer Light",
-      "description": "Bright, soft pastel cool tones suit you. We recommend elegant and feminine colors.",
-      "keywords": ["soft", "delicate", "elegant", "feminine"]
+      "name": "Hạ Sáng",
+      "description": "Tông lạnh pastel sáng và nhẹ nhàng phù hợp với bạn. Chúng tôi gợi ý những màu thanh lịch và nữ tính.",
+      "keywords": ["nhẹ nhàng", "mềm mại", "thanh lịch", "nữ tính"]
     },
     "summer_muted": {
-      "name": "Summer Muted",
-      "description": "Calm, greyish tones suit you. We recommend sophisticated and dignified colors.",
-      "keywords": ["calm", "greyish", "sophisticated", "dignified"]
+      "name": "Hạ Trầm",
+      "description": "Tông trầm, hơi xám phù hợp với bạn. Chúng tôi gợi ý những màu tinh tế và trang nhã.",
+      "keywords": ["trầm", "hơi xám", "tinh tế", "trang nhã"]
     },
     "summer_true": {
-      "name": "Summer True",
-      "description": "Cool, soft medium cool tones suit you. We recommend refreshing and clean colors.",
-      "keywords": ["cool", "soft", "refreshing", "clean"]
+      "name": "Hạ Thuần",
+      "description": "Tông lạnh trung bình, mát và nhẹ phù hợp với bạn. Chúng tôi gợi ý những màu mát mẻ và sạch sẽ.",
+      "keywords": ["mát", "nhẹ nhàng", "mát mẻ", "sạch sẽ"]
     },
     "autumn_soft": {
-      "name": "Autumn Soft",
-      "description": "Soft, warm muted tones suit you. We recommend natural and comfortable colors.",
-      "keywords": ["soft", "muted", "natural", "comfortable"]
+      "name": "Thu Nhẹ",
+      "description": "Tông ấm trầm, nhẹ nhàng phù hợp với bạn. Chúng tôi gợi ý những màu tự nhiên và thoải mái.",
+      "keywords": ["nhẹ nhàng", "trầm", "tự nhiên", "thoải mái"]
     },
     "autumn_deep": {
-      "name": "Autumn Deep",
-      "description": "Deep, rich earth tones suit you. We recommend luxurious and profound colors.",
-      "keywords": ["deep", "rich", "luxurious", "profound"]
+      "name": "Thu Đậm",
+      "description": "Tông đất đậm và phong phú phù hợp với bạn. Chúng tôi gợi ý những màu sang trọng và sâu lắng.",
+      "keywords": ["đậm", "phong phú", "sang trọng", "sâu lắng"]
     },
     "autumn_true": {
-      "name": "Autumn True",
-      "description": "Warm, natural earth tones suit you. We recommend classic and stable colors.",
-      "keywords": ["warm", "natural", "classic", "stable"]
+      "name": "Thu Thuần",
+      "description": "Tông đất ấm, tự nhiên phù hợp với bạn. Chúng tôi gợi ý những màu cổ điển và ổn định.",
+      "keywords": ["ấm", "tự nhiên", "cổ điển", "ổn định"]
     },
     "winter_bright": {
-      "name": "Winter Bright",
-      "description": "Vivid, cool bold tones suit you. We recommend intense, eye-catching colors.",
-      "keywords": ["vivid", "bold", "intense", "eye-catching"]
+      "name": "Đông Tươi",
+      "description": "Tông lạnh sống động và mạnh mẽ phù hợp với bạn. Chúng tôi gợi ý những màu mãnh liệt, bắt mắt.",
+      "keywords": ["sống động", "mạnh mẽ", "mãnh liệt", "bắt mắt"]
     },
     "winter_deep": {
-      "name": "Winter Deep",
-      "description": "Deep, dark tones suit you. We recommend chic and sophisticated colors.",
-      "keywords": ["deep", "chic", "sophisticated", "modern"]
+      "name": "Đông Đậm",
+      "description": "Tông tối và sâu phù hợp với bạn. Chúng tôi gợi ý những màu sang trọng và tinh tế.",
+      "keywords": ["sâu", "sang trọng", "tinh tế", "hiện đại"]
     },
     "winter_true": {
-      "name": "Winter True",
-      "description": "Cool, vivid high-contrast colors suit you. We recommend modern and urban colors.",
-      "keywords": ["contrast", "vivid", "modern", "urban"]
+      "name": "Đông Thuần",
+      "description": "Màu lạnh sống động, tương phản cao phù hợp với bạn. Chúng tôi gợi ý những màu hiện đại và đô thị.",
+      "keywords": ["tương phản", "sống động", "hiện đại", "đô thị"]
     }
   },
   "diagnosis": {
     "questions": [
       {
-        "question": "What color are the veins on the inside of your wrist?",
-        "options": ["Mostly greenish", "Mostly blue/purple", "Both look similar"]
+        "question": "Tĩnh mạch bên trong cổ tay bạn có màu gì?",
+        "options": ["Chủ yếu xanh lá", "Chủ yếu xanh dương/tím", "Cả hai trông giống nhau"]
       },
       {
-        "question": "How does your skin react to sunlight?",
-        "options": ["Burns easily and turns red", "Tans easily and turns brown", "Tans moderately"]
+        "question": "Da bạn phản ứng thế nào với ánh nắng?",
+        "options": ["Dễ cháy nắng và đỏ", "Dễ rám nắng và nâu", "Rám nắng vừa phải"]
       },
       {
-        "question": "Which accessories suit you better — gold or silver?",
-        "options": ["Gold looks better", "Silver looks better", "Both look similar"]
+        "question": "Phụ kiện nào hợp với bạn hơn — vàng hay bạc?",
+        "options": ["Vàng đẹp hơn", "Bạc đẹp hơn", "Cả hai trông giống nhau"]
       },
       {
-        "question": "When wearing white, which shade suits you more?",
-        "options": ["Ivory/cream white suits me better", "Pure/blue-tinted white suits me better", "Both work fine"]
+        "question": "Khi mặc đồ trắng, tông trắng nào hợp với bạn hơn?",
+        "options": ["Trắng ngà/kem hợp hơn", "Trắng tinh/hơi xanh hợp hơn", "Cả hai đều được"]
       },
       {
-        "question": "What color are your eyes and hair?",
-        "options": ["Light brown/lighter shades", "Medium brown tones", "Dark brown/black"]
+        "question": "Mắt và tóc bạn màu gì?",
+        "options": ["Nâu nhạt/tông sáng hơn", "Nâu trung bình", "Nâu đậm/đen"]
       },
       {
-        "question": "What is your overall image or impression?",
-        "options": ["Bright and radiant", "Soft and subtle", "Calm and deep", "Vivid and clear"]
+        "question": "Ấn tượng hoặc hình ảnh tổng thể của bạn là gì?",
+        "options": ["Sáng sủa và rạng rỡ", "Nhẹ nhàng và tinh tế", "Trầm tĩnh và sâu lắng", "Sống động và rõ ràng"]
       },
       {
-        "question": "Which suits you better — vivid primary colors or calm muted colors?",
-        "options": ["Vivid, bold colors suit me", "Calm, muted colors suit me", "Both are similar"]
+        "question": "Màu nguyên bản sống động hay màu trầm nhẹ hợp với bạn hơn?",
+        "options": ["Màu sống động, mạnh mẽ hợp với tôi", "Màu trầm, nhẹ nhàng hợp với tôi", "Cả hai giống nhau"]
       },
       {
-        "question": "How much contrast is there in your features? (between eyes, hair, and skin)",
-        "options": ["Low contrast — features blend together", "Medium contrast", "High contrast — features are distinct"]
+        "question": "Độ tương phản trên khuôn mặt bạn thế nào? (giữa mắt, tóc và da)",
+        "options": ["Tương phản thấp — các nét hòa lẫn", "Tương phản trung bình", "Tương phản cao — các nét rõ ràng"]
       }
     ],
     "results": {
       "spring_warm": {
-        "name": "Spring Warm",
-        "description": "Warm, bright colors suit you best. We recommend radiant colors like peach, coral, light orange, and soft yellow."
+        "name": "Xuân Ấm",
+        "description": "Màu ấm, sáng phù hợp nhất với bạn. Chúng tôi gợi ý các màu rạng rỡ như đào, san hô, cam nhạt, và vàng nhẹ."
       },
       "summer_cool": {
-        "name": "Summer Cool",
-        "description": "Cool, soft colors suit you best. We recommend pastel cool tones like lavender, rose, sky blue, and mint."
+        "name": "Hạ Lạnh",
+        "description": "Màu lạnh, nhẹ nhàng phù hợp nhất với bạn. Chúng tôi gợi ý các tông lạnh pastel như oải hương, hồng, xanh da trời, và bạc hà."
       },
       "autumn_warm": {
-        "name": "Autumn Warm",
-        "description": "Warm, deep colors suit you best. We recommend autumnal colors like camel, burgundy, olive, and mustard."
+        "name": "Thu Ấm",
+        "description": "Màu ấm, sâu phù hợp nhất với bạn. Chúng tôi gợi ý các màu thu như lạc đà, đỏ rượu vang, ô liu, và mù tạt."
       },
       "winter_cool": {
-        "name": "Winter Cool",
-        "description": "Cool, vivid colors suit you best. We recommend high-contrast colors like black, white, navy, and royal blue."
+        "name": "Đông Lạnh",
+        "description": "Màu lạnh, sống động phù hợp nhất với bạn. Chúng tôi gợi ý các màu tương phản cao như đen, trắng, navy, và xanh hoàng gia."
       }
     }
   }

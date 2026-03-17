@@ -1,359 +1,359 @@
 {
   "names": {
-    "outer": "Outerwear",
-    "middleware": "Mid Layer",
-    "top": "Top",
-    "inner": "Inner",
-    "bottom": "Bottom",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "shoes": "Shoes",
-    "mid_knit": "Knit",
-    "mid_cardigan": "Cardigan",
-    "mid_vest": "Vest",
-    "outer_coat": "Coat",
-    "outer_jacket": "Jacket",
-    "outer_padding": "Puffer"
+    "outer": "เสื้อคลุม",
+    "middleware": "ชั้นกลาง",
+    "top": "เสื้อ",
+    "inner": "ชั้นใน",
+    "bottom": "กางเกง",
+    "scarf": "ผ้าพันคอ",
+    "hat": "หมวก",
+    "shoes": "รองเท้า",
+    "mid_knit": "นิต",
+    "mid_cardigan": "คาร์ดิแกน",
+    "mid_vest": "เสื้อกั๊ก",
+    "outer_coat": "โค้ท",
+    "outer_jacket": "แจ็คเก็ต",
+    "outer_padding": "เสื้อพัฟเฟอร์"
   },
   "seasons": {
-    "spring": "Spring",
-    "summer": "Summer",
-    "fall": "Fall",
-    "winter": "Winter"
+    "spring": "ฤดูใบไม้ผลิ",
+    "summer": "ฤดูร้อน",
+    "fall": "ฤดูใบไม้ร่วง",
+    "winter": "ฤดูหนาว"
   },
   "fabricItems": {
     "outer": {
       "leather_jacket": {
-        "name": "Leather Jacket",
-        "desc": "Cowhide/lambskin rider or blouson"
+        "name": "แจ็คเก็ตหนัง",
+        "desc": "ไรเดอร์หรือบลูซงหนังวัว/หนังแกะ"
       },
       "denim_jacket": {
-        "name": "Denim Jacket",
-        "desc": "Jean jacket, trucker jacket"
+        "name": "แจ็คเก็ตเดนิม",
+        "desc": "แจ็คเก็ตยีนส์ ทรัคเกอร์แจ็คเก็ต"
       },
       "wool_coat": {
-        "name": "Wool Coat",
-        "desc": "Single or double-breasted wool coat"
+        "name": "โค้ทขนสัตว์",
+        "desc": "โค้ทขนสัตว์แถวเดียวหรือแถวคู่"
       },
       "padding": {
-        "name": "Puffer Jacket",
-        "desc": "Goose down or polyester puffer"
+        "name": "เสื้อพัฟเฟอร์",
+        "desc": "ขนห่านหรือโพลีเอสเตอร์พัฟเฟอร์"
       },
       "fleece_jacket": {
-        "name": "Fleece Jacket",
-        "desc": "Sherpa or boa fleece"
+        "name": "แจ็คเก็ตฟลีซ",
+        "desc": "เชอร์ปาหรือบัวฟลีซ"
       },
       "cotton_jacket": {
-        "name": "Cotton Jacket",
-        "desc": "Chino or cotton blazer"
+        "name": "แจ็คเก็ตผ้าฝ้าย",
+        "desc": "ชิโน่หรือเบลเซอร์ผ้าฝ้าย"
       },
       "nylon_jacket": {
-        "name": "Nylon Jacket",
-        "desc": "Windbreaker or coach jacket"
+        "name": "แจ็คเก็ตไนลอน",
+        "desc": "วินด์เบรกเกอร์หรือโค้ชแจ็คเก็ต"
       },
       "linen_jacket": {
-        "name": "Linen Jacket",
-        "desc": "Linen or hemp blazer"
+        "name": "แจ็คเก็ตลินิน",
+        "desc": "เบลเซอร์ลินินหรือป่าน"
       },
       "tweed_jacket": {
-        "name": "Tweed Jacket",
-        "desc": "Tweed blazer"
+        "name": "แจ็คเก็ตทวีด",
+        "desc": "เบลเซอร์ทวีด"
       },
       "suede_jacket": {
-        "name": "Suede Jacket",
-        "desc": "Suede blouson or jacket"
+        "name": "แจ็คเก็ตหนังกลับ",
+        "desc": "บลูซงหรือแจ็คเก็ตหนังกลับ"
       },
       "waxed_jacket": {
-        "name": "Waxed Jacket",
-        "desc": "Barbour or oiled jacket"
+        "name": "แจ็คเก็ตแว็กซ์",
+        "desc": "บาร์บัวร์หรือแจ็คเก็ตเคลือบน้ำมัน"
       }
     },
     "middleware": {
       "wool_knit": {
-        "name": "Wool Knit",
-        "desc": "Lambswool or merino wool knit"
+        "name": "นิตขนสัตว์",
+        "desc": "นิตแลมบ์สวูลหรือเมอริโนวูล"
       },
       "cotton_knit": {
-        "name": "Cotton Knit",
-        "desc": "Cotton knit or cardigan"
+        "name": "นิตผ้าฝ้าย",
+        "desc": "นิตผ้าฝ้ายหรือคาร์ดิแกน"
       },
       "cashmere_knit": {
-        "name": "Cashmere Knit",
-        "desc": "Cashmere pullover"
+        "name": "นิตแคชเมียร์",
+        "desc": "พูลโอเวอร์แคชเมียร์"
       },
       "fleece_mid": {
-        "name": "Fleece",
-        "desc": "Mid-layer fleece"
+        "name": "ฟลีซ",
+        "desc": "ฟลีซชั้นกลาง"
       },
       "cardigan_wool": {
-        "name": "Wool Cardigan",
-        "desc": "Wool cardigan with shawl collar"
+        "name": "คาร์ดิแกนขนสัตว์",
+        "desc": "คาร์ดิแกนขนสัตว์คอปก"
       },
       "vest_padding": {
-        "name": "Puffer Vest",
-        "desc": "Lightweight puffer vest"
+        "name": "เสื้อกั๊กพัฟเฟอร์",
+        "desc": "เสื้อกั๊กพัฟเฟอร์น้ำหนักเบา"
       },
       "vest_knit": {
-        "name": "Knit Vest",
-        "desc": "Knit vest or sweater vest"
+        "name": "เสื้อกั๊กนิต",
+        "desc": "เสื้อกั๊กนิตหรือสเวตเตอร์เวสต์"
       },
       "hoodie": {
-        "name": "Zip-Up Hoodie",
-        "desc": "Cotton or fleece-lined zip-up hoodie"
+        "name": "ฮู้ดดี้ซิป",
+        "desc": "ฮู้ดดี้ซิปผ้าฝ้ายหรือบุฟลีซ"
       },
       "sweatshirt_mid": {
-        "name": "Sweatshirt",
-        "desc": "Mid-layer sweatshirt"
+        "name": "สเวตเชิ้ต",
+        "desc": "สเวตเชิ้ตชั้นกลาง"
       }
     },
     "top": {
       "cotton_tee": {
-        "name": "Cotton T-Shirt",
-        "desc": "Cotton crew neck or V-neck"
+        "name": "เสื้อยืดผ้าฝ้าย",
+        "desc": "คอกลมหรือคอวีผ้าฝ้าย"
       },
       "oxford_shirt": {
-        "name": "Oxford Shirt",
-        "desc": "Oxford button-down shirt"
+        "name": "เสื้อเชิ้ตอ็อกซ์ฟอร์ด",
+        "desc": "เสื้อเชิ้ตอ็อกซ์ฟอร์ดบัตตันดาวน์"
       },
       "linen_shirt": {
-        "name": "Linen Shirt",
-        "desc": "Linen or hemp shirt"
+        "name": "เสื้อเชิ้ตลินิน",
+        "desc": "เสื้อเชิ้ตลินินหรือป่าน"
       },
       "flannel_shirt": {
-        "name": "Flannel Shirt",
-        "desc": "Brushed check shirt"
+        "name": "เสื้อเชิ้ตฟลานเนล",
+        "desc": "เสื้อเชิ้ตลายตารางผ้าขนแปรง"
       },
       "denim_shirt": {
-        "name": "Denim Shirt",
-        "desc": "Chambray or denim shirt"
+        "name": "เสื้อเชิ้ตเดนิม",
+        "desc": "เสื้อเชิ้ตแชมเบรย์หรือเดนิม"
       },
       "silk_blouse": {
-        "name": "Silk Blouse",
-        "desc": "Silk or satin blouse"
+        "name": "เบลาส์ผ้าไหม",
+        "desc": "เบลาส์ผ้าไหมหรือซาติน"
       },
       "polo_shirt": {
-        "name": "Polo Shirt",
-        "desc": "Piqué polo shirt"
+        "name": "เสื้อโปโล",
+        "desc": "เสื้อโปโลผ้าปิเก้"
       },
       "turtleneck": {
-        "name": "Turtleneck",
-        "desc": "Cotton or modal turtleneck"
+        "name": "เสื้อคอเต่า",
+        "desc": "เสื้อคอเต่าผ้าฝ้ายหรือโมดอล"
       },
       "wool_turtleneck": {
-        "name": "Wool Turtleneck",
-        "desc": "Wool turtleneck knit"
+        "name": "เสื้อคอเต่าขนสัตว์",
+        "desc": "นิตคอเต่าขนสัตว์"
       },
       "henley": {
-        "name": "Henley",
-        "desc": "Waffle or thermal henley"
+        "name": "เฮนลี่",
+        "desc": "เฮนลี่ผ้าวาฟเฟิลหรือเทอร์มอล"
       }
     },
     "bottom": {
       "raw_denim": {
-        "name": "Denim Jeans",
-        "desc": "Straight or slim denim"
+        "name": "กางเกงยีนส์",
+        "desc": "เดนิมทรงตรงหรือสลิม"
       },
       "chino": {
-        "name": "Chino Pants",
-        "desc": "Cotton chino pants"
+        "name": "กางเกงชิโน่",
+        "desc": "กางเกงชิโน่ผ้าฝ้าย"
       },
       "wool_slacks": {
-        "name": "Wool Slacks",
-        "desc": "Wool dress pants"
+        "name": "กางเกงสแล็คขนสัตว์",
+        "desc": "กางเกงทำงานขนสัตว์"
       },
       "linen_pants": {
-        "name": "Linen Pants",
-        "desc": "Linen wide or straight cut"
+        "name": "กางเกงลินิน",
+        "desc": "ลินินทรงกว้างหรือทรงตรง"
       },
       "corduroy": {
-        "name": "Corduroy Pants",
-        "desc": "Corduroy trousers"
+        "name": "กางเกงลูกฟูก",
+        "desc": "กางเกงผ้าลูกฟูก"
       },
       "cotton_shorts": {
-        "name": "Cotton Shorts",
-        "desc": "Chino or cargo shorts"
+        "name": "กางเกงขาสั้นผ้าฝ้าย",
+        "desc": "กางเกงขาสั้นชิโน่หรือคาร์โก้"
       },
       "cargo_pants": {
-        "name": "Cargo Pants",
-        "desc": "Cotton or nylon cargo pants"
+        "name": "กางเกงคาร์โก้",
+        "desc": "กางเกงคาร์โก้ผ้าฝ้ายหรือไนลอน"
       },
       "sweatpants": {
-        "name": "Sweatpants",
-        "desc": "Joggers or training pants"
+        "name": "กางเกงสเวท",
+        "desc": "จ็อกเกอร์หรือกางเกงวอร์ม"
       },
       "leather_pants": {
-        "name": "Leather Pants",
-        "desc": "Leather or eco-leather pants"
+        "name": "กางเกงหนัง",
+        "desc": "กางเกงหนังหรือหนังอีโค่"
       },
       "nylon_pants": {
-        "name": "Nylon Pants",
-        "desc": "Tech or outdoor pants"
+        "name": "กางเกงไนลอน",
+        "desc": "กางเกงเทคหรือเอาท์ดอร์"
       }
     },
     "shoes": {
       "leather_shoes": {
-        "name": "Leather Shoes",
-        "desc": "Oxford or derby shoes"
+        "name": "รองเท้าหนัง",
+        "desc": "รองเท้าอ็อกซ์ฟอร์ดหรือดาร์บี้"
       },
       "leather_boots": {
-        "name": "Leather Boots",
-        "desc": "Chelsea or lace-up boots"
+        "name": "บูทหนัง",
+        "desc": "เชลซีบูทหรือบูทผูกเชือก"
       },
       "suede_boots": {
-        "name": "Suede Boots",
-        "desc": "Suede chelsea or desert boots"
+        "name": "บูทหนังกลับ",
+        "desc": "เชลซีหรือเดเซิร์ทบูทหนังกลับ"
       },
       "canvas_sneakers": {
-        "name": "Canvas Sneakers",
-        "desc": "Converse or Jack Purcell"
+        "name": "สนีกเกอร์ผ้าใบ",
+        "desc": "คอนเวิร์สหรือแจ็ค เพอร์เซล"
       },
       "leather_sneakers": {
-        "name": "Leather Sneakers",
-        "desc": "White or clean sneakers"
+        "name": "สนีกเกอร์หนัง",
+        "desc": "สนีกเกอร์สีขาวหรือทรงสะอาด"
       },
       "suede_shoes": {
-        "name": "Suede Shoes",
-        "desc": "Suede loafers or derbies"
+        "name": "รองเท้าหนังกลับ",
+        "desc": "โลฟเฟอร์หรือดาร์บี้หนังกลับ"
       },
       "loafer": {
-        "name": "Loafers",
-        "desc": "Penny or tassel loafers"
+        "name": "โลฟเฟอร์",
+        "desc": "เพนนี่หรือแทสเซิลโลฟเฟอร์"
       },
       "hiking_boots": {
-        "name": "Hiking Boots",
-        "desc": "Gore-Tex or trail boots"
+        "name": "บูทเดินป่า",
+        "desc": "กอร์เท็กซ์หรือบูทเทรล"
       },
       "sandals": {
-        "name": "Sandals",
-        "desc": "Birkenstock or strap sandals"
+        "name": "รองเท้าแตะ",
+        "desc": "เบอร์เคนสต็อคหรือรองเท้าแตะสายรัด"
       }
     },
     "scarf": {
       "wool_scarf": {
-        "name": "Wool Muffler",
-        "desc": "Lambswool or merino muffler"
+        "name": "ผ้าพันคอขนสัตว์",
+        "desc": "ผ้าพันคอแลมบ์สวูลหรือเมอริโน"
       },
       "cashmere_scarf": {
-        "name": "Cashmere Muffler",
-        "desc": "Cashmere scarf"
+        "name": "ผ้าพันคอแคชเมียร์",
+        "desc": "ผ้าพันคอแคชเมียร์"
       },
       "cotton_scarf": {
-        "name": "Cotton Scarf",
-        "desc": "Cotton or gauze scarf"
+        "name": "ผ้าพันคอผ้าฝ้าย",
+        "desc": "ผ้าพันคอผ้าฝ้ายหรือผ้าก๊อซ"
       },
       "silk_scarf": {
-        "name": "Silk Scarf",
-        "desc": "Silk neckerchief"
+        "name": "ผ้าพันคอผ้าไหม",
+        "desc": "ผ้าพันคอผ้าไหม"
       },
       "linen_scarf": {
-        "name": "Linen Scarf",
-        "desc": "Linen scarf or shawl"
+        "name": "ผ้าพันคอลินิน",
+        "desc": "ผ้าพันคอหรือผ้าคลุมลินิน"
       }
     }
   },
   "compatRules": {
-    "leather_denim_great": "Leather × Denim: A classic biker/casual combination",
-    "leather_wool_great": "Leather × Wool: Balances formality with texture",
-    "leather_cotton_great": "Leather × Cotton: Casual yet sophisticated pairing",
-    "leather_cashmere_great": "Leather × Cashmere: Luxury layering",
-    "denim_cotton_great": "Denim × Cotton: The most natural casual combo",
-    "denim_flannel_great": "Denim × Flannel: Americana/workwear essential",
-    "denim_wool_great": "Denim × Wool: Casual meets warmth",
-    "wool_cotton_great": "Wool × Cotton: Layering basics",
-    "wool_silk_great": "Wool × Silk: Elevated texture contrast",
-    "wool_cashmere_great": "Wool × Cashmere: Warm and elegant winter pairing",
-    "linen_cotton_great": "Linen × Cotton: Best summer combination",
-    "linen_linen_great": "Linen × Linen: Cohesive cool look",
-    "cotton_cotton_great": "Cotton × Cotton: Comfortable and natural pairing",
-    "cotton_jersey_great": "Cotton Shirt × Jersey: Basic layering",
-    "suede_denim_great": "Suede × Denim: Vintage mood",
-    "suede_wool_great": "Suede × Wool: Fall texture layering",
-    "suede_cotton_great": "Suede × Cotton: Natural texture mix",
-    "suede_corduroy_great": "Suede × Corduroy: Fall vintage essential",
-    "tweed_cotton_great": "Tweed × Cotton: Classic British look",
-    "tweed_wool_great": "Tweed × Wool: Harmonious same-family textures",
-    "tweed_silk_great": "Tweed × Silk: Classic formal meets sophistication",
-    "corduroy_cotton_great": "Corduroy × Cotton: Fall casual essential",
-    "corduroy_wool_great": "Corduroy × Wool: Warm fall/winter layering",
-    "corduroy_flannel_great": "Corduroy × Flannel: Vintage workwear combo",
-    "corduroy_denim_great": "Corduroy × Denim: Textured casual",
-    "waxed_wool_great": "Waxed × Wool: British country essential",
-    "waxed_denim_great": "Waxed × Denim: Rugged outdoor mood",
-    "waxed_corduroy_great": "Waxed × Corduroy: British country look",
-    "knit_woven_great": "Knit × Woven: Standout texture contrast",
-    "knit_denim_great": "Knit × Denim: Casual layering basics",
-    "silk_cotton_great": "Silk × Cotton: Sophisticated texture contrast",
-    "pique_chino_great": "Piqué × Chino: Preppy essential combo",
-    "pique_cotton_great": "Piqué × Cotton: Clean casual",
-    "leather_leather_ok": "Leather × Leather: Possible but can be excessive. Vary the colors",
-    "leather_nylon_ok": "Leather × Nylon: Works for streetwear/techwear",
-    "leather_fleece_ok": "Leather × Fleece: Possible but styles may clash",
-    "denim_denim_ok": "Denim × Denim: OK with different washes (Canadian tuxedo)",
-    "nylon_cotton_ok": "Nylon × Cotton: Sporty-casual mix",
-    "nylon_nylon_ok": "Nylon × Nylon: Works for techwear/outdoor",
-    "nylon_denim_ok": "Nylon × Denim: Works for street casual",
-    "fleece_denim_ok": "Fleece × Denim: Outdoor casual",
-    "fleece_cotton_ok": "Fleece × Cotton: Practical layering",
-    "fleece_nylon_great": "Fleece × Nylon: Gorpcore/outdoor essential",
-    "padding_cotton_ok": "Puffer × Cotton: Practical winter combo",
-    "padding_denim_ok": "Puffer × Denim: Winter casual basics",
-    "padding_wool_ok": "Puffer × Wool: Warm but watch the bulk",
-    "jersey_jersey_ok": "Jersey × Jersey: Comfy but can look too casual",
-    "jersey_denim_great": "Jersey × Denim: Everyday casual basics",
-    "jersey_wool_ok": "Jersey × Wool: Watch the formality gap",
-    "synthetic_cotton_ok": "Synthetic × Cotton: Function meets comfort",
-    "canvas_denim_great": "Canvas × Denim: Casual essential",
-    "canvas_cotton_great": "Canvas × Cotton: Comfortable casual",
-    "canvas_chino_great": "Canvas × Chino: Clean casual",
-    "rubber_cotton_ok": "Rubber × Cotton: Summer casual",
-    "rubber_linen_ok": "Rubber × Linen: Summer resort look",
-    "leather_linen_bad": "Leather × Linen: Weight and seasonal feel clash",
-    "leather_rubber_bad": "Leather × Rubber: Extreme formality clash",
-    "silk_fleece_bad": "Silk × Fleece: Formality gap is too large",
-    "silk_nylon_bad": "Silk × Nylon: Formal and sporty clash",
-    "silk_rubber_bad": "Silk × Rubber: Luxury and casual clash extremely",
-    "tweed_nylon_bad": "Tweed × Nylon: Classic and sporty clash",
-    "tweed_fleece_bad": "Tweed × Fleece: Awkward formality difference",
-    "tweed_jersey_ok": "Tweed × Jersey: Possible as mix-and-match, use with care",
-    "cashmere_nylon_bad": "Cashmere × Nylon: Material quality clash",
-    "cashmere_fleece_bad": "Cashmere × Fleece: Luxury and utility clash",
-    "cashmere_rubber_bad": "Cashmere × Rubber: Extreme formality difference",
-    "formal_fleece_bad": "Formal × Fleece: Dress and outdoor clash",
-    "formal_rubber_bad": "Formal × Rubber: Extreme formality clash",
-    "formal_jersey_bad": "Formal Shoes × Jersey: Dress shoes with sweatshirt is awkward",
-    "semiformal_fleece_bad": "Semi-Formal × Fleece: Style clash",
-    "linen_wool_bad": "Linen × Wool: Complete seasonal clash",
-    "linen_padding_bad": "Linen × Puffer: Summer and winter materials clash",
-    "linen_fleece_bad": "Linen × Fleece: Seasonal clash",
-    "linen_flannel_bad": "Linen × Flannel: Cool and warm clash",
-    "padding_silk_bad": "Puffer × Silk: Formality and function clash",
-    "padding_linen_bad": "Puffer × Linen: Opposite seasons",
-    "waxed_silk_bad": "Waxed × Silk: Rugged and delicate clash",
-    "waxed_linen_bad": "Waxed × Linen: Seasonal mismatch",
-    "boots_linen_bad": "Boots × Linen: Heavy footwear with light fabric imbalance",
-    "boots_silk_ok": "Boots × Silk: Edgy mix, OK if intentional",
-    "corduroy_linen_bad": "Corduroy × Linen: Fall and summer seasonal clash",
-    "flannel_linen_bad": "Flannel × Linen: Warm and cool clash",
-    "rubber_wool_bad": "Rubber Sandals × Wool: Seasonal clash",
-    "rubber_flannel_bad": "Rubber × Flannel: Summer and fall clash",
-    "default_ok": "No specific compatibility rule — a neutral combination"
+    "leather_denim_great": "หนัง × เดนิม: คอมโบไบค์เกอร์/แคชชวลคลาสสิก",
+    "leather_wool_great": "หนัง × ขนสัตว์: สมดุลระหว่างความเป็นทางการกับเท็กซ์เจอร์",
+    "leather_cotton_great": "หนัง × ผ้าฝ้าย: สบายแต่ดูดี",
+    "leather_cashmere_great": "หนัง × แคชเมียร์: เลเยอร์ริ่งหรูหรา",
+    "denim_cotton_great": "เดนิม × ผ้าฝ้าย: คอมโบแคชชวลธรรมชาติที่สุด",
+    "denim_flannel_great": "เดนิม × ฟลานเนล: สิ่งจำเป็นของสไตล์อเมริกัน/เวิร์คแวร์",
+    "denim_wool_great": "เดนิม × ขนสัตว์: แคชชวลผสมความอบอุ่น",
+    "wool_cotton_great": "ขนสัตว์ × ผ้าฝ้าย: พื้นฐานการเลเยอร์",
+    "wool_silk_great": "ขนสัตว์ × ผ้าไหม: คอนทราสต์เท็กซ์เจอร์ยกระดับ",
+    "wool_cashmere_great": "ขนสัตว์ × แคชเมียร์: คู่ฤดูหนาวอบอุ่นและสง่างาม",
+    "linen_cotton_great": "ลินิน × ผ้าฝ้าย: คอมโบฤดูร้อนดีที่สุด",
+    "linen_linen_great": "ลินิน × ลินิน: ลุคเย็นสบายกลมกลืน",
+    "cotton_cotton_great": "ผ้าฝ้าย × ผ้าฝ้าย: คู่ที่สบายและเป็นธรรมชาติ",
+    "cotton_jersey_great": "เสื้อเชิ้ตผ้าฝ้าย × เจอร์ซีย์: เลเยอร์พื้นฐาน",
+    "suede_denim_great": "หนังกลับ × เดนิม: มูดวินเทจ",
+    "suede_wool_great": "หนังกลับ × ขนสัตว์: เลเยอร์เท็กซ์เจอร์ฤดูใบไม้ร่วง",
+    "suede_cotton_great": "หนังกลับ × ผ้าฝ้าย: มิกซ์เท็กซ์เจอร์ธรรมชาติ",
+    "suede_corduroy_great": "หนังกลับ × ลูกฟูก: สิ่งจำเป็นวินเทจฤดูใบไม้ร่วง",
+    "tweed_cotton_great": "ทวีด × ผ้าฝ้าย: ลุคอังกฤษคลาสสิก",
+    "tweed_wool_great": "ทวีด × ขนสัตว์: เท็กซ์เจอร์ตระกูลเดียวกันกลมกลืน",
+    "tweed_silk_great": "ทวีด × ผ้าไหม: ฟอร์มอลคลาสสิกพบความซับซ้อน",
+    "corduroy_cotton_great": "ลูกฟูก × ผ้าฝ้าย: สิ่งจำเป็นแคชชวลฤดูใบไม้ร่วง",
+    "corduroy_wool_great": "ลูกฟูก × ขนสัตว์: เลเยอร์อบอุ่นฤดูใบไม้ร่วง/หนาว",
+    "corduroy_flannel_great": "ลูกฟูก × ฟลานเนล: คอมโบเวิร์คแวร์วินเทจ",
+    "corduroy_denim_great": "ลูกฟูก × เดนิม: แคชชวลเท็กซ์เจอร์",
+    "waxed_wool_great": "แว็กซ์ × ขนสัตว์: สิ่งจำเป็นสไตล์ชนบทอังกฤษ",
+    "waxed_denim_great": "แว็กซ์ × เดนิม: มูดเอาท์ดอร์แข็งแกร่ง",
+    "waxed_corduroy_great": "แว็กซ์ × ลูกฟูก: ลุคชนบทอังกฤษ",
+    "knit_woven_great": "ถัก × ทอ: คอนทราสต์เท็กซ์เจอร์โดดเด่น",
+    "knit_denim_great": "นิต × เดนิม: พื้นฐานเลเยอร์แคชชวล",
+    "silk_cotton_great": "ผ้าไหม × ผ้าฝ้าย: คอนทราสต์เท็กซ์เจอร์ที่ดูดี",
+    "pique_chino_great": "ปิเก้ × ชิโน่: คอมโบหลักของเพรปพี้",
+    "pique_cotton_great": "ปิเก้ × ผ้าฝ้าย: แคชชวลสะอาดตา",
+    "leather_leather_ok": "หนัง × หนัง: ทำได้แต่อาจมากเกินไป เปลี่ยนสีให้ต่างกัน",
+    "leather_nylon_ok": "หนัง × ไนลอน: เหมาะกับสตรีทแวร์/เทคแวร์",
+    "leather_fleece_ok": "หนัง × ฟลีซ: ทำได้แต่สไตล์อาจขัดกัน",
+    "denim_denim_ok": "เดนิม × เดนิม: โอเคถ้าใช้สีซักต่างกัน (แคนาเดียนทักซิโด้)",
+    "nylon_cotton_ok": "ไนลอน × ผ้าฝ้าย: มิกซ์สปอร์ตี้-แคชชวล",
+    "nylon_nylon_ok": "ไนลอน × ไนลอน: เหมาะกับเทคแวร์/เอาท์ดอร์",
+    "nylon_denim_ok": "ไนลอน × เดนิม: เหมาะกับสตรีทแคชชวล",
+    "fleece_denim_ok": "ฟลีซ × เดนิม: เอาท์ดอร์แคชชวล",
+    "fleece_cotton_ok": "ฟลีซ × ผ้าฝ้าย: เลเยอร์ใช้ได้จริง",
+    "fleece_nylon_great": "ฟลีซ × ไนลอน: สิ่งจำเป็นกอร์ปคอร์/เอาท์ดอร์",
+    "padding_cotton_ok": "พัฟเฟอร์ × ผ้าฝ้าย: คอมโบฤดูหนาวใช้ได้จริง",
+    "padding_denim_ok": "พัฟเฟอร์ × เดนิม: พื้นฐานแคชชวลฤดูหนาว",
+    "padding_wool_ok": "พัฟเฟอร์ × ขนสัตว์: อุ่นแต่ระวังเทอะทะ",
+    "jersey_jersey_ok": "เจอร์ซีย์ × เจอร์ซีย์: สบายแต่อาจดูลำลองเกินไป",
+    "jersey_denim_great": "เจอร์ซีย์ × เดนิม: พื้นฐานแคชชวลประจำวัน",
+    "jersey_wool_ok": "เจอร์ซีย์ × ขนสัตว์: ระวังช่องว่างความเป็นทางการ",
+    "synthetic_cotton_ok": "สังเคราะห์ × ผ้าฝ้าย: ฟังก์ชั่นพบความสบาย",
+    "canvas_denim_great": "ผ้าใบ × เดนิม: สิ่งจำเป็นแคชชวล",
+    "canvas_cotton_great": "ผ้าใบ × ผ้าฝ้าย: แคชชวลสบาย",
+    "canvas_chino_great": "ผ้าใบ × ชิโน่: แคชชวลสะอาดตา",
+    "rubber_cotton_ok": "ยาง × ผ้าฝ้าย: แคชชวลฤดูร้อน",
+    "rubber_linen_ok": "ยาง × ลินิน: ลุครีสอร์ทฤดูร้อน",
+    "leather_linen_bad": "หนัง × ลินิน: น้ำหนักและฤดูกาลไม่เข้ากัน",
+    "leather_rubber_bad": "หนัง × ยาง: ความเป็นทางการขัดกันสุดๆ",
+    "silk_fleece_bad": "ผ้าไหม × ฟลีซ: ช่องว่างความเป็นทางการใหญ่เกินไป",
+    "silk_nylon_bad": "ผ้าไหม × ไนลอน: ฟอร์มอลกับสปอร์ตี้ขัดกัน",
+    "silk_rubber_bad": "ผ้าไหม × ยาง: หรูกับลำลองขัดกันสุดขีด",
+    "tweed_nylon_bad": "ทวีด × ไนลอน: คลาสสิกกับสปอร์ตี้ขัดกัน",
+    "tweed_fleece_bad": "ทวีด × ฟลีซ: ระดับความเป็นทางการไม่เข้ากัน",
+    "tweed_jersey_ok": "ทวีด × เจอร์ซีย์: มิกซ์แอนด์แมตช์ได้ ใช้อย่างระมัดระวัง",
+    "cashmere_nylon_bad": "แคชเมียร์ × ไนลอน: คุณภาพวัสดุขัดกัน",
+    "cashmere_fleece_bad": "แคชเมียร์ × ฟลีซ: หรูกับใช้งานขัดกัน",
+    "cashmere_rubber_bad": "แคชเมียร์ × ยาง: ความเป็นทางการต่างกันสุดขีด",
+    "formal_fleece_bad": "ฟอร์มอล × ฟลีซ: ชุดทำงานกับเอาท์ดอร์ขัดกัน",
+    "formal_rubber_bad": "ฟอร์มอล × ยาง: ความเป็นทางการขัดกันสุดๆ",
+    "formal_jersey_bad": "รองเท้าทำงาน × เจอร์ซีย์: รองเท้าหนังกับสเวตเชิ้ตดูขัดกัน",
+    "semiformal_fleece_bad": "เซมิฟอร์มอล × ฟลีซ: สไตล์ขัดกัน",
+    "linen_wool_bad": "ลินิน × ขนสัตว์: ฤดูกาลขัดกันสิ้นเชิง",
+    "linen_padding_bad": "ลินิน × พัฟเฟอร์: วัสดุฤดูร้อนกับฤดูหนาวขัดกัน",
+    "linen_fleece_bad": "ลินิน × ฟลีซ: ฤดูกาลขัดกัน",
+    "linen_flannel_bad": "ลินิน × ฟลานเนล: เย็นกับอุ่นขัดกัน",
+    "padding_silk_bad": "พัฟเฟอร์ × ผ้าไหม: ความเป็นทางการกับฟังก์ชั่นขัดกัน",
+    "padding_linen_bad": "พัฟเฟอร์ × ลินิน: คนละฤดูกาลกัน",
+    "waxed_silk_bad": "แว็กซ์ × ผ้าไหม: หยาบกร้านกับบอบบางขัดกัน",
+    "waxed_linen_bad": "แว็กซ์ × ลินิน: ฤดูกาลไม่เข้ากัน",
+    "boots_linen_bad": "บูท × ลินิน: รองเท้าหนักกับผ้าเบาไม่สมดุล",
+    "boots_silk_ok": "บูท × ผ้าไหม: มิกซ์แบบเอจจี้ โอเคถ้าตั้งใจ",
+    "corduroy_linen_bad": "ลูกฟูก × ลินิน: ฤดูใบไม้ร่วงกับฤดูร้อนขัดกัน",
+    "flannel_linen_bad": "ฟลานเนล × ลินิน: อุ่นกับเย็นขัดกัน",
+    "rubber_wool_bad": "รองเท้าแตะยาง × ขนสัตว์: ฤดูกาลขัดกัน",
+    "rubber_flannel_bad": "ยาง × ฟลานเนล: ฤดูร้อนกับฤดูใบไม้ร่วงขัดกัน",
+    "default_ok": "ไม่มีกฎความเข้ากันเฉพาะ — เป็นคอมโบกลางๆ"
   },
   "itemsCatalog": {
-    "padding": "Puffer",
-    "coat": "Coat",
-    "jacket": "Jacket",
-    "hood_zip": "Zip-Up Hoodie",
-    "cardigan": "Cardigan",
-    "knit_zip": "Knit Zip-Up",
-    "vest": "Vest",
-    "hoodie": "Hoodie",
-    "knit": "Knit",
-    "mtm": "Sweatshirt",
-    "shirt": "Shirt",
-    "tshirt": "T-Shirt",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "bottom": "Bottom",
-    "shoes": "Shoes"
+    "padding": "พัฟเฟอร์",
+    "coat": "โค้ท",
+    "jacket": "แจ็คเก็ต",
+    "hood_zip": "ฮู้ดดี้ซิป",
+    "cardigan": "คาร์ดิแกน",
+    "knit_zip": "นิตซิป",
+    "vest": "เสื้อกั๊ก",
+    "hoodie": "ฮู้ดดี้",
+    "knit": "นิต",
+    "mtm": "สเวตเชิ้ต",
+    "shirt": "เสื้อเชิ้ต",
+    "tshirt": "เสื้อยืด",
+    "scarf": "ผ้าพันคอ",
+    "hat": "หมวก",
+    "bottom": "กางเกง",
+    "shoes": "รองเท้า"
   }
 }

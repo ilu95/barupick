@@ -1,123 +1,123 @@
 {
   "seasons": {
-    "spring": { "name": "Spring Warm" },
-    "summer": { "name": "Summer Cool" },
-    "autumn": { "name": "Autumn Warm" },
-    "winter": { "name": "Winter Cool" }
+    "spring": { "name": "สปริงวอร์ม" },
+    "summer": { "name": "ซัมเมอร์คูล" },
+    "autumn": { "name": "ออทัมน์วอร์ม" },
+    "winter": { "name": "วินเทอร์คูล" }
   },
   "types": {
     "spring_light": {
-      "name": "Spring Light",
-      "description": "Bright, clear pastel warm tones suit you best. We recommend light and radiant colors.",
-      "keywords": ["bright", "clear", "light", "radiant"]
+      "name": "สปริงไลท์",
+      "description": "โทนวอร์มพาสเทลสว่างและใสเหมาะกับคุณที่สุด เราแนะนำสีสว่างและเปล่งประกาย",
+      "keywords": ["สว่าง", "ใส", "อ่อน", "เปล่งประกาย"]
     },
     "spring_bright": {
-      "name": "Spring Bright",
-      "description": "Vivid, vibrant warm tones suit you best. We recommend lively, energetic colors.",
-      "keywords": ["vivid", "vibrant", "lively", "energetic"]
+      "name": "สปริงไบรท์",
+      "description": "โทนวอร์มสดใสและมีชีวิตชีวาเหมาะกับคุณที่สุด เราแนะนำสีสดใสเปี่ยมพลัง",
+      "keywords": ["สดใส", "มีชีวิตชีวา", "ร่าเริง", "พลังงาน"]
     },
     "spring_true": {
-      "name": "Spring True",
-      "description": "Warm, clear medium tones suit you best. We recommend natural, healthy-looking colors.",
-      "keywords": ["warm", "clear", "natural", "healthy"]
+      "name": "สปริงทรู",
+      "description": "โทนกลางอุ่นและใสเหมาะกับคุณที่สุด เราแนะนำสีธรรมชาติดูมีสุขภาพดี",
+      "keywords": ["อุ่น", "ใส", "ธรรมชาติ", "สุขภาพดี"]
     },
     "summer_light": {
-      "name": "Summer Light",
-      "description": "Bright, soft pastel cool tones suit you. We recommend elegant and feminine colors.",
-      "keywords": ["soft", "delicate", "elegant", "feminine"]
+      "name": "ซัมเมอร์ไลท์",
+      "description": "โทนคูลพาสเทลสว่างและนุ่มนวลเหมาะกับคุณ เราแนะนำสีสง่างามและอ่อนหวาน",
+      "keywords": ["นุ่มนวล", "ละเอียด", "สง่างาม", "อ่อนหวาน"]
     },
     "summer_muted": {
-      "name": "Summer Muted",
-      "description": "Calm, greyish tones suit you. We recommend sophisticated and dignified colors.",
-      "keywords": ["calm", "greyish", "sophisticated", "dignified"]
+      "name": "ซัมเมอร์มิวท์",
+      "description": "โทนเทาสงบเหมาะกับคุณ เราแนะนำสีมีระดับและสง่า",
+      "keywords": ["สงบ", "เทา", "มีระดับ", "สง่า"]
     },
     "summer_true": {
-      "name": "Summer True",
-      "description": "Cool, soft medium cool tones suit you. We recommend refreshing and clean colors.",
-      "keywords": ["cool", "soft", "refreshing", "clean"]
+      "name": "ซัมเมอร์ทรู",
+      "description": "โทนคูลนุ่มนวลระดับกลางเหมาะกับคุณ เราแนะนำสีสดชื่นและสะอาดตา",
+      "keywords": ["เย็น", "นุ่มนวล", "สดชื่น", "สะอาดตา"]
     },
     "autumn_soft": {
-      "name": "Autumn Soft",
-      "description": "Soft, warm muted tones suit you. We recommend natural and comfortable colors.",
-      "keywords": ["soft", "muted", "natural", "comfortable"]
+      "name": "ออทัมน์ซอฟต์",
+      "description": "โทนมิวท์วอร์มนุ่มนวลเหมาะกับคุณ เราแนะนำสีธรรมชาติและสบาย",
+      "keywords": ["นุ่มนวล", "มิวท์", "ธรรมชาติ", "สบาย"]
     },
     "autumn_deep": {
-      "name": "Autumn Deep",
-      "description": "Deep, rich earth tones suit you. We recommend luxurious and profound colors.",
-      "keywords": ["deep", "rich", "luxurious", "profound"]
+      "name": "ออทัมน์ดีพ",
+      "description": "โทนเอิร์ธลึกและเข้มข้นเหมาะกับคุณ เราแนะนำสีหรูหราและลุ่มลึก",
+      "keywords": ["ลึก", "เข้มข้น", "หรูหรา", "ลุ่มลึก"]
     },
     "autumn_true": {
-      "name": "Autumn True",
-      "description": "Warm, natural earth tones suit you. We recommend classic and stable colors.",
-      "keywords": ["warm", "natural", "classic", "stable"]
+      "name": "ออทัมน์ทรู",
+      "description": "โทนเอิร์ธวอร์มธรรมชาติเหมาะกับคุณ เราแนะนำสีคลาสสิกและมั่นคง",
+      "keywords": ["อุ่น", "ธรรมชาติ", "คลาสสิก", "มั่นคง"]
     },
     "winter_bright": {
-      "name": "Winter Bright",
-      "description": "Vivid, cool bold tones suit you. We recommend intense, eye-catching colors.",
-      "keywords": ["vivid", "bold", "intense", "eye-catching"]
+      "name": "วินเทอร์ไบรท์",
+      "description": "โทนคูลสดใสและหนักแน่นเหมาะกับคุณ เราแนะนำสีเข้มข้นและสะดุดตา",
+      "keywords": ["สดใส", "หนักแน่น", "เข้มข้น", "สะดุดตา"]
     },
     "winter_deep": {
-      "name": "Winter Deep",
-      "description": "Deep, dark tones suit you. We recommend chic and sophisticated colors.",
-      "keywords": ["deep", "chic", "sophisticated", "modern"]
+      "name": "วินเทอร์ดีพ",
+      "description": "โทนลึกและเข้มเหมาะกับคุณ เราแนะนำสีชิคและมีระดับ",
+      "keywords": ["ลึก", "ชิค", "มีระดับ", "ทันสมัย"]
     },
     "winter_true": {
-      "name": "Winter True",
-      "description": "Cool, vivid high-contrast colors suit you. We recommend modern and urban colors.",
-      "keywords": ["contrast", "vivid", "modern", "urban"]
+      "name": "วินเทอร์ทรู",
+      "description": "สีคูลสดใสคอนทราสต์สูงเหมาะกับคุณ เราแนะนำสีทันสมัยและเมืองๆ",
+      "keywords": ["คอนทราสต์", "สดใส", "ทันสมัย", "เมือง"]
     }
   },
   "diagnosis": {
     "questions": [
       {
-        "question": "What color are the veins on the inside of your wrist?",
-        "options": ["Mostly greenish", "Mostly blue/purple", "Both look similar"]
+        "question": "เส้นเลือดที่ข้อมือด้านในเป็นสีอะไร?",
+        "options": ["เขียวเป็นส่วนใหญ่", "น้ำเงิน/ม่วงเป็นส่วนใหญ่", "ดูคล้ายกันทั้งสอง"]
       },
       {
-        "question": "How does your skin react to sunlight?",
-        "options": ["Burns easily and turns red", "Tans easily and turns brown", "Tans moderately"]
+        "question": "ผิวของคุณตอบสนองต่อแสงแดดอย่างไร?",
+        "options": ["ไหม้ง่ายและแดง", "แทนง่ายและคล้ำ", "แทนปานกลาง"]
       },
       {
-        "question": "Which accessories suit you better — gold or silver?",
-        "options": ["Gold looks better", "Silver looks better", "Both look similar"]
+        "question": "เครื่องประดับแบบไหนเหมาะกับคุณมากกว่า — ทองหรือเงิน?",
+        "options": ["ทองดูดีกว่า", "เงินดูดีกว่า", "ดูดีทั้งคู่"]
       },
       {
-        "question": "When wearing white, which shade suits you more?",
-        "options": ["Ivory/cream white suits me better", "Pure/blue-tinted white suits me better", "Both work fine"]
+        "question": "เมื่อใส่ชุดสีขาว สีขาวแบบไหนเหมาะกับคุณกว่า?",
+        "options": ["ขาวงาช้าง/ครีมเหมาะกว่า", "ขาวบริสุทธิ์/เจือฟ้าเหมาะกว่า", "ทั้งสองแบบโอเค"]
       },
       {
-        "question": "What color are your eyes and hair?",
-        "options": ["Light brown/lighter shades", "Medium brown tones", "Dark brown/black"]
+        "question": "สีตาและผมของคุณเป็นอย่างไร?",
+        "options": ["น้ำตาลอ่อน/โทนอ่อน", "โทนน้ำตาลกลาง", "น้ำตาลเข้ม/ดำ"]
       },
       {
-        "question": "What is your overall image or impression?",
-        "options": ["Bright and radiant", "Soft and subtle", "Calm and deep", "Vivid and clear"]
+        "question": "ภาพรวมหรือความรู้สึกของคุณเป็นแบบไหน?",
+        "options": ["สว่างและเปล่งประกาย", "นุ่มนวลและละเอียด", "สงบและลุ่มลึก", "สดใสและชัดเจน"]
       },
       {
-        "question": "Which suits you better — vivid primary colors or calm muted colors?",
-        "options": ["Vivid, bold colors suit me", "Calm, muted colors suit me", "Both are similar"]
+        "question": "แบบไหนเหมาะกับคุณกว่า — สีจัดสดใสหรือสีมิวท์สงบ?",
+        "options": ["สีสดจัดเหมาะกับฉัน", "สีมิวท์สงบเหมาะกับฉัน", "ทั้งสองแบบใกล้เคียงกัน"]
       },
       {
-        "question": "How much contrast is there in your features? (between eyes, hair, and skin)",
-        "options": ["Low contrast — features blend together", "Medium contrast", "High contrast — features are distinct"]
+        "question": "ใบหน้าของคุณมีคอนทราสต์มากแค่ไหน? (ระหว่างตา ผม และผิว)",
+        "options": ["คอนทราสต์ต่ำ — ดูกลมกลืนกัน", "คอนทราสต์ปานกลาง", "คอนทราสต์สูง — แต่ละส่วนชัดเจน"]
       }
     ],
     "results": {
       "spring_warm": {
-        "name": "Spring Warm",
-        "description": "Warm, bright colors suit you best. We recommend radiant colors like peach, coral, light orange, and soft yellow."
+        "name": "สปริงวอร์ม",
+        "description": "สีอุ่นและสว่างเหมาะกับคุณที่สุด เราแนะนำสีเปล่งประกายอย่างพีช คอรัล ส้มอ่อน และเหลืองนุ่ม"
       },
       "summer_cool": {
-        "name": "Summer Cool",
-        "description": "Cool, soft colors suit you best. We recommend pastel cool tones like lavender, rose, sky blue, and mint."
+        "name": "ซัมเมอร์คูล",
+        "description": "สีเย็นและนุ่มนวลเหมาะกับคุณที่สุด เราแนะนำโทนคูลพาสเทลอย่างลาเวนเดอร์ โรส ฟ้า และมิ้นท์"
       },
       "autumn_warm": {
-        "name": "Autumn Warm",
-        "description": "Warm, deep colors suit you best. We recommend autumnal colors like camel, burgundy, olive, and mustard."
+        "name": "ออทัมน์วอร์ม",
+        "description": "สีอุ่นและลึกเหมาะกับคุณที่สุด เราแนะนำสีฤดูใบไม้ร่วงอย่างคาเมล เบอร์กันดี โอลีฟ และมัสตาร์ด"
       },
       "winter_cool": {
-        "name": "Winter Cool",
-        "description": "Cool, vivid colors suit you best. We recommend high-contrast colors like black, white, navy, and royal blue."
+        "name": "วินเทอร์คูล",
+        "description": "สีเย็นและสดใสเหมาะกับคุณที่สุด เราแนะนำสีคอนทราสต์สูงอย่างดำ ขาว กรมท่า และรอยัลบลู"
       }
     }
   }

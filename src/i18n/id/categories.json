@@ -1,359 +1,359 @@
 {
   "names": {
     "outer": "Outerwear",
-    "middleware": "Mid Layer",
-    "top": "Top",
+    "middleware": "Lapisan Tengah",
+    "top": "Atasan",
     "inner": "Inner",
-    "bottom": "Bottom",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "shoes": "Shoes",
-    "mid_knit": "Knit",
-    "mid_cardigan": "Cardigan",
-    "mid_vest": "Vest",
-    "outer_coat": "Coat",
-    "outer_jacket": "Jacket",
+    "bottom": "Bawahan",
+    "scarf": "Syal",
+    "hat": "Topi",
+    "shoes": "Sepatu",
+    "mid_knit": "Rajut",
+    "mid_cardigan": "Kardigan",
+    "mid_vest": "Rompi",
+    "outer_coat": "Mantel",
+    "outer_jacket": "Jaket",
     "outer_padding": "Puffer"
   },
   "seasons": {
-    "spring": "Spring",
-    "summer": "Summer",
-    "fall": "Fall",
-    "winter": "Winter"
+    "spring": "Semi",
+    "summer": "Panas",
+    "fall": "Gugur",
+    "winter": "Dingin"
   },
   "fabricItems": {
     "outer": {
       "leather_jacket": {
-        "name": "Leather Jacket",
-        "desc": "Cowhide/lambskin rider or blouson"
+        "name": "Jaket Kulit",
+        "desc": "Jaket rider atau blouson dari kulit sapi/domba"
       },
       "denim_jacket": {
-        "name": "Denim Jacket",
-        "desc": "Jean jacket, trucker jacket"
+        "name": "Jaket Denim",
+        "desc": "Jaket jeans, trucker jacket"
       },
       "wool_coat": {
-        "name": "Wool Coat",
-        "desc": "Single or double-breasted wool coat"
+        "name": "Mantel Wol",
+        "desc": "Mantel wol single atau double-breasted"
       },
       "padding": {
-        "name": "Puffer Jacket",
-        "desc": "Goose down or polyester puffer"
+        "name": "Jaket Puffer",
+        "desc": "Puffer bulu angsa atau polyester"
       },
       "fleece_jacket": {
-        "name": "Fleece Jacket",
-        "desc": "Sherpa or boa fleece"
+        "name": "Jaket Fleece",
+        "desc": "Fleece sherpa atau boa"
       },
       "cotton_jacket": {
-        "name": "Cotton Jacket",
-        "desc": "Chino or cotton blazer"
+        "name": "Jaket Katun",
+        "desc": "Blazer chino atau katun"
       },
       "nylon_jacket": {
-        "name": "Nylon Jacket",
-        "desc": "Windbreaker or coach jacket"
+        "name": "Jaket Nylon",
+        "desc": "Windbreaker atau coach jacket"
       },
       "linen_jacket": {
-        "name": "Linen Jacket",
-        "desc": "Linen or hemp blazer"
+        "name": "Jaket Linen",
+        "desc": "Blazer linen atau hemp"
       },
       "tweed_jacket": {
-        "name": "Tweed Jacket",
-        "desc": "Tweed blazer"
+        "name": "Jaket Tweed",
+        "desc": "Blazer tweed"
       },
       "suede_jacket": {
-        "name": "Suede Jacket",
-        "desc": "Suede blouson or jacket"
+        "name": "Jaket Suede",
+        "desc": "Blouson atau jaket suede"
       },
       "waxed_jacket": {
-        "name": "Waxed Jacket",
-        "desc": "Barbour or oiled jacket"
+        "name": "Jaket Waxed",
+        "desc": "Jaket Barbour atau jaket berminyak"
       }
     },
     "middleware": {
       "wool_knit": {
-        "name": "Wool Knit",
-        "desc": "Lambswool or merino wool knit"
+        "name": "Rajut Wol",
+        "desc": "Rajut lambswool atau merino wool"
       },
       "cotton_knit": {
-        "name": "Cotton Knit",
-        "desc": "Cotton knit or cardigan"
+        "name": "Rajut Katun",
+        "desc": "Rajut katun atau kardigan"
       },
       "cashmere_knit": {
-        "name": "Cashmere Knit",
-        "desc": "Cashmere pullover"
+        "name": "Rajut Kasmir",
+        "desc": "Pullover kasmir"
       },
       "fleece_mid": {
         "name": "Fleece",
-        "desc": "Mid-layer fleece"
+        "desc": "Fleece lapisan tengah"
       },
       "cardigan_wool": {
-        "name": "Wool Cardigan",
-        "desc": "Wool cardigan with shawl collar"
+        "name": "Kardigan Wol",
+        "desc": "Kardigan wol dengan kerah shawl"
       },
       "vest_padding": {
-        "name": "Puffer Vest",
-        "desc": "Lightweight puffer vest"
+        "name": "Rompi Puffer",
+        "desc": "Rompi puffer ringan"
       },
       "vest_knit": {
-        "name": "Knit Vest",
-        "desc": "Knit vest or sweater vest"
+        "name": "Rompi Rajut",
+        "desc": "Rompi rajut atau sweater vest"
       },
       "hoodie": {
-        "name": "Zip-Up Hoodie",
-        "desc": "Cotton or fleece-lined zip-up hoodie"
+        "name": "Hoodie Zip-Up",
+        "desc": "Hoodie zip-up katun atau fleece-lined"
       },
       "sweatshirt_mid": {
         "name": "Sweatshirt",
-        "desc": "Mid-layer sweatshirt"
+        "desc": "Sweatshirt lapisan tengah"
       }
     },
     "top": {
       "cotton_tee": {
-        "name": "Cotton T-Shirt",
-        "desc": "Cotton crew neck or V-neck"
+        "name": "Kaos Katun",
+        "desc": "Kaos katun crew neck atau V-neck"
       },
       "oxford_shirt": {
-        "name": "Oxford Shirt",
-        "desc": "Oxford button-down shirt"
+        "name": "Kemeja Oxford",
+        "desc": "Kemeja oxford button-down"
       },
       "linen_shirt": {
-        "name": "Linen Shirt",
-        "desc": "Linen or hemp shirt"
+        "name": "Kemeja Linen",
+        "desc": "Kemeja linen atau hemp"
       },
       "flannel_shirt": {
-        "name": "Flannel Shirt",
-        "desc": "Brushed check shirt"
+        "name": "Kemeja Flanel",
+        "desc": "Kemeja kotak brushed"
       },
       "denim_shirt": {
-        "name": "Denim Shirt",
-        "desc": "Chambray or denim shirt"
+        "name": "Kemeja Denim",
+        "desc": "Kemeja chambray atau denim"
       },
       "silk_blouse": {
-        "name": "Silk Blouse",
-        "desc": "Silk or satin blouse"
+        "name": "Blus Sutra",
+        "desc": "Blus sutra atau satin"
       },
       "polo_shirt": {
         "name": "Polo Shirt",
-        "desc": "Piqué polo shirt"
+        "desc": "Polo shirt piqué"
       },
       "turtleneck": {
         "name": "Turtleneck",
-        "desc": "Cotton or modal turtleneck"
+        "desc": "Turtleneck katun atau modal"
       },
       "wool_turtleneck": {
-        "name": "Wool Turtleneck",
-        "desc": "Wool turtleneck knit"
+        "name": "Turtleneck Wol",
+        "desc": "Rajut turtleneck wol"
       },
       "henley": {
         "name": "Henley",
-        "desc": "Waffle or thermal henley"
+        "desc": "Henley waffle atau thermal"
       }
     },
     "bottom": {
       "raw_denim": {
-        "name": "Denim Jeans",
-        "desc": "Straight or slim denim"
+        "name": "Jeans Denim",
+        "desc": "Denim straight atau slim"
       },
       "chino": {
-        "name": "Chino Pants",
-        "desc": "Cotton chino pants"
+        "name": "Celana Chino",
+        "desc": "Celana chino katun"
       },
       "wool_slacks": {
-        "name": "Wool Slacks",
-        "desc": "Wool dress pants"
+        "name": "Celana Wol",
+        "desc": "Celana formal wol"
       },
       "linen_pants": {
-        "name": "Linen Pants",
-        "desc": "Linen wide or straight cut"
+        "name": "Celana Linen",
+        "desc": "Linen potongan lebar atau lurus"
       },
       "corduroy": {
-        "name": "Corduroy Pants",
-        "desc": "Corduroy trousers"
+        "name": "Celana Korduroy",
+        "desc": "Celana panjang korduroy"
       },
       "cotton_shorts": {
-        "name": "Cotton Shorts",
-        "desc": "Chino or cargo shorts"
+        "name": "Celana Pendek Katun",
+        "desc": "Celana pendek chino atau cargo"
       },
       "cargo_pants": {
-        "name": "Cargo Pants",
-        "desc": "Cotton or nylon cargo pants"
+        "name": "Celana Cargo",
+        "desc": "Celana cargo katun atau nylon"
       },
       "sweatpants": {
-        "name": "Sweatpants",
-        "desc": "Joggers or training pants"
+        "name": "Celana Training",
+        "desc": "Jogger atau celana training"
       },
       "leather_pants": {
-        "name": "Leather Pants",
-        "desc": "Leather or eco-leather pants"
+        "name": "Celana Kulit",
+        "desc": "Celana kulit atau eco-leather"
       },
       "nylon_pants": {
-        "name": "Nylon Pants",
-        "desc": "Tech or outdoor pants"
+        "name": "Celana Nylon",
+        "desc": "Celana teknis atau outdoor"
       }
     },
     "shoes": {
       "leather_shoes": {
-        "name": "Leather Shoes",
-        "desc": "Oxford or derby shoes"
+        "name": "Sepatu Kulit",
+        "desc": "Sepatu oxford atau derby"
       },
       "leather_boots": {
-        "name": "Leather Boots",
-        "desc": "Chelsea or lace-up boots"
+        "name": "Boots Kulit",
+        "desc": "Chelsea boots atau boots bertali"
       },
       "suede_boots": {
-        "name": "Suede Boots",
-        "desc": "Suede chelsea or desert boots"
+        "name": "Boots Suede",
+        "desc": "Chelsea boots atau desert boots suede"
       },
       "canvas_sneakers": {
-        "name": "Canvas Sneakers",
-        "desc": "Converse or Jack Purcell"
+        "name": "Sneakers Kanvas",
+        "desc": "Converse atau Jack Purcell"
       },
       "leather_sneakers": {
-        "name": "Leather Sneakers",
-        "desc": "White or clean sneakers"
+        "name": "Sneakers Kulit",
+        "desc": "Sneakers putih atau clean"
       },
       "suede_shoes": {
-        "name": "Suede Shoes",
-        "desc": "Suede loafers or derbies"
+        "name": "Sepatu Suede",
+        "desc": "Loafer atau derby suede"
       },
       "loafer": {
-        "name": "Loafers",
-        "desc": "Penny or tassel loafers"
+        "name": "Loafer",
+        "desc": "Penny loafer atau tassel loafer"
       },
       "hiking_boots": {
-        "name": "Hiking Boots",
-        "desc": "Gore-Tex or trail boots"
+        "name": "Sepatu Hiking",
+        "desc": "Boots Gore-Tex atau trail"
       },
       "sandals": {
-        "name": "Sandals",
-        "desc": "Birkenstock or strap sandals"
+        "name": "Sandal",
+        "desc": "Birkenstock atau sandal tali"
       }
     },
     "scarf": {
       "wool_scarf": {
-        "name": "Wool Muffler",
-        "desc": "Lambswool or merino muffler"
+        "name": "Syal Wol",
+        "desc": "Syal lambswool atau merino"
       },
       "cashmere_scarf": {
-        "name": "Cashmere Muffler",
-        "desc": "Cashmere scarf"
+        "name": "Syal Kasmir",
+        "desc": "Syal kasmir"
       },
       "cotton_scarf": {
-        "name": "Cotton Scarf",
-        "desc": "Cotton or gauze scarf"
+        "name": "Syal Katun",
+        "desc": "Syal katun atau kasa"
       },
       "silk_scarf": {
-        "name": "Silk Scarf",
-        "desc": "Silk neckerchief"
+        "name": "Syal Sutra",
+        "desc": "Saputangan leher sutra"
       },
       "linen_scarf": {
-        "name": "Linen Scarf",
-        "desc": "Linen scarf or shawl"
+        "name": "Syal Linen",
+        "desc": "Syal atau selendang linen"
       }
     }
   },
   "compatRules": {
-    "leather_denim_great": "Leather × Denim: A classic biker/casual combination",
-    "leather_wool_great": "Leather × Wool: Balances formality with texture",
-    "leather_cotton_great": "Leather × Cotton: Casual yet sophisticated pairing",
-    "leather_cashmere_great": "Leather × Cashmere: Luxury layering",
-    "denim_cotton_great": "Denim × Cotton: The most natural casual combo",
-    "denim_flannel_great": "Denim × Flannel: Americana/workwear essential",
-    "denim_wool_great": "Denim × Wool: Casual meets warmth",
-    "wool_cotton_great": "Wool × Cotton: Layering basics",
-    "wool_silk_great": "Wool × Silk: Elevated texture contrast",
-    "wool_cashmere_great": "Wool × Cashmere: Warm and elegant winter pairing",
-    "linen_cotton_great": "Linen × Cotton: Best summer combination",
-    "linen_linen_great": "Linen × Linen: Cohesive cool look",
-    "cotton_cotton_great": "Cotton × Cotton: Comfortable and natural pairing",
-    "cotton_jersey_great": "Cotton Shirt × Jersey: Basic layering",
-    "suede_denim_great": "Suede × Denim: Vintage mood",
-    "suede_wool_great": "Suede × Wool: Fall texture layering",
-    "suede_cotton_great": "Suede × Cotton: Natural texture mix",
-    "suede_corduroy_great": "Suede × Corduroy: Fall vintage essential",
-    "tweed_cotton_great": "Tweed × Cotton: Classic British look",
-    "tweed_wool_great": "Tweed × Wool: Harmonious same-family textures",
-    "tweed_silk_great": "Tweed × Silk: Classic formal meets sophistication",
-    "corduroy_cotton_great": "Corduroy × Cotton: Fall casual essential",
-    "corduroy_wool_great": "Corduroy × Wool: Warm fall/winter layering",
-    "corduroy_flannel_great": "Corduroy × Flannel: Vintage workwear combo",
-    "corduroy_denim_great": "Corduroy × Denim: Textured casual",
-    "waxed_wool_great": "Waxed × Wool: British country essential",
-    "waxed_denim_great": "Waxed × Denim: Rugged outdoor mood",
-    "waxed_corduroy_great": "Waxed × Corduroy: British country look",
-    "knit_woven_great": "Knit × Woven: Standout texture contrast",
-    "knit_denim_great": "Knit × Denim: Casual layering basics",
-    "silk_cotton_great": "Silk × Cotton: Sophisticated texture contrast",
-    "pique_chino_great": "Piqué × Chino: Preppy essential combo",
-    "pique_cotton_great": "Piqué × Cotton: Clean casual",
-    "leather_leather_ok": "Leather × Leather: Possible but can be excessive. Vary the colors",
-    "leather_nylon_ok": "Leather × Nylon: Works for streetwear/techwear",
-    "leather_fleece_ok": "Leather × Fleece: Possible but styles may clash",
-    "denim_denim_ok": "Denim × Denim: OK with different washes (Canadian tuxedo)",
-    "nylon_cotton_ok": "Nylon × Cotton: Sporty-casual mix",
-    "nylon_nylon_ok": "Nylon × Nylon: Works for techwear/outdoor",
-    "nylon_denim_ok": "Nylon × Denim: Works for street casual",
-    "fleece_denim_ok": "Fleece × Denim: Outdoor casual",
-    "fleece_cotton_ok": "Fleece × Cotton: Practical layering",
-    "fleece_nylon_great": "Fleece × Nylon: Gorpcore/outdoor essential",
-    "padding_cotton_ok": "Puffer × Cotton: Practical winter combo",
-    "padding_denim_ok": "Puffer × Denim: Winter casual basics",
-    "padding_wool_ok": "Puffer × Wool: Warm but watch the bulk",
-    "jersey_jersey_ok": "Jersey × Jersey: Comfy but can look too casual",
-    "jersey_denim_great": "Jersey × Denim: Everyday casual basics",
-    "jersey_wool_ok": "Jersey × Wool: Watch the formality gap",
-    "synthetic_cotton_ok": "Synthetic × Cotton: Function meets comfort",
-    "canvas_denim_great": "Canvas × Denim: Casual essential",
-    "canvas_cotton_great": "Canvas × Cotton: Comfortable casual",
-    "canvas_chino_great": "Canvas × Chino: Clean casual",
-    "rubber_cotton_ok": "Rubber × Cotton: Summer casual",
-    "rubber_linen_ok": "Rubber × Linen: Summer resort look",
-    "leather_linen_bad": "Leather × Linen: Weight and seasonal feel clash",
-    "leather_rubber_bad": "Leather × Rubber: Extreme formality clash",
-    "silk_fleece_bad": "Silk × Fleece: Formality gap is too large",
-    "silk_nylon_bad": "Silk × Nylon: Formal and sporty clash",
-    "silk_rubber_bad": "Silk × Rubber: Luxury and casual clash extremely",
-    "tweed_nylon_bad": "Tweed × Nylon: Classic and sporty clash",
-    "tweed_fleece_bad": "Tweed × Fleece: Awkward formality difference",
-    "tweed_jersey_ok": "Tweed × Jersey: Possible as mix-and-match, use with care",
-    "cashmere_nylon_bad": "Cashmere × Nylon: Material quality clash",
-    "cashmere_fleece_bad": "Cashmere × Fleece: Luxury and utility clash",
-    "cashmere_rubber_bad": "Cashmere × Rubber: Extreme formality difference",
-    "formal_fleece_bad": "Formal × Fleece: Dress and outdoor clash",
-    "formal_rubber_bad": "Formal × Rubber: Extreme formality clash",
-    "formal_jersey_bad": "Formal Shoes × Jersey: Dress shoes with sweatshirt is awkward",
-    "semiformal_fleece_bad": "Semi-Formal × Fleece: Style clash",
-    "linen_wool_bad": "Linen × Wool: Complete seasonal clash",
-    "linen_padding_bad": "Linen × Puffer: Summer and winter materials clash",
-    "linen_fleece_bad": "Linen × Fleece: Seasonal clash",
-    "linen_flannel_bad": "Linen × Flannel: Cool and warm clash",
-    "padding_silk_bad": "Puffer × Silk: Formality and function clash",
-    "padding_linen_bad": "Puffer × Linen: Opposite seasons",
-    "waxed_silk_bad": "Waxed × Silk: Rugged and delicate clash",
-    "waxed_linen_bad": "Waxed × Linen: Seasonal mismatch",
-    "boots_linen_bad": "Boots × Linen: Heavy footwear with light fabric imbalance",
-    "boots_silk_ok": "Boots × Silk: Edgy mix, OK if intentional",
-    "corduroy_linen_bad": "Corduroy × Linen: Fall and summer seasonal clash",
-    "flannel_linen_bad": "Flannel × Linen: Warm and cool clash",
-    "rubber_wool_bad": "Rubber Sandals × Wool: Seasonal clash",
-    "rubber_flannel_bad": "Rubber × Flannel: Summer and fall clash",
-    "default_ok": "No specific compatibility rule — a neutral combination"
+    "leather_denim_great": "Kulit × Denim: Kombinasi klasik biker/casual",
+    "leather_wool_great": "Kulit × Wol: Menyeimbangkan formalitas dengan tekstur",
+    "leather_cotton_great": "Kulit × Katun: Kasual namun berkelas",
+    "leather_cashmere_great": "Kulit × Kasmir: Layering mewah",
+    "denim_cotton_great": "Denim × Katun: Kombinasi kasual paling natural",
+    "denim_flannel_great": "Denim × Flanel: Esensial Americana/workwear",
+    "denim_wool_great": "Denim × Wol: Kasual bertemu kehangatan",
+    "wool_cotton_great": "Wol × Katun: Dasar layering",
+    "wool_silk_great": "Wol × Sutra: Kontras tekstur yang elegan",
+    "wool_cashmere_great": "Wol × Kasmir: Padanan musim dingin yang hangat dan elegan",
+    "linen_cotton_great": "Linen × Katun: Kombinasi musim panas terbaik",
+    "linen_linen_great": "Linen × Linen: Tampilan sejuk yang kohesif",
+    "cotton_cotton_great": "Katun × Katun: Padanan yang nyaman dan natural",
+    "cotton_jersey_great": "Kemeja Katun × Jersey: Layering dasar",
+    "suede_denim_great": "Suede × Denim: Nuansa vintage",
+    "suede_wool_great": "Suede × Wol: Layering tekstur musim gugur",
+    "suede_cotton_great": "Suede × Katun: Campuran tekstur natural",
+    "suede_corduroy_great": "Suede × Korduroy: Esensial vintage musim gugur",
+    "tweed_cotton_great": "Tweed × Katun: Tampilan British klasik",
+    "tweed_wool_great": "Tweed × Wol: Tekstur serumpun yang harmonis",
+    "tweed_silk_great": "Tweed × Sutra: Formal klasik bertemu kecanggihan",
+    "corduroy_cotton_great": "Korduroy × Katun: Esensial kasual musim gugur",
+    "corduroy_wool_great": "Korduroy × Wol: Layering hangat musim gugur/dingin",
+    "corduroy_flannel_great": "Korduroy × Flanel: Kombo workwear vintage",
+    "corduroy_denim_great": "Korduroy × Denim: Kasual bertekstur",
+    "waxed_wool_great": "Waxed × Wol: Esensial gaya pedesaan Inggris",
+    "waxed_denim_great": "Waxed × Denim: Nuansa outdoor yang tangguh",
+    "waxed_corduroy_great": "Waxed × Korduroy: Tampilan pedesaan Inggris",
+    "knit_woven_great": "Rajut × Tenun: Kontras tekstur yang menonjol",
+    "knit_denim_great": "Rajut × Denim: Dasar layering kasual",
+    "silk_cotton_great": "Sutra × Katun: Kontras tekstur yang sophisticated",
+    "pique_chino_great": "Piqué × Chino: Kombo esensial preppy",
+    "pique_cotton_great": "Piqué × Katun: Kasual bersih",
+    "leather_leather_ok": "Kulit × Kulit: Bisa tapi bisa berlebihan. Variasikan warnanya",
+    "leather_nylon_ok": "Kulit × Nylon: Cocok untuk streetwear/techwear",
+    "leather_fleece_ok": "Kulit × Fleece: Bisa tapi gaya mungkin bertabrakan",
+    "denim_denim_ok": "Denim × Denim: OK dengan warna cuci berbeda (Canadian tuxedo)",
+    "nylon_cotton_ok": "Nylon × Katun: Campuran sporty-kasual",
+    "nylon_nylon_ok": "Nylon × Nylon: Cocok untuk techwear/outdoor",
+    "nylon_denim_ok": "Nylon × Denim: Cocok untuk street casual",
+    "fleece_denim_ok": "Fleece × Denim: Kasual outdoor",
+    "fleece_cotton_ok": "Fleece × Katun: Layering praktis",
+    "fleece_nylon_great": "Fleece × Nylon: Esensial gorpcore/outdoor",
+    "padding_cotton_ok": "Puffer × Katun: Kombo musim dingin praktis",
+    "padding_denim_ok": "Puffer × Denim: Dasar kasual musim dingin",
+    "padding_wool_ok": "Puffer × Wol: Hangat tapi perhatikan volume",
+    "jersey_jersey_ok": "Jersey × Jersey: Nyaman tapi bisa terlihat terlalu kasual",
+    "jersey_denim_great": "Jersey × Denim: Dasar kasual sehari-hari",
+    "jersey_wool_ok": "Jersey × Wol: Perhatikan perbedaan formalitas",
+    "synthetic_cotton_ok": "Sintetis × Katun: Fungsi bertemu kenyamanan",
+    "canvas_denim_great": "Kanvas × Denim: Esensial kasual",
+    "canvas_cotton_great": "Kanvas × Katun: Kasual nyaman",
+    "canvas_chino_great": "Kanvas × Chino: Kasual bersih",
+    "rubber_cotton_ok": "Karet × Katun: Kasual musim panas",
+    "rubber_linen_ok": "Karet × Linen: Tampilan resort musim panas",
+    "leather_linen_bad": "Kulit × Linen: Berat dan nuansa musim bertabrakan",
+    "leather_rubber_bad": "Kulit × Karet: Perbedaan formalitas ekstrem",
+    "silk_fleece_bad": "Sutra × Fleece: Perbedaan formalitas terlalu besar",
+    "silk_nylon_bad": "Sutra × Nylon: Formal dan sporty bertabrakan",
+    "silk_rubber_bad": "Sutra × Karet: Mewah dan kasual sangat bertabrakan",
+    "tweed_nylon_bad": "Tweed × Nylon: Klasik dan sporty bertabrakan",
+    "tweed_fleece_bad": "Tweed × Fleece: Perbedaan formalitas yang canggung",
+    "tweed_jersey_ok": "Tweed × Jersey: Bisa sebagai mix-and-match, gunakan dengan hati-hati",
+    "cashmere_nylon_bad": "Kasmir × Nylon: Kualitas material bertabrakan",
+    "cashmere_fleece_bad": "Kasmir × Fleece: Mewah dan utilitas bertabrakan",
+    "cashmere_rubber_bad": "Kasmir × Karet: Perbedaan formalitas ekstrem",
+    "formal_fleece_bad": "Formal × Fleece: Busana formal dan outdoor bertabrakan",
+    "formal_rubber_bad": "Formal × Karet: Perbedaan formalitas ekstrem",
+    "formal_jersey_bad": "Sepatu Formal × Jersey: Sepatu formal dengan sweatshirt terlihat aneh",
+    "semiformal_fleece_bad": "Semi-Formal × Fleece: Gaya bertabrakan",
+    "linen_wool_bad": "Linen × Wol: Musim sama sekali bertabrakan",
+    "linen_padding_bad": "Linen × Puffer: Material musim panas dan dingin bertabrakan",
+    "linen_fleece_bad": "Linen × Fleece: Musim bertabrakan",
+    "linen_flannel_bad": "Linen × Flanel: Sejuk dan hangat bertabrakan",
+    "padding_silk_bad": "Puffer × Sutra: Formalitas dan fungsi bertabrakan",
+    "padding_linen_bad": "Puffer × Linen: Musim berlawanan",
+    "waxed_silk_bad": "Waxed × Sutra: Kasar dan halus bertabrakan",
+    "waxed_linen_bad": "Waxed × Linen: Ketidakcocokan musim",
+    "boots_linen_bad": "Boots × Linen: Alas kaki berat dengan kain ringan tidak seimbang",
+    "boots_silk_ok": "Boots × Sutra: Campuran edgy, OK jika disengaja",
+    "corduroy_linen_bad": "Korduroy × Linen: Musim gugur dan panas bertabrakan",
+    "flannel_linen_bad": "Flanel × Linen: Hangat dan sejuk bertabrakan",
+    "rubber_wool_bad": "Sandal Karet × Wol: Musim bertabrakan",
+    "rubber_flannel_bad": "Karet × Flanel: Musim panas dan gugur bertabrakan",
+    "default_ok": "Tidak ada aturan kompatibilitas khusus — kombinasi netral"
   },
   "itemsCatalog": {
     "padding": "Puffer",
-    "coat": "Coat",
-    "jacket": "Jacket",
-    "hood_zip": "Zip-Up Hoodie",
-    "cardigan": "Cardigan",
-    "knit_zip": "Knit Zip-Up",
-    "vest": "Vest",
+    "coat": "Mantel",
+    "jacket": "Jaket",
+    "hood_zip": "Hoodie Zip-Up",
+    "cardigan": "Kardigan",
+    "knit_zip": "Rajut Zip-Up",
+    "vest": "Rompi",
     "hoodie": "Hoodie",
-    "knit": "Knit",
+    "knit": "Rajut",
     "mtm": "Sweatshirt",
-    "shirt": "Shirt",
-    "tshirt": "T-Shirt",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "bottom": "Bottom",
-    "shoes": "Shoes"
+    "shirt": "Kemeja",
+    "tshirt": "Kaos",
+    "scarf": "Syal",
+    "hat": "Topi",
+    "bottom": "Bawahan",
+    "shoes": "Sepatu"
   }
 }

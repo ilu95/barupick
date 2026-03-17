@@ -1,359 +1,359 @@
 {
   "names": {
-    "outer": "Outerwear",
-    "middleware": "Mid Layer",
-    "top": "Top",
-    "inner": "Inner",
-    "bottom": "Bottom",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "shoes": "Shoes",
-    "mid_knit": "Knit",
+    "outer": "Áo khoác ngoài",
+    "middleware": "Lớp giữa",
+    "top": "Áo",
+    "inner": "Áo trong",
+    "bottom": "Quần",
+    "scarf": "Khăn quàng",
+    "hat": "Mũ",
+    "shoes": "Giày",
+    "mid_knit": "Áo len",
     "mid_cardigan": "Cardigan",
-    "mid_vest": "Vest",
-    "outer_coat": "Coat",
-    "outer_jacket": "Jacket",
-    "outer_padding": "Puffer"
+    "mid_vest": "Áo gile",
+    "outer_coat": "Áo khoác dài",
+    "outer_jacket": "Áo khoác",
+    "outer_padding": "Áo phao"
   },
   "seasons": {
-    "spring": "Spring",
-    "summer": "Summer",
-    "fall": "Fall",
-    "winter": "Winter"
+    "spring": "Xuân",
+    "summer": "Hạ",
+    "fall": "Thu",
+    "winter": "Đông"
   },
   "fabricItems": {
     "outer": {
       "leather_jacket": {
-        "name": "Leather Jacket",
-        "desc": "Cowhide/lambskin rider or blouson"
+        "name": "Áo khoác da",
+        "desc": "Áo da bò/da cừu kiểu rider hoặc blouson"
       },
       "denim_jacket": {
-        "name": "Denim Jacket",
-        "desc": "Jean jacket, trucker jacket"
+        "name": "Áo khoác denim",
+        "desc": "Áo khoác jean, áo trucker"
       },
       "wool_coat": {
-        "name": "Wool Coat",
-        "desc": "Single or double-breasted wool coat"
+        "name": "Áo khoác len",
+        "desc": "Áo khoác len một hàng hoặc hai hàng nút"
       },
       "padding": {
-        "name": "Puffer Jacket",
-        "desc": "Goose down or polyester puffer"
+        "name": "Áo phao",
+        "desc": "Áo phao lông vũ hoặc polyester"
       },
       "fleece_jacket": {
-        "name": "Fleece Jacket",
-        "desc": "Sherpa or boa fleece"
+        "name": "Áo khoác fleece",
+        "desc": "Áo fleece sherpa hoặc boa"
       },
       "cotton_jacket": {
-        "name": "Cotton Jacket",
-        "desc": "Chino or cotton blazer"
+        "name": "Áo khoác cotton",
+        "desc": "Áo blazer chino hoặc cotton"
       },
       "nylon_jacket": {
-        "name": "Nylon Jacket",
-        "desc": "Windbreaker or coach jacket"
+        "name": "Áo khoác nylon",
+        "desc": "Áo gió hoặc áo khoác coach"
       },
       "linen_jacket": {
-        "name": "Linen Jacket",
-        "desc": "Linen or hemp blazer"
+        "name": "Áo khoác linen",
+        "desc": "Áo blazer linen hoặc lanh"
       },
       "tweed_jacket": {
-        "name": "Tweed Jacket",
-        "desc": "Tweed blazer"
+        "name": "Áo khoác tweed",
+        "desc": "Áo blazer tweed"
       },
       "suede_jacket": {
-        "name": "Suede Jacket",
-        "desc": "Suede blouson or jacket"
+        "name": "Áo khoác da lộn",
+        "desc": "Áo blouson hoặc jacket da lộn"
       },
       "waxed_jacket": {
-        "name": "Waxed Jacket",
-        "desc": "Barbour or oiled jacket"
+        "name": "Áo khoác phủ sáp",
+        "desc": "Áo khoác Barbour hoặc áo phủ dầu"
       }
     },
     "middleware": {
       "wool_knit": {
-        "name": "Wool Knit",
-        "desc": "Lambswool or merino wool knit"
+        "name": "Áo len lông cừu",
+        "desc": "Áo len lambswool hoặc merino"
       },
       "cotton_knit": {
-        "name": "Cotton Knit",
-        "desc": "Cotton knit or cardigan"
+        "name": "Áo len cotton",
+        "desc": "Áo len cotton hoặc cardigan"
       },
       "cashmere_knit": {
-        "name": "Cashmere Knit",
-        "desc": "Cashmere pullover"
+        "name": "Áo len cashmere",
+        "desc": "Áo cashmere chui đầu"
       },
       "fleece_mid": {
-        "name": "Fleece",
-        "desc": "Mid-layer fleece"
+        "name": "Áo fleece",
+        "desc": "Áo fleece lớp giữa"
       },
       "cardigan_wool": {
-        "name": "Wool Cardigan",
-        "desc": "Wool cardigan with shawl collar"
+        "name": "Cardigan len",
+        "desc": "Cardigan len cổ khăn"
       },
       "vest_padding": {
-        "name": "Puffer Vest",
-        "desc": "Lightweight puffer vest"
+        "name": "Gile phao",
+        "desc": "Gile phao nhẹ"
       },
       "vest_knit": {
-        "name": "Knit Vest",
-        "desc": "Knit vest or sweater vest"
+        "name": "Gile len",
+        "desc": "Gile len hoặc sweater vest"
       },
       "hoodie": {
-        "name": "Zip-Up Hoodie",
-        "desc": "Cotton or fleece-lined zip-up hoodie"
+        "name": "Hoodie kéo khóa",
+        "desc": "Hoodie kéo khóa cotton hoặc lót fleece"
       },
       "sweatshirt_mid": {
-        "name": "Sweatshirt",
-        "desc": "Mid-layer sweatshirt"
+        "name": "Áo nỉ",
+        "desc": "Áo nỉ lớp giữa"
       }
     },
     "top": {
       "cotton_tee": {
-        "name": "Cotton T-Shirt",
-        "desc": "Cotton crew neck or V-neck"
+        "name": "Áo thun cotton",
+        "desc": "Áo thun cổ tròn hoặc cổ chữ V cotton"
       },
       "oxford_shirt": {
-        "name": "Oxford Shirt",
-        "desc": "Oxford button-down shirt"
+        "name": "Áo sơ mi Oxford",
+        "desc": "Áo sơ mi Oxford cài nút cổ"
       },
       "linen_shirt": {
-        "name": "Linen Shirt",
-        "desc": "Linen or hemp shirt"
+        "name": "Áo sơ mi linen",
+        "desc": "Áo sơ mi linen hoặc lanh"
       },
       "flannel_shirt": {
-        "name": "Flannel Shirt",
-        "desc": "Brushed check shirt"
+        "name": "Áo sơ mi flannel",
+        "desc": "Áo sơ mi kẻ nỉ chải"
       },
       "denim_shirt": {
-        "name": "Denim Shirt",
-        "desc": "Chambray or denim shirt"
+        "name": "Áo sơ mi denim",
+        "desc": "Áo sơ mi chambray hoặc denim"
       },
       "silk_blouse": {
-        "name": "Silk Blouse",
-        "desc": "Silk or satin blouse"
+        "name": "Áo blouse lụa",
+        "desc": "Áo blouse lụa hoặc satin"
       },
       "polo_shirt": {
-        "name": "Polo Shirt",
-        "desc": "Piqué polo shirt"
+        "name": "Áo polo",
+        "desc": "Áo polo vải piqué"
       },
       "turtleneck": {
-        "name": "Turtleneck",
-        "desc": "Cotton or modal turtleneck"
+        "name": "Áo cổ lọ",
+        "desc": "Áo cổ lọ cotton hoặc modal"
       },
       "wool_turtleneck": {
-        "name": "Wool Turtleneck",
-        "desc": "Wool turtleneck knit"
+        "name": "Áo cổ lọ len",
+        "desc": "Áo len cổ lọ"
       },
       "henley": {
-        "name": "Henley",
-        "desc": "Waffle or thermal henley"
+        "name": "Áo henley",
+        "desc": "Áo henley waffle hoặc giữ nhiệt"
       }
     },
     "bottom": {
       "raw_denim": {
-        "name": "Denim Jeans",
-        "desc": "Straight or slim denim"
+        "name": "Quần jeans denim",
+        "desc": "Quần denim suông hoặc ôm"
       },
       "chino": {
-        "name": "Chino Pants",
-        "desc": "Cotton chino pants"
+        "name": "Quần chino",
+        "desc": "Quần chino cotton"
       },
       "wool_slacks": {
-        "name": "Wool Slacks",
-        "desc": "Wool dress pants"
+        "name": "Quần âu len",
+        "desc": "Quần âu len"
       },
       "linen_pants": {
-        "name": "Linen Pants",
-        "desc": "Linen wide or straight cut"
+        "name": "Quần linen",
+        "desc": "Quần linen ống rộng hoặc suông"
       },
       "corduroy": {
-        "name": "Corduroy Pants",
-        "desc": "Corduroy trousers"
+        "name": "Quần nhung kẻ",
+        "desc": "Quần nhung kẻ corduroy"
       },
       "cotton_shorts": {
-        "name": "Cotton Shorts",
-        "desc": "Chino or cargo shorts"
+        "name": "Quần short cotton",
+        "desc": "Quần short chino hoặc cargo"
       },
       "cargo_pants": {
-        "name": "Cargo Pants",
-        "desc": "Cotton or nylon cargo pants"
+        "name": "Quần cargo",
+        "desc": "Quần cargo cotton hoặc nylon"
       },
       "sweatpants": {
-        "name": "Sweatpants",
-        "desc": "Joggers or training pants"
+        "name": "Quần nỉ",
+        "desc": "Quần jogger hoặc quần tập"
       },
       "leather_pants": {
-        "name": "Leather Pants",
-        "desc": "Leather or eco-leather pants"
+        "name": "Quần da",
+        "desc": "Quần da hoặc da nhân tạo"
       },
       "nylon_pants": {
-        "name": "Nylon Pants",
-        "desc": "Tech or outdoor pants"
+        "name": "Quần nylon",
+        "desc": "Quần tech hoặc quần outdoor"
       }
     },
     "shoes": {
       "leather_shoes": {
-        "name": "Leather Shoes",
-        "desc": "Oxford or derby shoes"
+        "name": "Giày da",
+        "desc": "Giày Oxford hoặc Derby"
       },
       "leather_boots": {
-        "name": "Leather Boots",
-        "desc": "Chelsea or lace-up boots"
+        "name": "Boots da",
+        "desc": "Boots Chelsea hoặc boots buộc dây"
       },
       "suede_boots": {
-        "name": "Suede Boots",
-        "desc": "Suede chelsea or desert boots"
+        "name": "Boots da lộn",
+        "desc": "Boots Chelsea hoặc Desert da lộn"
       },
       "canvas_sneakers": {
-        "name": "Canvas Sneakers",
-        "desc": "Converse or Jack Purcell"
+        "name": "Sneaker vải",
+        "desc": "Converse hoặc Jack Purcell"
       },
       "leather_sneakers": {
-        "name": "Leather Sneakers",
-        "desc": "White or clean sneakers"
+        "name": "Sneaker da",
+        "desc": "Sneaker trắng hoặc sneaker sạch"
       },
       "suede_shoes": {
-        "name": "Suede Shoes",
-        "desc": "Suede loafers or derbies"
+        "name": "Giày da lộn",
+        "desc": "Loafer hoặc Derby da lộn"
       },
       "loafer": {
-        "name": "Loafers",
-        "desc": "Penny or tassel loafers"
+        "name": "Giày loafer",
+        "desc": "Loafer penny hoặc loafer tua"
       },
       "hiking_boots": {
-        "name": "Hiking Boots",
-        "desc": "Gore-Tex or trail boots"
+        "name": "Giày leo núi",
+        "desc": "Boots Gore-Tex hoặc trail"
       },
       "sandals": {
-        "name": "Sandals",
-        "desc": "Birkenstock or strap sandals"
+        "name": "Dép sandal",
+        "desc": "Birkenstock hoặc sandal quai"
       }
     },
     "scarf": {
       "wool_scarf": {
-        "name": "Wool Muffler",
-        "desc": "Lambswool or merino muffler"
+        "name": "Khăn quàng len",
+        "desc": "Khăn quàng lambswool hoặc merino"
       },
       "cashmere_scarf": {
-        "name": "Cashmere Muffler",
-        "desc": "Cashmere scarf"
+        "name": "Khăn quàng cashmere",
+        "desc": "Khăn quàng cashmere"
       },
       "cotton_scarf": {
-        "name": "Cotton Scarf",
-        "desc": "Cotton or gauze scarf"
+        "name": "Khăn quàng cotton",
+        "desc": "Khăn quàng cotton hoặc gạc"
       },
       "silk_scarf": {
-        "name": "Silk Scarf",
-        "desc": "Silk neckerchief"
+        "name": "Khăn lụa",
+        "desc": "Khăn lụa quàng cổ"
       },
       "linen_scarf": {
-        "name": "Linen Scarf",
-        "desc": "Linen scarf or shawl"
+        "name": "Khăn quàng linen",
+        "desc": "Khăn quàng linen hoặc khăn choàng"
       }
     }
   },
   "compatRules": {
-    "leather_denim_great": "Leather × Denim: A classic biker/casual combination",
-    "leather_wool_great": "Leather × Wool: Balances formality with texture",
-    "leather_cotton_great": "Leather × Cotton: Casual yet sophisticated pairing",
-    "leather_cashmere_great": "Leather × Cashmere: Luxury layering",
-    "denim_cotton_great": "Denim × Cotton: The most natural casual combo",
-    "denim_flannel_great": "Denim × Flannel: Americana/workwear essential",
-    "denim_wool_great": "Denim × Wool: Casual meets warmth",
-    "wool_cotton_great": "Wool × Cotton: Layering basics",
-    "wool_silk_great": "Wool × Silk: Elevated texture contrast",
-    "wool_cashmere_great": "Wool × Cashmere: Warm and elegant winter pairing",
-    "linen_cotton_great": "Linen × Cotton: Best summer combination",
-    "linen_linen_great": "Linen × Linen: Cohesive cool look",
-    "cotton_cotton_great": "Cotton × Cotton: Comfortable and natural pairing",
-    "cotton_jersey_great": "Cotton Shirt × Jersey: Basic layering",
-    "suede_denim_great": "Suede × Denim: Vintage mood",
-    "suede_wool_great": "Suede × Wool: Fall texture layering",
-    "suede_cotton_great": "Suede × Cotton: Natural texture mix",
-    "suede_corduroy_great": "Suede × Corduroy: Fall vintage essential",
-    "tweed_cotton_great": "Tweed × Cotton: Classic British look",
-    "tweed_wool_great": "Tweed × Wool: Harmonious same-family textures",
-    "tweed_silk_great": "Tweed × Silk: Classic formal meets sophistication",
-    "corduroy_cotton_great": "Corduroy × Cotton: Fall casual essential",
-    "corduroy_wool_great": "Corduroy × Wool: Warm fall/winter layering",
-    "corduroy_flannel_great": "Corduroy × Flannel: Vintage workwear combo",
-    "corduroy_denim_great": "Corduroy × Denim: Textured casual",
-    "waxed_wool_great": "Waxed × Wool: British country essential",
-    "waxed_denim_great": "Waxed × Denim: Rugged outdoor mood",
-    "waxed_corduroy_great": "Waxed × Corduroy: British country look",
-    "knit_woven_great": "Knit × Woven: Standout texture contrast",
-    "knit_denim_great": "Knit × Denim: Casual layering basics",
-    "silk_cotton_great": "Silk × Cotton: Sophisticated texture contrast",
-    "pique_chino_great": "Piqué × Chino: Preppy essential combo",
-    "pique_cotton_great": "Piqué × Cotton: Clean casual",
-    "leather_leather_ok": "Leather × Leather: Possible but can be excessive. Vary the colors",
-    "leather_nylon_ok": "Leather × Nylon: Works for streetwear/techwear",
-    "leather_fleece_ok": "Leather × Fleece: Possible but styles may clash",
-    "denim_denim_ok": "Denim × Denim: OK with different washes (Canadian tuxedo)",
-    "nylon_cotton_ok": "Nylon × Cotton: Sporty-casual mix",
-    "nylon_nylon_ok": "Nylon × Nylon: Works for techwear/outdoor",
-    "nylon_denim_ok": "Nylon × Denim: Works for street casual",
+    "leather_denim_great": "Da × Denim: Sự kết hợp kinh điển biker/casual",
+    "leather_wool_great": "Da × Len: Cân bằng giữa trang trọng và chất liệu",
+    "leather_cotton_great": "Da × Cotton: Phối casual mà vẫn tinh tế",
+    "leather_cashmere_great": "Da × Cashmere: Phối lớp sang trọng",
+    "denim_cotton_great": "Denim × Cotton: Combo casual tự nhiên nhất",
+    "denim_flannel_great": "Denim × Flannel: Phong cách Americana/workwear cơ bản",
+    "denim_wool_great": "Denim × Len: Casual kết hợp ấm áp",
+    "wool_cotton_great": "Len × Cotton: Phối lớp cơ bản",
+    "wool_silk_great": "Len × Lụa: Tương phản chất liệu cao cấp",
+    "wool_cashmere_great": "Len × Cashmere: Phối mùa đông ấm áp và thanh lịch",
+    "linen_cotton_great": "Linen × Cotton: Combo mùa hè tốt nhất",
+    "linen_linen_great": "Linen × Linen: Phong cách mát mẻ đồng bộ",
+    "cotton_cotton_great": "Cotton × Cotton: Phối thoải mái và tự nhiên",
+    "cotton_jersey_great": "Áo sơ mi cotton × Jersey: Phối lớp cơ bản",
+    "suede_denim_great": "Da lộn × Denim: Phong cách vintage",
+    "suede_wool_great": "Da lộn × Len: Phối lớp chất liệu mùa thu",
+    "suede_cotton_great": "Da lộn × Cotton: Pha trộn chất liệu tự nhiên",
+    "suede_corduroy_great": "Da lộn × Nhung kẻ: Vintage mùa thu cơ bản",
+    "tweed_cotton_great": "Tweed × Cotton: Phong cách Anh kinh điển",
+    "tweed_wool_great": "Tweed × Len: Hài hòa chất liệu cùng họ",
+    "tweed_silk_great": "Tweed × Lụa: Trang trọng kinh điển kết hợp tinh tế",
+    "corduroy_cotton_great": "Nhung kẻ × Cotton: Casual mùa thu cơ bản",
+    "corduroy_wool_great": "Nhung kẻ × Len: Phối lớp ấm thu/đông",
+    "corduroy_flannel_great": "Nhung kẻ × Flannel: Combo workwear vintage",
+    "corduroy_denim_great": "Nhung kẻ × Denim: Casual có texture",
+    "waxed_wool_great": "Phủ sáp × Len: Phong cách đồng quê Anh cơ bản",
+    "waxed_denim_great": "Phủ sáp × Denim: Phong cách outdoor mạnh mẽ",
+    "waxed_corduroy_great": "Phủ sáp × Nhung kẻ: Phong cách đồng quê Anh",
+    "knit_woven_great": "Dệt kim × Dệt thoi: Tương phản chất liệu nổi bật",
+    "knit_denim_great": "Len × Denim: Phối lớp casual cơ bản",
+    "silk_cotton_great": "Lụa × Cotton: Tương phản chất liệu tinh tế",
+    "pique_chino_great": "Piqué × Chino: Combo preppy cơ bản",
+    "pique_cotton_great": "Piqué × Cotton: Casual sạch sẽ",
+    "leather_leather_ok": "Da × Da: Có thể nhưng dễ quá mức. Hãy thay đổi màu sắc",
+    "leather_nylon_ok": "Da × Nylon: Phù hợp cho streetwear/techwear",
+    "leather_fleece_ok": "Da × Fleece: Có thể nhưng phong cách có thể xung đột",
+    "denim_denim_ok": "Denim × Denim: Được nếu khác tone giặt (Canadian tuxedo)",
+    "nylon_cotton_ok": "Nylon × Cotton: Pha trộn thể thao-casual",
+    "nylon_nylon_ok": "Nylon × Nylon: Phù hợp cho techwear/outdoor",
+    "nylon_denim_ok": "Nylon × Denim: Phù hợp cho street casual",
     "fleece_denim_ok": "Fleece × Denim: Outdoor casual",
-    "fleece_cotton_ok": "Fleece × Cotton: Practical layering",
-    "fleece_nylon_great": "Fleece × Nylon: Gorpcore/outdoor essential",
-    "padding_cotton_ok": "Puffer × Cotton: Practical winter combo",
-    "padding_denim_ok": "Puffer × Denim: Winter casual basics",
-    "padding_wool_ok": "Puffer × Wool: Warm but watch the bulk",
-    "jersey_jersey_ok": "Jersey × Jersey: Comfy but can look too casual",
-    "jersey_denim_great": "Jersey × Denim: Everyday casual basics",
-    "jersey_wool_ok": "Jersey × Wool: Watch the formality gap",
-    "synthetic_cotton_ok": "Synthetic × Cotton: Function meets comfort",
-    "canvas_denim_great": "Canvas × Denim: Casual essential",
-    "canvas_cotton_great": "Canvas × Cotton: Comfortable casual",
-    "canvas_chino_great": "Canvas × Chino: Clean casual",
-    "rubber_cotton_ok": "Rubber × Cotton: Summer casual",
-    "rubber_linen_ok": "Rubber × Linen: Summer resort look",
-    "leather_linen_bad": "Leather × Linen: Weight and seasonal feel clash",
-    "leather_rubber_bad": "Leather × Rubber: Extreme formality clash",
-    "silk_fleece_bad": "Silk × Fleece: Formality gap is too large",
-    "silk_nylon_bad": "Silk × Nylon: Formal and sporty clash",
-    "silk_rubber_bad": "Silk × Rubber: Luxury and casual clash extremely",
-    "tweed_nylon_bad": "Tweed × Nylon: Classic and sporty clash",
-    "tweed_fleece_bad": "Tweed × Fleece: Awkward formality difference",
-    "tweed_jersey_ok": "Tweed × Jersey: Possible as mix-and-match, use with care",
-    "cashmere_nylon_bad": "Cashmere × Nylon: Material quality clash",
-    "cashmere_fleece_bad": "Cashmere × Fleece: Luxury and utility clash",
-    "cashmere_rubber_bad": "Cashmere × Rubber: Extreme formality difference",
-    "formal_fleece_bad": "Formal × Fleece: Dress and outdoor clash",
-    "formal_rubber_bad": "Formal × Rubber: Extreme formality clash",
-    "formal_jersey_bad": "Formal Shoes × Jersey: Dress shoes with sweatshirt is awkward",
-    "semiformal_fleece_bad": "Semi-Formal × Fleece: Style clash",
-    "linen_wool_bad": "Linen × Wool: Complete seasonal clash",
-    "linen_padding_bad": "Linen × Puffer: Summer and winter materials clash",
-    "linen_fleece_bad": "Linen × Fleece: Seasonal clash",
-    "linen_flannel_bad": "Linen × Flannel: Cool and warm clash",
-    "padding_silk_bad": "Puffer × Silk: Formality and function clash",
-    "padding_linen_bad": "Puffer × Linen: Opposite seasons",
-    "waxed_silk_bad": "Waxed × Silk: Rugged and delicate clash",
-    "waxed_linen_bad": "Waxed × Linen: Seasonal mismatch",
-    "boots_linen_bad": "Boots × Linen: Heavy footwear with light fabric imbalance",
-    "boots_silk_ok": "Boots × Silk: Edgy mix, OK if intentional",
-    "corduroy_linen_bad": "Corduroy × Linen: Fall and summer seasonal clash",
-    "flannel_linen_bad": "Flannel × Linen: Warm and cool clash",
-    "rubber_wool_bad": "Rubber Sandals × Wool: Seasonal clash",
-    "rubber_flannel_bad": "Rubber × Flannel: Summer and fall clash",
-    "default_ok": "No specific compatibility rule — a neutral combination"
+    "fleece_cotton_ok": "Fleece × Cotton: Phối lớp thực dụng",
+    "fleece_nylon_great": "Fleece × Nylon: Gorpcore/outdoor cơ bản",
+    "padding_cotton_ok": "Áo phao × Cotton: Combo mùa đông thực dụng",
+    "padding_denim_ok": "Áo phao × Denim: Casual mùa đông cơ bản",
+    "padding_wool_ok": "Áo phao × Len: Ấm nhưng chú ý độ cồng kềnh",
+    "jersey_jersey_ok": "Jersey × Jersey: Thoải mái nhưng có thể quá casual",
+    "jersey_denim_great": "Jersey × Denim: Casual hàng ngày cơ bản",
+    "jersey_wool_ok": "Jersey × Len: Chú ý khoảng cách trang trọng",
+    "synthetic_cotton_ok": "Sợi tổng hợp × Cotton: Chức năng kết hợp thoải mái",
+    "canvas_denim_great": "Canvas × Denim: Casual cơ bản",
+    "canvas_cotton_great": "Canvas × Cotton: Casual thoải mái",
+    "canvas_chino_great": "Canvas × Chino: Casual sạch sẽ",
+    "rubber_cotton_ok": "Cao su × Cotton: Casual mùa hè",
+    "rubber_linen_ok": "Cao su × Linen: Phong cách resort mùa hè",
+    "leather_linen_bad": "Da × Linen: Xung đột trọng lượng và cảm giác mùa",
+    "leather_rubber_bad": "Da × Cao su: Xung đột mức độ trang trọng cực đoan",
+    "silk_fleece_bad": "Lụa × Fleece: Khoảng cách trang trọng quá lớn",
+    "silk_nylon_bad": "Lụa × Nylon: Xung đột trang trọng và thể thao",
+    "silk_rubber_bad": "Lụa × Cao su: Xung đột cực đoan giữa sang trọng và casual",
+    "tweed_nylon_bad": "Tweed × Nylon: Xung đột cổ điển và thể thao",
+    "tweed_fleece_bad": "Tweed × Fleece: Chênh lệch mức trang trọng khó chịu",
+    "tweed_jersey_ok": "Tweed × Jersey: Có thể phối hợp, cần cẩn thận",
+    "cashmere_nylon_bad": "Cashmere × Nylon: Xung đột chất lượng chất liệu",
+    "cashmere_fleece_bad": "Cashmere × Fleece: Xung đột giữa sang trọng và tiện dụng",
+    "cashmere_rubber_bad": "Cashmere × Cao su: Chênh lệch mức trang trọng cực đoan",
+    "formal_fleece_bad": "Formal × Fleece: Xung đột giữa lịch sự và outdoor",
+    "formal_rubber_bad": "Formal × Cao su: Xung đột mức trang trọng cực đoan",
+    "formal_jersey_bad": "Giày tây × Jersey: Giày tây với áo nỉ rất lệch",
+    "semiformal_fleece_bad": "Bán trang trọng × Fleece: Xung đột phong cách",
+    "linen_wool_bad": "Linen × Len: Xung đột mùa hoàn toàn",
+    "linen_padding_bad": "Linen × Áo phao: Xung đột chất liệu hè và đông",
+    "linen_fleece_bad": "Linen × Fleece: Xung đột mùa",
+    "linen_flannel_bad": "Linen × Flannel: Xung đột mát và ấm",
+    "padding_silk_bad": "Áo phao × Lụa: Xung đột trang trọng và chức năng",
+    "padding_linen_bad": "Áo phao × Linen: Hai mùa đối lập",
+    "waxed_silk_bad": "Phủ sáp × Lụa: Xung đột mạnh mẽ và mỏng manh",
+    "waxed_linen_bad": "Phủ sáp × Linen: Không phù hợp mùa",
+    "boots_linen_bad": "Boots × Linen: Giày nặng với vải nhẹ mất cân bằng",
+    "boots_silk_ok": "Boots × Lụa: Phối pha cá tính, được nếu có chủ đích",
+    "corduroy_linen_bad": "Nhung kẻ × Linen: Xung đột mùa thu và mùa hè",
+    "flannel_linen_bad": "Flannel × Linen: Xung đột ấm và mát",
+    "rubber_wool_bad": "Dép cao su × Len: Xung đột mùa",
+    "rubber_flannel_bad": "Cao su × Flannel: Xung đột hè và thu",
+    "default_ok": "Không có quy tắc tương thích cụ thể — sự kết hợp trung tính"
   },
   "itemsCatalog": {
-    "padding": "Puffer",
-    "coat": "Coat",
-    "jacket": "Jacket",
-    "hood_zip": "Zip-Up Hoodie",
+    "padding": "Áo phao",
+    "coat": "Áo khoác dài",
+    "jacket": "Áo khoác",
+    "hood_zip": "Hoodie kéo khóa",
     "cardigan": "Cardigan",
-    "knit_zip": "Knit Zip-Up",
-    "vest": "Vest",
+    "knit_zip": "Len kéo khóa",
+    "vest": "Áo gile",
     "hoodie": "Hoodie",
-    "knit": "Knit",
-    "mtm": "Sweatshirt",
-    "shirt": "Shirt",
-    "tshirt": "T-Shirt",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "bottom": "Bottom",
-    "shoes": "Shoes"
+    "knit": "Áo len",
+    "mtm": "Áo nỉ",
+    "shirt": "Áo sơ mi",
+    "tshirt": "Áo thun",
+    "scarf": "Khăn quàng",
+    "hat": "Mũ",
+    "bottom": "Quần",
+    "shoes": "Giày"
   }
 }

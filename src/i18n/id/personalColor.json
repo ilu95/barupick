@@ -1,123 +1,123 @@
 {
   "seasons": {
-    "spring": { "name": "Spring Warm" },
-    "summer": { "name": "Summer Cool" },
-    "autumn": { "name": "Autumn Warm" },
-    "winter": { "name": "Winter Cool" }
+    "spring": { "name": "Semi Hangat" },
+    "summer": { "name": "Panas Sejuk" },
+    "autumn": { "name": "Gugur Hangat" },
+    "winter": { "name": "Dingin Sejuk" }
   },
   "types": {
     "spring_light": {
-      "name": "Spring Light",
-      "description": "Bright, clear pastel warm tones suit you best. We recommend light and radiant colors.",
-      "keywords": ["bright", "clear", "light", "radiant"]
+      "name": "Semi Terang",
+      "description": "Nada hangat pastel yang cerah dan jernih paling cocok untuk Anda. Kami merekomendasikan warna-warna terang dan bercahaya.",
+      "keywords": ["cerah", "jernih", "terang", "bercahaya"]
     },
     "spring_bright": {
-      "name": "Spring Bright",
-      "description": "Vivid, vibrant warm tones suit you best. We recommend lively, energetic colors.",
-      "keywords": ["vivid", "vibrant", "lively", "energetic"]
+      "name": "Semi Vivid",
+      "description": "Nada hangat yang vivid dan vibran paling cocok untuk Anda. Kami merekomendasikan warna-warna hidup dan energik.",
+      "keywords": ["vivid", "vibran", "hidup", "energik"]
     },
     "spring_true": {
-      "name": "Spring True",
-      "description": "Warm, clear medium tones suit you best. We recommend natural, healthy-looking colors.",
-      "keywords": ["warm", "clear", "natural", "healthy"]
+      "name": "Semi Murni",
+      "description": "Nada medium yang hangat dan jernih paling cocok untuk Anda. Kami merekomendasikan warna-warna natural dan tampak sehat.",
+      "keywords": ["hangat", "jernih", "natural", "sehat"]
     },
     "summer_light": {
-      "name": "Summer Light",
-      "description": "Bright, soft pastel cool tones suit you. We recommend elegant and feminine colors.",
-      "keywords": ["soft", "delicate", "elegant", "feminine"]
+      "name": "Panas Terang",
+      "description": "Nada sejuk pastel yang cerah dan lembut cocok untuk Anda. Kami merekomendasikan warna-warna elegan dan feminin.",
+      "keywords": ["lembut", "halus", "elegan", "feminin"]
     },
     "summer_muted": {
-      "name": "Summer Muted",
-      "description": "Calm, greyish tones suit you. We recommend sophisticated and dignified colors.",
-      "keywords": ["calm", "greyish", "sophisticated", "dignified"]
+      "name": "Panas Redup",
+      "description": "Nada keabu-abuan yang tenang cocok untuk Anda. Kami merekomendasikan warna-warna sophisticated dan bermartabat.",
+      "keywords": ["tenang", "keabu-abuan", "sophisticated", "bermartabat"]
     },
     "summer_true": {
-      "name": "Summer True",
-      "description": "Cool, soft medium cool tones suit you. We recommend refreshing and clean colors.",
-      "keywords": ["cool", "soft", "refreshing", "clean"]
+      "name": "Panas Murni",
+      "description": "Nada medium sejuk yang dingin dan lembut cocok untuk Anda. Kami merekomendasikan warna-warna segar dan bersih.",
+      "keywords": ["sejuk", "lembut", "segar", "bersih"]
     },
     "autumn_soft": {
-      "name": "Autumn Soft",
-      "description": "Soft, warm muted tones suit you. We recommend natural and comfortable colors.",
-      "keywords": ["soft", "muted", "natural", "comfortable"]
+      "name": "Gugur Lembut",
+      "description": "Nada redup yang lembut dan hangat cocok untuk Anda. Kami merekomendasikan warna-warna natural dan nyaman.",
+      "keywords": ["lembut", "redup", "natural", "nyaman"]
     },
     "autumn_deep": {
-      "name": "Autumn Deep",
-      "description": "Deep, rich earth tones suit you. We recommend luxurious and profound colors.",
-      "keywords": ["deep", "rich", "luxurious", "profound"]
+      "name": "Gugur Dalam",
+      "description": "Nada earth tone yang dalam dan kaya cocok untuk Anda. Kami merekomendasikan warna-warna mewah dan mendalam.",
+      "keywords": ["dalam", "kaya", "mewah", "mendalam"]
     },
     "autumn_true": {
-      "name": "Autumn True",
-      "description": "Warm, natural earth tones suit you. We recommend classic and stable colors.",
-      "keywords": ["warm", "natural", "classic", "stable"]
+      "name": "Gugur Murni",
+      "description": "Nada earth tone yang hangat dan natural cocok untuk Anda. Kami merekomendasikan warna-warna klasik dan stabil.",
+      "keywords": ["hangat", "natural", "klasik", "stabil"]
     },
     "winter_bright": {
-      "name": "Winter Bright",
-      "description": "Vivid, cool bold tones suit you. We recommend intense, eye-catching colors.",
-      "keywords": ["vivid", "bold", "intense", "eye-catching"]
+      "name": "Dingin Vivid",
+      "description": "Nada bold yang vivid dan sejuk cocok untuk Anda. Kami merekomendasikan warna-warna intens dan mencolok.",
+      "keywords": ["vivid", "bold", "intens", "mencolok"]
     },
     "winter_deep": {
-      "name": "Winter Deep",
-      "description": "Deep, dark tones suit you. We recommend chic and sophisticated colors.",
-      "keywords": ["deep", "chic", "sophisticated", "modern"]
+      "name": "Dingin Dalam",
+      "description": "Nada gelap yang dalam cocok untuk Anda. Kami merekomendasikan warna-warna chic dan sophisticated.",
+      "keywords": ["dalam", "chic", "sophisticated", "modern"]
     },
     "winter_true": {
-      "name": "Winter True",
-      "description": "Cool, vivid high-contrast colors suit you. We recommend modern and urban colors.",
-      "keywords": ["contrast", "vivid", "modern", "urban"]
+      "name": "Dingin Murni",
+      "description": "Warna kontras tinggi yang sejuk dan vivid cocok untuk Anda. Kami merekomendasikan warna-warna modern dan urban.",
+      "keywords": ["kontras", "vivid", "modern", "urban"]
     }
   },
   "diagnosis": {
     "questions": [
       {
-        "question": "What color are the veins on the inside of your wrist?",
-        "options": ["Mostly greenish", "Mostly blue/purple", "Both look similar"]
+        "question": "Apa warna urat nadi di bagian dalam pergelangan tangan Anda?",
+        "options": ["Kebanyakan kehijauan", "Kebanyakan biru/ungu", "Keduanya terlihat mirip"]
       },
       {
-        "question": "How does your skin react to sunlight?",
-        "options": ["Burns easily and turns red", "Tans easily and turns brown", "Tans moderately"]
+        "question": "Bagaimana reaksi kulit Anda terhadap sinar matahari?",
+        "options": ["Mudah terbakar dan memerah", "Mudah kecoklatan", "Kecoklatan sedang"]
       },
       {
-        "question": "Which accessories suit you better — gold or silver?",
-        "options": ["Gold looks better", "Silver looks better", "Both look similar"]
+        "question": "Aksesori mana yang lebih cocok untuk Anda — emas atau perak?",
+        "options": ["Emas terlihat lebih baik", "Perak terlihat lebih baik", "Keduanya terlihat mirip"]
       },
       {
-        "question": "When wearing white, which shade suits you more?",
-        "options": ["Ivory/cream white suits me better", "Pure/blue-tinted white suits me better", "Both work fine"]
+        "question": "Saat memakai putih, warna putih mana yang lebih cocok?",
+        "options": ["Putih gading/krem lebih cocok", "Putih murni/kebiruan lebih cocok", "Keduanya sama saja"]
       },
       {
-        "question": "What color are your eyes and hair?",
-        "options": ["Light brown/lighter shades", "Medium brown tones", "Dark brown/black"]
+        "question": "Apa warna mata dan rambut Anda?",
+        "options": ["Coklat muda/warna lebih terang", "Nada coklat sedang", "Coklat gelap/hitam"]
       },
       {
-        "question": "What is your overall image or impression?",
-        "options": ["Bright and radiant", "Soft and subtle", "Calm and deep", "Vivid and clear"]
+        "question": "Apa kesan keseluruhan Anda?",
+        "options": ["Cerah dan bercahaya", "Lembut dan halus", "Tenang dan mendalam", "Vivid dan jernih"]
       },
       {
-        "question": "Which suits you better — vivid primary colors or calm muted colors?",
-        "options": ["Vivid, bold colors suit me", "Calm, muted colors suit me", "Both are similar"]
+        "question": "Mana yang lebih cocok — warna primer vivid atau warna redup yang tenang?",
+        "options": ["Warna vivid dan bold cocok untuk saya", "Warna tenang dan redup cocok untuk saya", "Keduanya mirip"]
       },
       {
-        "question": "How much contrast is there in your features? (between eyes, hair, and skin)",
-        "options": ["Low contrast — features blend together", "Medium contrast", "High contrast — features are distinct"]
+        "question": "Seberapa besar kontras pada fitur wajah Anda? (antara mata, rambut, dan kulit)",
+        "options": ["Kontras rendah — fitur menyatu", "Kontras sedang", "Kontras tinggi — fitur jelas terpisah"]
       }
     ],
     "results": {
       "spring_warm": {
-        "name": "Spring Warm",
-        "description": "Warm, bright colors suit you best. We recommend radiant colors like peach, coral, light orange, and soft yellow."
+        "name": "Semi Hangat",
+        "description": "Warna hangat dan cerah paling cocok untuk Anda. Kami merekomendasikan warna-warna bercahaya seperti persik, koral, oranye muda, dan kuning lembut."
       },
       "summer_cool": {
-        "name": "Summer Cool",
-        "description": "Cool, soft colors suit you best. We recommend pastel cool tones like lavender, rose, sky blue, and mint."
+        "name": "Panas Sejuk",
+        "description": "Warna sejuk dan lembut paling cocok untuk Anda. Kami merekomendasikan nada sejuk pastel seperti lavender, rose, biru langit, dan mint."
       },
       "autumn_warm": {
-        "name": "Autumn Warm",
-        "description": "Warm, deep colors suit you best. We recommend autumnal colors like camel, burgundy, olive, and mustard."
+        "name": "Gugur Hangat",
+        "description": "Warna hangat dan dalam paling cocok untuk Anda. Kami merekomendasikan warna-warna musim gugur seperti kamel, burgundy, olive, dan mustard."
       },
       "winter_cool": {
-        "name": "Winter Cool",
-        "description": "Cool, vivid colors suit you best. We recommend high-contrast colors like black, white, navy, and royal blue."
+        "name": "Dingin Sejuk",
+        "description": "Warna sejuk dan vivid paling cocok untuk Anda. Kami merekomendasikan warna kontras tinggi seperti hitam, putih, navy, dan royal blue."
       }
     }
   }

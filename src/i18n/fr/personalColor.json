@@ -1,123 +1,123 @@
 {
   "seasons": {
-    "spring": { "name": "Spring Warm" },
-    "summer": { "name": "Summer Cool" },
-    "autumn": { "name": "Autumn Warm" },
-    "winter": { "name": "Winter Cool" }
+    "spring": { "name": "Printemps chaud" },
+    "summer": { "name": "Été froid" },
+    "autumn": { "name": "Automne chaud" },
+    "winter": { "name": "Hiver froid" }
   },
   "types": {
     "spring_light": {
-      "name": "Spring Light",
-      "description": "Bright, clear pastel warm tones suit you best. We recommend light and radiant colors.",
-      "keywords": ["bright", "clear", "light", "radiant"]
+      "name": "Printemps clair",
+      "description": "Les tons chauds pastel lumineux et clairs vous vont le mieux. Nous recommandons des couleurs légères et éclatantes.",
+      "keywords": ["lumineux", "clair", "léger", "éclatant"]
     },
     "spring_bright": {
-      "name": "Spring Bright",
-      "description": "Vivid, vibrant warm tones suit you best. We recommend lively, energetic colors.",
-      "keywords": ["vivid", "vibrant", "lively", "energetic"]
+      "name": "Printemps vif",
+      "description": "Les tons chauds vifs et vibrants vous vont le mieux. Nous recommandons des couleurs vivantes et énergiques.",
+      "keywords": ["vif", "vibrant", "vivant", "énergique"]
     },
     "spring_true": {
-      "name": "Spring True",
-      "description": "Warm, clear medium tones suit you best. We recommend natural, healthy-looking colors.",
-      "keywords": ["warm", "clear", "natural", "healthy"]
+      "name": "Printemps pur",
+      "description": "Les tons moyens chauds et clairs vous vont le mieux. Nous recommandons des couleurs naturelles et saines.",
+      "keywords": ["chaud", "clair", "naturel", "sain"]
     },
     "summer_light": {
-      "name": "Summer Light",
-      "description": "Bright, soft pastel cool tones suit you. We recommend elegant and feminine colors.",
-      "keywords": ["soft", "delicate", "elegant", "feminine"]
+      "name": "Été clair",
+      "description": "Les tons froids pastel lumineux et doux vous conviennent. Nous recommandons des couleurs élégantes et féminines.",
+      "keywords": ["doux", "délicat", "élégant", "féminin"]
     },
     "summer_muted": {
-      "name": "Summer Muted",
-      "description": "Calm, greyish tones suit you. We recommend sophisticated and dignified colors.",
-      "keywords": ["calm", "greyish", "sophisticated", "dignified"]
+      "name": "Été estompé",
+      "description": "Les tons calmes et grisés vous conviennent. Nous recommandons des couleurs sophistiquées et distinguées.",
+      "keywords": ["calme", "grisé", "sophistiqué", "distingué"]
     },
     "summer_true": {
-      "name": "Summer True",
-      "description": "Cool, soft medium cool tones suit you. We recommend refreshing and clean colors.",
-      "keywords": ["cool", "soft", "refreshing", "clean"]
+      "name": "Été pur",
+      "description": "Les tons froids moyens, frais et doux vous conviennent. Nous recommandons des couleurs fraîches et nettes.",
+      "keywords": ["frais", "doux", "rafraîchissant", "net"]
     },
     "autumn_soft": {
-      "name": "Autumn Soft",
-      "description": "Soft, warm muted tones suit you. We recommend natural and comfortable colors.",
-      "keywords": ["soft", "muted", "natural", "comfortable"]
+      "name": "Automne doux",
+      "description": "Les tons chauds doux et atténués vous conviennent. Nous recommandons des couleurs naturelles et confortables.",
+      "keywords": ["doux", "atténué", "naturel", "confortable"]
     },
     "autumn_deep": {
-      "name": "Autumn Deep",
-      "description": "Deep, rich earth tones suit you. We recommend luxurious and profound colors.",
-      "keywords": ["deep", "rich", "luxurious", "profound"]
+      "name": "Automne profond",
+      "description": "Les tons terre profonds et riches vous conviennent. Nous recommandons des couleurs luxueuses et profondes.",
+      "keywords": ["profond", "riche", "luxueux", "intense"]
     },
     "autumn_true": {
-      "name": "Autumn True",
-      "description": "Warm, natural earth tones suit you. We recommend classic and stable colors.",
-      "keywords": ["warm", "natural", "classic", "stable"]
+      "name": "Automne pur",
+      "description": "Les tons terre chauds et naturels vous conviennent. Nous recommandons des couleurs classiques et stables.",
+      "keywords": ["chaud", "naturel", "classique", "stable"]
     },
     "winter_bright": {
-      "name": "Winter Bright",
-      "description": "Vivid, cool bold tones suit you. We recommend intense, eye-catching colors.",
-      "keywords": ["vivid", "bold", "intense", "eye-catching"]
+      "name": "Hiver vif",
+      "description": "Les tons froids vifs et audacieux vous conviennent. Nous recommandons des couleurs intenses et accrocheuses.",
+      "keywords": ["vif", "audacieux", "intense", "accrocheur"]
     },
     "winter_deep": {
-      "name": "Winter Deep",
-      "description": "Deep, dark tones suit you. We recommend chic and sophisticated colors.",
-      "keywords": ["deep", "chic", "sophisticated", "modern"]
+      "name": "Hiver profond",
+      "description": "Les tons profonds et sombres vous conviennent. Nous recommandons des couleurs chic et sophistiquées.",
+      "keywords": ["profond", "chic", "sophistiqué", "moderne"]
     },
     "winter_true": {
-      "name": "Winter True",
-      "description": "Cool, vivid high-contrast colors suit you. We recommend modern and urban colors.",
-      "keywords": ["contrast", "vivid", "modern", "urban"]
+      "name": "Hiver pur",
+      "description": "Les couleurs froides, vives et à fort contraste vous conviennent. Nous recommandons des couleurs modernes et urbaines.",
+      "keywords": ["contraste", "vif", "moderne", "urbain"]
     }
   },
   "diagnosis": {
     "questions": [
       {
-        "question": "What color are the veins on the inside of your wrist?",
-        "options": ["Mostly greenish", "Mostly blue/purple", "Both look similar"]
+        "question": "De quelle couleur sont les veines à l'intérieur de votre poignet ?",
+        "options": ["Plutôt verdâtres", "Plutôt bleu/violet", "Les deux se ressemblent"]
       },
       {
-        "question": "How does your skin react to sunlight?",
-        "options": ["Burns easily and turns red", "Tans easily and turns brown", "Tans moderately"]
+        "question": "Comment votre peau réagit-elle au soleil ?",
+        "options": ["Brûle facilement et rougit", "Bronze facilement et brunit", "Bronze modérément"]
       },
       {
-        "question": "Which accessories suit you better — gold or silver?",
-        "options": ["Gold looks better", "Silver looks better", "Both look similar"]
+        "question": "Quels accessoires vous vont le mieux — or ou argent ?",
+        "options": ["L'or me va mieux", "L'argent me va mieux", "Les deux se ressemblent"]
       },
       {
-        "question": "When wearing white, which shade suits you more?",
-        "options": ["Ivory/cream white suits me better", "Pure/blue-tinted white suits me better", "Both work fine"]
+        "question": "En portant du blanc, quelle nuance vous va le mieux ?",
+        "options": ["Le blanc ivoire/crème me va mieux", "Le blanc pur/bleuté me va mieux", "Les deux me vont"]
       },
       {
-        "question": "What color are your eyes and hair?",
-        "options": ["Light brown/lighter shades", "Medium brown tones", "Dark brown/black"]
+        "question": "De quelle couleur sont vos yeux et vos cheveux ?",
+        "options": ["Brun clair/tons plus clairs", "Tons brun moyen", "Brun foncé/noir"]
       },
       {
-        "question": "What is your overall image or impression?",
-        "options": ["Bright and radiant", "Soft and subtle", "Calm and deep", "Vivid and clear"]
+        "question": "Quelle est votre image ou impression générale ?",
+        "options": ["Lumineuse et éclatante", "Douce et subtile", "Calme et profonde", "Vive et nette"]
       },
       {
-        "question": "Which suits you better — vivid primary colors or calm muted colors?",
-        "options": ["Vivid, bold colors suit me", "Calm, muted colors suit me", "Both are similar"]
+        "question": "Qu'est-ce qui vous va le mieux — couleurs primaires vives ou couleurs douces atténuées ?",
+        "options": ["Les couleurs vives et audacieuses me vont", "Les couleurs calmes et atténuées me vont", "Les deux se ressemblent"]
       },
       {
-        "question": "How much contrast is there in your features? (between eyes, hair, and skin)",
-        "options": ["Low contrast — features blend together", "Medium contrast", "High contrast — features are distinct"]
+        "question": "Quel est le niveau de contraste de vos traits ? (entre yeux, cheveux et peau)",
+        "options": ["Faible contraste — les traits se fondent", "Contraste moyen", "Fort contraste — les traits sont distincts"]
       }
     ],
     "results": {
       "spring_warm": {
-        "name": "Spring Warm",
-        "description": "Warm, bright colors suit you best. We recommend radiant colors like peach, coral, light orange, and soft yellow."
+        "name": "Printemps chaud",
+        "description": "Les couleurs chaudes et lumineuses vous vont le mieux. Nous recommandons des couleurs éclatantes comme le pêche, le corail, l'orange clair et le jaune doux."
       },
       "summer_cool": {
-        "name": "Summer Cool",
-        "description": "Cool, soft colors suit you best. We recommend pastel cool tones like lavender, rose, sky blue, and mint."
+        "name": "Été froid",
+        "description": "Les couleurs froides et douces vous vont le mieux. Nous recommandons des tons froids pastel comme la lavande, le rose, le bleu ciel et la menthe."
       },
       "autumn_warm": {
-        "name": "Autumn Warm",
-        "description": "Warm, deep colors suit you best. We recommend autumnal colors like camel, burgundy, olive, and mustard."
+        "name": "Automne chaud",
+        "description": "Les couleurs chaudes et profondes vous vont le mieux. Nous recommandons des couleurs automnales comme le camel, le bordeaux, l'olive et la moutarde."
       },
       "winter_cool": {
-        "name": "Winter Cool",
-        "description": "Cool, vivid colors suit you best. We recommend high-contrast colors like black, white, navy, and royal blue."
+        "name": "Hiver froid",
+        "description": "Les couleurs froides et vives vous vont le mieux. Nous recommandons des couleurs à fort contraste comme le noir, le blanc, le marine et le bleu roi."
       }
     }
   }

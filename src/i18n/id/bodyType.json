@@ -2,284 +2,284 @@
   "diagnosis": {
     "questions": [
       {
-        "question": "Compare your shoulder and hip width:",
+        "question": "Bandingkan lebar bahu dan pinggul Anda:",
         "options": [
-          "My shoulders are wider",
-          "My hips are wider",
-          "They're about the same"
+          "Bahu saya lebih lebar",
+          "Pinggul saya lebih lebar",
+          "Keduanya hampir sama"
         ]
       },
       {
-        "question": "How is your waistline?",
+        "question": "Bagaimana garis pinggang Anda?",
         "options": [
-          "My waist is well-defined",
-          "My waist and hips are straight",
-          "My belly area protrudes"
+          "Pinggang saya terdefinisi dengan baik",
+          "Pinggang dan pinggul saya lurus",
+          "Area perut saya menonjol"
         ]
       },
       {
-        "question": "What area concerns you most?",
+        "question": "Area mana yang paling Anda khawatirkan?",
         "options": [
-          "My shoulders look narrow",
-          "My shoulders look wide",
-          "My belly looks prominent",
-          "My legs look short",
-          "I look short overall",
-          "No particular concern"
+          "Bahu saya terlihat sempit",
+          "Bahu saya terlihat lebar",
+          "Perut saya terlihat menonjol",
+          "Kaki saya terlihat pendek",
+          "Saya terlihat pendek secara keseluruhan",
+          "Tidak ada kekhawatiran khusus"
         ]
       }
     ],
     "effects": {
       "shoulder-wide": {
-        "name": "Make Shoulders Look Wider",
-        "description": "Use light-colored tops and boat neck/puff sleeves to emphasize the shoulder line."
+        "name": "Buat Bahu Terlihat Lebih Lebar",
+        "description": "Gunakan atasan berwarna terang dan kerah boat neck/lengan puff untuk menegaskan garis bahu."
       },
       "shoulder-narrow": {
-        "name": "Make Shoulders Look Narrower",
-        "description": "Use dark-colored tops to visually reduce shoulders, and light bottoms to distribute attention."
+        "name": "Buat Bahu Terlihat Lebih Sempit",
+        "description": "Gunakan atasan berwarna gelap untuk mengurangi kesan bahu secara visual, dan bawahan terang untuk mendistribusikan perhatian."
       },
       "belly": {
-        "name": "Minimize Belly Appearance",
-        "description": "Use dark-colored tops/mid layers to visually conceal the belly area."
+        "name": "Minimalisasi Tampilan Perut",
+        "description": "Gunakan atasan/lapisan tengah berwarna gelap untuk menyembunyikan area perut secara visual."
       },
       "legs-long": {
-        "name": "Make Legs Look Longer",
-        "description": "Match bottom and shoe colors to create a longer leg line."
+        "name": "Buat Kaki Terlihat Lebih Panjang",
+        "description": "Samakan warna bawahan dan sepatu untuk menciptakan garis kaki yang lebih panjang."
       },
       "height-tall": {
-        "name": "Look Taller",
-        "description": "Emphasize vertical lines with solid colors or similar tones."
+        "name": "Terlihat Lebih Tinggi",
+        "description": "Tekankan garis vertikal dengan warna solid atau nada yang serupa."
       },
       "none": {
-        "name": "Color Harmony Only",
-        "description": "Focus purely on color harmony without body shape compensation."
+        "name": "Harmoni Warna Saja",
+        "description": "Fokus murni pada harmoni warna tanpa kompensasi bentuk tubuh."
       }
     }
   },
   "guide": {
     "inverted": {
-      "name": "Inverted Triangle",
-      "subtitle": "Wide shoulders, narrow hips",
-      "colorSummary": "Dark tops, light bottoms",
+      "name": "Segitiga Terbalik",
+      "subtitle": "Bahu lebar, pinggul sempit",
+      "colorSummary": "Atasan gelap, bawahan terang",
       "female": {
-        "desc": "You have broad shoulders/chest and relatively slim lower body. Adding volume to the lower body and softening the upper body creates balance.",
+        "desc": "Anda memiliki bahu/dada yang lebar dan tubuh bagian bawah yang relatif ramping. Menambah volume pada tubuh bagian bawah dan melunakkan tubuh bagian atas menciptakan keseimbangan.",
         "doList": [
-          "Deep V-neck, narrow scoop neck, U-neck, or asymmetric neckline to narrow shoulders",
-          "Light colors and patterns on bottoms to add lower body volume",
-          "Keep tops simple with wrap or empire waist styles",
-          "A-line, pleated, tulip, or voluminous skirts for lower body emphasis",
-          "Wide-leg, bootcut, or boyfriend-fit pants for lower body volume",
-          "Define waistline with belts or wrap jackets",
-          "Raglan, kimono, or dolman sleeves to soften shoulder line"
+          "V-neck dalam, scoop neck sempit, U-neck, atau garis leher asimetris untuk menyempitkan bahu",
+          "Warna terang dan motif pada bawahan untuk menambah volume tubuh bawah",
+          "Atasan sederhana dengan gaya wrap atau empire waist",
+          "Rok A-line, plisket, tulip, atau rok bervolume untuk menegaskan tubuh bawah",
+          "Celana wide-leg, bootcut, atau boyfriend-fit untuk volume tubuh bawah",
+          "Definisikan garis pinggang dengan ikat pinggang atau jaket wrap",
+          "Lengan raglan, kimono, atau dolman untuk melunakkan garis bahu"
         ],
         "dontList": [
-          "Off-shoulder, boat neck, square neck — makes shoulders look wider",
-          "Shoulder pads, puff sleeves, shoulder embellishments",
-          "Light tops with dark bottoms (counterproductive)",
-          "Skinny jeans alone (makes lower body look thinner)",
-          "Horizontal stripes or large patterns on tops"
+          "Off-shoulder, boat neck, square neck — membuat bahu terlihat lebih lebar",
+          "Bantalan bahu, lengan puff, hiasan bahu",
+          "Atasan terang dengan bawahan gelap (kontraproduktif)",
+          "Skinny jeans saja (membuat tubuh bawah terlihat lebih kurus)",
+          "Garis horizontal atau motif besar pada atasan"
         ]
       },
       "male": {
-        "desc": "You have broad shoulders and a developed upper body. Adding volume to the lower body improves balance.",
+        "desc": "Anda memiliki bahu lebar dan tubuh bagian atas yang berkembang. Menambah volume pada tubuh bagian bawah meningkatkan keseimbangan.",
         "doList": [
-          "V-neck to visually reduce shoulders and emphasize vertical lines",
-          "Light-colored bottoms to emphasize lower body volume",
-          "Dark solid colors on tops to visually reduce shoulders",
-          "Cargo pants or wide pants for lower body volume",
-          "Raglan sleeves to soften shoulder line",
-          "Single-breasted, slim lapel jackets",
-          "Straight-fit or bootcut pants"
+          "V-neck untuk mengurangi kesan bahu secara visual dan menegaskan garis vertikal",
+          "Bawahan berwarna terang untuk menegaskan volume tubuh bawah",
+          "Warna solid gelap pada atasan untuk mengurangi kesan bahu secara visual",
+          "Celana cargo atau celana lebar untuk volume tubuh bawah",
+          "Lengan raglan untuk melunakkan garis bahu",
+          "Jaket single-breasted, kerah slim",
+          "Celana straight-fit atau bootcut"
         ],
         "dontList": [
-          "Padded shoulders, puff sleeves",
-          "Light tops with dark bottoms (counterproductive)",
-          "Boat neck — makes shoulders look wider",
-          "Horizontal stripes on tops",
-          "Skinny jeans alone (breaks balance)",
-          "Boxy tees, thick bulky jackets"
+          "Bantalan bahu, lengan puff",
+          "Atasan terang dengan bawahan gelap (kontraproduktif)",
+          "Boat neck — membuat bahu terlihat lebih lebar",
+          "Garis horizontal pada atasan",
+          "Skinny jeans saja (merusak keseimbangan)",
+          "Kaos boxy, jaket tebal yang bulky"
         ]
       }
     },
     "triangle": {
-      "name": "Triangle",
-      "subtitle": "Narrow shoulders, wide hips",
-      "colorSummary": "Light tops, dark bottoms",
+      "name": "Segitiga",
+      "subtitle": "Bahu sempit, pinggul lebar",
+      "colorSummary": "Atasan terang, bawahan gelap",
       "female": {
-        "desc": "Your lower body is wider than your upper body. Drawing attention to the upper body and streamlining the lower body improves overall proportions.",
+        "desc": "Tubuh bagian bawah Anda lebih lebar dari tubuh bagian atas. Menarik perhatian ke tubuh bagian atas dan merampingkan tubuh bagian bawah memperbaiki proporsi keseluruhan.",
         "doList": [
-          "Boat neck, off-shoulder, square neck to widen shoulder line",
-          "Light colors, patterns, and embellishments on tops to draw eyes up",
-          "Jackets and blazers with shoulder pads",
-          "A-line, tulip, full circle, bias-cut skirts",
-          "High-waist bootcut, wide-leg, or straight pants",
-          "Crop jackets, trench coats with waist tie",
-          "Wrap dresses, fit-and-flare dresses"
+          "Boat neck, off-shoulder, square neck untuk melebarkan garis bahu",
+          "Warna terang, motif, dan hiasan pada atasan untuk menarik perhatian ke atas",
+          "Jaket dan blazer dengan bantalan bahu",
+          "Rok A-line, tulip, full circle, bias-cut",
+          "Celana high-waist bootcut, wide-leg, atau lurus",
+          "Jaket crop, trench coat dengan ikat pinggang",
+          "Dress wrap, dress fit-and-flare"
         ],
         "dontList": [
-          "Light colors, patterns, or embellishments on lower body",
-          "Skinny jeans alone (emphasizes hip line)",
-          "Hip-length tops (highlights widest point)",
-          "Horizontal stripes on bottoms",
-          "Tight pencil skirts (emphasizes hips)"
+          "Warna terang, motif, atau hiasan pada tubuh bawah",
+          "Skinny jeans saja (menegaskan garis pinggul)",
+          "Atasan sepanjang pinggul (menyorot titik terlebar)",
+          "Garis horizontal pada bawahan",
+          "Rok pensil ketat (menegaskan pinggul)"
         ]
       },
       "male": {
-        "desc": "Your lower body is wider than your upper body. Adding focal points to the upper body improves overall proportions.",
+        "desc": "Tubuh bagian bawah Anda lebih lebar dari tubuh bagian atas. Menambah titik fokus pada tubuh bagian atas memperbaiki proporsi keseluruhan.",
         "doList": [
-          "Structured blazers and shoulder-padded jackets to widen shoulders",
-          "Light colors and patterns on tops to draw eyes up",
-          "Chest details (pockets, epaulettes, horizontal stripes)",
-          "Dark solid colors on bottoms to streamline",
-          "Straight-fit, flat-front pants",
-          "V-neck or crew neck sweaters",
-          "Medium lapel single-breasted jackets"
+          "Blazer terstruktur dan jaket dengan bantalan bahu untuk melebarkan bahu",
+          "Warna terang dan motif pada atasan untuk menarik perhatian ke atas",
+          "Detail dada (saku, epaulet, garis horizontal)",
+          "Warna solid gelap pada bawahan untuk merampingkan",
+          "Celana straight-fit, flat-front",
+          "Sweater V-neck atau crew neck",
+          "Jaket single-breasted dengan kerah sedang"
         ],
         "dontList": [
-          "Unstructured tops (deconstructed jackets, etc.)",
-          "Skinny pants or tight bottoms",
-          "Light bottoms with dark tops",
-          "Horizontal stripes on lower body",
-          "Baggy pants (throws off balance)"
+          "Atasan tanpa struktur (jaket deconstructed, dll.)",
+          "Celana skinny atau bawahan ketat",
+          "Bawahan terang dengan atasan gelap",
+          "Garis horizontal pada tubuh bawah",
+          "Celana longgar (merusak keseimbangan)"
         ]
       }
     },
     "rectangle": {
-      "name": "Rectangle",
-      "subtitle": "Straight silhouette with similar shoulders, waist, and hips",
-      "colorSummary": "Create proportions with top-bottom color contrast",
+      "name": "Persegi Panjang",
+      "subtitle": "Siluet lurus dengan bahu, pinggang, dan pinggul yang serupa",
+      "colorSummary": "Ciptakan proporsi dengan kontras warna atas-bawah",
       "female": {
-        "desc": "You have a generally straight body shape. Creating a waistline or adding curves makes a great look.",
+        "desc": "Anda memiliki bentuk tubuh yang umumnya lurus. Menciptakan garis pinggang atau menambah lekukan menghasilkan tampilan yang bagus.",
         "doList": [
-          "V-neck, scoop neck, sweetheart neck for vertical lines and curves",
-          "Wrap tops, peplum, belted blouses to define waist",
-          "Wrap dresses, fit-and-flare, belted dresses",
-          "A-line, wrap, asymmetric skirts",
-          "High-waist bootcut or wide-leg pants",
-          "Puff, flutter, balloon sleeves for volume",
-          "Texture mixing (knit + denim, etc.) layering",
-          "Belt to accentuate waistline (slim to medium width)"
+          "V-neck, scoop neck, sweetheart neck untuk garis vertikal dan lekukan",
+          "Atasan wrap, peplum, blus berikat untuk mendefinisikan pinggang",
+          "Dress wrap, fit-and-flare, dress berikat",
+          "Rok A-line, wrap, asimetris",
+          "Celana high-waist bootcut atau wide-leg",
+          "Lengan puff, flutter, balon untuk volume",
+          "Campuran tekstur (rajut + denim, dll.) layering",
+          "Ikat pinggang untuk menegaskan garis pinggang (lebar slim hingga sedang)"
         ],
         "dontList": [
-          "Boxy or loose fit alone (hides body lines even more)",
-          "Turtleneck or high neck (emphasizes straight lines)",
-          "Same-color top and bottom worn straight (looks flat)",
-          "Volume only at waist (breaks overall balance)",
-          "Shapeless items worn alone"
+          "Fit boxy atau longgar saja (menyembunyikan garis tubuh lebih lagi)",
+          "Turtleneck atau high neck (menegaskan garis lurus)",
+          "Atasan dan bawahan warna sama dipakai lurus (terlihat datar)",
+          "Volume hanya di pinggang (merusak keseimbangan keseluruhan)",
+          "Pakaian tanpa bentuk yang dipakai sendiri"
         ]
       },
       "male": {
-        "desc": "You have a generally straight body shape. Creating dimension through layering and color contrast makes a great look.",
+        "desc": "Anda memiliki bentuk tubuh yang umumnya lurus. Menciptakan dimensi melalui layering dan kontras warna menghasilkan tampilan yang bagus.",
         "doList": [
-          "Create depth and dimension through layering",
-          "Accentuate waistline with belts or tuck-in",
-          "Divide proportions with top-bottom color contrast",
-          "Texture mixing (knit + denim, etc.)",
-          "Create vertical lines with jackets and cardigans",
-          "Crew neck t-shirts, V-neck sweaters",
-          "Structured blazers (with shoulder pads)"
+          "Ciptakan kedalaman dan dimensi melalui layering",
+          "Tegaskan garis pinggang dengan ikat pinggang atau tuck-in",
+          "Bagi proporsi dengan kontras warna atas-bawah",
+          "Campuran tekstur (rajut + denim, dll.)",
+          "Ciptakan garis vertikal dengan jaket dan kardigan",
+          "Kaos crew neck, sweater V-neck",
+          "Blazer terstruktur (dengan bantalan bahu)"
         ],
         "dontList": [
-          "Same-color top and bottom worn straight (looks flat)",
-          "Boxy fit alone (hides body lines even more)",
-          "Vertical stripes (emphasizes straight lines more)",
-          "Loose trousers or wide-leg pants",
-          "Long-line tops or coats (emphasizes straight vertical line)",
-          "Flat, shapeless shirts"
+          "Atasan dan bawahan warna sama dipakai lurus (terlihat datar)",
+          "Fit boxy saja (menyembunyikan garis tubuh lebih lagi)",
+          "Garis vertikal (lebih menegaskan garis lurus)",
+          "Celana longgar atau wide-leg",
+          "Atasan atau mantel panjang (menegaskan garis vertikal lurus)",
+          "Kemeja datar tanpa bentuk"
         ]
       }
     },
     "hourglass": {
-      "name": "Hourglass",
-      "subtitle": "Balanced shoulders and hips with a defined waist",
-      "colorSummary": "Wear anything! Just accentuate the waist",
+      "name": "Jam Pasir",
+      "subtitle": "Bahu dan pinggul seimbang dengan pinggang terdefinisi",
+      "colorSummary": "Pakai apa saja! Tinggal tegaskan pinggang",
       "female": {
-        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your natural lines looks amazing.",
+        "desc": "Anda memiliki bahu dan pinggul yang seimbang dengan pinggang yang terdefinisi dengan baik. Menonjolkan garis alami Anda akan terlihat luar biasa.",
         "doList": [
-          "Fits that accentuate the waistline (tuck-in, belt, wrap)",
-          "V-neck, scoop neck, sweetheart neck (natural bust line)",
-          "Wrap dresses, fit-and-flare, belted dresses",
-          "Pencil skirt (for curves) or full skirt (with tuck-in)",
-          "Medium fit flatters best",
-          "Draping fabrics (jersey, silk, cotton blend)",
-          "Single-breasted, short jackets, belted coats"
+          "Fit yang menegaskan garis pinggang (tuck-in, ikat pinggang, wrap)",
+          "V-neck, scoop neck, sweetheart neck (garis dada natural)",
+          "Dress wrap, fit-and-flare, dress berikat",
+          "Rok pensil (untuk lekukan) atau rok full (dengan tuck-in)",
+          "Fit medium paling cocok",
+          "Kain yang jatuh (jersey, sutra, katun campuran)",
+          "Jaket single-breasted, jaket pendek, mantel berikat"
         ],
         "dontList": [
-          "Overly boxy oversized fits (hides your lines)",
-          "Too-tight all-over fit (overdoes it)",
-          "Long outerwear that hides the waist",
-          "Thick knits or chunky fabrics (adds bulk)",
+          "Fit oversized yang terlalu boxy (menyembunyikan garis Anda)",
+          "Fit yang terlalu ketat di seluruh tubuh (berlebihan)",
+          "Outerwear panjang yang menyembunyikan pinggang",
+          "Rajutan tebal atau kain chunky (menambah volume)",
           "Double-breasted, drop waist",
-          "Thick belts (over 4.5cm)"
+          "Ikat pinggang tebal (lebih dari 4,5 cm)"
         ]
       },
       "male": {
-        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your lines looks amazing.",
+        "desc": "Anda memiliki bahu dan pinggul yang seimbang dengan pinggang yang terdefinisi dengan baik. Menonjolkan garis Anda akan terlihat luar biasa.",
         "doList": [
-          "Fits that accentuate the waistline (tuck-in, belt)",
-          "Medium fit flatters best",
-          "Solid colors with accent items",
-          "Fabrics that drape naturally on the body",
-          "Both V-neck and crew neck work well",
-          "Slim-fit shirts, high-waist trousers",
-          "Single-breasted jacket (waist suppression)",
-          "Medium belt (contrasting color for accent)"
+          "Fit yang menegaskan garis pinggang (tuck-in, ikat pinggang)",
+          "Fit medium paling cocok",
+          "Warna solid dengan item aksen",
+          "Kain yang jatuh alami pada tubuh",
+          "V-neck dan crew neck keduanya cocok",
+          "Kemeja slim-fit, celana high-waist",
+          "Jaket single-breasted (waist suppression)",
+          "Ikat pinggang sedang (warna kontras sebagai aksen)"
         ],
         "dontList": [
-          "Overly boxy oversized fits (hides your lines)",
-          "Too-tight all-over fit (overdoes it)",
-          "Low-rise pants",
-          "Bold patterns or colors",
-          "Oversized jackets or coats"
+          "Fit oversized yang terlalu boxy (menyembunyikan garis Anda)",
+          "Fit yang terlalu ketat di seluruh tubuh (berlebihan)",
+          "Celana low-rise",
+          "Motif atau warna yang mencolok",
+          "Jaket atau mantel oversized"
         ]
       }
     },
     "round": {
-      "name": "Round",
-      "subtitle": "Belly-centered, rounded silhouette",
-      "colorSummary": "Overall dark tones with vertical line emphasis",
+      "name": "Bulat",
+      "subtitle": "Siluet membulat dengan pusat di perut",
+      "colorSummary": "Warna gelap keseluruhan dengan penekanan garis vertikal",
       "female": {
-        "desc": "You carry volume in the midsection. Creating vertical lines and drawing attention to neckline, arms, and legs creates a slimmer look.",
+        "desc": "Anda membawa volume di bagian tengah tubuh. Menciptakan garis vertikal dan menarik perhatian ke garis leher, lengan, dan kaki menciptakan tampilan yang lebih ramping.",
         "doList": [
-          "Deep V-neck, wide V, scoop neck, cowl neck to distribute attention",
-          "Empire waist, wrap tops, flowing draped tops",
-          "Empire waist, A-line, wrap, fit-and-flare dresses",
-          "3/4 sleeves for visually slimmer arms and detail focus",
-          "A-line, flare, knee-length+ skirts",
-          "High-waist straight or bootcut pants",
-          "Slim belt below bust or at high waist (tonal matching)",
-          "Single-breasted, open-front, structured jackets (hip length+)",
-          "Well-fitting bra is essential (foundation for silhouette)"
+          "V-neck dalam, V lebar, scoop neck, cowl neck untuk mendistribusikan perhatian",
+          "Empire waist, atasan wrap, atasan drape yang mengalir",
+          "Dress empire waist, A-line, wrap, fit-and-flare",
+          "Lengan 3/4 untuk lengan yang lebih ramping secara visual dan fokus detail",
+          "Rok A-line, flare, panjang selutut+",
+          "Celana high-waist lurus atau bootcut",
+          "Ikat pinggang tipis di bawah dada atau high waist (warna senada)",
+          "Jaket single-breasted, depan terbuka, terstruktur (panjang sepinggul+)",
+          "Bra yang pas sangat penting (fondasi untuk siluet)"
         ],
         "dontList": [
-          "Clingy fabrics or tight midsection",
-          "Horizontal details or embellishments at waist",
-          "Double-breasted or crop jackets",
-          "Tight shorts",
-          "Light-colored tops alone (emphasizes belly)",
-          "Horizontal stripes, large patterns"
+          "Kain ketat atau bagian tengah yang sempit",
+          "Detail horizontal atau hiasan di pinggang",
+          "Jaket double-breasted atau crop",
+          "Celana pendek ketat",
+          "Atasan berwarna terang saja (menegaskan perut)",
+          "Garis horizontal, motif besar"
         ]
       },
       "male": {
-        "desc": "You carry volume in the midsection. Vertical lines and dark center colors create a slimmer appearance.",
+        "desc": "Anda membawa volume di bagian tengah tubuh. Garis vertikal dan warna gelap di tengah menciptakan tampilan yang lebih ramping.",
         "doList": [
-          "Dark colors on tops and mid layers for a slim center",
-          "Emphasize vertical lines (open jackets, cardigans)",
-          "Monochrome or similar tone outfits for a longer look",
-          "V-neck or deep crew neck to distribute attention",
-          "Structured jackets to organize the silhouette",
-          "Single-breasted, open jackets",
-          "Straight or slightly tapered pants"
+          "Warna gelap pada atasan dan lapisan tengah untuk tengah yang ramping",
+          "Tegaskan garis vertikal (jaket terbuka, kardigan)",
+          "Outfit monokrom atau nada serupa untuk tampilan yang lebih panjang",
+          "V-neck atau crew neck dalam untuk mendistribusikan perhatian",
+          "Jaket terstruktur untuk merapikan siluet",
+          "Jaket single-breasted, terbuka",
+          "Celana lurus atau sedikit meruncing"
         ],
         "dontList": [
-          "Light-colored tops alone (emphasizes belly)",
-          "Horizontal stripes, large patterns",
-          "Short-length tops (exposes waistline)",
-          "Too-tight fits",
-          "Double-breasted jackets",
-          "Pleated or high-waist pants",
-          "Colorful belts",
-          "Baggy or oversized (adds bulk)"
+          "Atasan berwarna terang saja (menegaskan perut)",
+          "Garis horizontal, motif besar",
+          "Atasan pendek (mengekspos garis pinggang)",
+          "Fit yang terlalu ketat",
+          "Jaket double-breasted",
+          "Celana plisket atau high-waist",
+          "Ikat pinggang berwarna-warni",
+          "Baggy atau oversized (menambah volume)"
         ]
       }
     }
@@ -287,24 +287,24 @@
   "quiz": {
     "questions": [
       {
-        "question": "Compare your shoulder and hip width:",
-        "options": ["My shoulders are wider", "My hips are wider", "They're about the same"]
+        "question": "Bandingkan lebar bahu dan pinggul Anda:",
+        "options": ["Bahu saya lebih lebar", "Pinggul saya lebih lebar", "Keduanya hampir sama"]
       },
       {
-        "question": "How is your waistline?",
-        "options": ["My waist is well-defined", "My waist and hips are straight", "My belly area protrudes"]
+        "question": "Bagaimana garis pinggang Anda?",
+        "options": ["Pinggang saya terdefinisi dengan baik", "Pinggang dan pinggul saya lurus", "Area perut saya menonjol"]
       },
       {
-        "question": "Where do you carry more volume — upper or lower body?",
-        "options": ["More volume in upper body", "More volume in lower body", "About the same"]
+        "question": "Di mana Anda membawa lebih banyak volume — tubuh atas atau bawah?",
+        "options": ["Lebih banyak volume di tubuh atas", "Lebih banyak volume di tubuh bawah", "Hampir sama"]
       },
       {
-        "question": "What concerns you most when choosing clothes?",
-        "options": ["Worried about top fit due to wide shoulders", "Hips and thighs bother me", "My belly area bothers me", "I look flat overall", "No particular concern (well-balanced)"]
+        "question": "Apa yang paling Anda khawatirkan saat memilih pakaian?",
+        "options": ["Khawatir dengan fit atasan karena bahu lebar", "Pinggul dan paha mengganggu saya", "Area perut mengganggu saya", "Saya terlihat datar secara keseluruhan", "Tidak ada kekhawatiran khusus (seimbang)"]
       },
       {
-        "question": "Which top fit suits you best?",
-        "options": ["Slim fit (body-hugging)", "Regular fit (moderate)", "Oversized fit (roomy)"]
+        "question": "Fit atasan mana yang paling cocok untuk Anda?",
+        "options": ["Slim fit (pas badan)", "Regular fit (sedang)", "Oversized fit (longgar)"]
       }
     ]
   }

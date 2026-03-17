@@ -2,284 +2,284 @@
   "diagnosis": {
     "questions": [
       {
-        "question": "Compare your shoulder and hip width:",
+        "question": "Comparez la largeur de vos épaules et de vos hanches :",
         "options": [
-          "My shoulders are wider",
-          "My hips are wider",
-          "They're about the same"
+          "Mes épaules sont plus larges",
+          "Mes hanches sont plus larges",
+          "C'est à peu près pareil"
         ]
       },
       {
-        "question": "How is your waistline?",
+        "question": "Comment est votre tour de taille ?",
         "options": [
-          "My waist is well-defined",
-          "My waist and hips are straight",
-          "My belly area protrudes"
+          "Ma taille est bien marquée",
+          "Ma taille et mes hanches sont alignées",
+          "Mon ventre est proéminent"
         ]
       },
       {
-        "question": "What area concerns you most?",
+        "question": "Quelle zone vous préoccupe le plus ?",
         "options": [
-          "My shoulders look narrow",
-          "My shoulders look wide",
-          "My belly looks prominent",
-          "My legs look short",
-          "I look short overall",
-          "No particular concern"
+          "Mes épaules ont l'air étroites",
+          "Mes épaules ont l'air larges",
+          "Mon ventre est visible",
+          "Mes jambes ont l'air courtes",
+          "Je parais petit(e) dans l'ensemble",
+          "Pas de préoccupation particulière"
         ]
       }
     ],
     "effects": {
       "shoulder-wide": {
-        "name": "Make Shoulders Look Wider",
-        "description": "Use light-colored tops and boat neck/puff sleeves to emphasize the shoulder line."
+        "name": "Élargir les épaules",
+        "description": "Utilisez des hauts clairs et des encolures bateau/manches bouffantes pour souligner la ligne d'épaules."
       },
       "shoulder-narrow": {
-        "name": "Make Shoulders Look Narrower",
-        "description": "Use dark-colored tops to visually reduce shoulders, and light bottoms to distribute attention."
+        "name": "Affiner les épaules",
+        "description": "Utilisez des hauts foncés pour réduire visuellement les épaules, et des bas clairs pour répartir l'attention."
       },
       "belly": {
-        "name": "Minimize Belly Appearance",
-        "description": "Use dark-colored tops/mid layers to visually conceal the belly area."
+        "name": "Minimiser le ventre",
+        "description": "Utilisez des hauts/couches intermédiaires foncés pour camoufler visuellement la zone du ventre."
       },
       "legs-long": {
-        "name": "Make Legs Look Longer",
-        "description": "Match bottom and shoe colors to create a longer leg line."
+        "name": "Allonger les jambes",
+        "description": "Assortissez les couleurs du bas et des chaussures pour créer une ligne de jambe plus longue."
       },
       "height-tall": {
-        "name": "Look Taller",
-        "description": "Emphasize vertical lines with solid colors or similar tones."
+        "name": "Paraître plus grand(e)",
+        "description": "Accentuez les lignes verticales avec des couleurs unies ou des tons similaires."
       },
       "none": {
-        "name": "Color Harmony Only",
-        "description": "Focus purely on color harmony without body shape compensation."
+        "name": "Harmonie des couleurs uniquement",
+        "description": "Se concentrer uniquement sur l'harmonie des couleurs sans compensation morphologique."
       }
     }
   },
   "guide": {
     "inverted": {
-      "name": "Inverted Triangle",
-      "subtitle": "Wide shoulders, narrow hips",
-      "colorSummary": "Dark tops, light bottoms",
+      "name": "Triangle inversé",
+      "subtitle": "Épaules larges, hanches étroites",
+      "colorSummary": "Hauts foncés, bas clairs",
       "female": {
-        "desc": "You have broad shoulders/chest and relatively slim lower body. Adding volume to the lower body and softening the upper body creates balance.",
+        "desc": "Vous avez des épaules/poitrine larges et un bas du corps relativement fin. Ajouter du volume en bas et adoucir le haut du corps crée un équilibre.",
         "doList": [
-          "Deep V-neck, narrow scoop neck, U-neck, or asymmetric neckline to narrow shoulders",
-          "Light colors and patterns on bottoms to add lower body volume",
-          "Keep tops simple with wrap or empire waist styles",
-          "A-line, pleated, tulip, or voluminous skirts for lower body emphasis",
-          "Wide-leg, bootcut, or boyfriend-fit pants for lower body volume",
-          "Define waistline with belts or wrap jackets",
-          "Raglan, kimono, or dolman sleeves to soften shoulder line"
+          "Col en V profond, encolure étroite arrondie, col en U ou encolure asymétrique pour affiner les épaules",
+          "Couleurs claires et motifs sur le bas pour ajouter du volume en bas",
+          "Garder les hauts simples avec des styles portefeuille ou taille empire",
+          "Jupes évasées, plissées, tulipe ou volumineuses pour mettre en valeur le bas",
+          "Pantalons larges, bootcut ou coupe boyfriend pour le volume en bas",
+          "Marquer la taille avec des ceintures ou des vestes portefeuille",
+          "Manches raglan, kimono ou chauve-souris pour adoucir la ligne d'épaules"
         ],
         "dontList": [
-          "Off-shoulder, boat neck, square neck — makes shoulders look wider",
-          "Shoulder pads, puff sleeves, shoulder embellishments",
-          "Light tops with dark bottoms (counterproductive)",
-          "Skinny jeans alone (makes lower body look thinner)",
-          "Horizontal stripes or large patterns on tops"
+          "Épaules dénudées, col bateau, col carré — élargit les épaules",
+          "Épaulettes, manches bouffantes, ornements aux épaules",
+          "Hauts clairs avec bas foncés (contre-productif)",
+          "Jean skinny seul (amincit davantage le bas du corps)",
+          "Rayures horizontales ou grands motifs sur le haut"
         ]
       },
       "male": {
-        "desc": "You have broad shoulders and a developed upper body. Adding volume to the lower body improves balance.",
+        "desc": "Vous avez des épaules larges et un haut du corps développé. Ajouter du volume en bas améliore l'équilibre.",
         "doList": [
-          "V-neck to visually reduce shoulders and emphasize vertical lines",
-          "Light-colored bottoms to emphasize lower body volume",
-          "Dark solid colors on tops to visually reduce shoulders",
-          "Cargo pants or wide pants for lower body volume",
-          "Raglan sleeves to soften shoulder line",
-          "Single-breasted, slim lapel jackets",
-          "Straight-fit or bootcut pants"
+          "Col en V pour réduire visuellement les épaules et accentuer les lignes verticales",
+          "Bas de couleur claire pour mettre en valeur le volume du bas du corps",
+          "Couleurs unies foncées sur le haut pour réduire visuellement les épaules",
+          "Pantalon cargo ou pantalon large pour le volume en bas",
+          "Manches raglan pour adoucir la ligne d'épaules",
+          "Vestes à boutonnage simple, revers fins",
+          "Pantalon droit ou bootcut"
         ],
         "dontList": [
-          "Padded shoulders, puff sleeves",
-          "Light tops with dark bottoms (counterproductive)",
-          "Boat neck — makes shoulders look wider",
-          "Horizontal stripes on tops",
-          "Skinny jeans alone (breaks balance)",
-          "Boxy tees, thick bulky jackets"
+          "Épaules rembourrées, manches bouffantes",
+          "Hauts clairs avec bas foncés (contre-productif)",
+          "Col bateau — élargit les épaules",
+          "Rayures horizontales sur le haut",
+          "Jean skinny seul (rompt l'équilibre)",
+          "T-shirts boxy, vestes volumineuses épaisses"
         ]
       }
     },
     "triangle": {
       "name": "Triangle",
-      "subtitle": "Narrow shoulders, wide hips",
-      "colorSummary": "Light tops, dark bottoms",
+      "subtitle": "Épaules étroites, hanches larges",
+      "colorSummary": "Hauts clairs, bas foncés",
       "female": {
-        "desc": "Your lower body is wider than your upper body. Drawing attention to the upper body and streamlining the lower body improves overall proportions.",
+        "desc": "Votre bas du corps est plus large que le haut. Attirer l'attention vers le haut et affiner le bas améliore les proportions.",
         "doList": [
-          "Boat neck, off-shoulder, square neck to widen shoulder line",
-          "Light colors, patterns, and embellishments on tops to draw eyes up",
-          "Jackets and blazers with shoulder pads",
-          "A-line, tulip, full circle, bias-cut skirts",
-          "High-waist bootcut, wide-leg, or straight pants",
-          "Crop jackets, trench coats with waist tie",
-          "Wrap dresses, fit-and-flare dresses"
+          "Col bateau, épaules dénudées, col carré pour élargir la ligne d'épaules",
+          "Couleurs claires, motifs et ornements sur le haut pour attirer le regard vers le haut",
+          "Vestes et blazers avec épaulettes",
+          "Jupes évasées, tulipe, corolle, coupées en biais",
+          "Pantalon taille haute bootcut, large ou droit",
+          "Vestes courtes, trench avec ceinture à la taille",
+          "Robes portefeuille, robes ajustées-évasées"
         ],
         "dontList": [
-          "Light colors, patterns, or embellishments on lower body",
-          "Skinny jeans alone (emphasizes hip line)",
-          "Hip-length tops (highlights widest point)",
-          "Horizontal stripes on bottoms",
-          "Tight pencil skirts (emphasizes hips)"
+          "Couleurs claires, motifs ou ornements sur le bas",
+          "Jean skinny seul (accentue la ligne des hanches)",
+          "Hauts mi-longs (met en valeur le point le plus large)",
+          "Rayures horizontales sur le bas",
+          "Jupes crayon ajustées (accentue les hanches)"
         ]
       },
       "male": {
-        "desc": "Your lower body is wider than your upper body. Adding focal points to the upper body improves overall proportions.",
+        "desc": "Votre bas du corps est plus large que le haut. Ajouter des points d'attention sur le haut améliore les proportions.",
         "doList": [
-          "Structured blazers and shoulder-padded jackets to widen shoulders",
-          "Light colors and patterns on tops to draw eyes up",
-          "Chest details (pockets, epaulettes, horizontal stripes)",
-          "Dark solid colors on bottoms to streamline",
-          "Straight-fit, flat-front pants",
-          "V-neck or crew neck sweaters",
-          "Medium lapel single-breasted jackets"
+          "Blazers structurés et vestes avec épaulettes pour élargir les épaules",
+          "Couleurs claires et motifs sur le haut pour attirer le regard vers le haut",
+          "Détails sur la poitrine (poches, épaulettes, rayures horizontales)",
+          "Couleurs unies foncées sur le bas pour affiner",
+          "Pantalon droit, devant plat",
+          "Pulls col V ou col rond",
+          "Vestes boutonnage simple, revers moyens"
         ],
         "dontList": [
-          "Unstructured tops (deconstructed jackets, etc.)",
-          "Skinny pants or tight bottoms",
-          "Light bottoms with dark tops",
-          "Horizontal stripes on lower body",
-          "Baggy pants (throws off balance)"
+          "Hauts déstructurés (vestes déconstruites, etc.)",
+          "Pantalons skinny ou bas ajustés",
+          "Bas clairs avec hauts foncés",
+          "Rayures horizontales sur le bas",
+          "Pantalons amples (déséquilibre les proportions)"
         ]
       }
     },
     "rectangle": {
       "name": "Rectangle",
-      "subtitle": "Straight silhouette with similar shoulders, waist, and hips",
-      "colorSummary": "Create proportions with top-bottom color contrast",
+      "subtitle": "Silhouette droite avec épaules, taille et hanches similaires",
+      "colorSummary": "Créer des proportions avec le contraste de couleur haut-bas",
       "female": {
-        "desc": "You have a generally straight body shape. Creating a waistline or adding curves makes a great look.",
+        "desc": "Vous avez une silhouette globalement droite. Créer une taille ou ajouter des courbes donne un superbe résultat.",
         "doList": [
-          "V-neck, scoop neck, sweetheart neck for vertical lines and curves",
-          "Wrap tops, peplum, belted blouses to define waist",
-          "Wrap dresses, fit-and-flare, belted dresses",
-          "A-line, wrap, asymmetric skirts",
-          "High-waist bootcut or wide-leg pants",
-          "Puff, flutter, balloon sleeves for volume",
-          "Texture mixing (knit + denim, etc.) layering",
-          "Belt to accentuate waistline (slim to medium width)"
+          "Col en V, col arrondi, col cœur pour des lignes verticales et des courbes",
+          "Hauts portefeuille, péplum, blouses ceinturées pour marquer la taille",
+          "Robes portefeuille, ajustées-évasées, ceinturées",
+          "Jupes évasées, portefeuille, asymétriques",
+          "Pantalon taille haute bootcut ou large",
+          "Manches bouffantes, volantées, ballon pour le volume",
+          "Superposition de textures (maille + denim, etc.)",
+          "Ceinture pour souligner la taille (fine à moyenne)"
         ],
         "dontList": [
-          "Boxy or loose fit alone (hides body lines even more)",
-          "Turtleneck or high neck (emphasizes straight lines)",
-          "Same-color top and bottom worn straight (looks flat)",
-          "Volume only at waist (breaks overall balance)",
-          "Shapeless items worn alone"
+          "Coupe boxy ou ample seule (cache encore plus les formes)",
+          "Col roulé ou col montant (accentue les lignes droites)",
+          "Haut et bas de même couleur portés droits (effet plat)",
+          "Volume uniquement à la taille (rompt l'équilibre général)",
+          "Vêtements informes portés seuls"
         ]
       },
       "male": {
-        "desc": "You have a generally straight body shape. Creating dimension through layering and color contrast makes a great look.",
+        "desc": "Vous avez une silhouette globalement droite. Créer de la profondeur par la superposition et le contraste de couleurs donne un superbe résultat.",
         "doList": [
-          "Create depth and dimension through layering",
-          "Accentuate waistline with belts or tuck-in",
-          "Divide proportions with top-bottom color contrast",
-          "Texture mixing (knit + denim, etc.)",
-          "Create vertical lines with jackets and cardigans",
-          "Crew neck t-shirts, V-neck sweaters",
-          "Structured blazers (with shoulder pads)"
+          "Créer profondeur et dimension par la superposition",
+          "Souligner la taille avec ceintures ou en rentrant le haut",
+          "Diviser les proportions avec le contraste de couleur haut-bas",
+          "Mélange de textures (maille + denim, etc.)",
+          "Créer des lignes verticales avec vestes et cardigans",
+          "T-shirts col rond, pulls col V",
+          "Blazers structurés (avec épaulettes)"
         ],
         "dontList": [
-          "Same-color top and bottom worn straight (looks flat)",
-          "Boxy fit alone (hides body lines even more)",
-          "Vertical stripes (emphasizes straight lines more)",
-          "Loose trousers or wide-leg pants",
-          "Long-line tops or coats (emphasizes straight vertical line)",
-          "Flat, shapeless shirts"
+          "Haut et bas de même couleur portés droits (effet plat)",
+          "Coupe boxy seule (cache encore plus les formes)",
+          "Rayures verticales (accentue encore les lignes droites)",
+          "Pantalons amples ou larges",
+          "Hauts ou manteaux longs (accentue la ligne verticale droite)",
+          "Chemises plates et informes"
         ]
       }
     },
     "hourglass": {
-      "name": "Hourglass",
-      "subtitle": "Balanced shoulders and hips with a defined waist",
-      "colorSummary": "Wear anything! Just accentuate the waist",
+      "name": "Sablier",
+      "subtitle": "Épaules et hanches équilibrées avec une taille marquée",
+      "colorSummary": "Tout vous va ! Soulignez simplement la taille",
       "female": {
-        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your natural lines looks amazing.",
+        "desc": "Vous avez des épaules et hanches équilibrées avec une taille bien marquée. Mettre en valeur vos lignes naturelles est superbe.",
         "doList": [
-          "Fits that accentuate the waistline (tuck-in, belt, wrap)",
-          "V-neck, scoop neck, sweetheart neck (natural bust line)",
-          "Wrap dresses, fit-and-flare, belted dresses",
-          "Pencil skirt (for curves) or full skirt (with tuck-in)",
-          "Medium fit flatters best",
-          "Draping fabrics (jersey, silk, cotton blend)",
-          "Single-breasted, short jackets, belted coats"
+          "Coupes qui soulignent la taille (rentrer le haut, ceinture, portefeuille)",
+          "Col en V, col arrondi, col cœur (ligne de buste naturelle)",
+          "Robes portefeuille, ajustées-évasées, ceinturées",
+          "Jupe crayon (pour les courbes) ou jupe ample (avec le haut rentré)",
+          "Coupe ajustée modérée pour un effet optimal",
+          "Tissus fluides (jersey, soie, mélange coton)",
+          "Vestes boutonnage simple, vestes courtes, manteaux ceinturés"
         ],
         "dontList": [
-          "Overly boxy oversized fits (hides your lines)",
-          "Too-tight all-over fit (overdoes it)",
-          "Long outerwear that hides the waist",
-          "Thick knits or chunky fabrics (adds bulk)",
-          "Double-breasted, drop waist",
-          "Thick belts (over 4.5cm)"
+          "Coupes oversize trop amples (cache vos formes)",
+          "Ajustement trop serré partout (en fait trop)",
+          "Vêtements d'extérieur longs qui cachent la taille",
+          "Mailles épaisses ou tissus volumineux (ajoute du volume)",
+          "Boutonnage double, taille basse",
+          "Ceintures épaisses (plus de 4,5 cm)"
         ]
       },
       "male": {
-        "desc": "You have balanced shoulders and hips with a well-defined waist. Highlighting your lines looks amazing.",
+        "desc": "Vous avez des épaules et hanches équilibrées avec une taille bien marquée. Mettre en valeur vos lignes est superbe.",
         "doList": [
-          "Fits that accentuate the waistline (tuck-in, belt)",
-          "Medium fit flatters best",
-          "Solid colors with accent items",
-          "Fabrics that drape naturally on the body",
-          "Both V-neck and crew neck work well",
-          "Slim-fit shirts, high-waist trousers",
-          "Single-breasted jacket (waist suppression)",
-          "Medium belt (contrasting color for accent)"
+          "Coupes qui soulignent la taille (rentrer le haut, ceinture)",
+          "Coupe ajustée modérée pour un effet optimal",
+          "Couleurs unies avec pièces d'accent",
+          "Tissus qui tombent naturellement sur le corps",
+          "Col en V et col rond fonctionnent tous les deux",
+          "Chemises ajustées, pantalon taille haute",
+          "Veste boutonnage simple (cintrée à la taille)",
+          "Ceinture moyenne (couleur contrastée pour l'accent)"
         ],
         "dontList": [
-          "Overly boxy oversized fits (hides your lines)",
-          "Too-tight all-over fit (overdoes it)",
-          "Low-rise pants",
-          "Bold patterns or colors",
-          "Oversized jackets or coats"
+          "Coupes oversize trop amples (cache vos formes)",
+          "Ajustement trop serré partout (en fait trop)",
+          "Pantalon taille basse",
+          "Motifs ou couleurs trop voyants",
+          "Vestes ou manteaux oversize"
         ]
       }
     },
     "round": {
-      "name": "Round",
-      "subtitle": "Belly-centered, rounded silhouette",
-      "colorSummary": "Overall dark tones with vertical line emphasis",
+      "name": "Rond",
+      "subtitle": "Silhouette arrondie centrée sur le ventre",
+      "colorSummary": "Tons foncés dans l'ensemble avec accent sur les lignes verticales",
       "female": {
-        "desc": "You carry volume in the midsection. Creating vertical lines and drawing attention to neckline, arms, and legs creates a slimmer look.",
+        "desc": "Vous portez du volume au niveau du ventre. Créer des lignes verticales et attirer l'attention vers l'encolure, les bras et les jambes affine la silhouette.",
         "doList": [
-          "Deep V-neck, wide V, scoop neck, cowl neck to distribute attention",
-          "Empire waist, wrap tops, flowing draped tops",
-          "Empire waist, A-line, wrap, fit-and-flare dresses",
-          "3/4 sleeves for visually slimmer arms and detail focus",
-          "A-line, flare, knee-length+ skirts",
-          "High-waist straight or bootcut pants",
-          "Slim belt below bust or at high waist (tonal matching)",
-          "Single-breasted, open-front, structured jackets (hip length+)",
-          "Well-fitting bra is essential (foundation for silhouette)"
+          "Col en V profond, large V, col arrondi, col bénitier pour répartir l'attention",
+          "Hauts taille empire, portefeuille, drapés fluides",
+          "Robes taille empire, évasées, portefeuille, ajustées-évasées",
+          "Manches 3/4 pour des bras visuellement plus fins et un point de détail",
+          "Jupes évasées, évasées, longueur genou ou plus",
+          "Pantalon taille haute droit ou bootcut",
+          "Ceinture fine sous la poitrine ou à la taille haute (ton sur ton)",
+          "Vestes boutonnage simple, ouvertes, structurées (longueur hanches ou plus)",
+          "Un soutien-gorge bien ajusté est essentiel (base de la silhouette)"
         ],
         "dontList": [
-          "Clingy fabrics or tight midsection",
-          "Horizontal details or embellishments at waist",
-          "Double-breasted or crop jackets",
-          "Tight shorts",
-          "Light-colored tops alone (emphasizes belly)",
-          "Horizontal stripes, large patterns"
+          "Tissus moulants ou serrés au niveau du ventre",
+          "Détails horizontaux ou ornements à la taille",
+          "Vestes à boutonnage double ou courtes",
+          "Shorts ajustés",
+          "Hauts clairs seuls (accentue le ventre)",
+          "Rayures horizontales, grands motifs"
         ]
       },
       "male": {
-        "desc": "You carry volume in the midsection. Vertical lines and dark center colors create a slimmer appearance.",
+        "desc": "Vous portez du volume au niveau du ventre. Les lignes verticales et les couleurs foncées au centre affinent la silhouette.",
         "doList": [
-          "Dark colors on tops and mid layers for a slim center",
-          "Emphasize vertical lines (open jackets, cardigans)",
-          "Monochrome or similar tone outfits for a longer look",
-          "V-neck or deep crew neck to distribute attention",
-          "Structured jackets to organize the silhouette",
-          "Single-breasted, open jackets",
-          "Straight or slightly tapered pants"
+          "Couleurs foncées sur les hauts et couches intermédiaires pour un centre affiné",
+          "Accentuer les lignes verticales (vestes ouvertes, cardigans)",
+          "Tenues monochromes ou dans des tons similaires pour un effet allongeant",
+          "Col en V ou col rond profond pour répartir l'attention",
+          "Vestes structurées pour organiser la silhouette",
+          "Vestes boutonnage simple, ouvertes",
+          "Pantalon droit ou légèrement fuselé"
         ],
         "dontList": [
-          "Light-colored tops alone (emphasizes belly)",
-          "Horizontal stripes, large patterns",
-          "Short-length tops (exposes waistline)",
-          "Too-tight fits",
-          "Double-breasted jackets",
-          "Pleated or high-waist pants",
-          "Colorful belts",
-          "Baggy or oversized (adds bulk)"
+          "Hauts clairs seuls (accentue le ventre)",
+          "Rayures horizontales, grands motifs",
+          "Hauts courts (expose la taille)",
+          "Coupes trop ajustées",
+          "Vestes à boutonnage double",
+          "Pantalon à pinces ou taille haute",
+          "Ceintures colorées",
+          "Coupes amples ou oversize (ajoute du volume)"
         ]
       }
     }
@@ -287,24 +287,24 @@
   "quiz": {
     "questions": [
       {
-        "question": "Compare your shoulder and hip width:",
-        "options": ["My shoulders are wider", "My hips are wider", "They're about the same"]
+        "question": "Comparez la largeur de vos épaules et de vos hanches :",
+        "options": ["Mes épaules sont plus larges", "Mes hanches sont plus larges", "C'est à peu près pareil"]
       },
       {
-        "question": "How is your waistline?",
-        "options": ["My waist is well-defined", "My waist and hips are straight", "My belly area protrudes"]
+        "question": "Comment est votre tour de taille ?",
+        "options": ["Ma taille est bien marquée", "Ma taille et mes hanches sont alignées", "Mon ventre est proéminent"]
       },
       {
-        "question": "Where do you carry more volume — upper or lower body?",
-        "options": ["More volume in upper body", "More volume in lower body", "About the same"]
+        "question": "Où portez-vous plus de volume — haut ou bas du corps ?",
+        "options": ["Plus de volume en haut", "Plus de volume en bas", "À peu près pareil"]
       },
       {
-        "question": "What concerns you most when choosing clothes?",
-        "options": ["Worried about top fit due to wide shoulders", "Hips and thighs bother me", "My belly area bothers me", "I look flat overall", "No particular concern (well-balanced)"]
+        "question": "Qu'est-ce qui vous préoccupe le plus en choisissant vos vêtements ?",
+        "options": ["Le haut m'inquiète à cause de mes épaules larges", "Mes hanches et cuisses me gênent", "Mon ventre me gêne", "J'ai l'air plat(e) dans l'ensemble", "Pas de préoccupation particulière (bien proportionné(e))"]
       },
       {
-        "question": "Which top fit suits you best?",
-        "options": ["Slim fit (body-hugging)", "Regular fit (moderate)", "Oversized fit (roomy)"]
+        "question": "Quelle coupe de haut vous convient le mieux ?",
+        "options": ["Coupe ajustée (près du corps)", "Coupe classique (modérée)", "Coupe oversize (ample)"]
       }
     ]
   }

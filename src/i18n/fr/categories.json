@@ -1,359 +1,359 @@
 {
   "names": {
-    "outer": "Outerwear",
-    "middleware": "Mid Layer",
-    "top": "Top",
-    "inner": "Inner",
-    "bottom": "Bottom",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "shoes": "Shoes",
-    "mid_knit": "Knit",
+    "outer": "Vêtement d'extérieur",
+    "middleware": "Couche intermédiaire",
+    "top": "Haut",
+    "inner": "Sous-vêtement",
+    "bottom": "Bas",
+    "scarf": "Écharpe",
+    "hat": "Chapeau",
+    "shoes": "Chaussures",
+    "mid_knit": "Maille",
     "mid_cardigan": "Cardigan",
-    "mid_vest": "Vest",
-    "outer_coat": "Coat",
-    "outer_jacket": "Jacket",
-    "outer_padding": "Puffer"
+    "mid_vest": "Gilet",
+    "outer_coat": "Manteau",
+    "outer_jacket": "Veste",
+    "outer_padding": "Doudoune"
   },
   "seasons": {
-    "spring": "Spring",
-    "summer": "Summer",
-    "fall": "Fall",
-    "winter": "Winter"
+    "spring": "Printemps",
+    "summer": "Été",
+    "fall": "Automne",
+    "winter": "Hiver"
   },
   "fabricItems": {
     "outer": {
       "leather_jacket": {
-        "name": "Leather Jacket",
-        "desc": "Cowhide/lambskin rider or blouson"
+        "name": "Blouson en cuir",
+        "desc": "Perfecto ou blouson en cuir de vache/agneau"
       },
       "denim_jacket": {
-        "name": "Denim Jacket",
-        "desc": "Jean jacket, trucker jacket"
+        "name": "Veste en jean",
+        "desc": "Veste en jean, trucker jacket"
       },
       "wool_coat": {
-        "name": "Wool Coat",
-        "desc": "Single or double-breasted wool coat"
+        "name": "Manteau en laine",
+        "desc": "Manteau en laine croisé ou droit"
       },
       "padding": {
-        "name": "Puffer Jacket",
-        "desc": "Goose down or polyester puffer"
+        "name": "Doudoune",
+        "desc": "Doudoune en duvet d'oie ou polyester"
       },
       "fleece_jacket": {
-        "name": "Fleece Jacket",
-        "desc": "Sherpa or boa fleece"
+        "name": "Veste polaire",
+        "desc": "Polaire sherpa ou mouton"
       },
       "cotton_jacket": {
-        "name": "Cotton Jacket",
-        "desc": "Chino or cotton blazer"
+        "name": "Veste en coton",
+        "desc": "Blazer en chino ou coton"
       },
       "nylon_jacket": {
-        "name": "Nylon Jacket",
-        "desc": "Windbreaker or coach jacket"
+        "name": "Veste en nylon",
+        "desc": "Coupe-vent ou coach jacket"
       },
       "linen_jacket": {
-        "name": "Linen Jacket",
-        "desc": "Linen or hemp blazer"
+        "name": "Veste en lin",
+        "desc": "Blazer en lin ou chanvre"
       },
       "tweed_jacket": {
-        "name": "Tweed Jacket",
-        "desc": "Tweed blazer"
+        "name": "Veste en tweed",
+        "desc": "Blazer en tweed"
       },
       "suede_jacket": {
-        "name": "Suede Jacket",
-        "desc": "Suede blouson or jacket"
+        "name": "Veste en daim",
+        "desc": "Blouson ou veste en daim"
       },
       "waxed_jacket": {
-        "name": "Waxed Jacket",
-        "desc": "Barbour or oiled jacket"
+        "name": "Veste huilée",
+        "desc": "Barbour ou veste cirée"
       }
     },
     "middleware": {
       "wool_knit": {
-        "name": "Wool Knit",
-        "desc": "Lambswool or merino wool knit"
+        "name": "Pull en laine",
+        "desc": "Pull en lambswool ou laine mérinos"
       },
       "cotton_knit": {
-        "name": "Cotton Knit",
-        "desc": "Cotton knit or cardigan"
+        "name": "Pull en coton",
+        "desc": "Pull ou cardigan en coton"
       },
       "cashmere_knit": {
-        "name": "Cashmere Knit",
-        "desc": "Cashmere pullover"
+        "name": "Pull en cachemire",
+        "desc": "Pull-over en cachemire"
       },
       "fleece_mid": {
-        "name": "Fleece",
-        "desc": "Mid-layer fleece"
+        "name": "Polaire",
+        "desc": "Polaire couche intermédiaire"
       },
       "cardigan_wool": {
-        "name": "Wool Cardigan",
-        "desc": "Wool cardigan with shawl collar"
+        "name": "Cardigan en laine",
+        "desc": "Cardigan en laine à col châle"
       },
       "vest_padding": {
-        "name": "Puffer Vest",
-        "desc": "Lightweight puffer vest"
+        "name": "Gilet matelassé",
+        "desc": "Gilet matelassé léger"
       },
       "vest_knit": {
-        "name": "Knit Vest",
-        "desc": "Knit vest or sweater vest"
+        "name": "Gilet en maille",
+        "desc": "Gilet en maille ou pull sans manches"
       },
       "hoodie": {
-        "name": "Zip-Up Hoodie",
-        "desc": "Cotton or fleece-lined zip-up hoodie"
+        "name": "Sweat zippé à capuche",
+        "desc": "Sweat zippé à capuche en coton ou doublé polaire"
       },
       "sweatshirt_mid": {
         "name": "Sweatshirt",
-        "desc": "Mid-layer sweatshirt"
+        "desc": "Sweatshirt couche intermédiaire"
       }
     },
     "top": {
       "cotton_tee": {
-        "name": "Cotton T-Shirt",
-        "desc": "Cotton crew neck or V-neck"
+        "name": "T-shirt en coton",
+        "desc": "T-shirt col rond ou col V en coton"
       },
       "oxford_shirt": {
-        "name": "Oxford Shirt",
-        "desc": "Oxford button-down shirt"
+        "name": "Chemise Oxford",
+        "desc": "Chemise Oxford à col boutonné"
       },
       "linen_shirt": {
-        "name": "Linen Shirt",
-        "desc": "Linen or hemp shirt"
+        "name": "Chemise en lin",
+        "desc": "Chemise en lin ou chanvre"
       },
       "flannel_shirt": {
-        "name": "Flannel Shirt",
-        "desc": "Brushed check shirt"
+        "name": "Chemise en flanelle",
+        "desc": "Chemise à carreaux brossée"
       },
       "denim_shirt": {
-        "name": "Denim Shirt",
-        "desc": "Chambray or denim shirt"
+        "name": "Chemise en denim",
+        "desc": "Chemise en chambray ou denim"
       },
       "silk_blouse": {
-        "name": "Silk Blouse",
-        "desc": "Silk or satin blouse"
+        "name": "Blouse en soie",
+        "desc": "Blouse en soie ou satin"
       },
       "polo_shirt": {
-        "name": "Polo Shirt",
-        "desc": "Piqué polo shirt"
+        "name": "Polo",
+        "desc": "Polo en piqué"
       },
       "turtleneck": {
-        "name": "Turtleneck",
-        "desc": "Cotton or modal turtleneck"
+        "name": "Col roulé",
+        "desc": "Col roulé en coton ou modal"
       },
       "wool_turtleneck": {
-        "name": "Wool Turtleneck",
-        "desc": "Wool turtleneck knit"
+        "name": "Col roulé en laine",
+        "desc": "Pull col roulé en laine"
       },
       "henley": {
         "name": "Henley",
-        "desc": "Waffle or thermal henley"
+        "desc": "Henley gaufré ou thermique"
       }
     },
     "bottom": {
       "raw_denim": {
-        "name": "Denim Jeans",
-        "desc": "Straight or slim denim"
+        "name": "Jean",
+        "desc": "Jean droit ou slim"
       },
       "chino": {
-        "name": "Chino Pants",
-        "desc": "Cotton chino pants"
+        "name": "Chino",
+        "desc": "Pantalon chino en coton"
       },
       "wool_slacks": {
-        "name": "Wool Slacks",
-        "desc": "Wool dress pants"
+        "name": "Pantalon en laine",
+        "desc": "Pantalon habillé en laine"
       },
       "linen_pants": {
-        "name": "Linen Pants",
-        "desc": "Linen wide or straight cut"
+        "name": "Pantalon en lin",
+        "desc": "Pantalon en lin large ou droit"
       },
       "corduroy": {
-        "name": "Corduroy Pants",
-        "desc": "Corduroy trousers"
+        "name": "Pantalon en velours côtelé",
+        "desc": "Pantalon en velours côtelé"
       },
       "cotton_shorts": {
-        "name": "Cotton Shorts",
-        "desc": "Chino or cargo shorts"
+        "name": "Short en coton",
+        "desc": "Short chino ou cargo"
       },
       "cargo_pants": {
-        "name": "Cargo Pants",
-        "desc": "Cotton or nylon cargo pants"
+        "name": "Pantalon cargo",
+        "desc": "Pantalon cargo en coton ou nylon"
       },
       "sweatpants": {
-        "name": "Sweatpants",
-        "desc": "Joggers or training pants"
+        "name": "Jogging",
+        "desc": "Pantalon de jogging ou d'entraînement"
       },
       "leather_pants": {
-        "name": "Leather Pants",
-        "desc": "Leather or eco-leather pants"
+        "name": "Pantalon en cuir",
+        "desc": "Pantalon en cuir ou simili cuir"
       },
       "nylon_pants": {
-        "name": "Nylon Pants",
-        "desc": "Tech or outdoor pants"
+        "name": "Pantalon en nylon",
+        "desc": "Pantalon technique ou outdoor"
       }
     },
     "shoes": {
       "leather_shoes": {
-        "name": "Leather Shoes",
-        "desc": "Oxford or derby shoes"
+        "name": "Chaussures en cuir",
+        "desc": "Richelieu ou derby"
       },
       "leather_boots": {
-        "name": "Leather Boots",
-        "desc": "Chelsea or lace-up boots"
+        "name": "Bottines en cuir",
+        "desc": "Chelsea boots ou bottines à lacets"
       },
       "suede_boots": {
-        "name": "Suede Boots",
-        "desc": "Suede chelsea or desert boots"
+        "name": "Bottines en daim",
+        "desc": "Chelsea ou desert boots en daim"
       },
       "canvas_sneakers": {
-        "name": "Canvas Sneakers",
-        "desc": "Converse or Jack Purcell"
+        "name": "Baskets en toile",
+        "desc": "Converse ou Jack Purcell"
       },
       "leather_sneakers": {
-        "name": "Leather Sneakers",
-        "desc": "White or clean sneakers"
+        "name": "Baskets en cuir",
+        "desc": "Baskets blanches ou épurées"
       },
       "suede_shoes": {
-        "name": "Suede Shoes",
-        "desc": "Suede loafers or derbies"
+        "name": "Chaussures en daim",
+        "desc": "Mocassins ou derbys en daim"
       },
       "loafer": {
-        "name": "Loafers",
-        "desc": "Penny or tassel loafers"
+        "name": "Mocassins",
+        "desc": "Mocassins penny ou à glands"
       },
       "hiking_boots": {
-        "name": "Hiking Boots",
-        "desc": "Gore-Tex or trail boots"
+        "name": "Chaussures de randonnée",
+        "desc": "Boots Gore-Tex ou de trail"
       },
       "sandals": {
-        "name": "Sandals",
-        "desc": "Birkenstock or strap sandals"
+        "name": "Sandales",
+        "desc": "Birkenstock ou sandales à brides"
       }
     },
     "scarf": {
       "wool_scarf": {
-        "name": "Wool Muffler",
-        "desc": "Lambswool or merino muffler"
+        "name": "Écharpe en laine",
+        "desc": "Écharpe en lambswool ou mérinos"
       },
       "cashmere_scarf": {
-        "name": "Cashmere Muffler",
-        "desc": "Cashmere scarf"
+        "name": "Écharpe en cachemire",
+        "desc": "Écharpe en cachemire"
       },
       "cotton_scarf": {
-        "name": "Cotton Scarf",
-        "desc": "Cotton or gauze scarf"
+        "name": "Foulard en coton",
+        "desc": "Foulard en coton ou gaze"
       },
       "silk_scarf": {
-        "name": "Silk Scarf",
-        "desc": "Silk neckerchief"
+        "name": "Foulard en soie",
+        "desc": "Carré de soie"
       },
       "linen_scarf": {
-        "name": "Linen Scarf",
-        "desc": "Linen scarf or shawl"
+        "name": "Écharpe en lin",
+        "desc": "Écharpe ou châle en lin"
       }
     }
   },
   "compatRules": {
-    "leather_denim_great": "Leather × Denim: A classic biker/casual combination",
-    "leather_wool_great": "Leather × Wool: Balances formality with texture",
-    "leather_cotton_great": "Leather × Cotton: Casual yet sophisticated pairing",
-    "leather_cashmere_great": "Leather × Cashmere: Luxury layering",
-    "denim_cotton_great": "Denim × Cotton: The most natural casual combo",
-    "denim_flannel_great": "Denim × Flannel: Americana/workwear essential",
-    "denim_wool_great": "Denim × Wool: Casual meets warmth",
-    "wool_cotton_great": "Wool × Cotton: Layering basics",
-    "wool_silk_great": "Wool × Silk: Elevated texture contrast",
-    "wool_cashmere_great": "Wool × Cashmere: Warm and elegant winter pairing",
-    "linen_cotton_great": "Linen × Cotton: Best summer combination",
-    "linen_linen_great": "Linen × Linen: Cohesive cool look",
-    "cotton_cotton_great": "Cotton × Cotton: Comfortable and natural pairing",
-    "cotton_jersey_great": "Cotton Shirt × Jersey: Basic layering",
-    "suede_denim_great": "Suede × Denim: Vintage mood",
-    "suede_wool_great": "Suede × Wool: Fall texture layering",
-    "suede_cotton_great": "Suede × Cotton: Natural texture mix",
-    "suede_corduroy_great": "Suede × Corduroy: Fall vintage essential",
-    "tweed_cotton_great": "Tweed × Cotton: Classic British look",
-    "tweed_wool_great": "Tweed × Wool: Harmonious same-family textures",
-    "tweed_silk_great": "Tweed × Silk: Classic formal meets sophistication",
-    "corduroy_cotton_great": "Corduroy × Cotton: Fall casual essential",
-    "corduroy_wool_great": "Corduroy × Wool: Warm fall/winter layering",
-    "corduroy_flannel_great": "Corduroy × Flannel: Vintage workwear combo",
-    "corduroy_denim_great": "Corduroy × Denim: Textured casual",
-    "waxed_wool_great": "Waxed × Wool: British country essential",
-    "waxed_denim_great": "Waxed × Denim: Rugged outdoor mood",
-    "waxed_corduroy_great": "Waxed × Corduroy: British country look",
-    "knit_woven_great": "Knit × Woven: Standout texture contrast",
-    "knit_denim_great": "Knit × Denim: Casual layering basics",
-    "silk_cotton_great": "Silk × Cotton: Sophisticated texture contrast",
-    "pique_chino_great": "Piqué × Chino: Preppy essential combo",
-    "pique_cotton_great": "Piqué × Cotton: Clean casual",
-    "leather_leather_ok": "Leather × Leather: Possible but can be excessive. Vary the colors",
-    "leather_nylon_ok": "Leather × Nylon: Works for streetwear/techwear",
-    "leather_fleece_ok": "Leather × Fleece: Possible but styles may clash",
-    "denim_denim_ok": "Denim × Denim: OK with different washes (Canadian tuxedo)",
-    "nylon_cotton_ok": "Nylon × Cotton: Sporty-casual mix",
-    "nylon_nylon_ok": "Nylon × Nylon: Works for techwear/outdoor",
-    "nylon_denim_ok": "Nylon × Denim: Works for street casual",
-    "fleece_denim_ok": "Fleece × Denim: Outdoor casual",
-    "fleece_cotton_ok": "Fleece × Cotton: Practical layering",
-    "fleece_nylon_great": "Fleece × Nylon: Gorpcore/outdoor essential",
-    "padding_cotton_ok": "Puffer × Cotton: Practical winter combo",
-    "padding_denim_ok": "Puffer × Denim: Winter casual basics",
-    "padding_wool_ok": "Puffer × Wool: Warm but watch the bulk",
-    "jersey_jersey_ok": "Jersey × Jersey: Comfy but can look too casual",
-    "jersey_denim_great": "Jersey × Denim: Everyday casual basics",
-    "jersey_wool_ok": "Jersey × Wool: Watch the formality gap",
-    "synthetic_cotton_ok": "Synthetic × Cotton: Function meets comfort",
-    "canvas_denim_great": "Canvas × Denim: Casual essential",
-    "canvas_cotton_great": "Canvas × Cotton: Comfortable casual",
-    "canvas_chino_great": "Canvas × Chino: Clean casual",
-    "rubber_cotton_ok": "Rubber × Cotton: Summer casual",
-    "rubber_linen_ok": "Rubber × Linen: Summer resort look",
-    "leather_linen_bad": "Leather × Linen: Weight and seasonal feel clash",
-    "leather_rubber_bad": "Leather × Rubber: Extreme formality clash",
-    "silk_fleece_bad": "Silk × Fleece: Formality gap is too large",
-    "silk_nylon_bad": "Silk × Nylon: Formal and sporty clash",
-    "silk_rubber_bad": "Silk × Rubber: Luxury and casual clash extremely",
-    "tweed_nylon_bad": "Tweed × Nylon: Classic and sporty clash",
-    "tweed_fleece_bad": "Tweed × Fleece: Awkward formality difference",
-    "tweed_jersey_ok": "Tweed × Jersey: Possible as mix-and-match, use with care",
-    "cashmere_nylon_bad": "Cashmere × Nylon: Material quality clash",
-    "cashmere_fleece_bad": "Cashmere × Fleece: Luxury and utility clash",
-    "cashmere_rubber_bad": "Cashmere × Rubber: Extreme formality difference",
-    "formal_fleece_bad": "Formal × Fleece: Dress and outdoor clash",
-    "formal_rubber_bad": "Formal × Rubber: Extreme formality clash",
-    "formal_jersey_bad": "Formal Shoes × Jersey: Dress shoes with sweatshirt is awkward",
-    "semiformal_fleece_bad": "Semi-Formal × Fleece: Style clash",
-    "linen_wool_bad": "Linen × Wool: Complete seasonal clash",
-    "linen_padding_bad": "Linen × Puffer: Summer and winter materials clash",
-    "linen_fleece_bad": "Linen × Fleece: Seasonal clash",
-    "linen_flannel_bad": "Linen × Flannel: Cool and warm clash",
-    "padding_silk_bad": "Puffer × Silk: Formality and function clash",
-    "padding_linen_bad": "Puffer × Linen: Opposite seasons",
-    "waxed_silk_bad": "Waxed × Silk: Rugged and delicate clash",
-    "waxed_linen_bad": "Waxed × Linen: Seasonal mismatch",
-    "boots_linen_bad": "Boots × Linen: Heavy footwear with light fabric imbalance",
-    "boots_silk_ok": "Boots × Silk: Edgy mix, OK if intentional",
-    "corduroy_linen_bad": "Corduroy × Linen: Fall and summer seasonal clash",
-    "flannel_linen_bad": "Flannel × Linen: Warm and cool clash",
-    "rubber_wool_bad": "Rubber Sandals × Wool: Seasonal clash",
-    "rubber_flannel_bad": "Rubber × Flannel: Summer and fall clash",
-    "default_ok": "No specific compatibility rule — a neutral combination"
+    "leather_denim_great": "Cuir × Denim : Un classique biker/casual",
+    "leather_wool_great": "Cuir × Laine : Équilibre entre formalité et texture",
+    "leather_cotton_great": "Cuir × Coton : Décontracté mais sophistiqué",
+    "leather_cashmere_great": "Cuir × Cachemire : Superposition luxueuse",
+    "denim_cotton_great": "Denim × Coton : Le combo casual le plus naturel",
+    "denim_flannel_great": "Denim × Flanelle : Incontournable americana/workwear",
+    "denim_wool_great": "Denim × Laine : Le casual rencontre la chaleur",
+    "wool_cotton_great": "Laine × Coton : Les bases de la superposition",
+    "wool_silk_great": "Laine × Soie : Contraste de textures raffiné",
+    "wool_cashmere_great": "Laine × Cachemire : Accord hivernal chaud et élégant",
+    "linen_cotton_great": "Lin × Coton : Le meilleur combo d'été",
+    "linen_linen_great": "Lin × Lin : Un look frais et cohérent",
+    "cotton_cotton_great": "Coton × Coton : Accord confortable et naturel",
+    "cotton_jersey_great": "Chemise en coton × Jersey : Superposition basique",
+    "suede_denim_great": "Daim × Denim : Ambiance vintage",
+    "suede_wool_great": "Daim × Laine : Superposition texturée d'automne",
+    "suede_cotton_great": "Daim × Coton : Mélange de textures naturelles",
+    "suede_corduroy_great": "Daim × Velours côtelé : Incontournable vintage d'automne",
+    "tweed_cotton_great": "Tweed × Coton : Look british classique",
+    "tweed_wool_great": "Tweed × Laine : Textures harmonieuses de même famille",
+    "tweed_silk_great": "Tweed × Soie : Le classique formel rencontre la sophistication",
+    "corduroy_cotton_great": "Velours côtelé × Coton : Incontournable casual d'automne",
+    "corduroy_wool_great": "Velours côtelé × Laine : Superposition chaude automne/hiver",
+    "corduroy_flannel_great": "Velours côtelé × Flanelle : Combo workwear vintage",
+    "corduroy_denim_great": "Velours côtelé × Denim : Casual texturé",
+    "waxed_wool_great": "Ciré × Laine : Incontournable campagne anglaise",
+    "waxed_denim_great": "Ciré × Denim : Ambiance outdoor robuste",
+    "waxed_corduroy_great": "Ciré × Velours côtelé : Look campagne anglaise",
+    "knit_woven_great": "Maille × Tissé : Contraste de textures marqué",
+    "knit_denim_great": "Maille × Denim : Les bases de la superposition casual",
+    "silk_cotton_great": "Soie × Coton : Contraste de textures sophistiqué",
+    "pique_chino_great": "Piqué × Chino : Combo preppy incontournable",
+    "pique_cotton_great": "Piqué × Coton : Casual épuré",
+    "leather_leather_ok": "Cuir × Cuir : Possible mais peut faire trop. Variez les couleurs",
+    "leather_nylon_ok": "Cuir × Nylon : Fonctionne pour le streetwear/techwear",
+    "leather_fleece_ok": "Cuir × Polaire : Possible mais les styles peuvent se heurter",
+    "denim_denim_ok": "Denim × Denim : OK avec des délavages différents (total denim)",
+    "nylon_cotton_ok": "Nylon × Coton : Mix sporty-casual",
+    "nylon_nylon_ok": "Nylon × Nylon : Fonctionne pour le techwear/outdoor",
+    "nylon_denim_ok": "Nylon × Denim : Fonctionne pour le street casual",
+    "fleece_denim_ok": "Polaire × Denim : Casual outdoor",
+    "fleece_cotton_ok": "Polaire × Coton : Superposition pratique",
+    "fleece_nylon_great": "Polaire × Nylon : Incontournable gorpcore/outdoor",
+    "padding_cotton_ok": "Doudoune × Coton : Combo hivernal pratique",
+    "padding_denim_ok": "Doudoune × Denim : Basique casual d'hiver",
+    "padding_wool_ok": "Doudoune × Laine : Chaud mais attention au volume",
+    "jersey_jersey_ok": "Jersey × Jersey : Confortable mais peut faire trop décontracté",
+    "jersey_denim_great": "Jersey × Denim : Les basiques du quotidien",
+    "jersey_wool_ok": "Jersey × Laine : Attention à l'écart de formalité",
+    "synthetic_cotton_ok": "Synthétique × Coton : Fonctionnel et confortable",
+    "canvas_denim_great": "Toile × Denim : Incontournable casual",
+    "canvas_cotton_great": "Toile × Coton : Casual confortable",
+    "canvas_chino_great": "Toile × Chino : Casual épuré",
+    "rubber_cotton_ok": "Caoutchouc × Coton : Casual d'été",
+    "rubber_linen_ok": "Caoutchouc × Lin : Look estival",
+    "leather_linen_bad": "Cuir × Lin : Le poids et la saisonnalité se heurtent",
+    "leather_rubber_bad": "Cuir × Caoutchouc : Écart de formalité extrême",
+    "silk_fleece_bad": "Soie × Polaire : Écart de formalité trop important",
+    "silk_nylon_bad": "Soie × Nylon : Le formel et le sportif se heurtent",
+    "silk_rubber_bad": "Soie × Caoutchouc : Le luxe et le casual s'opposent totalement",
+    "tweed_nylon_bad": "Tweed × Nylon : Le classique et le sportif se heurtent",
+    "tweed_fleece_bad": "Tweed × Polaire : Différence de formalité gênante",
+    "tweed_jersey_ok": "Tweed × Jersey : Possible en mix & match, à manier avec précaution",
+    "cashmere_nylon_bad": "Cachemire × Nylon : Les qualités de matière se heurtent",
+    "cashmere_fleece_bad": "Cachemire × Polaire : Le luxe et l'utilitaire se heurtent",
+    "cashmere_rubber_bad": "Cachemire × Caoutchouc : Écart de formalité extrême",
+    "formal_fleece_bad": "Formel × Polaire : L'habillé et l'outdoor se heurtent",
+    "formal_rubber_bad": "Formel × Caoutchouc : Écart de formalité extrême",
+    "formal_jersey_bad": "Chaussures habillées × Jersey : Des chaussures habillées avec un sweatshirt, c'est maladroit",
+    "semiformal_fleece_bad": "Semi-formel × Polaire : Conflit de styles",
+    "linen_wool_bad": "Lin × Laine : Opposition saisonnière totale",
+    "linen_padding_bad": "Lin × Doudoune : Matières d'été et d'hiver se heurtent",
+    "linen_fleece_bad": "Lin × Polaire : Conflit saisonnier",
+    "linen_flannel_bad": "Lin × Flanelle : Le frais et le chaud se heurtent",
+    "padding_silk_bad": "Doudoune × Soie : La formalité et la fonction se heurtent",
+    "padding_linen_bad": "Doudoune × Lin : Saisons opposées",
+    "waxed_silk_bad": "Ciré × Soie : Le robuste et le délicat se heurtent",
+    "waxed_linen_bad": "Ciré × Lin : Décalage saisonnier",
+    "boots_linen_bad": "Bottines × Lin : Déséquilibre entre chaussures lourdes et tissu léger",
+    "boots_silk_ok": "Bottines × Soie : Mix audacieux, OK si c'est intentionnel",
+    "corduroy_linen_bad": "Velours côtelé × Lin : Conflit saisonnier automne/été",
+    "flannel_linen_bad": "Flanelle × Lin : Le chaud et le frais se heurtent",
+    "rubber_wool_bad": "Sandales caoutchouc × Laine : Conflit saisonnier",
+    "rubber_flannel_bad": "Caoutchouc × Flanelle : L'été et l'automne se heurtent",
+    "default_ok": "Pas de règle de compatibilité spécifique — une combinaison neutre"
   },
   "itemsCatalog": {
-    "padding": "Puffer",
-    "coat": "Coat",
-    "jacket": "Jacket",
-    "hood_zip": "Zip-Up Hoodie",
+    "padding": "Doudoune",
+    "coat": "Manteau",
+    "jacket": "Veste",
+    "hood_zip": "Sweat zippé à capuche",
     "cardigan": "Cardigan",
-    "knit_zip": "Knit Zip-Up",
-    "vest": "Vest",
-    "hoodie": "Hoodie",
-    "knit": "Knit",
+    "knit_zip": "Maille zippée",
+    "vest": "Gilet",
+    "hoodie": "Sweat à capuche",
+    "knit": "Maille",
     "mtm": "Sweatshirt",
-    "shirt": "Shirt",
-    "tshirt": "T-Shirt",
-    "scarf": "Scarf",
-    "hat": "Hat",
-    "bottom": "Bottom",
-    "shoes": "Shoes"
+    "shirt": "Chemise",
+    "tshirt": "T-shirt",
+    "scarf": "Écharpe",
+    "hat": "Chapeau",
+    "bottom": "Bas",
+    "shoes": "Chaussures"
   }
 }
