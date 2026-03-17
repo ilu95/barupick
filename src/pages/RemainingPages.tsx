@@ -663,7 +663,7 @@ export function BodyGuide() {
         <button onClick={() => { handleSave(); toast.success(t('bodyGuide.saveSuccess')) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">
           {t('bodyGuide.saveBodyType')}
         </button>
-        <button onClick={() => navigate('/home/recommend')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
+        <button onClick={() => { sessionStorage.removeItem('rec_session'); navigate('/home/recommend') }} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">
           {t('bodyGuide.getRecommend')}
         </button>
       </div>

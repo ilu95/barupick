@@ -169,7 +169,7 @@ export default function Home() {
       {/* 메인 CTA */}
       <div className="flex flex-col gap-3 mb-6">
         {/* 히어로 — 코디 추천받기 */}
-        <button onClick={() => navigate('/home/recommend')} className="group w-full bg-gradient-to-br from-terra-50 to-terra-100 border-[1.5px] border-terra-300 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
+        <button onClick={() => { sessionStorage.removeItem('rec_session'); navigate('/home/recommend') }} className="group w-full bg-gradient-to-br from-terra-50 to-terra-100 border-[1.5px] border-terra-300 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
           <div className="w-14 h-14 rounded-2xl bg-terra-200 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
             <Wand2 size={26} className="text-terra-600" />
           </div>
