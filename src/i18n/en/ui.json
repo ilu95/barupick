@@ -496,6 +496,18 @@
       "harmony": "Color Harmony"
     }
   },
+  "weatherConditions": {
+    "clear": "Clear",
+    "partlyCloudy": "Partly Cloudy",
+    "fog": "Fog",
+    "drizzle": "Drizzle",
+    "rain": "Rain",
+    "snow": "Snow",
+    "showers": "Showers",
+    "heavySnow": "Heavy Snow",
+    "thunderstorm": "Thunderstorm",
+    "cloudy": "Cloudy"
+  },
   "ootdRecord": {
     "situations": {
       "commute": "Work",

@@ -607,7 +607,7 @@ function getBuildPartLabel(partKey: string, upper: any[]): string {
     const slot = getSlotKey(i, sorted.length, sorted[i])
     if (slot === partKey) {
       const item = ITEMS_CATALOG.find(x => x.id === sorted[i].itemId)
-      if (item) return item.label
+      if (item) return i18n.t('categories:itemsCatalog.' + item.id)
     }
   }
   const fallbacks: Record<string, string> = { top: i18n.t('categories.top'), bottom: i18n.t('categories.bottom'), shoes: i18n.t('categories.shoes'), outer: i18n.t('categories.outer'), middleware: i18n.t('categories.middleware'), scarf: i18n.t('categories.scarf'), hat: i18n.t('categories.hat') }
@@ -708,7 +708,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
             ))}
           </div>
           {evalResult?.theory && Array.isArray(evalResult.theory) && (
-            <div className="mt-3 text-[11px] text-terra-600 font-medium">💡 {evalResult.theory.join(' · ')}</div>
+            <div className="mt-3 text-[11px] text-terra-600 font-medium">💡 {evalResult.theory.map((k: string) => t(k)).join(' · ')}</div>
           )}
         </div>
       )}

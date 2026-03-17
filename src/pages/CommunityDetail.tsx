@@ -12,6 +12,34 @@ import { useSocial } from '@/hooks/useSocial'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 
+/** Reverse map Korean color theory names to i18n keys */
+const THEORY_KO_MAP: Record<string, string> = {
+  '모노크롬': 'colorTheory.monochrome', '톤온톤': 'colorTheory.tone_on_tone',
+  '그라데이션': 'colorTheory.gradient', '톤인톤': 'colorTheory.tone_in_tone',
+  '원포인트': 'colorTheory.one_point', '보색대비': 'colorTheory.complementary',
+  '유사색': 'colorTheory.analogous', '분할보색': 'colorTheory.split_complementary',
+  '컬러블로킹': 'colorTheory.color_blocking', '명암대비': 'colorTheory.light_dark_contrast',
+  '뉴트럴악센트': 'colorTheory.neutral_accent', '올뉴트럴': 'colorTheory.all_neutral',
+  '2:1:1비율': 'colorTheory.ratio_211', '샌드위치': 'colorTheory.sandwich',
+  '자유 배색': 'evaluation.freeColor',
+}
+
+function resolveStyleName(style: string, t: any): string {
+  // Split comma-separated theories
+  const parts = style.split(',').map(s => s.trim())
+  return parts.map(p => {
+    // New format: i18n key (colorTheory.xxx or evaluation.xxx)
+    if (p.startsWith('colorTheory.') || p.startsWith('evaluation.')) return t(p)
+    // Old format: Korean text → reverse map
+    const key = THEORY_KO_MAP[p]
+    if (key) return t(key)
+    // Style guide name (e.g., "Classic Preppy")
+    const guideTranslation = t('styles:guide.' + p + '.name', { defaultValue: '' })
+    if (guideTranslation) return guideTranslation
+    return p
+  }).join(', ')
+}
+
 export default function CommunityDetail() {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -267,7 +295,7 @@ export default function CommunityDetail() {
   const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
   const instaId = post.profiles?.instagram_id
-  const styleName = post.style ? t('styles:guide.' + post.style + '.name') : null
+  const styleName = post.style ? resolveStyleName(post.style, t) : null
   const isMe = user?.id === post.user_id
   const isFriendsPost = post.visibility === 'friends'
   const canComment = isFriendsPost && (isFriend(post.user_id) || isMe)

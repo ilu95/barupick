@@ -140,6 +140,13 @@ export function useRecommend() {
       setState(prev => ({ ...prev, mood, style: styleParam }))
       setStep('pick')
       setHistory(['mood', 'style'])
+      return
+    }
+    // URL에서 layer 파라미터 (날씨 코디 추천) → 레이어 고정 후 mood 단계
+    const layerParam = searchParams.get('layer')
+    if (layerParam && LAYER_LEVELS[layerParam]) {
+      initRef.current = true
+      setState(prev => ({ ...prev, layerType: layerParam, weatherLayerLocked: true }))
     }
   }, [searchParams])
 
@@ -187,6 +194,8 @@ export function useRecommend() {
         ? prev.pickedItems.filter(id => id !== itemId)
         : [...prev.pickedItems, itemId]
       const info = itemsToLayerInfo(picked)
+      // 날씨 레이어 잠금 시 layerType 유지
+      if (prev.weatherLayerLocked) info.layerType = prev.layerType
       return { ...prev, pickedItems: picked, ...info }
     })
   }, [])
@@ -194,6 +203,8 @@ export function useRecommend() {
   // ─── pick에서 추천받기 ───
   const generateFromPick = useCallback(() => {
     const info = itemsToLayerInfo(state.pickedItems)
+    // 날씨 레이어 잠금 시 layerType 유지
+    if (state.weatherLayerLocked) info.layerType = state.layerType
     const newState = { ...state, ...info }
     const results = generateRecommendations(newState)
     setState(prev => ({ ...prev, ...newState, results }))
@@ -207,6 +218,7 @@ export function useRecommend() {
         ? prev.pickedItems.filter(id => id !== itemId)
         : [...prev.pickedItems, itemId]
       const info = itemsToLayerInfo(picked)
+      if (prev.weatherLayerLocked) info.layerType = prev.layerType
       const newState = { ...prev, pickedItems: picked, ...info }
       const results = generateRecommendations(newState)
       return { ...newState, results }

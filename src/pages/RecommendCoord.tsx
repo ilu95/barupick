@@ -531,7 +531,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
       {evalResult?.theory && evalResult.theory.length > 0 && (
         <div className="flex flex-wrap justify-center gap-1.5 mb-4">
           {evalResult.theory.map((tag: string, i: number) => (
-            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{tag}</span>
+            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{t(tag)}</span>
           ))}
         </div>
       )}
@@ -606,7 +606,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
                 className="flex flex-col items-center gap-1 flex-shrink-0">
                 <div className={`w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold active:scale-90 transition-transform border ${isEditing ? 'border-terra-500 border-2 ring-2 ring-terra-300' : 'border-warm-400/30'}`}
                   style={{ background: c.hex }}>
-                  <span style={{ color: c.hcl[2] > 60 ? '#1C1917' : '#ffffff' }}>{c.name}</span>
+                  <span style={{ color: c.hcl[2] > 60 ? '#1C1917' : '#ffffff' }}>{getColorName(colorKey as string)}</span>
                 </div>
                 <div className={`text-[10px] whitespace-nowrap ${isEditing ? 'text-terra-600 dark:text-terra-400 font-semibold' : 'text-warm-700 dark:text-warm-300'}`}>
                   {getPickedPartLabel(cat, rec.state.pickedItems, t)}
@@ -654,7 +654,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
                           currentOutfit[editingPart] === rec.key ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
                         }`}
                         style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
-                        {c.name}
+                        {getColorName(rec.key)}
                         {rec.delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{rec.delta}</span>}
                         {rec.delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{rec.delta}</span>}
                       </button>

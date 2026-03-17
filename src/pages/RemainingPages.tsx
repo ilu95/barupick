@@ -113,7 +113,7 @@ export function Weather() {
 
             {/* CTA */}
             <button
-              onClick={() => navigate('/home/recommend')}
+              onClick={() => navigate(`/home/recommend?layer=${advice.layer}`)}
               className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
             >
               <Palette size={16} /> {t('weather.ctaButton')}
@@ -224,12 +224,12 @@ export function Quiz() {
                     <span className="text-2xl">{icon}</span>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className={`text-[15px] font-bold ${isTop ? 'text-terra-700 dark:text-terra-400' : 'text-warm-900 dark:text-warm-100'}`}>{sd.name}</span>
+                        <span className={`text-[15px] font-bold ${isTop ? 'text-terra-700 dark:text-terra-400' : 'text-warm-900 dark:text-warm-100'}`}>{t('styles:guide.' + styleKey + '.name')}</span>
                         {isTop && <span className="text-[10px] font-bold bg-terra-500 text-white px-2 py-0.5 rounded-full">BEST</span>}
                         {rank === 1 && <span className="text-[10px] font-medium text-warm-500">2nd</span>}
                         {rank === 2 && <span className="text-[10px] font-medium text-warm-500">3rd</span>}
                       </div>
-                      <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{sd.subtitle}</div>
+                      <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('styles:guide.' + styleKey + '.subtitle')}</div>
                     </div>
                     <ChevronRight size={16} className="text-warm-400 flex-shrink-0" />
                   </div>

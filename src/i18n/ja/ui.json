@@ -496,6 +496,18 @@
       "harmony": "カラー調和"
     }
   },
+  "weatherConditions": {
+    "clear": "晴れ",
+    "partlyCloudy": "曇り時々晴れ",
+    "fog": "霧",
+    "drizzle": "霧雨",
+    "rain": "雨",
+    "snow": "雪",
+    "showers": "にわか雨",
+    "heavySnow": "大雪",
+    "thunderstorm": "雷雨",
+    "cloudy": "曇り"
+  },
   "ootdRecord": {
     "situations": {
       "commute": "通勤",

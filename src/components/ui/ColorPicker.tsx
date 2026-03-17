@@ -155,7 +155,10 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 }
 
 function breakName(name: string): string {
-  if (name.length <= 3) return name
+  if (name.length <= 5) return name
+  // 공백이 있으면 공백 기준으로 줄바꿈 (영어)
+  if (name.includes(' ')) return name.replace(' ', '\n')
+  // 한국어 등 공백 없는 짧은 이름은 중간에서 줄바꿈
   const mid = Math.ceil(name.length / 2)
   return name.slice(0, mid) + '\n' + name.slice(mid)
 }

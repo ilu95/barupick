@@ -8,6 +8,30 @@ import type { CommunityPost } from '@/hooks/useCommunity'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
 
+const THEORY_KO_MAP: Record<string, string> = {
+  '모노크롬': 'colorTheory.monochrome', '톤온톤': 'colorTheory.tone_on_tone',
+  '그라데이션': 'colorTheory.gradient', '톤인톤': 'colorTheory.tone_in_tone',
+  '원포인트': 'colorTheory.one_point', '보색대비': 'colorTheory.complementary',
+  '유사색': 'colorTheory.analogous', '분할보색': 'colorTheory.split_complementary',
+  '컬러블로킹': 'colorTheory.color_blocking', '명암대비': 'colorTheory.light_dark_contrast',
+  '뉴트럴악센트': 'colorTheory.neutral_accent', '올뉴트럴': 'colorTheory.all_neutral',
+  '2:1:1비율': 'colorTheory.ratio_211', '샌드위치': 'colorTheory.sandwich',
+  '자유 배색': 'evaluation.freeColor',
+}
+
+function resolveTheoryLabel(style: string, t: any): string {
+  const parts = style.split(',').map(s => s.trim())
+  return parts.map(p => {
+    if (p.startsWith('colorTheory.') || p.startsWith('evaluation.')) return t(p)
+    const key = THEORY_KO_MAP[p]
+    if (key) return t(key)
+    // Style guide name
+    const guideVal = t('styles:guide.' + p + '.name', { defaultValue: '' })
+    if (guideVal) return guideVal
+    return p
+  }).join(', ')
+}
+
 interface Props {
   post: CommunityPost
   isLiked: boolean
@@ -34,7 +58,7 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
   const photoUrl = hasPhoto ? post.photo_urls![0] : null
   const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
-  const styleName = post.style ? (STYLE_GUIDE[post.style]?.name?.replace(/ 룩$/, '').replace(/ Look$/i, '') || post.style) : ''
+  const styleName = post.style ? resolveTheoryLabel(post.style, t) : ''
   const title = post.caption || post.title || ''
   const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' }) : ''
 

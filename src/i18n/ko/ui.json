@@ -496,6 +496,18 @@
       "harmony": "컬러 조화"
     }
   },
+  "weatherConditions": {
+    "clear": "맑음",
+    "partlyCloudy": "구름 조금",
+    "fog": "안개",
+    "drizzle": "이슬비",
+    "rain": "비",
+    "snow": "눈",
+    "showers": "소나기",
+    "heavySnow": "폭설",
+    "thunderstorm": "뇌우",
+    "cloudy": "흐림"
+  },
   "ootdRecord": {
     "situations": {
       "commute": "출근",
