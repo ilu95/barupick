@@ -7,7 +7,13 @@
     "bottom": "Bottom",
     "scarf": "Scarf",
     "hat": "Hat",
-    "shoes": "Shoes"
+    "shoes": "Shoes",
+    "mid_knit": "Knit",
+    "mid_cardigan": "Cardigan",
+    "mid_vest": "Vest",
+    "outer_coat": "Coat",
+    "outer_jacket": "Jacket",
+    "outer_padding": "Puffer"
   },
   "seasons": {
     "spring": "Spring",
@@ -17,70 +23,232 @@
   },
   "fabricItems": {
     "outer": {
-      "leather_jacket": { "name": "Leather Jacket", "desc": "Cowhide/lambskin rider or blouson" },
-      "denim_jacket": { "name": "Denim Jacket", "desc": "Jean jacket, trucker jacket" },
-      "wool_coat": { "name": "Wool Coat", "desc": "Single or double-breasted wool coat" },
-      "padding": { "name": "Puffer Jacket", "desc": "Goose down or polyester puffer" },
-      "fleece_jacket": { "name": "Fleece Jacket", "desc": "Sherpa or boa fleece" },
-      "cotton_jacket": { "name": "Cotton Jacket", "desc": "Chino or cotton blazer" },
-      "nylon_jacket": { "name": "Nylon Jacket", "desc": "Windbreaker or coach jacket" },
-      "linen_jacket": { "name": "Linen Jacket", "desc": "Linen or hemp blazer" },
-      "tweed_jacket": { "name": "Tweed Jacket", "desc": "Tweed blazer" },
-      "suede_jacket": { "name": "Suede Jacket", "desc": "Suede blouson or jacket" },
-      "waxed_jacket": { "name": "Waxed Jacket", "desc": "Barbour or oiled jacket" }
+      "leather_jacket": {
+        "name": "Leather Jacket",
+        "desc": "Cowhide/lambskin rider or blouson"
+      },
+      "denim_jacket": {
+        "name": "Denim Jacket",
+        "desc": "Jean jacket, trucker jacket"
+      },
+      "wool_coat": {
+        "name": "Wool Coat",
+        "desc": "Single or double-breasted wool coat"
+      },
+      "padding": {
+        "name": "Puffer Jacket",
+        "desc": "Goose down or polyester puffer"
+      },
+      "fleece_jacket": {
+        "name": "Fleece Jacket",
+        "desc": "Sherpa or boa fleece"
+      },
+      "cotton_jacket": {
+        "name": "Cotton Jacket",
+        "desc": "Chino or cotton blazer"
+      },
+      "nylon_jacket": {
+        "name": "Nylon Jacket",
+        "desc": "Windbreaker or coach jacket"
+      },
+      "linen_jacket": {
+        "name": "Linen Jacket",
+        "desc": "Linen or hemp blazer"
+      },
+      "tweed_jacket": {
+        "name": "Tweed Jacket",
+        "desc": "Tweed blazer"
+      },
+      "suede_jacket": {
+        "name": "Suede Jacket",
+        "desc": "Suede blouson or jacket"
+      },
+      "waxed_jacket": {
+        "name": "Waxed Jacket",
+        "desc": "Barbour or oiled jacket"
+      }
     },
     "middleware": {
-      "wool_knit": { "name": "Wool Knit", "desc": "Lambswool or merino wool knit" },
-      "cotton_knit": { "name": "Cotton Knit", "desc": "Cotton knit or cardigan" },
-      "cashmere_knit": { "name": "Cashmere Knit", "desc": "Cashmere pullover" },
-      "fleece_mid": { "name": "Fleece", "desc": "Mid-layer fleece" },
-      "cardigan_wool": { "name": "Wool Cardigan", "desc": "Wool cardigan with shawl collar" },
-      "vest_padding": { "name": "Puffer Vest", "desc": "Lightweight puffer vest" },
-      "vest_knit": { "name": "Knit Vest", "desc": "Knit vest or sweater vest" },
-      "hoodie": { "name": "Zip-Up Hoodie", "desc": "Cotton or fleece-lined zip-up hoodie" },
-      "sweatshirt_mid": { "name": "Sweatshirt", "desc": "Mid-layer sweatshirt" }
+      "wool_knit": {
+        "name": "Wool Knit",
+        "desc": "Lambswool or merino wool knit"
+      },
+      "cotton_knit": {
+        "name": "Cotton Knit",
+        "desc": "Cotton knit or cardigan"
+      },
+      "cashmere_knit": {
+        "name": "Cashmere Knit",
+        "desc": "Cashmere pullover"
+      },
+      "fleece_mid": {
+        "name": "Fleece",
+        "desc": "Mid-layer fleece"
+      },
+      "cardigan_wool": {
+        "name": "Wool Cardigan",
+        "desc": "Wool cardigan with shawl collar"
+      },
+      "vest_padding": {
+        "name": "Puffer Vest",
+        "desc": "Lightweight puffer vest"
+      },
+      "vest_knit": {
+        "name": "Knit Vest",
+        "desc": "Knit vest or sweater vest"
+      },
+      "hoodie": {
+        "name": "Zip-Up Hoodie",
+        "desc": "Cotton or fleece-lined zip-up hoodie"
+      },
+      "sweatshirt_mid": {
+        "name": "Sweatshirt",
+        "desc": "Mid-layer sweatshirt"
+      }
     },
     "top": {
-      "cotton_tee": { "name": "Cotton T-Shirt", "desc": "Cotton crew neck or V-neck" },
-      "oxford_shirt": { "name": "Oxford Shirt", "desc": "Oxford button-down shirt" },
-      "linen_shirt": { "name": "Linen Shirt", "desc": "Linen or hemp shirt" },
-      "flannel_shirt": { "name": "Flannel Shirt", "desc": "Brushed check shirt" },
-      "denim_shirt": { "name": "Denim Shirt", "desc": "Chambray or denim shirt" },
-      "silk_blouse": { "name": "Silk Blouse", "desc": "Silk or satin blouse" },
-      "polo_shirt": { "name": "Polo Shirt", "desc": "Piqué polo shirt" },
-      "turtleneck": { "name": "Turtleneck", "desc": "Cotton or modal turtleneck" },
-      "wool_turtleneck": { "name": "Wool Turtleneck", "desc": "Wool turtleneck knit" },
-      "henley": { "name": "Henley", "desc": "Waffle or thermal henley" }
+      "cotton_tee": {
+        "name": "Cotton T-Shirt",
+        "desc": "Cotton crew neck or V-neck"
+      },
+      "oxford_shirt": {
+        "name": "Oxford Shirt",
+        "desc": "Oxford button-down shirt"
+      },
+      "linen_shirt": {
+        "name": "Linen Shirt",
+        "desc": "Linen or hemp shirt"
+      },
+      "flannel_shirt": {
+        "name": "Flannel Shirt",
+        "desc": "Brushed check shirt"
+      },
+      "denim_shirt": {
+        "name": "Denim Shirt",
+        "desc": "Chambray or denim shirt"
+      },
+      "silk_blouse": {
+        "name": "Silk Blouse",
+        "desc": "Silk or satin blouse"
+      },
+      "polo_shirt": {
+        "name": "Polo Shirt",
+        "desc": "Piqué polo shirt"
+      },
+      "turtleneck": {
+        "name": "Turtleneck",
+        "desc": "Cotton or modal turtleneck"
+      },
+      "wool_turtleneck": {
+        "name": "Wool Turtleneck",
+        "desc": "Wool turtleneck knit"
+      },
+      "henley": {
+        "name": "Henley",
+        "desc": "Waffle or thermal henley"
+      }
     },
     "bottom": {
-      "raw_denim": { "name": "Denim Jeans", "desc": "Straight or slim denim" },
-      "chino": { "name": "Chino Pants", "desc": "Cotton chino pants" },
-      "wool_slacks": { "name": "Wool Slacks", "desc": "Wool dress pants" },
-      "linen_pants": { "name": "Linen Pants", "desc": "Linen wide or straight cut" },
-      "corduroy": { "name": "Corduroy Pants", "desc": "Corduroy trousers" },
-      "cotton_shorts": { "name": "Cotton Shorts", "desc": "Chino or cargo shorts" },
-      "cargo_pants": { "name": "Cargo Pants", "desc": "Cotton or nylon cargo pants" },
-      "sweatpants": { "name": "Sweatpants", "desc": "Joggers or training pants" },
-      "leather_pants": { "name": "Leather Pants", "desc": "Leather or eco-leather pants" },
-      "nylon_pants": { "name": "Nylon Pants", "desc": "Tech or outdoor pants" }
+      "raw_denim": {
+        "name": "Denim Jeans",
+        "desc": "Straight or slim denim"
+      },
+      "chino": {
+        "name": "Chino Pants",
+        "desc": "Cotton chino pants"
+      },
+      "wool_slacks": {
+        "name": "Wool Slacks",
+        "desc": "Wool dress pants"
+      },
+      "linen_pants": {
+        "name": "Linen Pants",
+        "desc": "Linen wide or straight cut"
+      },
+      "corduroy": {
+        "name": "Corduroy Pants",
+        "desc": "Corduroy trousers"
+      },
+      "cotton_shorts": {
+        "name": "Cotton Shorts",
+        "desc": "Chino or cargo shorts"
+      },
+      "cargo_pants": {
+        "name": "Cargo Pants",
+        "desc": "Cotton or nylon cargo pants"
+      },
+      "sweatpants": {
+        "name": "Sweatpants",
+        "desc": "Joggers or training pants"
+      },
+      "leather_pants": {
+        "name": "Leather Pants",
+        "desc": "Leather or eco-leather pants"
+      },
+      "nylon_pants": {
+        "name": "Nylon Pants",
+        "desc": "Tech or outdoor pants"
+      }
     },
     "shoes": {
-      "leather_shoes": { "name": "Leather Shoes", "desc": "Oxford or derby shoes" },
-      "leather_boots": { "name": "Leather Boots", "desc": "Chelsea or lace-up boots" },
-      "suede_boots": { "name": "Suede Boots", "desc": "Suede chelsea or desert boots" },
-      "canvas_sneakers": { "name": "Canvas Sneakers", "desc": "Converse or Jack Purcell" },
-      "leather_sneakers": { "name": "Leather Sneakers", "desc": "White or clean sneakers" },
-      "suede_shoes": { "name": "Suede Shoes", "desc": "Suede loafers or derbies" },
-      "loafer": { "name": "Loafers", "desc": "Penny or tassel loafers" },
-      "hiking_boots": { "name": "Hiking Boots", "desc": "Gore-Tex or trail boots" },
-      "sandals": { "name": "Sandals", "desc": "Birkenstock or strap sandals" }
+      "leather_shoes": {
+        "name": "Leather Shoes",
+        "desc": "Oxford or derby shoes"
+      },
+      "leather_boots": {
+        "name": "Leather Boots",
+        "desc": "Chelsea or lace-up boots"
+      },
+      "suede_boots": {
+        "name": "Suede Boots",
+        "desc": "Suede chelsea or desert boots"
+      },
+      "canvas_sneakers": {
+        "name": "Canvas Sneakers",
+        "desc": "Converse or Jack Purcell"
+      },
+      "leather_sneakers": {
+        "name": "Leather Sneakers",
+        "desc": "White or clean sneakers"
+      },
+      "suede_shoes": {
+        "name": "Suede Shoes",
+        "desc": "Suede loafers or derbies"
+      },
+      "loafer": {
+        "name": "Loafers",
+        "desc": "Penny or tassel loafers"
+      },
+      "hiking_boots": {
+        "name": "Hiking Boots",
+        "desc": "Gore-Tex or trail boots"
+      },
+      "sandals": {
+        "name": "Sandals",
+        "desc": "Birkenstock or strap sandals"
+      }
     },
     "scarf": {
-      "wool_scarf": { "name": "Wool Muffler", "desc": "Lambswool or merino muffler" },
-      "cashmere_scarf": { "name": "Cashmere Muffler", "desc": "Cashmere scarf" },
-      "cotton_scarf": { "name": "Cotton Scarf", "desc": "Cotton or gauze scarf" },
-      "silk_scarf": { "name": "Silk Scarf", "desc": "Silk neckerchief" },
-      "linen_scarf": { "name": "Linen Scarf", "desc": "Linen scarf or shawl" }
+      "wool_scarf": {
+        "name": "Wool Muffler",
+        "desc": "Lambswool or merino muffler"
+      },
+      "cashmere_scarf": {
+        "name": "Cashmere Muffler",
+        "desc": "Cashmere scarf"
+      },
+      "cotton_scarf": {
+        "name": "Cotton Scarf",
+        "desc": "Cotton or gauze scarf"
+      },
+      "silk_scarf": {
+        "name": "Silk Scarf",
+        "desc": "Silk neckerchief"
+      },
+      "linen_scarf": {
+        "name": "Linen Scarf",
+        "desc": "Linen scarf or shawl"
+      }
     }
   },
   "compatRules": {

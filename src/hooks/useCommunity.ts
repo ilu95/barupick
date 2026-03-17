@@ -2,6 +2,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import i18n from '@/i18n'
 
 export interface CommunityPost {
   id: string
@@ -183,7 +184,7 @@ export function useCommunity() {
     } catch (e: any) {
       console.error('Community load error:', e)
       if (myVer !== loadVerRef.current) return
-      setError(e.message || '로딩 실패')
+      setError(e.message || i18n.t('common.loadError'))
     } finally {
       if (myVer === loadVerRef.current) setLoading(false)
     }
@@ -218,7 +219,7 @@ export function useCommunity() {
       }
     } catch (e: any) {
       console.error('Ranking load error:', e)
-      setError(e.message || '랭킹 로딩 실패')
+      setError(e.message || i18n.t('common.rankingLoadError'))
     } finally {
       if (myVer === loadVerRef.current) setLoading(false)
     }

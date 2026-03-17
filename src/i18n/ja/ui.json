@@ -55,7 +55,9 @@
     "score": "{{score}}点",
     "itemRegister": "アイテム登録",
     "generateFailed": "生成失敗",
-    "addPhoto": "写真を追加"
+    "addPhoto": "写真を追加",
+    "loadError": "読み込み失敗",
+    "rankingLoadError": "ランキングの読み込み失敗"
   },
   "nav": {
     "coord": "コーデ",
@@ -393,7 +395,10 @@
       "tip4": "{{color}}をアクセントにしたセンスあるスタイリング",
       "tip5": "{{count}}部位のレイヤードで奥行きのある{{technique}}コーデ"
     },
-    "stylePrefix": "スタイル"
+    "stylePrefix": "スタイル",
+    "fallbackName": "基本コーデ {{num}}",
+    "fallbackTag": "基本",
+    "fallbackTip": "基本的なニュートラルカラーの組み合わせです"
   },
   "build": {
     "stepStyle": "スタイル選択",
@@ -770,7 +775,8 @@
     "title": "通知",
     "clearAll": "すべて削除",
     "clearConfirm": "すべての通知を削除しますか？",
-    "empty": "新しい通知はありません"
+    "empty": "新しい通知はありません",
+    "followMessage": "さんがあなたをフォローしました"
   },
   "followList": {
     "followers": "フォロワー",
@@ -872,7 +878,11 @@
     },
     "comboDelta": "+{{count}}コーデ",
     "avgScoreLabel": "平均 {{score}}点",
-    "bestScoreLabel": "最高 {{score}}点"
+    "bestScoreLabel": "最高 {{score}}点",
+    "reasonStrongBuy": "強くおすすめ！{{count}}個の高スコアコーデが新たに可能です",
+    "reasonBuy": "いい選択！既存のクローゼットと{{count}}個の組み合わせが合います",
+    "reasonWeak": "合う組み合わせが{{count}}個と少なめ。慎重にご検討を",
+    "reasonSkip": "現在のクローゼットとは合わないようです"
   },
   "wardrobeReport": {
     "title": "クローゼットレポート",

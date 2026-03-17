@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import i18n from '@/i18n'
 
 export interface MannequinOutfit {
   outer?: string
@@ -278,6 +279,9 @@ MannequinSVG.displayName = 'MannequinSVG'
 
 export default MannequinSVG
 
-// ─── 타입 라벨 (기존 코드 호환) ───
-export const MID_TYPE_LABELS: Record<string, string> = { knit: '니트', cardigan: '가디건', vest: '베스트' }
-export const OUTER_TYPE_LABELS: Record<string, string> = { coat: '코트', jacket: '자켓', padding: '패딩' }
+// ─── 타입 라벨 (i18n) ───
+export function getMidTypeLabel(key: string): string { return i18n.t(`categories:names.mid_${key}`, { defaultValue: key }) }
+export function getOuterTypeLabel(key: string): string { return i18n.t(`categories:names.outer_${key}`, { defaultValue: key }) }
+// 하위 호환용 getter
+export const MID_TYPE_LABELS = new Proxy({} as Record<string, string>, { get: (_, k: string) => getMidTypeLabel(k) })
+export const OUTER_TYPE_LABELS = new Proxy({} as Record<string, string>, { get: (_, k: string) => getOuterTypeLabel(k) })

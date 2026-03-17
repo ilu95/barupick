@@ -55,7 +55,9 @@
     "score": "{{score}}점",
     "itemRegister": "아이템 등록하기",
     "generateFailed": "생성 실패",
-    "addPhoto": "사진 추가"
+    "addPhoto": "사진 추가",
+    "loadError": "로딩 실패",
+    "rankingLoadError": "랭킹 로딩 실패"
   },
   "nav": {
     "coord": "코디",
@@ -393,7 +395,10 @@
       "tip4": "{{color}}을(를) 포인트로 활용한 감각적인 스타일링",
       "tip5": "{{count}}부위 레이어드로 깊이감 있는 {{technique}} 코디"
     },
-    "stylePrefix": "스타일"
+    "stylePrefix": "스타일",
+    "fallbackName": "기본 코디 {{num}}",
+    "fallbackTag": "기본",
+    "fallbackTip": "기본 중립색 조합이에요"
   },
   "build": {
     "stepStyle": "스타일 선택",
@@ -770,7 +775,8 @@
     "title": "알림",
     "clearAll": "모두 삭제",
     "clearConfirm": "모든 알림을 삭제할까요?",
-    "empty": "새 알림이 없어요"
+    "empty": "새 알림이 없어요",
+    "followMessage": "님이 회원님을 팔로우했어요"
   },
   "followList": {
     "followers": "팔로워",
@@ -872,7 +878,11 @@
     },
     "comboDelta": "+{{count}}개 코디",
     "avgScoreLabel": "평균 {{score}}점",
-    "bestScoreLabel": "최고 {{score}}점"
+    "bestScoreLabel": "최고 {{score}}점",
+    "reasonStrongBuy": "강력 추천! {{count}}개의 고점수 코디가 새로 가능해요",
+    "reasonBuy": "좋은 선택! 기존 옷장과 {{count}}개 조합이 잘 어울려요",
+    "reasonWeak": "어울리는 조합이 {{count}}개로 적어요. 신중하게 고려해보세요",
+    "reasonSkip": "현재 옷장과 잘 맞지 않아요"
   },
   "wardrobeReport": {
     "title": "내 옷장 이야기",
@@ -1302,36 +1312,114 @@
       "7": "스타일 마스터"
     },
     "badges": {
-      "first_step": { "name": "첫 발걸음", "desc": "첫 번째 OOTD 기록" },
-      "recorder": { "name": "기록왕", "desc": "OOTD 10번 기록" },
-      "streak3": { "name": "3일 연속", "desc": "3일 연속 기록 달성" },
-      "streak7": { "name": "7일 연속", "desc": "7일 연속 기록 달성" },
-      "streak30": { "name": "30일 연속", "desc": "30일 연속 기록!" },
-      "closet_start": { "name": "옷장 시작", "desc": "옷장에 첫 아이템 등록" },
-      "closet10": { "name": "옷장 컬렉터", "desc": "옷장에 10개 이상" },
-      "saver": { "name": "코디 수집가", "desc": "코디 5개 이상 저장" },
-      "photo_lover": { "name": "사진 기록가", "desc": "사진 포함 기록 5회" },
-      "color_variety": { "name": "컬러 탐험가", "desc": "10가지 이상 컬러 사용" },
-      "quiz_master": { "name": "패션 박사", "desc": "패션 퀴즈 완료" },
-      "pc_diagnosed": { "name": "퍼스널컬러", "desc": "퍼스널컬러 진단 완료" },
-      "title_holder": { "name": "칭호 보유자", "desc": "칭호 시험 1회 통과" },
-      "challenger": { "name": "챌린저", "desc": "챌린지 3회 완료" },
-      "master100": { "name": "스타일 마스터", "desc": "OOTD 100번 기록" }
+      "first_step": {
+        "name": "첫 발걸음",
+        "desc": "첫 번째 OOTD 기록"
+      },
+      "recorder": {
+        "name": "기록왕",
+        "desc": "OOTD 10번 기록"
+      },
+      "streak3": {
+        "name": "3일 연속",
+        "desc": "3일 연속 기록 달성"
+      },
+      "streak7": {
+        "name": "7일 연속",
+        "desc": "7일 연속 기록 달성"
+      },
+      "streak30": {
+        "name": "30일 연속",
+        "desc": "30일 연속 기록!"
+      },
+      "closet_start": {
+        "name": "옷장 시작",
+        "desc": "옷장에 첫 아이템 등록"
+      },
+      "closet10": {
+        "name": "옷장 컬렉터",
+        "desc": "옷장에 10개 이상"
+      },
+      "saver": {
+        "name": "코디 수집가",
+        "desc": "코디 5개 이상 저장"
+      },
+      "photo_lover": {
+        "name": "사진 기록가",
+        "desc": "사진 포함 기록 5회"
+      },
+      "color_variety": {
+        "name": "컬러 탐험가",
+        "desc": "10가지 이상 컬러 사용"
+      },
+      "quiz_master": {
+        "name": "패션 박사",
+        "desc": "패션 퀴즈 완료"
+      },
+      "pc_diagnosed": {
+        "name": "퍼스널컬러",
+        "desc": "퍼스널컬러 진단 완료"
+      },
+      "title_holder": {
+        "name": "칭호 보유자",
+        "desc": "칭호 시험 1회 통과"
+      },
+      "challenger": {
+        "name": "챌린저",
+        "desc": "챌린지 3회 완료"
+      },
+      "master100": {
+        "name": "스타일 마스터",
+        "desc": "OOTD 100번 기록"
+      }
     },
     "challenges": {
-      "pastel_3": { "name": "파스텔 위크", "desc": "파스텔 컬러 코디 3회 기록" },
-      "dark_3": { "name": "다크 무드", "desc": "다크톤 코디 3회 기록" },
-      "mono_2": { "name": "모노톤 챌린지", "desc": "단색 계열 코디 2회" },
-      "photo_5": { "name": "포토제닉", "desc": "사진 포함 기록 5회" },
-      "streak_5": { "name": "5일 연속 기록", "desc": "5일 연속으로 OOTD 기록" },
-      "variety_7": { "name": "컬러풀 위크", "desc": "7가지 이상 다른 컬러 사용" },
-      "earth_3": { "name": "어스톤 위크", "desc": "어스톤 코디 3회 기록" },
-      "record_7": { "name": "주간 기록왕", "desc": "이번 주 7일 모두 기록" }
+      "pastel_3": {
+        "name": "파스텔 위크",
+        "desc": "파스텔 컬러 코디 3회 기록"
+      },
+      "dark_3": {
+        "name": "다크 무드",
+        "desc": "다크톤 코디 3회 기록"
+      },
+      "mono_2": {
+        "name": "모노톤 챌린지",
+        "desc": "단색 계열 코디 2회"
+      },
+      "photo_5": {
+        "name": "포토제닉",
+        "desc": "사진 포함 기록 5회"
+      },
+      "streak_5": {
+        "name": "5일 연속 기록",
+        "desc": "5일 연속으로 OOTD 기록"
+      },
+      "variety_7": {
+        "name": "컬러풀 위크",
+        "desc": "7가지 이상 다른 컬러 사용"
+      },
+      "earth_3": {
+        "name": "어스톤 위크",
+        "desc": "어스톤 코디 3회 기록"
+      },
+      "record_7": {
+        "name": "주간 기록왕",
+        "desc": "이번 주 7일 모두 기록"
+      }
     },
     "titleExams": {
-      "beginner": { "name": "초급 코디네이터", "desc": "기본 색상 조합 이해" },
-      "intermediate": { "name": "중급 코디네이터", "desc": "컬러 하모니 이론 활용" },
-      "advanced": { "name": "고급 코디네이터", "desc": "전문 스타일링 감각" }
+      "beginner": {
+        "name": "초급 코디네이터",
+        "desc": "기본 색상 조합 이해"
+      },
+      "intermediate": {
+        "name": "중급 코디네이터",
+        "desc": "컬러 하모니 이론 활용"
+      },
+      "advanced": {
+        "name": "고급 코디네이터",
+        "desc": "전문 스타일링 감각"
+      }
     }
   },
   "categories": {

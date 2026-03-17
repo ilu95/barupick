@@ -7,7 +7,13 @@
     "bottom": "ボトムス",
     "scarf": "マフラー",
     "hat": "帽子",
-    "shoes": "シューズ"
+    "shoes": "シューズ",
+    "mid_knit": "ニット",
+    "mid_cardigan": "カーディガン",
+    "mid_vest": "ベスト",
+    "outer_coat": "コート",
+    "outer_jacket": "ジャケット",
+    "outer_padding": "ダウン"
   },
   "seasons": {
     "spring": "春",
@@ -17,70 +23,232 @@
   },
   "fabricItems": {
     "outer": {
-      "leather_jacket": { "name": "レザージャケット", "desc": "牛革・羊革ライダース/ブルゾン" },
-      "denim_jacket": { "name": "デニムジャケット", "desc": "Gジャン、トラッカージャケット" },
-      "wool_coat": { "name": "ウールコート", "desc": "シングル・ダブルウールコート" },
-      "padding": { "name": "ダウンジャケット", "desc": "グースダウン・ポリダウン" },
-      "fleece_jacket": { "name": "フリースジャケット", "desc": "ボアフリース・シェルパ" },
-      "cotton_jacket": { "name": "コットンジャケット", "desc": "チノ・コットンブレザー" },
-      "nylon_jacket": { "name": "ナイロンジャケット", "desc": "ウインドブレーカー・コーチジャケット" },
-      "linen_jacket": { "name": "リネンジャケット", "desc": "リネン・麻ブレザー" },
-      "tweed_jacket": { "name": "ツイードジャケット", "desc": "ツイードブレザー" },
-      "suede_jacket": { "name": "スエードジャケット", "desc": "スエードブルゾン・ジャケット" },
-      "waxed_jacket": { "name": "ワックスドジャケット", "desc": "バブアー・オイルドジャケット" }
+      "leather_jacket": {
+        "name": "レザージャケット",
+        "desc": "牛革・羊革ライダース/ブルゾン"
+      },
+      "denim_jacket": {
+        "name": "デニムジャケット",
+        "desc": "Gジャン、トラッカージャケット"
+      },
+      "wool_coat": {
+        "name": "ウールコート",
+        "desc": "シングル・ダブルウールコート"
+      },
+      "padding": {
+        "name": "ダウンジャケット",
+        "desc": "グースダウン・ポリダウン"
+      },
+      "fleece_jacket": {
+        "name": "フリースジャケット",
+        "desc": "ボアフリース・シェルパ"
+      },
+      "cotton_jacket": {
+        "name": "コットンジャケット",
+        "desc": "チノ・コットンブレザー"
+      },
+      "nylon_jacket": {
+        "name": "ナイロンジャケット",
+        "desc": "ウインドブレーカー・コーチジャケット"
+      },
+      "linen_jacket": {
+        "name": "リネンジャケット",
+        "desc": "リネン・麻ブレザー"
+      },
+      "tweed_jacket": {
+        "name": "ツイードジャケット",
+        "desc": "ツイードブレザー"
+      },
+      "suede_jacket": {
+        "name": "スエードジャケット",
+        "desc": "スエードブルゾン・ジャケット"
+      },
+      "waxed_jacket": {
+        "name": "ワックスドジャケット",
+        "desc": "バブアー・オイルドジャケット"
+      }
     },
     "middleware": {
-      "wool_knit": { "name": "ウールニット", "desc": "ラムウール・メリノウールニット" },
-      "cotton_knit": { "name": "コットンニット", "desc": "コットンニット・カーディガン" },
-      "cashmere_knit": { "name": "カシミヤニット", "desc": "カシミヤプルオーバー" },
-      "fleece_mid": { "name": "フリース", "desc": "ミドルレイヤーフリース" },
-      "cardigan_wool": { "name": "ウールカーディガン", "desc": "ウールカーディガン・ショールカラー" },
-      "vest_padding": { "name": "ダウンベスト", "desc": "軽量ダウンベスト" },
-      "vest_knit": { "name": "ニットベスト", "desc": "ニットベスト・セーターベスト" },
-      "hoodie": { "name": "フードジップ", "desc": "コットン・裏起毛フードジップ" },
-      "sweatshirt_mid": { "name": "スウェット", "desc": "ミドルレイヤー用スウェット" }
+      "wool_knit": {
+        "name": "ウールニット",
+        "desc": "ラムウール・メリノウールニット"
+      },
+      "cotton_knit": {
+        "name": "コットンニット",
+        "desc": "コットンニット・カーディガン"
+      },
+      "cashmere_knit": {
+        "name": "カシミヤニット",
+        "desc": "カシミヤプルオーバー"
+      },
+      "fleece_mid": {
+        "name": "フリース",
+        "desc": "ミドルレイヤーフリース"
+      },
+      "cardigan_wool": {
+        "name": "ウールカーディガン",
+        "desc": "ウールカーディガン・ショールカラー"
+      },
+      "vest_padding": {
+        "name": "ダウンベスト",
+        "desc": "軽量ダウンベスト"
+      },
+      "vest_knit": {
+        "name": "ニットベスト",
+        "desc": "ニットベスト・セーターベスト"
+      },
+      "hoodie": {
+        "name": "フードジップ",
+        "desc": "コットン・裏起毛フードジップ"
+      },
+      "sweatshirt_mid": {
+        "name": "スウェット",
+        "desc": "ミドルレイヤー用スウェット"
+      }
     },
     "top": {
-      "cotton_tee": { "name": "コットンTシャツ", "desc": "コットンラウンド・Vネック" },
-      "oxford_shirt": { "name": "オックスフォードシャツ", "desc": "オックスフォードBDシャツ" },
-      "linen_shirt": { "name": "リネンシャツ", "desc": "リネン・麻シャツ" },
-      "flannel_shirt": { "name": "フランネルシャツ", "desc": "起毛チェックシャツ" },
-      "denim_shirt": { "name": "デニムシャツ", "desc": "シャンブレー・デニムシャツ" },
-      "silk_blouse": { "name": "シルクブラウス", "desc": "シルク・サテンブラウス" },
-      "polo_shirt": { "name": "ポロシャツ", "desc": "鹿の子ポロシャツ" },
-      "turtleneck": { "name": "タートルネック", "desc": "コットン・モダールタートルネック" },
-      "wool_turtleneck": { "name": "ウールタートルネック", "desc": "ウールタートルネックニット" },
-      "henley": { "name": "ヘンリーネック", "desc": "ワッフル・サーマルヘンリーネック" }
+      "cotton_tee": {
+        "name": "コットンTシャツ",
+        "desc": "コットンラウンド・Vネック"
+      },
+      "oxford_shirt": {
+        "name": "オックスフォードシャツ",
+        "desc": "オックスフォードBDシャツ"
+      },
+      "linen_shirt": {
+        "name": "リネンシャツ",
+        "desc": "リネン・麻シャツ"
+      },
+      "flannel_shirt": {
+        "name": "フランネルシャツ",
+        "desc": "起毛チェックシャツ"
+      },
+      "denim_shirt": {
+        "name": "デニムシャツ",
+        "desc": "シャンブレー・デニムシャツ"
+      },
+      "silk_blouse": {
+        "name": "シルクブラウス",
+        "desc": "シルク・サテンブラウス"
+      },
+      "polo_shirt": {
+        "name": "ポロシャツ",
+        "desc": "鹿の子ポロシャツ"
+      },
+      "turtleneck": {
+        "name": "タートルネック",
+        "desc": "コットン・モダールタートルネック"
+      },
+      "wool_turtleneck": {
+        "name": "ウールタートルネック",
+        "desc": "ウールタートルネックニット"
+      },
+      "henley": {
+        "name": "ヘンリーネック",
+        "desc": "ワッフル・サーマルヘンリーネック"
+      }
     },
     "bottom": {
-      "raw_denim": { "name": "デニムジーンズ", "desc": "ストレート・スリムデニム" },
-      "chino": { "name": "チノパンツ", "desc": "コットンチノパンツ" },
-      "wool_slacks": { "name": "ウールスラックス", "desc": "ウールドレスパンツ" },
-      "linen_pants": { "name": "リネンパンツ", "desc": "リネンワイド・ストレート" },
-      "corduroy": { "name": "コーデュロイ", "desc": "コーデュロイパンツ" },
-      "cotton_shorts": { "name": "コットンショーツ", "desc": "チノ・カーゴショーツ" },
-      "cargo_pants": { "name": "カーゴパンツ", "desc": "コットン・ナイロンカーゴ" },
-      "sweatpants": { "name": "スウェットパンツ", "desc": "ジョガー・トレーニングパンツ" },
-      "leather_pants": { "name": "レザーパンツ", "desc": "レザー・エコレザーパンツ" },
-      "nylon_pants": { "name": "ナイロンパンツ", "desc": "テック・アウトドアパンツ" }
+      "raw_denim": {
+        "name": "デニムジーンズ",
+        "desc": "ストレート・スリムデニム"
+      },
+      "chino": {
+        "name": "チノパンツ",
+        "desc": "コットンチノパンツ"
+      },
+      "wool_slacks": {
+        "name": "ウールスラックス",
+        "desc": "ウールドレスパンツ"
+      },
+      "linen_pants": {
+        "name": "リネンパンツ",
+        "desc": "リネンワイド・ストレート"
+      },
+      "corduroy": {
+        "name": "コーデュロイ",
+        "desc": "コーデュロイパンツ"
+      },
+      "cotton_shorts": {
+        "name": "コットンショーツ",
+        "desc": "チノ・カーゴショーツ"
+      },
+      "cargo_pants": {
+        "name": "カーゴパンツ",
+        "desc": "コットン・ナイロンカーゴ"
+      },
+      "sweatpants": {
+        "name": "スウェットパンツ",
+        "desc": "ジョガー・トレーニングパンツ"
+      },
+      "leather_pants": {
+        "name": "レザーパンツ",
+        "desc": "レザー・エコレザーパンツ"
+      },
+      "nylon_pants": {
+        "name": "ナイロンパンツ",
+        "desc": "テック・アウトドアパンツ"
+      }
     },
     "shoes": {
-      "leather_shoes": { "name": "革靴", "desc": "オックスフォード・ダービー" },
-      "leather_boots": { "name": "レザーブーツ", "desc": "チェルシー・レースアップブーツ" },
-      "suede_boots": { "name": "スエードブーツ", "desc": "スエードチェルシー・デザートブーツ" },
-      "canvas_sneakers": { "name": "キャンバススニーカー", "desc": "コンバース・ジャックパーセル" },
-      "leather_sneakers": { "name": "レザースニーカー", "desc": "ホワイト・クリーンスニーカー" },
-      "suede_shoes": { "name": "スエードシューズ", "desc": "スエードローファー・ダービー" },
-      "loafer": { "name": "ローファー", "desc": "ペニー・タッセルローファー" },
-      "hiking_boots": { "name": "ハイキングブーツ", "desc": "ゴアテックス・トレイル" },
-      "sandals": { "name": "サンダル", "desc": "ビルケンシュトック・ストラップサンダル" }
+      "leather_shoes": {
+        "name": "革靴",
+        "desc": "オックスフォード・ダービー"
+      },
+      "leather_boots": {
+        "name": "レザーブーツ",
+        "desc": "チェルシー・レースアップブーツ"
+      },
+      "suede_boots": {
+        "name": "スエードブーツ",
+        "desc": "スエードチェルシー・デザートブーツ"
+      },
+      "canvas_sneakers": {
+        "name": "キャンバススニーカー",
+        "desc": "コンバース・ジャックパーセル"
+      },
+      "leather_sneakers": {
+        "name": "レザースニーカー",
+        "desc": "ホワイト・クリーンスニーカー"
+      },
+      "suede_shoes": {
+        "name": "スエードシューズ",
+        "desc": "スエードローファー・ダービー"
+      },
+      "loafer": {
+        "name": "ローファー",
+        "desc": "ペニー・タッセルローファー"
+      },
+      "hiking_boots": {
+        "name": "ハイキングブーツ",
+        "desc": "ゴアテックス・トレイル"
+      },
+      "sandals": {
+        "name": "サンダル",
+        "desc": "ビルケンシュトック・ストラップサンダル"
+      }
     },
     "scarf": {
-      "wool_scarf": { "name": "ウールマフラー", "desc": "ラムウール・メリノマフラー" },
-      "cashmere_scarf": { "name": "カシミヤマフラー", "desc": "カシミヤスカーフ" },
-      "cotton_scarf": { "name": "コットンスカーフ", "desc": "コットン・ガーゼスカーフ" },
-      "silk_scarf": { "name": "シルクスカーフ", "desc": "シルクネッカチーフ" },
-      "linen_scarf": { "name": "リネンスカーフ", "desc": "リネンスカーフ・ショール" }
+      "wool_scarf": {
+        "name": "ウールマフラー",
+        "desc": "ラムウール・メリノマフラー"
+      },
+      "cashmere_scarf": {
+        "name": "カシミヤマフラー",
+        "desc": "カシミヤスカーフ"
+      },
+      "cotton_scarf": {
+        "name": "コットンスカーフ",
+        "desc": "コットン・ガーゼスカーフ"
+      },
+      "silk_scarf": {
+        "name": "シルクスカーフ",
+        "desc": "シルクネッカチーフ"
+      },
+      "linen_scarf": {
+        "name": "リネンスカーフ",
+        "desc": "リネンスカーフ・ショール"
+      }
     }
   },
   "compatRules": {

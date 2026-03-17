@@ -5,6 +5,7 @@ import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, ITEMS_CATALOG, type ItemDef } f
 import { getDynamicCombos } from '@/lib/recommend'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
+import i18n from '@/i18n'
 
 export type RecStep = 'mood' | 'style' | 'pick' | 'results' | 'detail'
 
@@ -373,6 +374,7 @@ function generateFallbackCombos(s: RecState): ComboResult[] {
       const evalResult = evaluationSystem.evaluate(outfit, pc)
       score = evalResult?.total || 50
     } catch {}
-    return { id: `fallback_${i}`, name: `기본 코디 ${i + 1}`, outfit, tags: ['기본'], tip: '기본 중립색 조합이에요', score, evalResult: null }
+    const t = i18n.t.bind(i18n)
+    return { id: `fallback_${i}`, name: t('recommend.fallbackName', { num: i + 1 }), outfit, tags: [t('recommend.fallbackTag')], tip: t('recommend.fallbackTip'), score, evalResult: null }
   })
 }

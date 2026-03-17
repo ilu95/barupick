@@ -6,6 +6,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { COLORS_60, hcl } from '@/lib/colors'
 import { evaluationSystem } from '@/lib/evaluation'
+import i18n from '@/i18n'
 import { profile } from '@/lib/profile'
 
 // ─── 타입 정의 ───
@@ -236,18 +237,19 @@ export function useWardrobe() {
 
     let verdict: 'strong_buy' | 'buy' | 'weak' | 'skip'
     let reason: string
+    const t = i18n.t.bind(i18n)
     if (comboDelta >= 5 && avgScore >= 80) {
       verdict = 'strong_buy'
-      reason = `강력 추천! ${comboDelta}개의 고점수 코디가 새로 가능해요`
+      reason = t('purchaseSimulate.reasonStrongBuy', { count: comboDelta })
     } else if (comboDelta >= 3) {
       verdict = 'buy'
-      reason = `좋은 선택! 기존 옷장과 ${comboDelta}개 조합이 잘 어울려요`
+      reason = t('purchaseSimulate.reasonBuy', { count: comboDelta })
     } else if (comboDelta >= 1) {
       verdict = 'weak'
-      reason = `어울리는 조합이 ${comboDelta}개로 적어요. 신중하게 고려해보세요`
+      reason = t('purchaseSimulate.reasonWeak', { count: comboDelta })
     } else {
       verdict = 'skip'
-      reason = '현재 옷장과 잘 맞지 않아요'
+      reason = t('purchaseSimulate.reasonSkip')
     }
 
     return { currentCombos, afterCombos, comboDelta, matchingOutfits: matchingOutfits.slice(0, 10), avgScore, bestScore, verdict, reason }

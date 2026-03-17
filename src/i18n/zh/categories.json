@@ -7,7 +7,13 @@
     "bottom": "下装",
     "scarf": "围巾",
     "hat": "帽子",
-    "shoes": "鞋子"
+    "shoes": "鞋子",
+    "mid_knit": "针织衫",
+    "mid_cardigan": "开衫",
+    "mid_vest": "马甲",
+    "outer_coat": "大衣",
+    "outer_jacket": "夹克",
+    "outer_padding": "羽绒服"
   },
   "seasons": {
     "spring": "春",
@@ -17,70 +23,232 @@
   },
   "fabricItems": {
     "outer": {
-      "leather_jacket": { "name": "皮夹克", "desc": "牛皮·羊皮骑士/飞行夹克" },
-      "denim_jacket": { "name": "牛仔夹克", "desc": "牛仔外套、卡车夹克" },
-      "wool_coat": { "name": "羊毛大衣", "desc": "单排·双排扣羊毛大衣" },
-      "padding": { "name": "羽绒服", "desc": "鹅绒·聚酯纤维羽绒服" },
-      "fleece_jacket": { "name": "摇粒绒外套", "desc": "羊羔毛·长毛绒外套" },
-      "cotton_jacket": { "name": "棉质夹克", "desc": "斜纹·纯棉西装外套" },
-      "nylon_jacket": { "name": "尼龙夹克", "desc": "防风衣·教练夹克" },
-      "linen_jacket": { "name": "亚麻夹克", "desc": "亚麻·麻质西装外套" },
-      "tweed_jacket": { "name": "粗花呢夹克", "desc": "粗花呢西装外套" },
-      "suede_jacket": { "name": "麂皮夹克", "desc": "麂皮飞行·短夹克" },
-      "waxed_jacket": { "name": "蜡面夹克", "desc": "巴伯·油蜡夹克" }
+      "leather_jacket": {
+        "name": "皮夹克",
+        "desc": "牛皮·羊皮骑士/飞行夹克"
+      },
+      "denim_jacket": {
+        "name": "牛仔夹克",
+        "desc": "牛仔外套、卡车夹克"
+      },
+      "wool_coat": {
+        "name": "羊毛大衣",
+        "desc": "单排·双排扣羊毛大衣"
+      },
+      "padding": {
+        "name": "羽绒服",
+        "desc": "鹅绒·聚酯纤维羽绒服"
+      },
+      "fleece_jacket": {
+        "name": "摇粒绒外套",
+        "desc": "羊羔毛·长毛绒外套"
+      },
+      "cotton_jacket": {
+        "name": "棉质夹克",
+        "desc": "斜纹·纯棉西装外套"
+      },
+      "nylon_jacket": {
+        "name": "尼龙夹克",
+        "desc": "防风衣·教练夹克"
+      },
+      "linen_jacket": {
+        "name": "亚麻夹克",
+        "desc": "亚麻·麻质西装外套"
+      },
+      "tweed_jacket": {
+        "name": "粗花呢夹克",
+        "desc": "粗花呢西装外套"
+      },
+      "suede_jacket": {
+        "name": "麂皮夹克",
+        "desc": "麂皮飞行·短夹克"
+      },
+      "waxed_jacket": {
+        "name": "蜡面夹克",
+        "desc": "巴伯·油蜡夹克"
+      }
     },
     "middleware": {
-      "wool_knit": { "name": "羊毛针织衫", "desc": "羔羊毛·美利奴羊毛针织衫" },
-      "cotton_knit": { "name": "棉质针织衫", "desc": "纯棉针织衫·开衫" },
-      "cashmere_knit": { "name": "羊绒针织衫", "desc": "羊绒套头衫" },
-      "fleece_mid": { "name": "摇粒绒", "desc": "中间层摇粒绒" },
-      "cardigan_wool": { "name": "羊毛开衫", "desc": "羊毛开衫·青果领" },
-      "vest_padding": { "name": "羽绒马甲", "desc": "轻薄羽绒马甲" },
-      "vest_knit": { "name": "针织马甲", "desc": "针织背心·毛衣马甲" },
-      "hoodie": { "name": "连帽拉链衫", "desc": "纯棉·加绒连帽拉链衫" },
-      "sweatshirt_mid": { "name": "卫衣", "desc": "中间层卫衣" }
+      "wool_knit": {
+        "name": "羊毛针织衫",
+        "desc": "羔羊毛·美利奴羊毛针织衫"
+      },
+      "cotton_knit": {
+        "name": "棉质针织衫",
+        "desc": "纯棉针织衫·开衫"
+      },
+      "cashmere_knit": {
+        "name": "羊绒针织衫",
+        "desc": "羊绒套头衫"
+      },
+      "fleece_mid": {
+        "name": "摇粒绒",
+        "desc": "中间层摇粒绒"
+      },
+      "cardigan_wool": {
+        "name": "羊毛开衫",
+        "desc": "羊毛开衫·青果领"
+      },
+      "vest_padding": {
+        "name": "羽绒马甲",
+        "desc": "轻薄羽绒马甲"
+      },
+      "vest_knit": {
+        "name": "针织马甲",
+        "desc": "针织背心·毛衣马甲"
+      },
+      "hoodie": {
+        "name": "连帽拉链衫",
+        "desc": "纯棉·加绒连帽拉链衫"
+      },
+      "sweatshirt_mid": {
+        "name": "卫衣",
+        "desc": "中间层卫衣"
+      }
     },
     "top": {
-      "cotton_tee": { "name": "棉质T恤", "desc": "纯棉圆领·V领T恤" },
-      "oxford_shirt": { "name": "牛津衬衫", "desc": "牛津布扣领衬衫" },
-      "linen_shirt": { "name": "亚麻衬衫", "desc": "亚麻·麻质衬衫" },
-      "flannel_shirt": { "name": "法兰绒衬衫", "desc": "磨毛格纹衬衫" },
-      "denim_shirt": { "name": "牛仔衬衫", "desc": "香布雷·牛仔衬衫" },
-      "silk_blouse": { "name": "丝质衬衫", "desc": "真丝·缎面衬衫" },
-      "polo_shirt": { "name": "Polo衫", "desc": "珠地棉Polo衫" },
-      "turtleneck": { "name": "高领衫", "desc": "纯棉·莫代尔高领衫" },
-      "wool_turtleneck": { "name": "羊毛高领衫", "desc": "羊毛高领针织衫" },
-      "henley": { "name": "亨利领", "desc": "华夫格·保暖亨利领" }
+      "cotton_tee": {
+        "name": "棉质T恤",
+        "desc": "纯棉圆领·V领T恤"
+      },
+      "oxford_shirt": {
+        "name": "牛津衬衫",
+        "desc": "牛津布扣领衬衫"
+      },
+      "linen_shirt": {
+        "name": "亚麻衬衫",
+        "desc": "亚麻·麻质衬衫"
+      },
+      "flannel_shirt": {
+        "name": "法兰绒衬衫",
+        "desc": "磨毛格纹衬衫"
+      },
+      "denim_shirt": {
+        "name": "牛仔衬衫",
+        "desc": "香布雷·牛仔衬衫"
+      },
+      "silk_blouse": {
+        "name": "丝质衬衫",
+        "desc": "真丝·缎面衬衫"
+      },
+      "polo_shirt": {
+        "name": "Polo衫",
+        "desc": "珠地棉Polo衫"
+      },
+      "turtleneck": {
+        "name": "高领衫",
+        "desc": "纯棉·莫代尔高领衫"
+      },
+      "wool_turtleneck": {
+        "name": "羊毛高领衫",
+        "desc": "羊毛高领针织衫"
+      },
+      "henley": {
+        "name": "亨利领",
+        "desc": "华夫格·保暖亨利领"
+      }
     },
     "bottom": {
-      "raw_denim": { "name": "牛仔裤", "desc": "直筒·修身牛仔裤" },
-      "chino": { "name": "卡其裤", "desc": "纯棉卡其裤" },
-      "wool_slacks": { "name": "羊毛西裤", "desc": "羊毛正装裤" },
-      "linen_pants": { "name": "亚麻裤", "desc": "亚麻阔腿·直筒裤" },
-      "corduroy": { "name": "灯芯绒裤", "desc": "灯芯绒长裤" },
-      "cotton_shorts": { "name": "棉质短裤", "desc": "卡其·工装短裤" },
-      "cargo_pants": { "name": "工装裤", "desc": "纯棉·尼龙工装裤" },
-      "sweatpants": { "name": "运动裤", "desc": "束脚·训练长裤" },
-      "leather_pants": { "name": "皮裤", "desc": "真皮·仿皮裤" },
-      "nylon_pants": { "name": "尼龙裤", "desc": "机能·户外长裤" }
+      "raw_denim": {
+        "name": "牛仔裤",
+        "desc": "直筒·修身牛仔裤"
+      },
+      "chino": {
+        "name": "卡其裤",
+        "desc": "纯棉卡其裤"
+      },
+      "wool_slacks": {
+        "name": "羊毛西裤",
+        "desc": "羊毛正装裤"
+      },
+      "linen_pants": {
+        "name": "亚麻裤",
+        "desc": "亚麻阔腿·直筒裤"
+      },
+      "corduroy": {
+        "name": "灯芯绒裤",
+        "desc": "灯芯绒长裤"
+      },
+      "cotton_shorts": {
+        "name": "棉质短裤",
+        "desc": "卡其·工装短裤"
+      },
+      "cargo_pants": {
+        "name": "工装裤",
+        "desc": "纯棉·尼龙工装裤"
+      },
+      "sweatpants": {
+        "name": "运动裤",
+        "desc": "束脚·训练长裤"
+      },
+      "leather_pants": {
+        "name": "皮裤",
+        "desc": "真皮·仿皮裤"
+      },
+      "nylon_pants": {
+        "name": "尼龙裤",
+        "desc": "机能·户外长裤"
+      }
     },
     "shoes": {
-      "leather_shoes": { "name": "皮鞋", "desc": "牛津鞋·德比鞋" },
-      "leather_boots": { "name": "皮靴", "desc": "切尔西·系带靴" },
-      "suede_boots": { "name": "麂皮靴", "desc": "麂皮切尔西·沙漠靴" },
-      "canvas_sneakers": { "name": "帆布鞋", "desc": "匡威·开口笑帆布鞋" },
-      "leather_sneakers": { "name": "皮质运动鞋", "desc": "白色·简约运动鞋" },
-      "suede_shoes": { "name": "麂皮鞋", "desc": "麂皮乐福·德比鞋" },
-      "loafer": { "name": "乐福鞋", "desc": "便士·流苏乐福鞋" },
-      "hiking_boots": { "name": "登山鞋/徒步鞋", "desc": "Gore-Tex·越野鞋" },
-      "sandals": { "name": "凉鞋", "desc": "勃肯·绑带凉鞋" }
+      "leather_shoes": {
+        "name": "皮鞋",
+        "desc": "牛津鞋·德比鞋"
+      },
+      "leather_boots": {
+        "name": "皮靴",
+        "desc": "切尔西·系带靴"
+      },
+      "suede_boots": {
+        "name": "麂皮靴",
+        "desc": "麂皮切尔西·沙漠靴"
+      },
+      "canvas_sneakers": {
+        "name": "帆布鞋",
+        "desc": "匡威·开口笑帆布鞋"
+      },
+      "leather_sneakers": {
+        "name": "皮质运动鞋",
+        "desc": "白色·简约运动鞋"
+      },
+      "suede_shoes": {
+        "name": "麂皮鞋",
+        "desc": "麂皮乐福·德比鞋"
+      },
+      "loafer": {
+        "name": "乐福鞋",
+        "desc": "便士·流苏乐福鞋"
+      },
+      "hiking_boots": {
+        "name": "登山鞋/徒步鞋",
+        "desc": "Gore-Tex·越野鞋"
+      },
+      "sandals": {
+        "name": "凉鞋",
+        "desc": "勃肯·绑带凉鞋"
+      }
     },
     "scarf": {
-      "wool_scarf": { "name": "羊毛围巾", "desc": "羔羊毛·美利奴围巾" },
-      "cashmere_scarf": { "name": "羊绒围巾", "desc": "羊绒披肩" },
-      "cotton_scarf": { "name": "棉质围巾", "desc": "纯棉·纱布围巾" },
-      "silk_scarf": { "name": "丝巾", "desc": "真丝方巾" },
-      "linen_scarf": { "name": "亚麻围巾", "desc": "亚麻围巾·披肩" }
+      "wool_scarf": {
+        "name": "羊毛围巾",
+        "desc": "羔羊毛·美利奴围巾"
+      },
+      "cashmere_scarf": {
+        "name": "羊绒围巾",
+        "desc": "羊绒披肩"
+      },
+      "cotton_scarf": {
+        "name": "棉质围巾",
+        "desc": "纯棉·纱布围巾"
+      },
+      "silk_scarf": {
+        "name": "丝巾",
+        "desc": "真丝方巾"
+      },
+      "linen_scarf": {
+        "name": "亚麻围巾",
+        "desc": "亚麻围巾·披肩"
+      }
     }
   },
   "compatRules": {

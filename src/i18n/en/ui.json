@@ -55,7 +55,9 @@
     "score": "{{score}} pts",
     "itemRegister": "Add item",
     "generateFailed": "Generation failed",
-    "addPhoto": "Add photo"
+    "addPhoto": "Add photo",
+    "loadError": "Failed to load",
+    "rankingLoadError": "Failed to load rankings"
   },
   "nav": {
     "coord": "Coord",
@@ -393,7 +395,10 @@
       "tip4": "Sophisticated styling with {{color}} as a point",
       "tip5": "A {{technique}} coord with depth using {{count}} layers"
     },
-    "stylePrefix": "Style"
+    "stylePrefix": "Style",
+    "fallbackName": "Basic Outfit {{num}}",
+    "fallbackTag": "Basic",
+    "fallbackTip": "A basic neutral color combination"
   },
   "build": {
     "stepStyle": "Select Style",
@@ -770,7 +775,8 @@
     "title": "Notifications",
     "clearAll": "Clear all",
     "clearConfirm": "Clear all notifications?",
-    "empty": "No new notifications"
+    "empty": "No new notifications",
+    "followMessage": "started following you"
   },
   "followList": {
     "followers": "Followers",
@@ -872,7 +878,11 @@
     },
     "comboDelta": "+{{count}} combos",
     "avgScoreLabel": "Avg {{score}} pts",
-    "bestScoreLabel": "Best {{score}} pts"
+    "bestScoreLabel": "Best {{score}} pts",
+    "reasonStrongBuy": "Highly recommended! {{count}} high-score outfits now possible",
+    "reasonBuy": "Great choice! {{count}} combos work well with your closet",
+    "reasonWeak": "Only {{count}} matching combos. Consider carefully",
+    "reasonSkip": "Doesn't match well with your closet"
   },
   "wardrobeReport": {
     "title": "My Wardrobe Story",
@@ -1302,36 +1312,114 @@
       "7": "Style Master"
     },
     "badges": {
-      "first_step": { "name": "First Step", "desc": "First OOTD record" },
-      "recorder": { "name": "Recorder", "desc": "10 OOTD records" },
-      "streak3": { "name": "3-Day Streak", "desc": "3-day streak achieved" },
-      "streak7": { "name": "7-Day Streak", "desc": "7-day streak achieved" },
-      "streak30": { "name": "30-Day Streak", "desc": "30-day streak!" },
-      "closet_start": { "name": "Closet Start", "desc": "First item in closet" },
-      "closet10": { "name": "Closet Collector", "desc": "10+ items in closet" },
-      "saver": { "name": "Coord Collector", "desc": "5+ coords saved" },
-      "photo_lover": { "name": "Photo Logger", "desc": "5 records with photos" },
-      "color_variety": { "name": "Color Explorer", "desc": "10+ colors used" },
-      "quiz_master": { "name": "Fashion Expert", "desc": "Fashion quiz completed" },
-      "pc_diagnosed": { "name": "Personal Color", "desc": "Personal color diagnosed" },
-      "title_holder": { "name": "Title Holder", "desc": "Passed 1 title exam" },
-      "challenger": { "name": "Challenger", "desc": "3 challenges completed" },
-      "master100": { "name": "Style Master", "desc": "100 OOTD records" }
+      "first_step": {
+        "name": "First Step",
+        "desc": "First OOTD record"
+      },
+      "recorder": {
+        "name": "Recorder",
+        "desc": "10 OOTD records"
+      },
+      "streak3": {
+        "name": "3-Day Streak",
+        "desc": "3-day streak achieved"
+      },
+      "streak7": {
+        "name": "7-Day Streak",
+        "desc": "7-day streak achieved"
+      },
+      "streak30": {
+        "name": "30-Day Streak",
+        "desc": "30-day streak!"
+      },
+      "closet_start": {
+        "name": "Closet Start",
+        "desc": "First item in closet"
+      },
+      "closet10": {
+        "name": "Closet Collector",
+        "desc": "10+ items in closet"
+      },
+      "saver": {
+        "name": "Coord Collector",
+        "desc": "5+ coords saved"
+      },
+      "photo_lover": {
+        "name": "Photo Logger",
+        "desc": "5 records with photos"
+      },
+      "color_variety": {
+        "name": "Color Explorer",
+        "desc": "10+ colors used"
+      },
+      "quiz_master": {
+        "name": "Fashion Expert",
+        "desc": "Fashion quiz completed"
+      },
+      "pc_diagnosed": {
+        "name": "Personal Color",
+        "desc": "Personal color diagnosed"
+      },
+      "title_holder": {
+        "name": "Title Holder",
+        "desc": "Passed 1 title exam"
+      },
+      "challenger": {
+        "name": "Challenger",
+        "desc": "3 challenges completed"
+      },
+      "master100": {
+        "name": "Style Master",
+        "desc": "100 OOTD records"
+      }
     },
     "challenges": {
-      "pastel_3": { "name": "Pastel Week", "desc": "3 pastel color coords" },
-      "dark_3": { "name": "Dark Mood", "desc": "3 dark-tone coords" },
-      "mono_2": { "name": "Monotone Challenge", "desc": "2 monochrome coords" },
-      "photo_5": { "name": "Photogenic", "desc": "5 records with photos" },
-      "streak_5": { "name": "5-Day Streak", "desc": "5 consecutive OOTD records" },
-      "variety_7": { "name": "Colorful Week", "desc": "7+ different colors used" },
-      "earth_3": { "name": "Earth Tone Week", "desc": "3 earth-tone coords" },
-      "record_7": { "name": "Weekly Recorder", "desc": "Record all 7 days this week" }
+      "pastel_3": {
+        "name": "Pastel Week",
+        "desc": "3 pastel color coords"
+      },
+      "dark_3": {
+        "name": "Dark Mood",
+        "desc": "3 dark-tone coords"
+      },
+      "mono_2": {
+        "name": "Monotone Challenge",
+        "desc": "2 monochrome coords"
+      },
+      "photo_5": {
+        "name": "Photogenic",
+        "desc": "5 records with photos"
+      },
+      "streak_5": {
+        "name": "5-Day Streak",
+        "desc": "5 consecutive OOTD records"
+      },
+      "variety_7": {
+        "name": "Colorful Week",
+        "desc": "7+ different colors used"
+      },
+      "earth_3": {
+        "name": "Earth Tone Week",
+        "desc": "3 earth-tone coords"
+      },
+      "record_7": {
+        "name": "Weekly Recorder",
+        "desc": "Record all 7 days this week"
+      }
     },
     "titleExams": {
-      "beginner": { "name": "Beginner Coordinator", "desc": "Basic color combo understanding" },
-      "intermediate": { "name": "Intermediate Coordinator", "desc": "Color harmony theory" },
-      "advanced": { "name": "Advanced Coordinator", "desc": "Expert styling sense" }
+      "beginner": {
+        "name": "Beginner Coordinator",
+        "desc": "Basic color combo understanding"
+      },
+      "intermediate": {
+        "name": "Intermediate Coordinator",
+        "desc": "Color harmony theory"
+      },
+      "advanced": {
+        "name": "Advanced Coordinator",
+        "desc": "Expert styling sense"
+      }
     }
   },
   "categories": {

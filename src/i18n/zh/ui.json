@@ -55,7 +55,9 @@
     "score": "{{score}}分",
     "itemRegister": "添加单品",
     "generateFailed": "生成失败",
-    "addPhoto": "添加照片"
+    "addPhoto": "添加照片",
+    "loadError": "加载失败",
+    "rankingLoadError": "排行榜加载失败"
   },
   "nav": {
     "coord": "搭配",
@@ -393,7 +395,10 @@
       "tip4": "以{{color}}为亮点的时尚造型",
       "tip5": "{{count}}层叠穿打造层次感{{technique}}搭配"
     },
-    "stylePrefix": "风格"
+    "stylePrefix": "风格",
+    "fallbackName": "基础搭配 {{num}}",
+    "fallbackTag": "基础",
+    "fallbackTip": "基础中性色组合"
   },
   "build": {
     "stepStyle": "选择风格",
@@ -770,7 +775,8 @@
     "title": "通知",
     "clearAll": "全部删除",
     "clearConfirm": "确定删除所有通知吗？",
-    "empty": "没有新通知"
+    "empty": "没有新通知",
+    "followMessage": "关注了你"
   },
   "followList": {
     "followers": "粉丝",
@@ -872,7 +878,11 @@
     },
     "comboDelta": "+{{count}}套搭配",
     "avgScoreLabel": "平均 {{score}}分",
-    "bestScoreLabel": "最高 {{score}}分"
+    "bestScoreLabel": "最高 {{score}}分",
+    "reasonStrongBuy": "强烈推荐！可新增{{count}}个高分搭配",
+    "reasonBuy": "好选择！与衣柜中{{count}}个组合很搭",
+    "reasonWeak": "匹配组合仅{{count}}个，请慎重考虑",
+    "reasonSkip": "与当前衣柜不太搭配"
   },
   "wardrobeReport": {
     "title": "我的衣柜故事",
@@ -1302,36 +1312,114 @@
       "7": "时尚大师"
     },
     "badges": {
-      "first_step": { "name": "第一步", "desc": "首次 OOTD 记录" },
-      "recorder": { "name": "记录达人", "desc": "OOTD 记录10次" },
-      "streak3": { "name": "连续3天", "desc": "达成连续3天记录" },
-      "streak7": { "name": "连续7天", "desc": "达成连续7天记录" },
-      "streak30": { "name": "连续30天", "desc": "连续30天记录！" },
-      "closet_start": { "name": "衣柜起步", "desc": "在衣柜中添加第一件单品" },
-      "closet10": { "name": "衣柜收藏家", "desc": "衣柜中超过10件" },
-      "saver": { "name": "搭配收藏家", "desc": "保存5套以上搭配" },
-      "photo_lover": { "name": "照片记录者", "desc": "含照片的记录5次" },
-      "color_variety": { "name": "色彩探索者", "desc": "使用10种以上颜色" },
-      "quiz_master": { "name": "时尚博士", "desc": "完成时尚测试" },
-      "pc_diagnosed": { "name": "个人色彩", "desc": "完成个人色彩诊断" },
-      "title_holder": { "name": "称号持有者", "desc": "通过1次称号考试" },
-      "challenger": { "name": "挑战者", "desc": "完成3次挑战" },
-      "master100": { "name": "时尚大师", "desc": "OOTD 记录100次" }
+      "first_step": {
+        "name": "第一步",
+        "desc": "首次 OOTD 记录"
+      },
+      "recorder": {
+        "name": "记录达人",
+        "desc": "OOTD 记录10次"
+      },
+      "streak3": {
+        "name": "连续3天",
+        "desc": "达成连续3天记录"
+      },
+      "streak7": {
+        "name": "连续7天",
+        "desc": "达成连续7天记录"
+      },
+      "streak30": {
+        "name": "连续30天",
+        "desc": "连续30天记录！"
+      },
+      "closet_start": {
+        "name": "衣柜起步",
+        "desc": "在衣柜中添加第一件单品"
+      },
+      "closet10": {
+        "name": "衣柜收藏家",
+        "desc": "衣柜中超过10件"
+      },
+      "saver": {
+        "name": "搭配收藏家",
+        "desc": "保存5套以上搭配"
+      },
+      "photo_lover": {
+        "name": "照片记录者",
+        "desc": "含照片的记录5次"
+      },
+      "color_variety": {
+        "name": "色彩探索者",
+        "desc": "使用10种以上颜色"
+      },
+      "quiz_master": {
+        "name": "时尚博士",
+        "desc": "完成时尚测试"
+      },
+      "pc_diagnosed": {
+        "name": "个人色彩",
+        "desc": "完成个人色彩诊断"
+      },
+      "title_holder": {
+        "name": "称号持有者",
+        "desc": "通过1次称号考试"
+      },
+      "challenger": {
+        "name": "挑战者",
+        "desc": "完成3次挑战"
+      },
+      "master100": {
+        "name": "时尚大师",
+        "desc": "OOTD 记录100次"
+      }
     },
     "challenges": {
-      "pastel_3": { "name": "粉彩周", "desc": "记录3次粉彩色搭配" },
-      "dark_3": { "name": "暗色氛围", "desc": "记录3次暗色调搭配" },
-      "mono_2": { "name": "单色挑战", "desc": "2次单色系搭配" },
-      "photo_5": { "name": "上镜达人", "desc": "含照片的记录5次" },
-      "streak_5": { "name": "连续5天记录", "desc": "连续5天记录 OOTD" },
-      "variety_7": { "name": "缤纷一周", "desc": "使用7种以上不同颜色" },
-      "earth_3": { "name": "大地色周", "desc": "记录3次大地色搭配" },
-      "record_7": { "name": "周记录王", "desc": "本周每天都记录" }
+      "pastel_3": {
+        "name": "粉彩周",
+        "desc": "记录3次粉彩色搭配"
+      },
+      "dark_3": {
+        "name": "暗色氛围",
+        "desc": "记录3次暗色调搭配"
+      },
+      "mono_2": {
+        "name": "单色挑战",
+        "desc": "2次单色系搭配"
+      },
+      "photo_5": {
+        "name": "上镜达人",
+        "desc": "含照片的记录5次"
+      },
+      "streak_5": {
+        "name": "连续5天记录",
+        "desc": "连续5天记录 OOTD"
+      },
+      "variety_7": {
+        "name": "缤纷一周",
+        "desc": "使用7种以上不同颜色"
+      },
+      "earth_3": {
+        "name": "大地色周",
+        "desc": "记录3次大地色搭配"
+      },
+      "record_7": {
+        "name": "周记录王",
+        "desc": "本周每天都记录"
+      }
     },
     "titleExams": {
-      "beginner": { "name": "初级搭配师", "desc": "理解基础色彩搭配" },
-      "intermediate": { "name": "中级搭配师", "desc": "运用色彩和谐理论" },
-      "advanced": { "name": "高级搭配师", "desc": "专业造型感觉" }
+      "beginner": {
+        "name": "初级搭配师",
+        "desc": "理解基础色彩搭配"
+      },
+      "intermediate": {
+        "name": "中级搭配师",
+        "desc": "运用色彩和谐理论"
+      },
+      "advanced": {
+        "name": "高级搭配师",
+        "desc": "专业造型感觉"
+      }
     }
   },
   "categories": {
