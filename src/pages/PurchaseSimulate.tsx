@@ -5,9 +5,10 @@
 // ═══════════════════════════════════════════════════════
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ShoppingBag, ArrowLeft, Plus, ChevronRight, Sparkles, Target, Shirt, Check, X } from 'lucide-react'
+import { ShoppingBag, ArrowLeft, ChevronRight, Sparkles, Target, Shirt, Check, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
+import { ITEMS_CATALOG } from '@/lib/styles'
 
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +22,23 @@ const CATEGORIES = [
   { key: 'bottom', labelKey: 'categories.bottom', emoji: '👖' },
   { key: 'shoes', labelKey: 'categories.shoes', emoji: '👞' },
 ]
+
+// 사고 싶은 옷 종류 (세부 아이템 목록)
+const PICK_TARGET_ITEMS = [
+  ...ITEMS_CATALOG.filter(i => !['scarf', 'hat'].includes(i.id)),
+  { id: 'bottom', emoji: '👖' },
+  { id: 'shoes',  emoji: '👞' },
+]
+
+function itemToCategory(itemId: string): string {
+  const outerIds = ['padding', 'coat', 'jacket', 'hood_zip']
+  const midIds = ['cardigan', 'knit_zip', 'vest']
+  if (outerIds.includes(itemId)) return 'outer'
+  if (midIds.includes(itemId)) return 'middleware'
+  if (itemId === 'bottom') return 'bottom'
+  if (itemId === 'shoes') return 'shoes'
+  return 'top'
+}
 
 // 추천 스캔용 대표 색상 (옷장에 없는 것만 필터)
 const SCAN_COLORS = [
@@ -156,16 +174,6 @@ export default function PurchaseSimulate() {
     }
   }, [presetCategory, presetColor])
 
-  const handleAddToWardrobe = (cat: string, col: string) => {
-    try {
-      const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
-      items.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), category: cat, color: col, colorKey: col, name: getColorName(col), createdAt: new Date().toISOString() })
-      if (items.length > 200) items.length = 200
-      localStorage.setItem('sp_wardrobe', JSON.stringify(items))
-      wardrobe.refresh()
-      navigate('/closet', { replace: true })
-    } catch {}
-  }
 
   // ═══ 모드 선택 ═══
   if (mode === 'select') {
@@ -270,11 +278,6 @@ export default function PurchaseSimulate() {
                       </div>
                     </div>
                   </div>
-                  {rec.verdict === 'strong_buy' || rec.verdict === 'buy' ? (
-                    <button onClick={() => handleAddToWardrobe(rec.category, rec.color)} className="mt-3 w-full py-2.5 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.98] transition-all">
-                      <Plus size={14} /> {t('purchaseSimulate.addToCloset')}
-                    </button>
-                  ) : null}
                 </div>
               )
             })}
@@ -433,15 +436,11 @@ export default function PurchaseSimulate() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5">
-              {CATEGORIES.map(cat => (
-                <button key={cat.key} onClick={() => runPickedSim(cat.key)}
-                  className="flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-5 py-4 active:scale-[0.98] transition-all shadow-warm-sm">
-                  <span className="text-2xl">{cat.emoji}</span>
-                  <div className="flex-1 text-left">
-                    <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t(cat.labelKey)}</div>
-                  </div>
-                  <ChevronRight size={16} className="text-warm-400" />
+            <div className="flex flex-wrap gap-2">
+              {PICK_TARGET_ITEMS.map(item => (
+                <button key={item.id} onClick={() => runPickedSim(itemToCategory(item.id))}
+                  className="px-3 py-2 rounded-full text-[12px] font-medium bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95 transition-all">
+                  {item.emoji} {t('categories:itemsCatalog.' + item.id)}
                 </button>
               ))}
             </div>
@@ -504,12 +503,6 @@ export default function PurchaseSimulate() {
                           </div>
                         </div>
                       </div>
-                      {(r.verdict === 'strong_buy' || r.verdict === 'buy') && (
-                        <button onClick={() => handleAddToWardrobe(pickedCategory!, r.colorKey)}
-                          className="mt-3 w-full py-2.5 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.98] transition-all">
-                          <Plus size={14} /> {t('purchaseSimulate.addToCloset')}
-                        </button>
-                      )}
                     </div>
                   )
                 })}
@@ -617,11 +610,6 @@ export default function PurchaseSimulate() {
                     <div className="text-[10px] text-warm-500">{t('purchaseSimulate.avgScore')}</div>
                   </div>
                 </div>
-                {(simResult.verdict === 'strong_buy' || simResult.verdict === 'buy') && (
-                  <button onClick={() => handleAddToWardrobe(category, color)} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra mb-3">
-                    <Plus size={16} /> {t('purchaseSimulate.addToCloset')}
-                  </button>
-                )}
               </>
             )
           })()}
