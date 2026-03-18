@@ -50,7 +50,7 @@ export default function PurchaseSimulate() {
 
   // ─── 내 옷 기준 검토 모드 상태 ───
   const [pickedStep, setPickedStep] = useState<'items' | 'category' | 'result'>('items')
-  const [pickedItems, setPickedItems] = useState<{ category: string; color: string }[]>([])
+  const [pickedItems, setPickedItems] = useState<string[]>([])
   const [pickedCategory, setPickedCategory] = useState<string | null>(null)
   const [pickedResults, setPickedResults] = useState<any[]>([])
   const [pickedAnalyzing, setPickedAnalyzing] = useState(false)
@@ -292,15 +292,16 @@ export default function PurchaseSimulate() {
       items: wardrobe.getItems(cat.key),
     })).filter(g => g.items.length > 0)
 
-    // 이미 선택한 카테고리 목록 (사고 싶은 카테고리 선택 시 제외용)
-    const pickedCats = new Set(pickedItems.map(p => p.category))
+    // 선택된 아이템 실제 객체 조회 헬퍼
+    const resolvePickedItems = () => pickedItems.map(id => wardrobe.items.find(i => i.id === id)).filter(Boolean)
 
-    const togglePickedItem = (category: string, color: string) => {
-      setPickedItems(prev => {
-        const exists = prev.find(p => p.category === category && p.color === color)
-        if (exists) return prev.filter(p => !(p.category === category && p.color === color))
-        return [...prev, { category, color }]
-      })
+    // 이미 선택한 카테고리 목록 (사고 싶은 카테고리 선택 시 제외용)
+    const pickedCats = new Set(resolvePickedItems().map(i => i.category))
+
+    const togglePickedItem = (itemId: string) => {
+      setPickedItems(prev =>
+        prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
+      )
     }
 
     const runPickedSim = (cat: string) => {
@@ -309,7 +310,8 @@ export default function PurchaseSimulate() {
       setPickedAnalyzing(true)
       requestAnimationFrame(() => {
         try {
-          const results = wardrobe.simulatePurchaseWithPicks(cat, pickedItems)
+          const resolved = resolvePickedItems().map(i => ({ category: i.category, color: i.color || i.colorKey }))
+          const results = wardrobe.simulatePurchaseWithPicks(cat, resolved)
           setPickedResults(results)
         } catch { setPickedResults([]) }
         finally { setPickedAnalyzing(false) }
@@ -340,20 +342,25 @@ export default function PurchaseSimulate() {
               <div key={group.key} className="mb-4">
                 <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 mb-2">{group.emoji} {t(group.labelKey)}</div>
                 <div className="flex flex-wrap gap-2">
-                  {/* 같은 카테고리 내 중복 색상 제거 */}
-                  {[...new Map(group.items.map(item => [item.color, item])).values()].map(item => {
-                    const c = COLORS_60[item.color]
+                  {group.items.map(item => {
+                    const c = COLORS_60[item.color || item.colorKey]
                     if (!c) return null
-                    const isSelected = pickedItems.some(p => p.category === group.key && p.color === item.color)
+                    const isSelected = pickedItems.includes(item.id)
+                    const displayName = item.name || getColorName(item.color || item.colorKey)
+                    const brandLabel = item.brand ? `${item.brand} · ` : ''
                     return (
-                      <button key={item.color} onClick={() => togglePickedItem(group.key, item.color)}
+                      <button key={item.id} onClick={() => togglePickedItem(item.id)}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-all active:scale-[0.97]
                           ${isSelected
                             ? 'border-violet-400 dark:border-violet-500 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 ring-1 ring-violet-300 dark:ring-violet-600'
                             : 'border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-700 dark:text-warm-300'
                           }`}>
-                        <span className="w-4 h-4 rounded-full border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
-                        {getColorName(item.color)}
+                        {item.photoThumb ? (
+                          <img src={item.photoThumb} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0 border border-warm-300 dark:border-warm-500" />
+                        ) : (
+                          <span className="w-4 h-4 rounded-full border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
+                        )}
+                        <span className="truncate max-w-[140px]">{brandLabel}{displayName}</span>
                         {isSelected && <Check size={12} className="text-violet-500" />}
                       </button>
                     )
@@ -368,12 +375,19 @@ export default function PurchaseSimulate() {
                 <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-700 rounded-2xl p-4 mb-4">
                   <div className="text-xs font-semibold text-violet-700 dark:text-violet-300 mb-2">{t('purchaseSimulate.pickedSelected', { count: pickedItems.length })}</div>
                   <div className="flex flex-wrap gap-1.5">
-                    {pickedItems.map((p, i) => {
-                      const c = COLORS_60[p.color]
+                    {resolvePickedItems().map((item) => {
+                      const colorKey = item.color || item.colorKey
+                      const c = COLORS_60[colorKey]
+                      const displayName = item.name || getColorName(colorKey)
+                      const brandLabel = item.brand ? `${item.brand} · ` : ''
                       return (
-                        <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
-                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
-                          {getColorName(p.color)} {t(CATEGORIES.find(c => c.key === p.category)?.labelKey || '')}
+                        <span key={item.id} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
+                          {item.photoThumb ? (
+                            <img src={item.photoThumb} alt="" className="w-3 h-3 rounded-full object-cover flex-shrink-0" />
+                          ) : (
+                            <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
+                          )}
+                          <span className="truncate max-w-[120px]">{brandLabel}{displayName}</span>
                         </span>
                       )
                     })}
@@ -400,12 +414,19 @@ export default function PurchaseSimulate() {
             {/* 선택한 아이템 요약 */}
             <div className="bg-warm-100 dark:bg-warm-700 rounded-2xl p-3 mb-5">
               <div className="flex flex-wrap gap-1.5">
-                {pickedItems.map((p, i) => {
-                  const c = COLORS_60[p.color]
+                {resolvePickedItems().map((item) => {
+                  const colorKey = item.color || item.colorKey
+                  const c = COLORS_60[colorKey]
+                  const displayName = item.name || getColorName(colorKey)
+                  const brandLabel = item.brand ? `${item.brand} · ` : ''
                   return (
-                    <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
-                      <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
-                      {getColorName(p.color)} {t(CATEGORIES.find(c => c.key === p.category)?.labelKey || '')}
+                    <span key={item.id} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
+                      {item.photoThumb ? (
+                        <img src={item.photoThumb} alt="" className="w-3 h-3 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
+                      )}
+                      <span className="truncate max-w-[120px]">{brandLabel}{displayName}</span>
                     </span>
                   )
                 })}
@@ -437,12 +458,19 @@ export default function PurchaseSimulate() {
             {/* 선택한 아이템 요약 */}
             <div className="bg-warm-100 dark:bg-warm-700 rounded-2xl p-3 mb-5">
               <div className="flex flex-wrap gap-1.5">
-                {pickedItems.map((p, i) => {
-                  const c = COLORS_60[p.color]
+                {resolvePickedItems().map((item) => {
+                  const colorKey = item.color || item.colorKey
+                  const c = COLORS_60[colorKey]
+                  const displayName = item.name || getColorName(colorKey)
+                  const brandLabel = item.brand ? `${item.brand} · ` : ''
                   return (
-                    <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
-                      <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
-                      {getColorName(p.color)} {t(CATEGORIES.find(c => c.key === p.category)?.labelKey || '')}
+                    <span key={item.id} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
+                      {item.photoThumb ? (
+                        <img src={item.photoThumb} alt="" className="w-3 h-3 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
+                      )}
+                      <span className="truncate max-w-[120px]">{brandLabel}{displayName}</span>
                     </span>
                   )
                 })}
