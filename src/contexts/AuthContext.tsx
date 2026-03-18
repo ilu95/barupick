@@ -92,8 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (url.includes('callback') && url.includes('access_token')) {
             // SFSafariViewController 닫기
             try {
-              const cap = (window as any).Capacitor
-              if (cap?.Plugins?.Browser) await cap.Plugins.Browser.close()
+              const { Browser } = await import('@capacitor/browser')
+              await Browser.close()
             } catch { }
             const hashPart = url.split('#')[1]
             if (hashPart) {
@@ -170,13 +170,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error
       if (data?.url) {
         try {
-          const cap = (window as any).Capacitor
-          if (cap?.Plugins?.Browser) {
-            await cap.Plugins.Browser.open({ url: data.url, presentationStyle: 'popover' })
-          } else {
-            window.location.href = data.url
-          }
+          // @capacitor/browser → iOS에서 SFSafariViewController (인앱 브라우저) 사용
+          const { Browser } = await import('@capacitor/browser')
+          await Browser.open({ url: data.url, presentationStyle: 'popover' })
         } catch {
+          // Browser 플러그인 미설치 시 fallback
           window.location.href = data.url
         }
       }

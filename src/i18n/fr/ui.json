@@ -1478,5 +1478,22 @@
       "warm": "chaud",
       "cool": "froid"
     }
+  },
+  "support": {
+    "title": "Service Client",
+    "description": "Si vous avez des questions ou des problèmes lors de l'utilisation de Barupick, veuillez nous contacter par les méthodes ci-dessous.",
+    "emailTitle": "Support par Email",
+    "emailDesc": "Nous répondons sous 24 heures les jours ouvrables.",
+    "feedbackTitle": "Commentaires dans l'App",
+    "feedbackDesc": "Vous pouvez laisser vos commentaires dans Paramètres > Envoyer un Commentaire.",
+    "faqTitle": "Questions Fréquemment Posées",
+    "faq1Q": "Je ne peux pas me connecter avec les réseaux sociaux",
+    "faq1A": "Vérifiez votre connexion réseau et mettez l'application à jour. Si vous utilisez iCloud Private Relay, essayez de le désactiver temporairement.",
+    "faq2Q": "Mes données de garde-robe ont disparu",
+    "faq2A": "Les données sont automatiquement synchronisées dans le cloud lorsque vous êtes connecté. Essayez Paramètres > Synchronisation Manuelle ou reconnectez-vous.",
+    "faq3Q": "Je veux supprimer mon compte",
+    "faq3A": "Vous pouvez le faire dans Paramètres > Supprimer le Compte. Les comptes supprimés ne peuvent pas être récupérés.",
+    "developer": "Développeur",
+    "developerName": "Barusa"
   }
 }

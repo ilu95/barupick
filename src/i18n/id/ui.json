@@ -1478,5 +1478,22 @@
       "warm": "hangat",
       "cool": "dingin"
     }
+  },
+  "support": {
+    "title": "Dukungan Pelanggan",
+    "description": "Jika Anda memiliki pertanyaan atau masalah saat menggunakan Barupick, silakan hubungi kami melalui metode di bawah ini.",
+    "emailTitle": "Dukungan Email",
+    "emailDesc": "Kami merespons dalam 24 jam pada hari kerja.",
+    "feedbackTitle": "Umpan Balik di Aplikasi",
+    "feedbackDesc": "Anda dapat memberikan umpan balik langsung di Pengaturan > Kirim Umpan Balik.",
+    "faqTitle": "Pertanyaan yang Sering Diajukan",
+    "faq1Q": "Saya tidak bisa login dengan media sosial",
+    "faq1A": "Silakan periksa koneksi jaringan Anda dan perbarui aplikasi ke versi terbaru. Jika Anda menggunakan iCloud Private Relay, coba nonaktifkan sementara.",
+    "faq2Q": "Data lemari pakaian saya hilang",
+    "faq2A": "Data secara otomatis disinkronkan ke cloud saat login. Coba Pengaturan > Sinkronisasi Manual atau login kembali.",
+    "faq3Q": "Saya ingin menghapus akun saya",
+    "faq3A": "Anda dapat melakukannya di Pengaturan > Hapus Akun. Akun yang dihapus tidak dapat dipulihkan.",
+    "developer": "Pengembang",
+    "developerName": "Barusa"
   }
 }
