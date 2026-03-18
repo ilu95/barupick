@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ShoppingBag, ArrowLeft, Plus, ChevronRight, Sparkles, Target, Shirt, Check, X } from 'lucide-react'
+import { ShoppingBag, ArrowLeft, ChevronRight, Sparkles, Target, Shirt, Check, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
 
@@ -156,16 +156,6 @@ export default function PurchaseSimulate() {
     }
   }, [presetCategory, presetColor])
 
-  const handleAddToWardrobe = (cat: string, col: string) => {
-    try {
-      const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
-      items.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), category: cat, color: col, colorKey: col, name: getColorName(col), createdAt: new Date().toISOString() })
-      if (items.length > 200) items.length = 200
-      localStorage.setItem('sp_wardrobe', JSON.stringify(items))
-      wardrobe.refresh()
-      navigate('/closet', { replace: true })
-    } catch {}
-  }
 
   // ═══ 모드 선택 ═══
   if (mode === 'select') {
@@ -270,11 +260,6 @@ export default function PurchaseSimulate() {
                       </div>
                     </div>
                   </div>
-                  {rec.verdict === 'strong_buy' || rec.verdict === 'buy' ? (
-                    <button onClick={() => handleAddToWardrobe(rec.category, rec.color)} className="mt-3 w-full py-2.5 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.98] transition-all">
-                      <Plus size={14} /> {t('purchaseSimulate.addToCloset')}
-                    </button>
-                  ) : null}
                 </div>
               )
             })}
@@ -504,12 +489,6 @@ export default function PurchaseSimulate() {
                           </div>
                         </div>
                       </div>
-                      {(r.verdict === 'strong_buy' || r.verdict === 'buy') && (
-                        <button onClick={() => handleAddToWardrobe(pickedCategory!, r.colorKey)}
-                          className="mt-3 w-full py-2.5 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.98] transition-all">
-                          <Plus size={14} /> {t('purchaseSimulate.addToCloset')}
-                        </button>
-                      )}
                     </div>
                   )
                 })}
@@ -617,11 +596,6 @@ export default function PurchaseSimulate() {
                     <div className="text-[10px] text-warm-500">{t('purchaseSimulate.avgScore')}</div>
                   </div>
                 </div>
-                {(simResult.verdict === 'strong_buy' || simResult.verdict === 'buy') && (
-                  <button onClick={() => handleAddToWardrobe(category, color)} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra mb-3">
-                    <Plus size={16} /> {t('purchaseSimulate.addToCloset')}
-                  </button>
-                )}
               </>
             )
           })()}
