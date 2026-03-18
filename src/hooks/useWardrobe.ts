@@ -255,6 +255,66 @@ export function useWardrobe() {
     return { currentCombos, afterCombos, comboDelta, matchingOutfits: matchingOutfits.slice(0, 10), avgScore, bestScore, verdict, reason }
   }, [generateAllCombos])
 
+  // ─── 선택 아이템 기준 구매 시뮬레이션 (내 옷 기준 검토) ───
+  const simulatePurchaseWithPicks = useCallback((
+    targetCategory: string,
+    pickedItems: { category: string; color: string }[]
+  ): {
+    colorKey: string
+    score: number
+    verdict: 'strong_buy' | 'buy' | 'weak' | 'skip'
+  }[] => {
+    const cat = normalizeCategory(targetCategory)
+    const pc = profile.getPersonalColor()
+
+    // 선택한 아이템으로 고정 풀 구성
+    const fixedPools: Record<string, string> = {}
+    pickedItems.forEach(p => {
+      fixedPools[normalizeCategory(p.category)] = p.color
+    })
+
+    // 사고 싶은 카테고리에 SCAN_COLORS를 하나씩 넣고 평가
+    const SCAN = [
+      'white', 'ivory', 'beige', 'cream', 'lightgray', 'gray', 'charcoal', 'black',
+      'navy', 'brown', 'camel', 'cognac', 'tan', 'olive', 'khaki', 'burgundy',
+      'terracotta', 'sage', 'moss', 'denim', 'steel_blue', 'dusty_rose', 'plum',
+      'red', 'blue', 'green', 'mustard', 'rust', 'teal', 'forest',
+      'pastel_pink', 'pastel_blue', 'pastel_green', 'lavender', 'mauve',
+    ]
+
+    const results: { colorKey: string; score: number; verdict: 'strong_buy' | 'buy' | 'weak' | 'skip' }[] = []
+
+    for (const colorKey of SCAN) {
+      if (!COLORS_60[colorKey]) continue
+
+      // 코디 구성: 선택 아이템 + 평가 대상 컬러
+      const outfit: Record<string, string> = { ...fixedPools, [cat]: colorKey }
+
+      // 필수 슬롯(top, bottom, shoes) 중 비어있으면 빈 문자열
+      for (const slot of ['top', 'bottom', 'shoes']) {
+        if (!outfit[slot]) outfit[slot] = ''
+      }
+
+      try {
+        const result = evaluationSystem.evaluate(outfit, pc)
+        const score = result.total
+
+        let verdict: 'strong_buy' | 'buy' | 'weak' | 'skip'
+        if (score >= 85) verdict = 'strong_buy'
+        else if (score >= 75) verdict = 'buy'
+        else if (score >= 60) verdict = 'weak'
+        else verdict = 'skip'
+
+        results.push({ colorKey, score, verdict })
+      } catch {
+        results.push({ colorKey, score: 0, verdict: 'skip' })
+      }
+    }
+
+    results.sort((a, b) => b.score - a.score)
+    return results
+  }, [])
+
   // ─── 아이템별 활용도 계산 (④번) ───
   const calculateItemUtility = useCallback((targetItem: WardrobeItem): {
     highScoreCombos: number
@@ -382,6 +442,7 @@ export function useWardrobe() {
     generateAllCombos,
     findMatchingOutfits,
     simulatePurchase,
+    simulatePurchaseWithPicks,
     calculateItemUtility,
     getColorProfile,
     markWorn,

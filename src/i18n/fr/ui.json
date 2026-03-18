@@ -885,7 +885,18 @@
     "reasonStrongBuy": "Fortement recommandé ! {{count}} tenues à haut score sont désormais possibles",
     "reasonBuy": "Excellent choix ! {{count}} combinaisons fonctionnent bien avec votre dressing",
     "reasonWeak": "Seulement {{count}} combinaisons compatibles. À considérer attentivement",
-    "reasonSkip": "Ne s'accorde pas bien avec votre dressing"
+    "reasonSkip": "Ne s'accorde pas bien avec votre dressing",
+    "pickedMode": "Vérifier avec mes vêtements",
+    "pickedModeDesc": "Choisissez vos vêtements et recevez des suggestions de couleurs",
+    "pickedTitle": "Vérifier avec mes vêtements",
+    "pickedSelectItems": "Sélectionnez les vêtements que vous prévoyez de porter ensemble",
+    "pickedSelected": "{{count}} sélectionnés",
+    "pickedNext": "Choisir le type de vêtement à acheter",
+    "pickedHint": "Veuillez sélectionner au moins 1 article de votre dressing",
+    "pickedSelectCategory": "Quel type de vêtement souhaitez-vous acheter ?",
+    "pickedResultDesc": "Couleurs de {{category}} recommandées selon votre sélection",
+    "pickedScore": "Score coord {{score}}",
+    "pickedNoResult": "Aucune couleur recommandée trouvée pour cette combinaison"
   },
   "wardrobeReport": {
     "title": "L'histoire de mon dressing",

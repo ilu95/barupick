@@ -885,7 +885,18 @@
     "reasonStrongBuy": "Altamente recomendado! {{count}} looks de alta pontuação agora são possíveis",
     "reasonBuy": "Ótima escolha! {{count}} combinações funcionam bem com seu armário",
     "reasonWeak": "Apenas {{count}} combinações compatíveis. Considere com cuidado",
-    "reasonSkip": "Não combina bem com seu armário"
+    "reasonSkip": "Não combina bem com seu armário",
+    "pickedMode": "Verificar com minhas roupas",
+    "pickedModeDesc": "Escolha suas roupas e receba recomendações de cores",
+    "pickedTitle": "Verificar com minhas roupas",
+    "pickedSelectItems": "Selecione as roupas que planeja usar juntas",
+    "pickedSelected": "{{count}} selecionadas",
+    "pickedNext": "Selecionar tipo de roupa para comprar",
+    "pickedHint": "Selecione pelo menos 1 peça do seu armário",
+    "pickedSelectCategory": "Que tipo de roupa você quer comprar?",
+    "pickedResultDesc": "Cores de {{category}} recomendadas com base na sua seleção",
+    "pickedScore": "Pontuação coord {{score}}",
+    "pickedNoResult": "Não foram encontradas cores recomendadas para esta combinação"
   },
   "wardrobeReport": {
     "title": "A história do meu armário",

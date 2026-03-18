@@ -885,7 +885,18 @@
     "reasonStrongBuy": "Rất đáng mua! Giờ có thể tạo {{count}} bộ trang phục điểm cao",
     "reasonBuy": "Lựa chọn tuyệt vời! {{count}} combo phối tốt với tủ quần áo của bạn",
     "reasonWeak": "Chỉ {{count}} combo phù hợp. Hãy cân nhắc kỹ",
-    "reasonSkip": "Không phối tốt với tủ quần áo của bạn"
+    "reasonSkip": "Không phối tốt với tủ quần áo của bạn",
+    "pickedMode": "Kiểm tra với đồ của tôi",
+    "pickedModeDesc": "Chọn quần áo bạn có và nhận gợi ý màu",
+    "pickedTitle": "Kiểm tra với đồ của tôi",
+    "pickedSelectItems": "Chọn quần áo bạn định mặc cùng từ tủ đồ",
+    "pickedSelected": "Đã chọn {{count}} món",
+    "pickedNext": "Chọn loại đồ muốn mua",
+    "pickedHint": "Vui lòng chọn ít nhất 1 món từ tủ quần áo",
+    "pickedSelectCategory": "Bạn muốn mua loại quần áo nào?",
+    "pickedResultDesc": "Màu {{category}} gợi ý dựa trên lựa chọn của bạn",
+    "pickedScore": "Điểm phối đồ {{score}}",
+    "pickedNoResult": "Không tìm thấy màu gợi ý cho tổ hợp này"
   },
   "wardrobeReport": {
     "title": "Câu chuyện tủ quần áo",

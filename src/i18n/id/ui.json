@@ -885,7 +885,18 @@
     "reasonStrongBuy": "Sangat direkomendasikan! {{count}} outfit skor tinggi sekarang bisa dibuat",
     "reasonBuy": "Pilihan bagus! {{count}} kombo cocok dengan lemari pakaianmu",
     "reasonWeak": "Hanya {{count}} kombo yang cocok. Pertimbangkan dengan baik",
-    "reasonSkip": "Tidak cocok dengan lemari pakaianmu"
+    "reasonSkip": "Tidak cocok dengan lemari pakaianmu",
+    "pickedMode": "Cek dengan pakaian saya",
+    "pickedModeDesc": "Pilih pakaianmu dan dapatkan rekomendasi warna",
+    "pickedTitle": "Cek dengan pakaian saya",
+    "pickedSelectItems": "Pilih pakaian yang akan dipakai bersama dari lemari",
+    "pickedSelected": "{{count}} dipilih",
+    "pickedNext": "Pilih jenis pakaian yang ingin dibeli",
+    "pickedHint": "Silakan pilih minimal 1 item dari lemari pakaianmu",
+    "pickedSelectCategory": "Jenis pakaian apa yang ingin kamu beli?",
+    "pickedResultDesc": "Warna {{category}} yang direkomendasikan berdasarkan pilihanmu",
+    "pickedScore": "Skor coord {{score}}",
+    "pickedNoResult": "Tidak ditemukan warna yang direkomendasikan untuk kombinasi ini"
   },
   "wardrobeReport": {
     "title": "Cerita Lemari Pakaianku",

@@ -5,14 +5,14 @@
 // ═══════════════════════════════════════════════════════
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ShoppingBag, ArrowLeft, Plus, ChevronRight, Sparkles, Target } from 'lucide-react'
+import { ShoppingBag, ArrowLeft, Plus, ChevronRight, Sparkles, Target, Shirt, Check, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
 
-type PageMode = 'select' | 'recommend' | 'manual'
+type PageMode = 'select' | 'recommend' | 'manual' | 'picked'
 
 const CATEGORIES = [
   { key: 'outer', labelKey: 'categories.outer', emoji: '🧥' },
@@ -47,6 +47,13 @@ export default function PurchaseSimulate() {
   const [recResults, setRecResults] = useState<any[]>([])
   const [recAnalyzing, setRecAnalyzing] = useState(false)
   const [recProgress, setRecProgress] = useState(0)
+
+  // ─── 내 옷 기준 검토 모드 상태 ───
+  const [pickedStep, setPickedStep] = useState<'items' | 'category' | 'result'>('items')
+  const [pickedItems, setPickedItems] = useState<{ category: string; color: string }[]>([])
+  const [pickedCategory, setPickedCategory] = useState<string | null>(null)
+  const [pickedResults, setPickedResults] = useState<any[]>([])
+  const [pickedAnalyzing, setPickedAnalyzing] = useState(false)
 
   // ─── 직접 선택 모드 상태 ───
   const [manualStep, setManualStep] = useState<'category' | 'color' | 'result'>(
@@ -192,6 +199,17 @@ export default function PurchaseSimulate() {
             </div>
             <ChevronRight size={16} className="text-warm-400" />
           </button>
+
+          <button onClick={() => { setMode('picked'); setPickedStep('items'); setPickedItems([]); setPickedCategory(null); setPickedResults([]) }} className="w-full bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-warm-800 dark:to-warm-700 border border-violet-300 dark:border-violet-700 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm">
+            <div className="w-12 h-12 rounded-xl bg-violet-200 dark:bg-violet-800 flex items-center justify-center flex-shrink-0">
+              <Shirt size={22} className="text-violet-700 dark:text-violet-300" />
+            </div>
+            <div className="flex-1">
+              <div className="text-[15px] font-bold text-violet-800 dark:text-violet-200">{t('purchaseSimulate.pickedMode')}</div>
+              <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-0.5">{t('purchaseSimulate.pickedModeDesc')}</div>
+            </div>
+            <ChevronRight size={16} className="text-violet-400" />
+          </button>
         </div>
       </div>
     )
@@ -260,6 +278,222 @@ export default function PurchaseSimulate() {
                 </div>
               )
             })}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ═══ 내 옷 기준 검토 모드 ═══
+  if (mode === 'picked') {
+    // 옷장 아이템을 카테고리별로 그룹화
+    const groupedItems = CATEGORIES.map(cat => ({
+      ...cat,
+      items: wardrobe.getItems(cat.key),
+    })).filter(g => g.items.length > 0)
+
+    // 이미 선택한 카테고리 목록 (사고 싶은 카테고리 선택 시 제외용)
+    const pickedCats = new Set(pickedItems.map(p => p.category))
+
+    const togglePickedItem = (category: string, color: string) => {
+      setPickedItems(prev => {
+        const exists = prev.find(p => p.category === category && p.color === color)
+        if (exists) return prev.filter(p => !(p.category === category && p.color === color))
+        return [...prev, { category, color }]
+      })
+    }
+
+    const runPickedSim = (cat: string) => {
+      setPickedCategory(cat)
+      setPickedStep('result')
+      setPickedAnalyzing(true)
+      requestAnimationFrame(() => {
+        try {
+          const results = wardrobe.simulatePurchaseWithPicks(cat, pickedItems)
+          setPickedResults(results)
+        } catch { setPickedResults([]) }
+        finally { setPickedAnalyzing(false) }
+      })
+    }
+
+    return (
+      <div className="animate-screen-fade px-5 pt-2 pb-10">
+        <button onClick={() => {
+          if (pickedStep === 'result') { setPickedStep('category'); setPickedResults([]) }
+          else if (pickedStep === 'category') { setPickedStep('items') }
+          else { setMode('select') }
+        }} className="flex items-center gap-1 text-sm text-warm-500 dark:text-warm-400 mb-3 active:opacity-70">
+          <ArrowLeft size={16} /> {t('common.goBack')}
+        </button>
+
+        <div className="flex items-center gap-2 mb-1">
+          <Shirt size={20} className="text-violet-600 dark:text-violet-400" />
+          <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">{t('purchaseSimulate.pickedTitle')}</h2>
+        </div>
+
+        {/* Step 1: 옷장에서 함께 입을 아이템 선택 */}
+        {pickedStep === 'items' && (
+          <div className="animate-screen-fade">
+            <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">{t('purchaseSimulate.pickedSelectItems')}</p>
+
+            {groupedItems.map(group => (
+              <div key={group.key} className="mb-4">
+                <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 mb-2">{group.emoji} {t(group.labelKey)}</div>
+                <div className="flex flex-wrap gap-2">
+                  {/* 같은 카테고리 내 중복 색상 제거 */}
+                  {[...new Map(group.items.map(item => [item.color, item])).values()].map(item => {
+                    const c = COLORS_60[item.color]
+                    if (!c) return null
+                    const isSelected = pickedItems.some(p => p.category === group.key && p.color === item.color)
+                    return (
+                      <button key={item.color} onClick={() => togglePickedItem(group.key, item.color)}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-all active:scale-[0.97]
+                          ${isSelected
+                            ? 'border-violet-400 dark:border-violet-500 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 ring-1 ring-violet-300 dark:ring-violet-600'
+                            : 'border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-700 dark:text-warm-300'
+                          }`}>
+                        <span className="w-4 h-4 rounded-full border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
+                        {getColorName(item.color)}
+                        {isSelected && <Check size={12} className="text-violet-500" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* 선택한 아이템 요약 & 다음 버튼 */}
+            {pickedItems.length > 0 && (
+              <div className="mt-4">
+                <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-700 rounded-2xl p-4 mb-4">
+                  <div className="text-xs font-semibold text-violet-700 dark:text-violet-300 mb-2">{t('purchaseSimulate.pickedSelected', { count: pickedItems.length })}</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {pickedItems.map((p, i) => {
+                      const c = COLORS_60[p.color]
+                      return (
+                        <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
+                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
+                          {getColorName(p.color)} {t(CATEGORIES.find(c => c.key === p.category)?.labelKey || '')}
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
+                <button onClick={() => setPickedStep('category')}
+                  className="w-full py-3.5 bg-violet-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-sm">
+                  {t('purchaseSimulate.pickedNext')} <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+
+            {pickedItems.length === 0 && (
+              <div className="text-center py-6 text-sm text-warm-500 dark:text-warm-400">{t('purchaseSimulate.pickedHint')}</div>
+            )}
+          </div>
+        )}
+
+        {/* Step 2: 사고 싶은 카테고리 선택 */}
+        {pickedStep === 'category' && (
+          <div className="animate-screen-fade">
+            <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">{t('purchaseSimulate.pickedSelectCategory')}</p>
+
+            {/* 선택한 아이템 요약 */}
+            <div className="bg-warm-100 dark:bg-warm-700 rounded-2xl p-3 mb-5">
+              <div className="flex flex-wrap gap-1.5">
+                {pickedItems.map((p, i) => {
+                  const c = COLORS_60[p.color]
+                  return (
+                    <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
+                      <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
+                      {getColorName(p.color)} {t(CATEGORIES.find(c => c.key === p.category)?.labelKey || '')}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2.5">
+              {CATEGORIES.map(cat => (
+                <button key={cat.key} onClick={() => runPickedSim(cat.key)}
+                  className="flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-5 py-4 active:scale-[0.98] transition-all shadow-warm-sm">
+                  <span className="text-2xl">{cat.emoji}</span>
+                  <div className="flex-1 text-left">
+                    <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t(cat.labelKey)}</div>
+                  </div>
+                  <ChevronRight size={16} className="text-warm-400" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: 결과 */}
+        {pickedStep === 'result' && (
+          <div className="animate-screen-fade">
+            <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">
+              {t('purchaseSimulate.pickedResultDesc', { category: t(CATEGORIES.find(c => c.key === pickedCategory)?.labelKey || '') })}
+            </p>
+
+            {/* 선택한 아이템 요약 */}
+            <div className="bg-warm-100 dark:bg-warm-700 rounded-2xl p-3 mb-5">
+              <div className="flex flex-wrap gap-1.5">
+                {pickedItems.map((p, i) => {
+                  const c = COLORS_60[p.color]
+                  return (
+                    <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1">
+                      <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: c?.hex || '#ccc' }} />
+                      {getColorName(p.color)} {t(CATEGORIES.find(c => c.key === p.category)?.labelKey || '')}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+
+            {pickedAnalyzing && (
+              <div className="flex flex-col items-center py-16">
+                <div className="w-10 h-10 border-2 border-violet-300 border-t-violet-500 rounded-full animate-spin mb-4" />
+                <div className="text-sm text-warm-500">{t('common.analyzing')}</div>
+              </div>
+            )}
+
+            {!pickedAnalyzing && pickedResults.length > 0 && (
+              <div className="flex flex-col gap-2.5">
+                {pickedResults.filter(r => r.score > 0).map((r, idx) => {
+                  const c = COLORS_60[r.colorKey]
+                  const v = VERDICT_UI[r.verdict] || VERDICT_UI.weak
+                  return (
+                    <div key={r.colorKey} className={`bg-white dark:bg-warm-800 border ${v.border} rounded-2xl p-4 shadow-warm-sm`}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold text-warm-500 dark:text-warm-400 w-6 text-center">{idx + 1}</span>
+                        <div className="w-10 h-10 rounded-xl border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">{getColorName(r.colorKey)}</span>
+                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${v.bg} ${v.text}`}>{v.emoji} {v.label}</span>
+                          </div>
+                          <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">
+                            {t('purchaseSimulate.pickedScore', { score: r.score })}
+                          </div>
+                        </div>
+                      </div>
+                      {(r.verdict === 'strong_buy' || r.verdict === 'buy') && (
+                        <button onClick={() => handleAddToWardrobe(pickedCategory!, r.colorKey)}
+                          className="mt-3 w-full py-2.5 bg-terra-500 text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 active:scale-[0.98] transition-all">
+                          <Plus size={14} /> {t('purchaseSimulate.addToCloset')}
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {!pickedAnalyzing && pickedResults.filter(r => r.score > 0).length === 0 && (
+              <div className="text-center py-16">
+                <div className="text-3xl mb-3">🤔</div>
+                <div className="text-sm text-warm-600 dark:text-warm-400">{t('purchaseSimulate.pickedNoResult')}</div>
+              </div>
+            )}
           </div>
         )}
       </div>
