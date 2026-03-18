@@ -1478,5 +1478,22 @@
       "warm": "warm",
       "cool": "cool"
     }
+  },
+  "support": {
+    "title": "Customer Support",
+    "description": "If you have any questions or issues while using Barupick, please contact us through the methods below.",
+    "emailTitle": "Email Support",
+    "emailDesc": "We respond within 24 hours on business days.",
+    "feedbackTitle": "In-App Feedback",
+    "feedbackDesc": "You can leave feedback directly in Settings > Send Feedback.",
+    "faqTitle": "Frequently Asked Questions",
+    "faq1Q": "I can't log in with social login",
+    "faq1A": "Please check your network connection and update the app to the latest version. If you're using iCloud Private Relay, try disabling it temporarily.",
+    "faq2Q": "My closet data disappeared",
+    "faq2A": "Data is automatically synced to the cloud when logged in. Try running Settings > Manual Sync, or log in again with the same account.",
+    "faq3Q": "I want to delete my account",
+    "faq3A": "You can do this in Settings > Delete Account. Deleted accounts cannot be recovered.",
+    "developer": "Developer",
+    "developerName": "Barusa"
   }
 }

@@ -1478,5 +1478,22 @@
       "warm": "warm",
       "cool": "kühl"
     }
+  },
+  "support": {
+    "title": "Kundenservice",
+    "description": "Wenn Sie Fragen oder Probleme bei der Nutzung von Barupick haben, kontaktieren Sie uns über die folgenden Wege.",
+    "emailTitle": "E-Mail-Support",
+    "emailDesc": "Wir antworten innerhalb von 24 Stunden an Werktagen.",
+    "feedbackTitle": "In-App Feedback",
+    "feedbackDesc": "Sie können Feedback direkt unter Einstellungen > Feedback senden hinterlassen.",
+    "faqTitle": "Häufig Gestellte Fragen",
+    "faq1Q": "Ich kann mich nicht mit Social Login anmelden",
+    "faq1A": "Bitte überprüfen Sie Ihre Netzwerkverbindung und aktualisieren Sie die App. Wenn Sie iCloud Private Relay verwenden, deaktivieren Sie es vorübergehend.",
+    "faq2Q": "Meine Kleiderschrank-Daten sind verschwunden",
+    "faq2A": "Daten werden im eingeloggten Zustand automatisch mit der Cloud synchronisiert. Versuchen Sie Einstellungen > Manuelle Synchronisation oder melden Sie sich erneut an.",
+    "faq3Q": "Ich möchte mein Konto löschen",
+    "faq3A": "Dies können Sie unter Einstellungen > Konto löschen tun. Gelöschte Konten können nicht wiederhergestellt werden.",
+    "developer": "Entwickler",
+    "developerName": "Barusa"
   }
 }

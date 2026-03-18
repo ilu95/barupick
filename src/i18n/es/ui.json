@@ -1478,5 +1478,22 @@
       "warm": "cálido",
       "cool": "frío"
     }
+  },
+  "support": {
+    "title": "Soporte al Cliente",
+    "description": "Si tienes alguna pregunta o problema al usar Barupick, contáctanos a través de los siguientes métodos.",
+    "emailTitle": "Soporte por Email",
+    "emailDesc": "Respondemos dentro de 24 horas en días hábiles.",
+    "feedbackTitle": "Comentarios en la App",
+    "feedbackDesc": "Puedes dejar tus comentarios en Configuración > Enviar Comentarios.",
+    "faqTitle": "Preguntas Frecuentes",
+    "faq1Q": "No puedo iniciar sesión con redes sociales",
+    "faq1A": "Verifica tu conexión de red y actualiza la app a la última versión. Si usas iCloud Private Relay, intenta desactivarlo temporalmente.",
+    "faq2Q": "Mis datos del armario desaparecieron",
+    "faq2A": "Los datos se sincronizan automáticamente en la nube al iniciar sesión. Intenta Configuración > Sincronización Manual o inicia sesión nuevamente.",
+    "faq3Q": "Quiero eliminar mi cuenta",
+    "faq3A": "Puedes hacerlo en Configuración > Eliminar Cuenta. Las cuentas eliminadas no se pueden recuperar.",
+    "developer": "Desarrollador",
+    "developerName": "Barusa"
   }
 }

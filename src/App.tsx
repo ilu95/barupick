@@ -33,7 +33,7 @@ import FollowList from '@/pages/FollowList'
 import BlockList from '@/pages/BlockList'
 import Notifications from '@/pages/Notifications'
 import { MyLevel, MyBadges, ColorRanking, ColorPattern, Challenges, TitleExam, MyPosts, Insights, SavedCoords } from '@/pages/ProfileSubPages'
-import { Weather, Quiz, FabricGuide, BodyGuide, Shop, Terms, Privacy, EventDetail, PcSelect } from '@/pages/RemainingPages'
+import { Weather, Quiz, FabricGuide, BodyGuide, Shop, Terms, Privacy, Support, EventDetail, PcSelect } from '@/pages/RemainingPages'
 
 import Onboarding from '@/pages/Onboarding'
 import ClosetCoord from '@/pages/ClosetCoord'
@@ -142,6 +142,7 @@ export default function App() {
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/support" element={<Support />} />
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/dev/diag" element={<AdminOnly><DevDiag /></AdminOnly>} />
                   <Route path="*" element={<Navigate to="/home" replace />} />

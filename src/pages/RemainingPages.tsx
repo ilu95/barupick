@@ -774,6 +774,74 @@ export function Terms() {
   )
 }
 
+// ─── 고객 지원 ───
+export function Support() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const faqs = [
+    { q: t('support.faq1Q'), a: t('support.faq1A') },
+    { q: t('support.faq2Q'), a: t('support.faq2A') },
+    { q: t('support.faq3Q'), a: t('support.faq3A') },
+  ]
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+
+  return (
+    <div className="animate-screen-fade px-5 pt-2 pb-10">
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-2">{t('support.title')}</h2>
+      <p className="text-sm text-warm-600 mb-5">{t('support.description')}</p>
+
+      {/* 이메일 문의 */}
+      <div className="bg-white border border-warm-400 rounded-2xl p-4 shadow-warm-sm mb-3">
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <HelpCircle size={18} className="text-terra-500" />
+          <h3 className="text-[15px] font-semibold text-warm-900">{t('support.emailTitle')}</h3>
+        </div>
+        <p className="text-sm text-warm-600 mb-2">{t('support.emailDesc')}</p>
+        <a href="mailto:barusa.corp@gmail.com" className="text-sm text-terra-600 font-semibold">barusa.corp@gmail.com</a>
+      </div>
+
+      {/* 앱 내 피드백 */}
+      <div className="bg-white border border-warm-400 rounded-2xl p-4 shadow-warm-sm mb-5">
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <HelpCircle size={18} className="text-terra-500" />
+          <h3 className="text-[15px] font-semibold text-warm-900">{t('support.feedbackTitle')}</h3>
+        </div>
+        <p className="text-sm text-warm-600 mb-2">{t('support.feedbackDesc')}</p>
+        <button onClick={() => navigate('/profile/settings?feedback=1')} className="text-sm text-terra-600 font-semibold">
+          {t('settings.feedback')} →
+        </button>
+      </div>
+
+      {/* FAQ */}
+      <h3 className="font-display text-base font-bold text-warm-900 mb-3">{t('support.faqTitle')}</h3>
+      <div className="space-y-2.5">
+        {faqs.map((faq, i) => (
+          <div key={i} className="bg-white border border-warm-400 rounded-2xl shadow-warm-sm overflow-hidden">
+            <button
+              onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              className="w-full flex items-center justify-between p-4 text-left"
+            >
+              <span className="text-sm font-semibold text-warm-900 flex-1">{faq.q}</span>
+              <ChevronRight size={16} className={`text-warm-400 transition-transform ${openFaq === i ? 'rotate-90' : ''}`} />
+            </button>
+            {openFaq === i && (
+              <div className="px-4 pb-4 text-sm text-warm-600 leading-relaxed border-t border-warm-300 pt-3">
+                {faq.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* 개발사 정보 */}
+      <div className="mt-6 text-center text-xs text-warm-500 space-y-1">
+        <div>{t('support.developer')}: {t('support.developerName')}</div>
+        <div>barusa.corp@gmail.com</div>
+      </div>
+    </div>
+  )
+}
+
 // ─── 개인정보처리방침 ───
 export function Privacy() {
   const { t } = useTranslation()

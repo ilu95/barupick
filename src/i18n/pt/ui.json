@@ -1478,5 +1478,22 @@
       "warm": "quente",
       "cool": "frio"
     }
+  },
+  "support": {
+    "title": "Suporte ao Cliente",
+    "description": "Se você tiver dúvidas ou problemas ao usar o Barupick, entre em contato conosco pelos métodos abaixo.",
+    "emailTitle": "Suporte por Email",
+    "emailDesc": "Respondemos em até 24 horas em dias úteis.",
+    "feedbackTitle": "Feedback no App",
+    "feedbackDesc": "Você pode deixar feedback em Configurações > Enviar Feedback.",
+    "faqTitle": "Perguntas Frequentes",
+    "faq1Q": "Não consigo fazer login social",
+    "faq1A": "Verifique sua conexão de rede e atualize o app para a versão mais recente. Se estiver usando iCloud Private Relay, tente desativá-lo temporariamente.",
+    "faq2Q": "Meus dados do guarda-roupa desapareceram",
+    "faq2A": "Os dados são sincronizados automaticamente na nuvem quando logado. Tente Configurações > Sincronização Manual ou faça login novamente.",
+    "faq3Q": "Quero excluir minha conta",
+    "faq3A": "Você pode fazer isso em Configurações > Excluir Conta. Contas excluídas não podem ser recuperadas.",
+    "developer": "Desenvolvedor",
+    "developerName": "Barusa"
   }
 }

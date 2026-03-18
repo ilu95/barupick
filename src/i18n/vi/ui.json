@@ -1478,5 +1478,22 @@
       "warm": "ấm",
       "cool": "lạnh"
     }
+  },
+  "support": {
+    "title": "Hỗ Trợ Khách Hàng",
+    "description": "Nếu bạn có câu hỏi hoặc vấn đề khi sử dụng Barupick, vui lòng liên hệ chúng tôi qua các phương thức dưới đây.",
+    "emailTitle": "Hỗ Trợ Email",
+    "emailDesc": "Chúng tôi phản hồi trong vòng 24 giờ vào ngày làm việc.",
+    "feedbackTitle": "Phản Hồi Trong Ứng Dụng",
+    "feedbackDesc": "Bạn có thể gửi phản hồi trực tiếp trong Cài đặt > Gửi Phản Hồi.",
+    "faqTitle": "Câu Hỏi Thường Gặp",
+    "faq1Q": "Tôi không thể đăng nhập bằng mạng xã hội",
+    "faq1A": "Vui lòng kiểm tra kết nối mạng và cập nhật ứng dụng lên phiên bản mới nhất. Nếu bạn đang sử dụng iCloud Private Relay, hãy thử tắt tạm thời.",
+    "faq2Q": "Dữ liệu tủ quần áo của tôi biến mất",
+    "faq2A": "Dữ liệu được tự động đồng bộ lên đám mây khi đăng nhập. Hãy thử Cài đặt > Đồng Bộ Thủ Công hoặc đăng nhập lại.",
+    "faq3Q": "Tôi muốn xóa tài khoản",
+    "faq3A": "Bạn có thể thực hiện trong Cài đặt > Xóa Tài Khoản. Tài khoản đã xóa không thể khôi phục.",
+    "developer": "Nhà phát triển",
+    "developerName": "Barusa"
   }
 }

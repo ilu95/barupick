@@ -1478,5 +1478,22 @@
       "warm": "暖",
       "cool": "冷"
     }
+  },
+  "support": {
+    "title": "客户支持",
+    "description": "如果您在使用巴鲁皮克时有任何问题，请通过以下方式联系我们。",
+    "emailTitle": "邮件支持",
+    "emailDesc": "我们会在工作日24小时内回复。",
+    "feedbackTitle": "应用内反馈",
+    "feedbackDesc": "您可以在设置 > 发送反馈中直接留言。",
+    "faqTitle": "常见问题",
+    "faq1Q": "无法使用社交登录",
+    "faq1A": "请检查网络连接并将应用更新到最新版本。如果您正在使用iCloud Private Relay，请尝试暂时关闭。",
+    "faq2Q": "衣柜数据消失了",
+    "faq2A": "登录状态下数据会自动同步到云端。请尝试设置 > 手动同步，或使用相同账号重新登录。",
+    "faq3Q": "我想删除账号",
+    "faq3A": "您可以在设置 > 删除账号中操作。已删除的账号无法恢复。",
+    "developer": "开发商",
+    "developerName": "Barusa"
   }
 }
