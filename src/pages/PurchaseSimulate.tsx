@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ShoppingBag, ArrowLeft, ChevronRight, Sparkles, Target, Shirt, Check, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
+import { ITEMS_CATALOG } from '@/lib/styles'
 
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +22,23 @@ const CATEGORIES = [
   { key: 'bottom', labelKey: 'categories.bottom', emoji: '👖' },
   { key: 'shoes', labelKey: 'categories.shoes', emoji: '👞' },
 ]
+
+// 사고 싶은 옷 종류 (세부 아이템 목록)
+const PICK_TARGET_ITEMS = [
+  ...ITEMS_CATALOG.filter(i => !['scarf', 'hat'].includes(i.id)),
+  { id: 'bottom', emoji: '👖' },
+  { id: 'shoes',  emoji: '👞' },
+]
+
+function itemToCategory(itemId: string): string {
+  const outerIds = ['padding', 'coat', 'jacket', 'hood_zip']
+  const midIds = ['cardigan', 'knit_zip', 'vest']
+  if (outerIds.includes(itemId)) return 'outer'
+  if (midIds.includes(itemId)) return 'middleware'
+  if (itemId === 'bottom') return 'bottom'
+  if (itemId === 'shoes') return 'shoes'
+  return 'top'
+}
 
 // 추천 스캔용 대표 색상 (옷장에 없는 것만 필터)
 const SCAN_COLORS = [
@@ -418,15 +436,11 @@ export default function PurchaseSimulate() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5">
-              {CATEGORIES.map(cat => (
-                <button key={cat.key} onClick={() => runPickedSim(cat.key)}
-                  className="flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-5 py-4 active:scale-[0.98] transition-all shadow-warm-sm">
-                  <span className="text-2xl">{cat.emoji}</span>
-                  <div className="flex-1 text-left">
-                    <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t(cat.labelKey)}</div>
-                  </div>
-                  <ChevronRight size={16} className="text-warm-400" />
+            <div className="flex flex-wrap gap-2">
+              {PICK_TARGET_ITEMS.map(item => (
+                <button key={item.id} onClick={() => runPickedSim(itemToCategory(item.id))}
+                  className="px-3 py-2 rounded-full text-[12px] font-medium bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95 transition-all">
+                  {item.emoji} {t('categories:itemsCatalog.' + item.id)}
                 </button>
               ))}
             </div>
