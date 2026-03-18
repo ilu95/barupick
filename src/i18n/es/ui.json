@@ -885,7 +885,18 @@
     "reasonStrongBuy": "¡Muy recomendado! {{count}} outfits de alta puntuación ahora son posibles",
     "reasonBuy": "¡Excelente elección! {{count}} combinaciones funcionan bien con tu armario",
     "reasonWeak": "Solo {{count}} combinaciones compatibles. Considéralo bien",
-    "reasonSkip": "No combina bien con tu armario"
+    "reasonSkip": "No combina bien con tu armario",
+    "pickedMode": "Check with my outfits",
+    "pickedModeDesc": "Pick your clothes and get color recommendations",
+    "pickedTitle": "Check with My Outfits",
+    "pickedSelectItems": "Select clothes you plan to wear together",
+    "pickedSelected": "{{count}} selected",
+    "pickedNext": "Select item type to buy",
+    "pickedHint": "Please select at least 1 item from your closet",
+    "pickedSelectCategory": "What type of clothing do you want to buy?",
+    "pickedResultDesc": "Recommended {{category}} colors based on your selection",
+    "pickedScore": "Coord score {{score}}",
+    "pickedNoResult": "Couldn't find recommended colors for this combination"
   },
   "wardrobeReport": {
     "title": "La historia de mi armario",

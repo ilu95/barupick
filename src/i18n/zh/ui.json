@@ -885,7 +885,18 @@
     "reasonStrongBuy": "强烈推荐！可新增{{count}}个高分搭配",
     "reasonBuy": "好选择！与衣柜中{{count}}个组合很搭",
     "reasonWeak": "匹配组合仅{{count}}个，请慎重考虑",
-    "reasonSkip": "与当前衣柜不太搭配"
+    "reasonSkip": "与当前衣柜不太搭配",
+    "pickedMode": "Check with my outfits",
+    "pickedModeDesc": "Pick your clothes and get color recommendations",
+    "pickedTitle": "Check with My Outfits",
+    "pickedSelectItems": "Select clothes you plan to wear together",
+    "pickedSelected": "{{count}} selected",
+    "pickedNext": "Select item type to buy",
+    "pickedHint": "Please select at least 1 item from your closet",
+    "pickedSelectCategory": "What type of clothing do you want to buy?",
+    "pickedResultDesc": "Recommended {{category}} colors based on your selection",
+    "pickedScore": "Coord score {{score}}",
+    "pickedNoResult": "Couldn't find recommended colors for this combination"
   },
   "wardrobeReport": {
     "title": "我的衣柜故事",

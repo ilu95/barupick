@@ -885,7 +885,18 @@
     "reasonStrongBuy": "強くおすすめ！{{count}}個の高スコアコーデが新たに可能です",
     "reasonBuy": "いい選択！既存のクローゼットと{{count}}個の組み合わせが合います",
     "reasonWeak": "合う組み合わせが{{count}}個と少なめ。慎重にご検討を",
-    "reasonSkip": "現在のクローゼットとは合わないようです"
+    "reasonSkip": "現在のクローゼットとは合わないようです",
+    "pickedMode": "Check with my outfits",
+    "pickedModeDesc": "Pick your clothes and get color recommendations",
+    "pickedTitle": "Check with My Outfits",
+    "pickedSelectItems": "Select clothes you plan to wear together",
+    "pickedSelected": "{{count}} selected",
+    "pickedNext": "Select item type to buy",
+    "pickedHint": "Please select at least 1 item from your closet",
+    "pickedSelectCategory": "What type of clothing do you want to buy?",
+    "pickedResultDesc": "Recommended {{category}} colors based on your selection",
+    "pickedScore": "Coord score {{score}}",
+    "pickedNoResult": "Couldn't find recommended colors for this combination"
   },
   "wardrobeReport": {
     "title": "クローゼットレポート",

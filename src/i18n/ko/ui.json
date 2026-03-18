@@ -885,7 +885,18 @@
     "reasonStrongBuy": "강력 추천! {{count}}개의 고점수 코디가 새로 가능해요",
     "reasonBuy": "좋은 선택! 기존 옷장과 {{count}}개 조합이 잘 어울려요",
     "reasonWeak": "어울리는 조합이 {{count}}개로 적어요. 신중하게 고려해보세요",
-    "reasonSkip": "현재 옷장과 잘 맞지 않아요"
+    "reasonSkip": "현재 옷장과 잘 맞지 않아요",
+    "pickedMode": "내 옷 기준으로 검토하기",
+    "pickedModeDesc": "가진 옷을 골라서 어울리는 색상 추천",
+    "pickedTitle": "내 옷 기준 검토",
+    "pickedSelectItems": "함께 입을 옷을 옷장에서 선택하세요",
+    "pickedSelected": "{{count}}개 선택됨",
+    "pickedNext": "사고 싶은 옷 종류 선택",
+    "pickedHint": "옷장에서 함께 코디할 아이템을 1개 이상 선택해주세요",
+    "pickedSelectCategory": "어떤 종류의 옷을 사고 싶으세요?",
+    "pickedResultDesc": "선택한 옷 기준 {{category}} 추천 컬러에요",
+    "pickedScore": "코디 점수 {{score}}점",
+    "pickedNoResult": "선택한 조합으로는 추천할 컬러를 찾지 못했어요"
   },
   "wardrobeReport": {
     "title": "내 옷장 이야기",

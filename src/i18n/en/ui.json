@@ -885,7 +885,18 @@
     "reasonStrongBuy": "Highly recommended! {{count}} high-score outfits now possible",
     "reasonBuy": "Great choice! {{count}} combos work well with your closet",
     "reasonWeak": "Only {{count}} matching combos. Consider carefully",
-    "reasonSkip": "Doesn't match well with your closet"
+    "reasonSkip": "Doesn't match well with your closet",
+    "pickedMode": "Check with my outfits",
+    "pickedModeDesc": "Pick your clothes and get color recommendations",
+    "pickedTitle": "Check with My Outfits",
+    "pickedSelectItems": "Select clothes you plan to wear together",
+    "pickedSelected": "{{count}} selected",
+    "pickedNext": "Select item type to buy",
+    "pickedHint": "Please select at least 1 item from your closet",
+    "pickedSelectCategory": "What type of clothing do you want to buy?",
+    "pickedResultDesc": "Recommended {{category}} colors based on your selection",
+    "pickedScore": "Coord score {{score}}",
+    "pickedNoResult": "Couldn't find recommended colors for this combination"
   },
   "wardrobeReport": {
     "title": "My Wardrobe Story",
