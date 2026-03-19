@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
@@ -92,8 +92,11 @@ export default function CommunityDetail() {
   }
 
   // ── 좋아요 ──
+  const likingRef = useRef(false)
   const toggleLike = async () => {
     if (!user || !postId) return
+    if (likingRef.current) return
+    likingRef.current = true
     const was = liked
     setLiked(!was)
     setPost((p: any) => p ? { ...p, likes_count: (p.likes_count || 0) + (was ? -1 : 1) } : p)
@@ -107,7 +110,7 @@ export default function CommunityDetail() {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).catch(() => {})
         }
       }
-    } catch { setLiked(was) }
+    } catch { setLiked(was) } finally { likingRef.current = false }
   }
 
   // ── 저장 (북마크) ──

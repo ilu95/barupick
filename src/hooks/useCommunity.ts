@@ -226,8 +226,11 @@ export function useCommunity() {
   }
 
   // 좋아요 토글
+  const likingRef = useRef<Set<string>>(new Set())
   const toggleLike = useCallback(async (postId: string) => {
     if (!user) return
+    if (likingRef.current.has(postId)) return
+    likingRef.current.add(postId)
 
     const isLiked = myLikes.has(postId)
 
@@ -262,6 +265,8 @@ export function useCommunity() {
       setPosts(prev => prev.map(p =>
         p.id === postId ? { ...p, likes_count: p.likes_count + (isLiked ? 1 : -1) } : p
       ))
+    } finally {
+      likingRef.current.delete(postId)
     }
   }, [user, myLikes])
 
