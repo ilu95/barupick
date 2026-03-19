@@ -181,7 +181,8 @@
     "accessDenied": "Anmeldung wurde abgebrochen.",
     "loggingIn": "Anmeldung läuft...",
     "backToLogin": "Zurück zur Anmeldung",
-    "kakaoPrivateRelay": "Wenn du iCloud Private Relay verwendest,\ngehe zu Einstellungen → iCloud → Private Relay und deaktiviere es, dann versuche es erneut."
+    "kakaoPrivateRelay": "Wenn die Kakao-E-Mail-Anmeldung fehlschlägt,\nverwende bitte die KakaoTalk-Schnellanmeldung.",
+    "kakaoNeedApp": "Kakao-Login erfordert die KakaoTalk-App.\nBitte installiere KakaoTalk und versuche es erneut."
   },
   "settings": {
     "display": "Anzeige",
