@@ -181,7 +181,8 @@
     "accessDenied": "Login dibatalkan.",
     "loggingIn": "Sedang masuk...",
     "backToLogin": "Kembali ke login",
-    "kakaoPrivateRelay": "Jika login email Kakao gagal,\ngunakan login cepat KakaoTalk."
+    "kakaoPrivateRelay": "Jika login email Kakao gagal,\ngunakan login cepat KakaoTalk.",
+    "kakaoNeedApp": "Login Kakao memerlukan aplikasi KakaoTalk.\nSilakan instal KakaoTalk dan coba lagi."
   },
   "settings": {
     "display": "Tampilan",

@@ -181,7 +181,8 @@
     "accessDenied": "登录已取消。",
     "loggingIn": "正在登录...",
     "backToLogin": "返回登录",
-    "kakaoPrivateRelay": "如果Kakao邮箱登录失败，\n请使用KakaoTalk快捷登录。"
+    "kakaoPrivateRelay": "如果Kakao邮箱登录失败，\n请使用KakaoTalk快捷登录。",
+    "kakaoNeedApp": "Kakao登录需要KakaoTalk应用。\n请安装KakaoTalk后重试。"
   },
   "settings": {
     "display": "显示",

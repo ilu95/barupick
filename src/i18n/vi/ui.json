@@ -181,7 +181,8 @@
     "accessDenied": "Đăng nhập đã bị hủy.",
     "loggingIn": "Đang đăng nhập...",
     "backToLogin": "Quay lại đăng nhập",
-    "kakaoPrivateRelay": "Nếu đăng nhập bằng email Kakao thất bại,\nhãy sử dụng đăng nhập nhanh KakaoTalk."
+    "kakaoPrivateRelay": "Nếu đăng nhập bằng email Kakao thất bại,\nhãy sử dụng đăng nhập nhanh KakaoTalk.",
+    "kakaoNeedApp": "Đăng nhập Kakao cần ứng dụng KakaoTalk.\nVui lòng cài đặt KakaoTalk và thử lại."
   },
   "settings": {
     "display": "Hiển thị",

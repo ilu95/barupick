@@ -181,7 +181,8 @@
     "accessDenied": "로그인이 취소되었습니다.",
     "loggingIn": "로그인 처리 중...",
     "backToLogin": "로그인으로 돌아가기",
-    "kakaoPrivateRelay": "카카오 이메일 로그인 시 오류가 발생하면\n카카오톡 간편인증을 이용해주세요."
+    "kakaoPrivateRelay": "카카오 이메일 로그인 시 오류가 발생하면\n카카오톡 간편인증을 이용해주세요.",
+    "kakaoNeedApp": "카카오 로그인은 카카오톡 앱이 필요합니다.\n카카오톡을 설치한 후 다시 시도해주세요."
   },
   "settings": {
     "display": "디스플레이",

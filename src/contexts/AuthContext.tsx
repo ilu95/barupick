@@ -131,31 +131,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
 
     if (isNative && provider === 'kakao') {
-      // ── 카카오 네이티브 SDK (Private Relay 우회) ──
-      try {
-        const cap = (window as any).Capacitor
-        const kakaoPlugin = cap?.Plugins?.Capacitor3KakaoLogin
-        if (kakaoPlugin) {
-          const result = await kakaoPlugin.kakaoLogin()
-          const parsed = typeof result.value === 'string' ? JSON.parse(result.value) : result.value
-
-          // OpenID Connect id_token으로 Supabase 세션 생성
-          const idToken = parsed.idToken || parsed.id_token
-          if (idToken) {
-            const { error } = await supabase.auth.signInWithIdToken({
-              provider: 'kakao',
-              token: idToken,
-            })
-            if (error) throw error
-            return
-          }
-          // id_token 없으면 fallback
-          throw new Error('id_token not available')
-        }
-      } catch (nativeErr: any) {
-        console.warn('Kakao native login failed, falling back to OAuth:', nativeErr.message)
-        // 네이티브 SDK 실패 시 기존 OAuth로 fallback
-      }
+      // ── 카카오: 네이티브 SDK (카카오톡 간편인증) 전용 ──
+      const cap = (window as any).Capacitor
+      const kakaoPlugin = cap?.Plugins?.Capacitor3KakaoLogin
+      if (!kakaoPlugin) throw new Error('KakaoTalk is not available')
+      const result = await kakaoPlugin.kakaoLogin()
+      const parsed = typeof result.value === 'string' ? JSON.parse(result.value) : result.value
+      const idToken = parsed.idToken || parsed.id_token
+      if (!idToken) throw new Error('id_token not available')
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'kakao',
+        token: idToken,
+      })
+      if (error) throw error
+      return
     }
 
     // ── 기존 OAuth 플로우 (웹 + fallback) ──

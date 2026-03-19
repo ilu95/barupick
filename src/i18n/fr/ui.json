@@ -181,7 +181,8 @@
     "accessDenied": "La connexion a été annulée.",
     "loggingIn": "Connexion en cours...",
     "backToLogin": "Retour à la connexion",
-    "kakaoPrivateRelay": "Si la connexion par email Kakao échoue,\nutilisez la connexion rapide KakaoTalk."
+    "kakaoPrivateRelay": "Si la connexion par email Kakao échoue,\nutilisez la connexion rapide KakaoTalk.",
+    "kakaoNeedApp": "La connexion Kakao nécessite l'application KakaoTalk.\nInstallez KakaoTalk et réessayez."
   },
   "settings": {
     "display": "Affichage",

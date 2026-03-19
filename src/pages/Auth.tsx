@@ -58,6 +58,8 @@ function Login() {
       const msg = e.message || ''
       if (msg.includes('not enabled') || msg.includes('Unsupported provider')) {
         setError(t('auth.providerNotEnabled'))
+      } else if (provider === 'kakao' && (msg.includes('not available') || msg.includes('cancel'))) {
+        setError(t('auth.kakaoNeedApp'))
       } else {
         setError(t('auth.loginFailed') + ': ' + msg)
       }
@@ -213,6 +215,8 @@ function Signup() {
       const msg = e.message || ''
       if (msg.includes('not enabled') || msg.includes('Unsupported provider')) {
         setError(t('auth.providerNotEnabled'))
+      } else if (provider === 'kakao' && (msg.includes('not available') || msg.includes('cancel'))) {
+        setError(t('auth.kakaoNeedApp'))
       } else {
         setError(t('auth.loginFailed') + ': ' + msg)
       }

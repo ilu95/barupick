@@ -181,7 +181,8 @@
     "accessDenied": "O login foi cancelado.",
     "loggingIn": "Entrando...",
     "backToLogin": "Voltar ao login",
-    "kakaoPrivateRelay": "Se o login por email do Kakao falhar,\nuse o login rápido do KakaoTalk."
+    "kakaoPrivateRelay": "Se o login por email do Kakao falhar,\nuse o login rápido do KakaoTalk.",
+    "kakaoNeedApp": "O login do Kakao requer o app KakaoTalk.\nInstale o KakaoTalk e tente novamente."
   },
   "settings": {
     "display": "Exibição",
