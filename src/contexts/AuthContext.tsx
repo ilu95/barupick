@@ -147,7 +147,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    // ── 기존 OAuth 플로우 (웹 + fallback) ──
+    if (isNative && provider === 'apple') {
+      // ── Apple: 네이티브 ASAuthorizationController (Apple 심사 필수) ──
+      const { SignInWithApple } = await import('@capacitor-community/apple-sign-in')
+      const result = await SignInWithApple.authorize({
+        clientId: 'kr.co.barusa.barupick',
+        redirectURI: 'https://barupick.vercel.app/auth/callback.html',
+        scopes: 'email name',
+      })
+      const idToken = result.response?.identityToken
+      if (!idToken) throw new Error('Apple ID token not available')
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: idToken,
+      })
+      if (error) throw error
+      return
+    }
+
+    // ── Google OAuth (SFSafariViewController 인앱 브라우저) ──
     if (isNative) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -158,14 +176,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       if (error) throw error
       if (data?.url) {
-        try {
-          // @capacitor/browser → iOS에서 SFSafariViewController (인앱 브라우저) 사용
-          const { Browser } = await import('@capacitor/browser')
-          await Browser.open({ url: data.url, presentationStyle: 'popover' })
-        } catch {
-          // Browser 플러그인 미설치 시 fallback
-          window.location.href = data.url
-        }
+        const { Browser } = await import('@capacitor/browser')
+        await Browser.open({ url: data.url })
       }
     } else {
       // 웹: Supabase 자동 리다이렉트 (작동 확인된 방식)

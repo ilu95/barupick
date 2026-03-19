@@ -11,9 +11,10 @@
     "lint:i18n": "eslint src/ --rule 'i18next/no-literal-string: error'"
   },
   "dependencies": {
+    "@capacitor-community/apple-sign-in": "^7.1.0",
     "@capacitor/app": "^8.0.1",
-    "@capacitor/cli": "^8.2.0",
     "@capacitor/browser": "^8.0.1",
+    "@capacitor/cli": "^8.2.0",
     "@capacitor/core": "^8.2.0",
     "@capacitor/ios": "^8.2.0",
     "@supabase/supabase-js": "^2.49.0",
