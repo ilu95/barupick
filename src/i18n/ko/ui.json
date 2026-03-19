@@ -181,7 +181,7 @@
     "accessDenied": "로그인이 취소되었습니다.",
     "loggingIn": "로그인 처리 중...",
     "backToLogin": "로그인으로 돌아가기",
-    "kakaoPrivateRelay": "iCloud 비공개 릴레이를 사용 중이면\n설정 → iCloud → 비공개 릴레이를 끄고 다시 시도해주세요."
+    "kakaoPrivateRelay": "카카오 이메일 로그인 시 오류가 발생하면\n카카오톡 간편인증을 이용해주세요."
   },
   "settings": {
     "display": "디스플레이",

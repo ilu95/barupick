@@ -181,7 +181,7 @@
     "accessDenied": "Login was cancelled.",
     "loggingIn": "Logging in...",
     "backToLogin": "Back to login",
-    "kakaoPrivateRelay": "If you're using iCloud Private Relay,\ngo to Settings → iCloud → Private Relay and turn it off, then try again."
+    "kakaoPrivateRelay": "If Kakao email login fails,\nplease use KakaoTalk simple login instead."
   },
   "settings": {
     "display": "Display",

@@ -181,7 +181,7 @@
     "accessDenied": "ログインがキャンセルされました。",
     "loggingIn": "ログイン中...",
     "backToLogin": "ログインに戻る",
-    "kakaoPrivateRelay": "iCloudプライベートリレーを使用している場合、\n設定→iCloud→プライベートリレーをオフにしてから再試行してください。"
+    "kakaoPrivateRelay": "カカオメールログインでエラーが発生した場合、\nカカオトーク簡単認証をご利用ください。"
   },
   "settings": {
     "display": "ディスプレイ",

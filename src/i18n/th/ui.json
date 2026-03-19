@@ -181,7 +181,7 @@
     "accessDenied": "การเข้าสู่ระบบถูกยกเลิก",
     "loggingIn": "กำลังเข้าสู่ระบบ...",
     "backToLogin": "กลับไปหน้าเข้าสู่ระบบ",
-    "kakaoPrivateRelay": "หากคุณใช้ iCloud Private Relay\nไปที่ ตั้งค่า → iCloud → Private Relay แล้วปิด จากนั้นลองอีกครั้ง"
+    "kakaoPrivateRelay": "หากเข้าสู่ระบบด้วยอีเมล Kakao ล้มเหลว\nกรุณาใช้การเข้าสู่ระบบด่วน KakaoTalk"
   },
   "settings": {
     "display": "การแสดงผล",

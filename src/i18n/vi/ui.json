@@ -181,7 +181,7 @@
     "accessDenied": "Đăng nhập đã bị hủy.",
     "loggingIn": "Đang đăng nhập...",
     "backToLogin": "Quay lại đăng nhập",
-    "kakaoPrivateRelay": "Nếu bạn đang sử dụng iCloud Private Relay,\nhãy vào Cài đặt → iCloud → Private Relay và tắt đi, rồi thử lại."
+    "kakaoPrivateRelay": "Nếu đăng nhập bằng email Kakao thất bại,\nhãy sử dụng đăng nhập nhanh KakaoTalk."
   },
   "settings": {
     "display": "Hiển thị",

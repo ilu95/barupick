@@ -181,7 +181,7 @@
     "accessDenied": "登录已取消。",
     "loggingIn": "正在登录...",
     "backToLogin": "返回登录",
-    "kakaoPrivateRelay": "如果您正在使用iCloud私人中继，\n请前往设置→iCloud→私人中继将其关闭后重试。"
+    "kakaoPrivateRelay": "如果Kakao邮箱登录失败，\n请使用KakaoTalk快捷登录。"
   },
   "settings": {
     "display": "显示",

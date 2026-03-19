@@ -181,7 +181,7 @@
     "accessDenied": "La connexion a été annulée.",
     "loggingIn": "Connexion en cours...",
     "backToLogin": "Retour à la connexion",
-    "kakaoPrivateRelay": "Si vous utilisez iCloud Private Relay,\nallez dans Réglages → iCloud → Private Relay et désactivez-le, puis réessayez."
+    "kakaoPrivateRelay": "Si la connexion par email Kakao échoue,\nutilisez la connexion rapide KakaoTalk."
   },
   "settings": {
     "display": "Affichage",

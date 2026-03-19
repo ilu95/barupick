@@ -181,7 +181,7 @@
     "accessDenied": "Se canceló el inicio de sesión.",
     "loggingIn": "Iniciando sesión...",
     "backToLogin": "Volver al inicio de sesión",
-    "kakaoPrivateRelay": "Si estás usando iCloud Private Relay,\nve a Ajustes → iCloud → Private Relay y desactívalo, luego inténtalo de nuevo."
+    "kakaoPrivateRelay": "Si el inicio de sesión con email de Kakao falla,\nusa el inicio de sesión rápido de KakaoTalk."
   },
   "settings": {
     "display": "Pantalla",

@@ -110,9 +110,7 @@ function Login() {
             </svg>}
             {t('auth.googleLogin')}
           </button>
-          {/iP(hone|ad|od)/.test(navigator.userAgent) && (
-            <p className="text-[11px] text-warm-500 text-center leading-relaxed whitespace-pre-line">{t('auth.kakaoPrivateRelay')}</p>
-          )}
+          <p className="text-[11px] text-warm-500 text-center leading-relaxed whitespace-pre-line">{t('auth.kakaoPrivateRelay')}</p>
         </div>
 
         {/* 구분선 */}
@@ -264,9 +262,7 @@ function Signup() {
             </svg>
             {t('auth.googleLogin')}
           </button>
-          {/iP(hone|ad|od)/.test(navigator.userAgent) && (
-            <p className="text-[11px] text-warm-500 text-center leading-relaxed whitespace-pre-line">{t('auth.kakaoPrivateRelay')}</p>
-          )}
+          <p className="text-[11px] text-warm-500 text-center leading-relaxed whitespace-pre-line">{t('auth.kakaoPrivateRelay')}</p>
         </div>
 
         {/* 구분선 */}

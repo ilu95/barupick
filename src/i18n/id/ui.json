@@ -181,7 +181,7 @@
     "accessDenied": "Login dibatalkan.",
     "loggingIn": "Sedang masuk...",
     "backToLogin": "Kembali ke login",
-    "kakaoPrivateRelay": "Jika Anda menggunakan iCloud Private Relay,\nbuka Pengaturan → iCloud → Private Relay dan matikan, lalu coba lagi."
+    "kakaoPrivateRelay": "Jika login email Kakao gagal,\ngunakan login cepat KakaoTalk."
   },
   "settings": {
     "display": "Tampilan",
