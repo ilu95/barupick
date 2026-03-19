@@ -149,13 +149,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (isNative && provider === 'apple') {
       // ── Apple: 네이티브 ASAuthorizationController (Apple 심사 필수) ──
-      const { SignInWithApple } = await import('@capacitor-community/apple-sign-in')
-      const result = await SignInWithApple.authorize({
-        clientId: 'kr.co.barusa.barupick',
-        redirectURI: 'https://barupick.vercel.app/auth/callback.html',
-        scopes: 'email name',
-      })
-      const idToken = result.response?.identityToken
+      // ios/App/App/AppleSignInPlugin.swift 에서 등록한 커스텀 플러그인 사용
+      const cap = (window as any).Capacitor
+      const applePlugin = cap?.Plugins?.AppleSignIn
+      if (!applePlugin) throw new Error('Apple Sign In not available')
+      const result = await applePlugin.authorize()
+      const idToken = result.identityToken
       if (!idToken) throw new Error('Apple ID token not available')
       const { error } = await supabase.auth.signInWithIdToken({
         provider: 'apple',
