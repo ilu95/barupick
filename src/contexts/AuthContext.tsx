@@ -1,7 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { registerPlugin } from '@capacitor/core'
 import { supabase } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { trackSocialLogin, trackSignup, setAnalyticsUser } from '@/lib/analytics'
+
+// 커스텀 네이티브 Apple Sign In 플러그인 (ios/App/App/AppleSignInPlugin.swift)
+interface AppleSignInPlugin {
+  authorize(): Promise<{ identityToken: string; user: string; email?: string; fullName?: string }>
+}
+const AppleSignIn = registerPlugin<AppleSignInPlugin>('AppleSignIn')
 
 
 interface Profile {
@@ -131,29 +138,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.()
 
     if (isNative && provider === 'kakao') {
-      // ── 카카오: 네이티브 SDK (카카오톡 간편인증) 전용 ──
-      const cap = (window as any).Capacitor
-      const kakaoPlugin = cap?.Plugins?.Capacitor3KakaoLogin
-      if (!kakaoPlugin) throw new Error('KakaoTalk is not available')
-      const result = await kakaoPlugin.kakaoLogin()
-      const parsed = typeof result.value === 'string' ? JSON.parse(result.value) : result.value
-      const idToken = parsed.idToken || parsed.id_token
-      if (!idToken) throw new Error('id_token not available')
-      const { error } = await supabase.auth.signInWithIdToken({
-        provider: 'kakao',
-        token: idToken,
-      })
-      if (error) throw error
-      return
+      // ── 카카오: 네이티브 SDK 우선, 실패 시 OAuth fallback ──
+      try {
+        const cap = (window as any).Capacitor
+        const kakaoPlugin = cap?.Plugins?.Capacitor3KakaoLogin
+        if (kakaoPlugin) {
+          const result = await kakaoPlugin.kakaoLogin()
+          const parsed = typeof result.value === 'string' ? JSON.parse(result.value) : result.value
+          const idToken = parsed.idToken || parsed.id_token
+          if (idToken) {
+            const { error } = await supabase.auth.signInWithIdToken({
+              provider: 'kakao',
+              token: idToken,
+            })
+            if (error) throw error
+            return
+          }
+        }
+      } catch (nativeErr: any) {
+        console.warn('Kakao native login failed, falling back to OAuth:', nativeErr.message)
+      }
+      // 카카오톡 미설치 또는 네이티브 실패 → SFSafariViewController OAuth
     }
 
     if (isNative && provider === 'apple') {
       // ── Apple: 네이티브 ASAuthorizationController (Apple 심사 필수) ──
-      // ios/App/App/AppleSignInPlugin.swift 에서 등록한 커스텀 플러그인 사용
-      const cap = (window as any).Capacitor
-      const applePlugin = cap?.Plugins?.AppleSignIn
-      if (!applePlugin) throw new Error('Apple Sign In not available')
-      const result = await applePlugin.authorize()
+      const result = await AppleSignIn.authorize()
       const idToken = result.identityToken
       if (!idToken) throw new Error('Apple ID token not available')
       const { error } = await supabase.auth.signInWithIdToken({
@@ -164,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    // ── Google OAuth (SFSafariViewController 인앱 브라우저) ──
+    // ── OAuth 플로우: Google + 카카오 fallback (SFSafariViewController) ──
     if (isNative) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,

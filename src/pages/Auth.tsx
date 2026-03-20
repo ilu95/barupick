@@ -58,8 +58,9 @@ function Login() {
       const msg = e.message || ''
       if (msg.includes('not enabled') || msg.includes('Unsupported provider')) {
         setError(t('auth.providerNotEnabled'))
-      } else if (provider === 'kakao' && (msg.includes('not available') || msg.includes('cancel'))) {
-        setError(t('auth.kakaoNeedApp'))
+      } else if (msg.includes('cancel') || msg.includes('Cancel')) {
+        // 사용자가 로그인 취소한 경우 에러 표시하지 않음
+        return
       } else {
         setError(t('auth.loginFailed') + ': ' + msg)
       }
@@ -112,7 +113,6 @@ function Login() {
             </svg>}
             {t('auth.googleLogin')}
           </button>
-          <p className="text-[11px] text-warm-500 text-center leading-relaxed whitespace-pre-line">{t('auth.kakaoPrivateRelay')}</p>
         </div>
 
         {/* 구분선 */}
@@ -215,8 +215,9 @@ function Signup() {
       const msg = e.message || ''
       if (msg.includes('not enabled') || msg.includes('Unsupported provider')) {
         setError(t('auth.providerNotEnabled'))
-      } else if (provider === 'kakao' && (msg.includes('not available') || msg.includes('cancel'))) {
-        setError(t('auth.kakaoNeedApp'))
+      } else if (msg.includes('cancel') || msg.includes('Cancel')) {
+        // 사용자가 로그인 취소한 경우 에러 표시하지 않음
+        return
       } else {
         setError(t('auth.loginFailed') + ': ' + msg)
       }
@@ -266,7 +267,6 @@ function Signup() {
             </svg>
             {t('auth.googleLogin')}
           </button>
-          <p className="text-[11px] text-warm-500 text-center leading-relaxed whitespace-pre-line">{t('auth.kakaoPrivateRelay')}</p>
         </div>
 
         {/* 구분선 */}
