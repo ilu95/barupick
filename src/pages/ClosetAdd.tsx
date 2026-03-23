@@ -145,7 +145,7 @@ export default function ClosetAdd() {
   }
 
   // ─── 아이템 선택 (코디 만들기와 동일한 아이템 목록) ───
-  const ItemSelector = () => (
+  const itemSelector = (
     <div className="mb-5">
       <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{t('closetAdd.step1')}</div>
       <div className="flex flex-wrap gap-2">
@@ -159,7 +159,7 @@ export default function ClosetAdd() {
   )
 
   // ─── 브랜드 + 상품명 ───
-  const ItemInfo = ({ step }) => (
+  const itemInfo = (step) => (
     <div className="mb-5">
       <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">{step}. {t('closetAdd.step3')}</div>
       <div className="flex flex-col gap-2.5">
@@ -207,7 +207,7 @@ export default function ClosetAdd() {
         <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
         <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('closetAdd.photoMode')}</h2>
 
-        <ItemSelector />
+        {itemSelector}
 
         <div className="mb-5">
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. {t('common.photo')}</div>
@@ -245,7 +245,7 @@ export default function ClosetAdd() {
           </div>
         )}
 
-        {color && <ItemInfo step={4} />}
+        {color && itemInfo(4)}
 
         {selectedItem && color && (
           <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('common.done')}</button>
@@ -270,7 +270,7 @@ export default function ClosetAdd() {
         </div>
       )}
 
-      {selectedItem && color && <ItemInfo step={3} />}
+      {selectedItem && color && itemInfo(3)}
 
       {selectedItem && color && (
         <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('common.done')}</button>
