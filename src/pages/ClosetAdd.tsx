@@ -259,7 +259,7 @@ export default function ClosetAdd() {
       <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('closetAdd.manualMode')}</h2>
 
-      <ItemSelector />
+      {itemSelector}
 
       {selectedItem && (
         <div className="mb-5">
