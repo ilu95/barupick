@@ -125,6 +125,28 @@ CREATE POLICY IF NOT EXISTS "bookmarks_read" ON public.bookmarks FOR SELECT USIN
 CREATE POLICY IF NOT EXISTS "bookmarks_insert" ON public.bookmarks FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY IF NOT EXISTS "bookmarks_delete" ON public.bookmarks FOR DELETE USING (auth.uid() = user_id);
 
+-- ────────────────────────────────────
+-- 4-1. likes_count 자동 동기화 트리거
+-- ────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.update_likes_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE public.posts SET likes_count = likes_count + 1 WHERE id = NEW.post_id;
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE public.posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = OLD.post_id;
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trigger_update_likes_count ON public.likes;
+CREATE TRIGGER trigger_update_likes_count
+  AFTER INSERT OR DELETE ON public.likes
+  FOR EACH ROW EXECUTE FUNCTION public.update_likes_count();
+
 
 -- ────────────────────────────────────
 -- 5. follows / blocks

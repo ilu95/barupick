@@ -247,12 +247,16 @@ export function useCommunity() {
 
     try {
       if (isLiked) {
-        const { data } = await supabase.from('likes').select('id').eq('user_id', user.id).eq('post_id', postId)
-        if (data && data[0]) {
-          await supabase.from('likes').delete().eq('id', data[0].id)
-        }
+        await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
       } else {
-        await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
+        await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
+      }
+      // DB 트리거가 갱신한 실제 count 반영
+      const { data: fresh } = await supabase.from('posts').select('likes_count').eq('id', postId).single()
+      if (fresh) {
+        setPosts(prev => prev.map(p =>
+          p.id === postId ? { ...p, likes_count: fresh.likes_count } : p
+        ))
       }
     } catch (e) {
       // 롤백
