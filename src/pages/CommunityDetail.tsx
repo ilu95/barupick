@@ -94,7 +94,8 @@ export default function CommunityDetail() {
   // ── 좋아요 ──
   const likingRef = useRef(false)
   const toggleLike = async () => {
-    if (!user || !postId) { console.warn('[Like] No user or postId', { user: !!user, postId }); return }
+    if (!user) { toast.toast({ message: t('common.loginRequired') }); navigate('/auth'); return }
+    if (!postId) return
     if (likingRef.current) return
     likingRef.current = true
     const was = liked
@@ -126,7 +127,8 @@ export default function CommunityDetail() {
 
   // ── 저장 (북마크) ──
   const toggleBookmark = async () => {
-    if (!user || !post) { console.warn('[Save] No user or post'); return }
+    if (!user) { toast.toast({ message: t('common.loginRequired') }); navigate('/auth'); return }
+    if (!post) return
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     const already = saved.find((s: any) => s.commPostId === postId)
 
