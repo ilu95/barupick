@@ -76,6 +76,24 @@ export function useCommunity() {
   const loadVerRef = useRef(0)
   const hasCacheRef = useRef(!!_cache)
 
+  // CommunityDetail에서 좋아요 변경 시 동기화
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { postId, liked } = (e as CustomEvent).detail
+      setMyLikes(prev => {
+        const next = new Set(prev)
+        if (liked) next.add(postId)
+        else next.delete(postId)
+        return next
+      })
+      setPosts(prev => prev.map(p =>
+        p.id === postId ? { ...p, likes_count: p.likes_count + (liked ? 1 : -1) } : p
+      ))
+    }
+    window.addEventListener('like-changed', handler)
+    return () => window.removeEventListener('like-changed', handler)
+  }, [])
+
   // 팔로우 목록 로드
   useEffect(() => {
     if (!user) return

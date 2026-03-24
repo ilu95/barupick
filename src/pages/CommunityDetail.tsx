@@ -78,7 +78,8 @@ export default function CommunityDetail() {
       supabase.rpc('increment_view_count', { p_post_id: postId }).then(null, () => {})
       // 좋아요 확인
       if (user) {
-        const { data: likeData } = await supabase.from('likes').select('id').eq('user_id', user.id).eq('post_id', postId)
+        const { data: likeData, error: likeErr } = await supabase.from('likes').select('user_id').eq('user_id', user.id).eq('post_id', postId)
+        if (likeErr) console.warn('[Like] Check failed:', likeErr.message)
         setLiked(!!(likeData && likeData.length > 0))
       }
       // 댓글 로드 (친구 공개 게시물만)
@@ -117,7 +118,8 @@ export default function CommunityDetail() {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(null, () => {})
         }
       }
-      console.log('[Like] Success:', was ? 'unliked' : 'liked')
+      // 피드 페이지와 동기화
+      window.dispatchEvent(new CustomEvent('like-changed', { detail: { postId, liked: !was } }))
     } catch (e) {
       console.error('[Like] Failed:', e)
       setLiked(was)
