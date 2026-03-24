@@ -10,6 +10,7 @@ import { COLORS_60, getColorName } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
+import { updateCachedLike } from '@/hooks/useCommunity'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 
@@ -118,8 +119,8 @@ export default function CommunityDetail() {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(null, () => {})
         }
       }
-      // 피드 페이지와 동기화
-      window.dispatchEvent(new CustomEvent('like-changed', { detail: { postId, liked: !was } }))
+      // 피드 페이지 캐시와 동기화
+      updateCachedLike(postId!, !was)
     } catch (e) {
       console.error('[Like] Failed:', e)
       setLiked(was)
