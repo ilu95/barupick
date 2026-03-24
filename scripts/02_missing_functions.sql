@@ -69,6 +69,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ────────────────────────────────────
 -- 5. get_user_like_rankings: 유저별 좋아요 랭킹
 -- ────────────────────────────────────
+DROP FUNCTION IF EXISTS public.get_user_like_rankings(INT);
 CREATE OR REPLACE FUNCTION public.get_user_like_rankings(lim INT DEFAULT 20)
 RETURNS TABLE (
   user_id UUID,
