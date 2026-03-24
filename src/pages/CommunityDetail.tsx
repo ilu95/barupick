@@ -78,7 +78,8 @@ export default function CommunityDetail() {
       supabase.rpc('increment_view_count', { p_post_id: postId }).then(null, () => {})
       // 좋아요 확인
       if (user) {
-        const { data: likeData } = await supabase.from('likes').select('id').eq('user_id', user.id).eq('post_id', postId)
+        const { data: likeData, error: likeErr } = await supabase.from('likes').select('user_id').eq('user_id', user.id).eq('post_id', postId)
+        if (likeErr) console.warn('[Like] Check failed:', likeErr.message)
         setLiked(!!(likeData && likeData.length > 0))
       }
       // 댓글 로드 (친구 공개 게시물만)
@@ -94,7 +95,8 @@ export default function CommunityDetail() {
   // ── 좋아요 ──
   const likingRef = useRef(false)
   const toggleLike = async () => {
-    if (!user || !postId) { console.warn('[Like] No user or postId', { user: !!user, postId }); return }
+    if (!user) { toast.toast({ message: t('common.loginRequired') }); navigate('/auth'); return }
+    if (!postId) return
     if (likingRef.current) return
     likingRef.current = true
     const was = liked
@@ -116,7 +118,8 @@ export default function CommunityDetail() {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(null, () => {})
         }
       }
-      console.log('[Like] Success:', was ? 'unliked' : 'liked')
+      // 피드 페이지와 동기화
+      window.dispatchEvent(new CustomEvent('like-changed', { detail: { postId, liked: !was } }))
     } catch (e) {
       console.error('[Like] Failed:', e)
       setLiked(was)
@@ -126,7 +129,8 @@ export default function CommunityDetail() {
 
   // ── 저장 (북마크) ──
   const toggleBookmark = async () => {
-    if (!user || !post) { console.warn('[Save] No user or post'); return }
+    if (!user) { toast.toast({ message: t('common.loginRequired') }); navigate('/auth'); return }
+    if (!post) return
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     const already = saved.find((s: any) => s.commPostId === postId)
 

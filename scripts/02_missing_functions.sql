@@ -4,6 +4,19 @@
 -- ================================================================
 
 -- ────────────────────────────────────
+-- 0. likes 테이블 RLS 정책 재적용 (400 Bad Request 수정)
+-- ────────────────────────────────────
+ALTER TABLE public.likes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "likes_read" ON public.likes;
+DROP POLICY IF EXISTS "likes_select" ON public.likes;
+CREATE POLICY "likes_read" ON public.likes FOR SELECT USING (true);
+DROP POLICY IF EXISTS "likes_insert" ON public.likes;
+CREATE POLICY "likes_insert" ON public.likes FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "likes_delete" ON public.likes;
+CREATE POLICY "likes_delete" ON public.likes FOR DELETE USING (auth.uid() = user_id);
+
+
+-- ────────────────────────────────────
 -- 1. increment_view_count: 게시물 조회수 증가
 -- ────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.increment_view_count(p_post_id UUID)
@@ -69,6 +82,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ────────────────────────────────────
 -- 5. get_user_like_rankings: 유저별 좋아요 랭킹
 -- ────────────────────────────────────
+DROP FUNCTION IF EXISTS public.get_user_like_rankings(INT);
 CREATE OR REPLACE FUNCTION public.get_user_like_rankings(lim INT DEFAULT 20)
 RETURNS TABLE (
   user_id UUID,
