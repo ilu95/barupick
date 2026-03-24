@@ -59,8 +59,12 @@ export default function DevDiag() {
     // 3. RPC 함수 확인
     const rpcs = [
       { name: 'increment_view_count', args: { p_post_id: '00000000-0000-0000-0000-000000000000' } },
+      { name: 'increment_save_count', args: { p_post_id: '00000000-0000-0000-0000-000000000000' } },
+      { name: 'decrement_save_count', args: { p_post_id: '00000000-0000-0000-0000-000000000000' } },
+      { name: 'send_notification', args: { p_user_id: '00000000-0000-0000-0000-000000000000', p_actor_id: '00000000-0000-0000-0000-000000000000', p_type: 'test', p_message: 'diag', p_related_id: '00000000-0000-0000-0000-000000000000' } },
       { name: 'get_unread_notification_count', args: { p_user_id: '00000000-0000-0000-0000-000000000000' } },
       { name: 'mark_notifications_read', args: { p_user_id: '00000000-0000-0000-0000-000000000000' } },
+      { name: 'get_user_like_rankings', args: { lim: 1 } },
     ]
     for (const rpc of rpcs) {
       try {

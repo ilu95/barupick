@@ -75,7 +75,7 @@ export default function CommunityDetail() {
         .eq('id', postId).single()
       setPost(data)
       // 조회수
-      supabase.rpc('increment_view_count', { p_post_id: postId }).then(() => {}, () => {})
+      supabase.rpc('increment_view_count', { p_post_id: postId }).then(null, () => {})
       // 좋아요 확인
       if (user) {
         const { data: likeData } = await supabase.from('likes').select('id').eq('user_id', user.id).eq('post_id', postId)
@@ -94,7 +94,7 @@ export default function CommunityDetail() {
   // ── 좋아요 ──
   const likingRef = useRef(false)
   const toggleLike = async () => {
-    if (!user || !postId) return
+    if (!user || !postId) { console.warn('[Like] No user or postId', { user: !!user, postId }); return }
     if (likingRef.current) return
     likingRef.current = true
     const was = liked
@@ -108,16 +108,17 @@ export default function CommunityDetail() {
       } else {
         const { error } = await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
         if (error) {
-          // UNIQUE 제약 위반 (이미 좋아요함) → 무시
           if (error.code === '23505') { /* already liked, ignore */ }
           else throw error
         }
+        // 알림 (실패해도 무시)
         if (post?.user_id !== user.id) {
-          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(() => {}, () => {})
+          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(null, () => {})
         }
       }
+      console.log('[Like] Success:', was ? 'unliked' : 'liked')
     } catch (e) {
-      console.error('Like toggle failed:', e)
+      console.error('[Like] Failed:', e)
       setLiked(was)
       setPost((p: any) => p ? { ...p, likes_count: prevCount } : p)
     } finally { likingRef.current = false }
@@ -125,20 +126,19 @@ export default function CommunityDetail() {
 
   // ── 저장 (북마크) ──
   const toggleBookmark = async () => {
-    if (!user || !post) return
+    if (!user || !post) { console.warn('[Save] No user or post'); return }
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     const already = saved.find((s: any) => s.commPostId === postId)
 
     if (already) {
-      // 제거
       const newSaved = saved.filter((s: any) => s.commPostId !== postId)
       localStorage.setItem('cs_saved', JSON.stringify(newSaved))
       setBookmarked(false)
       toast.toast({ message: t('communityDetail.saveSuccess') })
-      supabase.rpc('decrement_save_count', { p_post_id: postId }).then(() => {}, () => {})
+      supabase.rpc('decrement_save_count', { p_post_id: postId }).then(null, () => {})
       setPost((p: any) => p ? { ...p, save_count: Math.max(0, (p.save_count || 1) - 1) } : p)
+      console.log('[Save] Removed bookmark')
     } else {
-      // 저장
       if (saved.length >= 50) { toast.error(t('communityDetail.saveSuccess')); return }
       const nick = post.profiles?.nickname || t('common.user')
       saved.unshift({
@@ -157,20 +157,20 @@ export default function CommunityDetail() {
       localStorage.setItem('cs_saved', JSON.stringify(saved))
       setBookmarked(true)
       toast.success(t('communityDetail.saveSuccess'))
-      supabase.rpc('increment_save_count', { p_post_id: postId }).then(() => {}, () => {})
+      supabase.rpc('increment_save_count', { p_post_id: postId }).then(null, () => {})
       setPost((p: any) => p ? { ...p, save_count: (p.save_count || 0) + 1 } : p)
-      // 알림
       if (post.user_id && post.user_id !== user.id) {
-        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: t('communityDetail.saveSuccess'), p_related_id: postId }).then(() => {}, () => {})
+        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: t('communityDetail.saveSuccess'), p_related_id: postId }).then(null, () => {})
       }
+      console.log('[Save] Added bookmark')
     }
   }
 
   // ── 공유 ──
-  const handleShare = () => {
+  const handleShare = async () => {
     const title = post?.caption || post?.title || t('shareCard.shareTitle')
     const text = `${post?.profiles?.nickname || t('common.user')} (${post?.score || 0}${t('common.score', { score: '' })})`
-    navigator.share?.({ title, text, url: window.location.href }).then(() => {}, () => {})
+    try { await navigator.share?.({ title, text, url: window.location.href }) } catch {}
   }
 
   // ── 신고 ──
@@ -273,7 +273,7 @@ export default function CommunityDetail() {
       // 알림
       if (post?.user_id && post.user_id !== user.id) {
         const preview = commentText.trim().slice(0, 30)
-        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'comment', p_message: t('communityDetail.comments') + ': ' + preview, p_related_id: postId }).then(() => {}, () => {})
+        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'comment', p_message: t('communityDetail.comments') + ': ' + preview, p_related_id: postId }).then(null, () => {})
       }
       toast.success(t('communityDetail.comments'))
       loadPost()
