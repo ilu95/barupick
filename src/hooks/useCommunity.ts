@@ -247,9 +247,11 @@ export function useCommunity() {
 
     try {
       if (isLiked) {
-        await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
+        const { error } = await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
+        if (error) throw error
       } else {
-        await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
+        const { error } = await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
+        if (error) throw error
       }
       // DB 트리거가 갱신한 실제 count 반영
       const { data: fresh } = await supabase.from('posts').select('likes_count').eq('id', postId).single()
@@ -259,7 +261,7 @@ export function useCommunity() {
         ))
       }
     } catch (e) {
-      // 롤백
+      console.error('Like toggle failed:', e)
       setMyLikes(prev => {
         const next = new Set(prev)
         if (isLiked) next.add(postId)

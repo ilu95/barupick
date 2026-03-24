@@ -103,9 +103,11 @@ export default function CommunityDetail() {
     setPost((p: any) => p ? { ...p, likes_count: prevCount + (was ? -1 : 1) } : p)
     try {
       if (was) {
-        await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
+        const { error } = await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
+        if (error) throw error
       } else {
-        await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
+        const { error } = await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
+        if (error) throw error
         if (post?.user_id !== user.id) {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).catch(() => {})
         }
@@ -113,7 +115,8 @@ export default function CommunityDetail() {
       // DB 트리거가 갱신한 실제 count 반영
       const { data: fresh } = await supabase.from('posts').select('likes_count').eq('id', postId).single()
       if (fresh) setPost((p: any) => p ? { ...p, likes_count: fresh.likes_count } : p)
-    } catch {
+    } catch (e) {
+      console.error('Like toggle failed:', e)
       setLiked(was)
       setPost((p: any) => p ? { ...p, likes_count: prevCount } : p)
     } finally { likingRef.current = false }
