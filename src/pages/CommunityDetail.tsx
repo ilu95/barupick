@@ -98,19 +98,25 @@ export default function CommunityDetail() {
     if (likingRef.current) return
     likingRef.current = true
     const was = liked
+    const prevCount = post?.likes_count || 0
     setLiked(!was)
-    setPost((p: any) => p ? { ...p, likes_count: (p.likes_count || 0) + (was ? -1 : 1) } : p)
+    setPost((p: any) => p ? { ...p, likes_count: prevCount + (was ? -1 : 1) } : p)
     try {
       if (was) {
-        const { data } = await supabase.from('likes').select('id').eq('user_id', user.id).eq('post_id', postId)
-        if (data?.[0]) await supabase.from('likes').delete().eq('id', data[0].id)
+        await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
       } else {
-        await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
+        await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
         if (post?.user_id !== user.id) {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).catch(() => {})
         }
       }
-    } catch { setLiked(was) } finally { likingRef.current = false }
+      // DB 트리거가 갱신한 실제 count 반영
+      const { data: fresh } = await supabase.from('posts').select('likes_count').eq('id', postId).single()
+      if (fresh) setPost((p: any) => p ? { ...p, likes_count: fresh.likes_count } : p)
+    } catch {
+      setLiked(was)
+      setPost((p: any) => p ? { ...p, likes_count: prevCount } : p)
+    } finally { likingRef.current = false }
   }
 
   // ── 저장 (북마크) ──
