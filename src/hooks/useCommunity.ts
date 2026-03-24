@@ -53,6 +53,18 @@ let _cache: {
   myLikes: Set<string>
 } | null = null
 
+/** 외부에서 캐시의 좋아요 상태를 직접 갱신 (언마운트 상태에서도 동작) */
+export function updateCachedLike(postId: string, liked: boolean) {
+  if (!_cache) return
+  const next = new Set(_cache.myLikes)
+  if (liked) next.add(postId)
+  else next.delete(postId)
+  _cache.myLikes = next
+  _cache.posts = _cache.posts.map(p =>
+    p.id === postId ? { ...p, likes_count: Math.max(0, p.likes_count + (liked ? 1 : -1)) } : p
+  )
+}
+
 export function useCommunity() {
   const { user } = useAuth()
 
@@ -75,24 +87,6 @@ export function useCommunity() {
   const pageRef = useRef(_cache?.page || 0)
   const loadVerRef = useRef(0)
   const hasCacheRef = useRef(!!_cache)
-
-  // CommunityDetail에서 좋아요 변경 시 동기화
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const { postId, liked } = (e as CustomEvent).detail
-      setMyLikes(prev => {
-        const next = new Set(prev)
-        if (liked) next.add(postId)
-        else next.delete(postId)
-        return next
-      })
-      setPosts(prev => prev.map(p =>
-        p.id === postId ? { ...p, likes_count: p.likes_count + (liked ? 1 : -1) } : p
-      ))
-    }
-    window.addEventListener('like-changed', handler)
-    return () => window.removeEventListener('like-changed', handler)
-  }, [])
 
   // 팔로우 목록 로드
   useEffect(() => {
