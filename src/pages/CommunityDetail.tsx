@@ -106,15 +106,16 @@ export default function CommunityDetail() {
         const { error } = await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
-        if (error) throw error
+        const { error } = await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
+        if (error) {
+          // UNIQUE 제약 위반 (이미 좋아요함) → 무시
+          if (error.code === '23505') { /* already liked, ignore */ }
+          else throw error
+        }
         if (post?.user_id !== user.id) {
           supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).catch(() => {})
         }
       }
-      // DB 트리거가 갱신한 실제 count 반영
-      const { data: fresh } = await supabase.from('posts').select('likes_count').eq('id', postId).single()
-      if (fresh) setPost((p: any) => p ? { ...p, likes_count: fresh.likes_count } : p)
     } catch (e) {
       console.error('Like toggle failed:', e)
       setLiked(was)

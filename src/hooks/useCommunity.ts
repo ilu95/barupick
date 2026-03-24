@@ -250,15 +250,12 @@ export function useCommunity() {
         const { error } = await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('likes').upsert({ user_id: user.id, post_id: postId }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
-        if (error) throw error
-      }
-      // DB 트리거가 갱신한 실제 count 반영
-      const { data: fresh } = await supabase.from('posts').select('likes_count').eq('id', postId).single()
-      if (fresh) {
-        setPosts(prev => prev.map(p =>
-          p.id === postId ? { ...p, likes_count: fresh.likes_count } : p
-        ))
+        const { error } = await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
+        if (error) {
+          // UNIQUE 제약 위반 (이미 좋아요함) → 무시
+          if (error.code === '23505') { /* already liked, ignore */ }
+          else throw error
+        }
       }
     } catch (e) {
       console.error('Like toggle failed:', e)
