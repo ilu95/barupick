@@ -75,7 +75,7 @@ export default function CommunityDetail() {
         .eq('id', postId).single()
       setPost(data)
       // 조회수
-      supabase.rpc('increment_view_count', { p_post_id: postId }).catch(() => {})
+      supabase.rpc('increment_view_count', { p_post_id: postId }).then(() => {}, () => {})
       // 좋아요 확인
       if (user) {
         const { data: likeData } = await supabase.from('likes').select('id').eq('user_id', user.id).eq('post_id', postId)
@@ -113,7 +113,7 @@ export default function CommunityDetail() {
           else throw error
         }
         if (post?.user_id !== user.id) {
-          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).catch(() => {})
+          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(() => {}, () => {})
         }
       }
     } catch (e) {
@@ -135,7 +135,7 @@ export default function CommunityDetail() {
       localStorage.setItem('cs_saved', JSON.stringify(newSaved))
       setBookmarked(false)
       toast.toast({ message: t('communityDetail.saveSuccess') })
-      supabase.rpc('decrement_save_count', { p_post_id: postId }).catch(() => {})
+      supabase.rpc('decrement_save_count', { p_post_id: postId }).then(() => {}, () => {})
       setPost((p: any) => p ? { ...p, save_count: Math.max(0, (p.save_count || 1) - 1) } : p)
     } else {
       // 저장
@@ -157,11 +157,11 @@ export default function CommunityDetail() {
       localStorage.setItem('cs_saved', JSON.stringify(saved))
       setBookmarked(true)
       toast.success(t('communityDetail.saveSuccess'))
-      supabase.rpc('increment_save_count', { p_post_id: postId }).catch(() => {})
+      supabase.rpc('increment_save_count', { p_post_id: postId }).then(() => {}, () => {})
       setPost((p: any) => p ? { ...p, save_count: (p.save_count || 0) + 1 } : p)
       // 알림
       if (post.user_id && post.user_id !== user.id) {
-        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: t('communityDetail.saveSuccess'), p_related_id: postId }).catch(() => {})
+        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: t('communityDetail.saveSuccess'), p_related_id: postId }).then(() => {}, () => {})
       }
     }
   }
@@ -170,7 +170,7 @@ export default function CommunityDetail() {
   const handleShare = () => {
     const title = post?.caption || post?.title || t('shareCard.shareTitle')
     const text = `${post?.profiles?.nickname || t('common.user')} (${post?.score || 0}${t('common.score', { score: '' })})`
-    navigator.share?.({ title, text, url: window.location.href }).catch(() => {})
+    navigator.share?.({ title, text, url: window.location.href }).then(() => {}, () => {})
   }
 
   // ── 신고 ──
@@ -273,7 +273,7 @@ export default function CommunityDetail() {
       // 알림
       if (post?.user_id && post.user_id !== user.id) {
         const preview = commentText.trim().slice(0, 30)
-        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'comment', p_message: t('communityDetail.comments') + ': ' + preview, p_related_id: postId }).catch(() => {})
+        supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'comment', p_message: t('communityDetail.comments') + ': ' + preview, p_related_id: postId }).then(() => {}, () => {})
       }
       toast.success(t('communityDetail.comments'))
       loadPost()
