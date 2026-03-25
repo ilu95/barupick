@@ -1,8 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { registerPlugin } from '@capacitor/core'
-import { supabase } from '@/lib/supabase'
+import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { trackSocialLogin, trackSignup, setAnalyticsUser } from '@/lib/analytics'
+
+// iOS 번들 ID — Apple 네이티브 로그인 시 id_token의 aud 클레임에 사용됨
+const IOS_BUNDLE_ID = 'kr.co.barusa.barupick'
 
 // 커스텀 네이티브 Apple Sign In 플러그인 (ios/App/App/AppleSignInPlugin.swift)
 interface AppleSignInPlugin {
@@ -163,12 +166,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (isNative && provider === 'apple') {
       // ── Apple: 네이티브 ASAuthorizationController (Apple 심사 필수) ──
+      // iOS 네이티브 Apple 로그인 시 id_token의 aud가 번들 ID(kr.co.barusa.barupick)로 설정됨
+      // supabase-js의 signInWithIdToken은 client_id를 전달하지 않아 audience 불일치 발생 가능
+      // → GoTrue API를 직접 호출하여 client_id를 명시적으로 전달
       const result = await AppleSignIn.authorize()
       const idToken = result.identityToken
       if (!idToken) throw new Error('Apple ID token not available')
-      const { error } = await supabase.auth.signInWithIdToken({
-        provider: 'apple',
-        token: idToken,
+
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=id_token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          provider: 'apple',
+          id_token: idToken,
+          client_id: IOS_BUNDLE_ID,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        throw new Error(data.error_description || data.msg || data.error || 'Apple 로그인 실패')
+      }
+
+      // GoTrue에서 받은 세션을 Supabase 클라이언트에 설정
+      const { error } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
       })
       if (error) throw error
       return

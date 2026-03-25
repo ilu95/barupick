@@ -92,7 +92,14 @@ function generateAppleClientSecret() {
   console.log('━'.repeat(60))
   console.log('\n📋 위 JWT를 복사해서 Supabase → Apple → Secret Key에 붙여넣으세요.')
   console.log(`⏰ 만료일: ${new Date((now + 86400 * 180) * 1000).toLocaleDateString('ko-KR')}`)
-  console.log('   (6개월 후 이 스크립트를 다시 실행해서 갱신하세요)\n')
+  console.log('   (6개월 후 이 스크립트를 다시 실행해서 갱신하세요)')
+  console.log('')
+  console.log('⚠️  Supabase Apple 프로바이더 필수 설정:')
+  console.log('   Supabase Dashboard → Authentication → Providers → Apple')
+  console.log('   - Client ID (for web):       com.barusa.barupick.web')
+  console.log('   - Authorized Client IDs:     kr.co.barusa.barupick')
+  console.log('   (iOS 네이티브 Apple 로그인은 번들 ID가 id_token의 aud로 설정됩니다)')
+  console.log('')
 
   return jwt
 }
