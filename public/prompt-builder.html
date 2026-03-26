@@ -648,7 +648,137 @@ function itemsToLayerInfo(itemIds) {
   if (hasHat && !partKeys.includes('hat')) partKeys = [...partKeys,'hat'];
   return {layerType,outerType,midType,partKeys,hasOuter,hasMid,hasScarf,hasHat};
 }
-// === PLACEHOLDER: 4단계에서 추천 엔진 (테크닉, 점수, 필터) 추가 ===
+// ═══════════════════════════════════════════════
+// 4: 추천 엔진 — 헬퍼, 14 테크닉, 점수, 필터, 생성
+// ═══════════════════════════════════════════════
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function pickN(a,n){return shuffle(a).slice(0,Math.min(n,a.length));}
+function wPick(items,weights){const r=Math.random();let c=0;for(let i=0;i<items.length;i++){c+=weights[i];if(r<=c)return items[i];}return items[items.length-1];}
+function pick4Spread(sorted){if(sorted.length<=4)return sorted.slice(0,4);const n=sorted.length,step=(n-1)/3;return[sorted[0],sorted[Math.round(step)],sorted[Math.round(step*2)],sorted[n-1]];}
+function selectGradient(sorted,count,minGap){for(let a=0;a<30;a++){const sel=[pick(sorted)];const pool=shuffle(sorted.filter(c=>c!==sel[0]));for(const c of pool){if(sel.length>=count)break;if(sel.every(s=>Math.abs(L(c)-L(s))>=minGap))sel.push(c);}if(sel.length>=count)return sel.sort((a,b)=>L(a)-L(b));}return null;}
+function pickDiverseHues(pool,n){for(let a=0;a<30;a++){const sel=[pick(pool)];const rest=shuffle(pool.filter(c=>c!==sel[0]));for(const c of rest){if(sel.length>=n)break;if(sel.every(s=>{const d=Math.min(Math.abs(H(c)-H(s)),360-Math.abs(H(c)-H(s)));return d>=25||(Cv(c)<10&&Cv(s)<10);}))sel.push(c);}if(sel.length>=n)return sel;}return null;}
+function pickWithLSpread(pool,n){for(let a=0;a<20;a++){const s=pickN(pool,n);if(s.length<n)continue;const ls=s.map(L);if(Math.max(...ls)-Math.min(...ls)>=20)return s;}const sorted=[...pool].sort((a,b)=>L(a)-L(b));return sorted.length>=n?pick4Spread(sorted):null;}
+function pickShoe(style,ctx){const pool=STYLE_MOODS[style].shoes;const ok=pool.filter(s=>{const c=ctx.filter(x=>x===s).length;return c<2;});return pick(ok.length?ok:pool);}
+function assignPos(sorted,shoes){const patterns=[s=>({outer:s[0],top:s[3],bottom:s[1],shoes}),s=>({outer:s[3],top:s[1],bottom:s[2],shoes}),s=>({outer:s[1],top:s[3],bottom:s[0],shoes}),s=>({outer:s[0],top:s[2],bottom:s[3],shoes}),s=>({outer:s[2],top:s[0],bottom:s[3],shoes}),s=>({outer:s[3],top:s[0],bottom:s[2],shoes})];return pick(patterns)(sorted);}
+
+// 14 TECHNIQUES
+const TECHNIQUES={
+  monochrome:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights];const fams=Object.keys(COLOR_FAMILIES).filter(f=>COLOR_FAMILIES[f].filter(c=>all.includes(c)).length>=4);if(!fams.length)return null;const pool=COLOR_FAMILIES[pick(fams)].filter(c=>all.includes(c)||m.pastels.includes(c));if(pool.length<4)return null;const sorted=[...pool].sort((a,b)=>L(a)-L(b));const colors=pick4Spread(sorted);return assignPos(colors.sort((a,b)=>L(a)-L(b)),pickShoe(style,colors));}},
+  tone_on_tone:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const fams=Object.keys(COLOR_FAMILIES).filter(f=>{const p=COLOR_FAMILIES[f].filter(c=>all.includes(c));return p.length>=3;});if(!fams.length)return null;const pool=COLOR_FAMILIES[pick(fams)].filter(c=>all.includes(c)).sort((a,b)=>L(a)-L(b));if(pool.length<3||L(pool[pool.length-1])-L(pool[0])<25)return null;const colors=pick4Spread(pool);return assignPos(colors.sort((a,b)=>L(a)-L(b)),pickShoe(style,colors));}},
+  gradient:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const dir=Math.random()<0.5?'d2l':'l2d';const sel=selectGradient(shuffle(all).sort((a,b)=>L(a)-L(b)),4,10);if(!sel)return null;const shoes=pickShoe(style,sel);return dir==='d2l'?{outer:sel[0],top:sel[1],bottom:sel[2],shoes}:{outer:sel[3],top:sel[2],bottom:sel[1],shoes};}},
+  tone_in_tone:{compose(style){const m=STYLE_MOODS[style],tgt=30+Math.random()*50,rng=15;const all=[...m.darks,...m.mids,...m.lights,...m.pastels];const cands=all.filter(c=>Math.abs(L(c)-tgt)<=rng);if(cands.length<4)return null;const sel=pickDiverseHues(cands,4);if(!sel)return null;const shoes=pickShoe(style,sel);return{outer:sel[0],top:sel[1],bottom:sel[2],shoes};}},
+  one_point:{compose(style){const m=STYLE_MOODS[style];const base=[...m.darks,...m.mids,...m.lights].filter(c=>Cv(c)<50);const accent=[...m.pastels,...m.accents].filter(c=>Cv(c)>=20);if(base.length<3||accent.length<1)return null;const ac=pick(accent);const bases=pickWithLSpread(base,3);if(!bases)return null;const pos=Math.floor(Math.random()*4);const all4=[...bases];all4.splice(pos,0,ac);const shoes=pickShoe(style,all4);return{outer:all4[0],top:all4[1],bottom:all4[2],shoes};}},
+  complementary:{compose(style){const m=STYLE_MOODS[style];const chrom=[...m.darks,...m.mids,...m.accents].filter(c=>Cv(c)>=25);if(chrom.length<2)return null;const c1=pick(chrom),h1=H(c1);const comp=chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-h1),360-Math.abs(H(c)-h1));return d>=120&&d<=210&&c!==c1;});if(!comp.length)return null;const c2=pick(comp);const neut=[...m.lights,...m.mids].filter(c=>Cv(c)<35);const n1=pick(neut),n2=pick(neut.filter(c=>c!==n1));if(!n2)return null;const shoes=pickShoe(style,[c1,c2,n1,n2]);const arr=pick([[c1,n1,c2,n2],[n1,c1,n2,c2],[c1,n2,n1,c2],[n1,c2,c1,n2]]);return{outer:arr[0],top:arr[1],bottom:arr[2],shoes};}},
+  analogous:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels,...m.accents];const chrom=all.filter(c=>Cv(c)>=15);if(chrom.length<2)return null;const anchor=pick(chrom),hA=H(anchor);const nearby=all.filter(c=>{if(c===anchor)return false;const d=Math.min(Math.abs(H(c)-hA),360-Math.abs(H(c)-hA));return d<=70;});if(nearby.length<3)return null;const others=pickWithLSpread(nearby,3);if(!others)return null;const all4=[anchor,...others].sort((a,b)=>L(a)-L(b));return assignPos(all4,pickShoe(style,all4));}},
+  split_complementary:{compose(style){const m=STYLE_MOODS[style];const chrom=[...m.darks,...m.mids,...m.accents,...m.pastels].filter(c=>Cv(c)>=20);if(chrom.length<3)return null;const base=pick(chrom),hB=H(base);const s1p=chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-hB),360-Math.abs(H(c)-hB));return d>=110&&d<=160&&c!==base;});const s2p=chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-hB),360-Math.abs(H(c)-hB));return d>=160&&d<=210&&c!==base;});if(!s1p.length||!s2p.length)return null;const s1=pick(s1p),s2=pick(s2p);const neut=pick([...m.lights,...m.mids].filter(c=>Cv(c)<30));if(!neut)return null;const shoes=pickShoe(style,[base,s1,s2,neut]);const arr=shuffle([base,s1,s2,neut]);return{outer:arr[0],top:arr[1],bottom:arr[2],shoes};}},
+  color_blocking:{compose(style){const m=STYLE_MOODS[style];const chrom=[...m.darks,...m.mids,...m.accents].filter(c=>Cv(c)>=20);if(chrom.length<3)return null;const c1=pick(chrom);const c2=pick(chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-H(c1)),360-Math.abs(H(c)-H(c1)));return d>=40&&c!==c1;}));if(!c2)return null;const pool3=[...m.lights,...m.mids].filter(c=>c!==c1&&c!==c2);const c3=pick(pool3);if(!c3)return null;const shoes=pickShoe(style,[c1,c2,c3]);const arr=shuffle([c1,c2,c3]);return{outer:arr[0],top:arr[1],bottom:arr[2],shoes};}},
+  light_dark_contrast:{compose(style){const m=STYLE_MOODS[style];const dp=m.darks.filter(c=>L(c)<=40),lp=[...m.lights,...m.pastels].filter(c=>L(c)>=70);if(dp.length<1||lp.length<1)return null;const pat=pick(['2d2l','1d3l','3d1l']);let colors;if(pat==='2d2l'){const d1=pick(dp),d2=pick(dp.filter(c=>c!==d1))||d1,l1=pick(lp),l2=pick(lp.filter(c=>c!==l1))||l1;colors=shuffle([d1,d2,l1,l2]);}else if(pat==='1d3l'){colors=shuffle([pick(dp),...pickN(lp,3)]);}else{colors=shuffle([...pickN(dp,3),pick(lp)]);}const shoes=pickShoe(style,colors);return{outer:colors[0],top:colors[1],bottom:colors[2],shoes};}},
+  neutral_accent:{compose(style){const m=STYLE_MOODS[style];const np=[...m.darks,...m.mids,...m.lights].filter(c=>Cv(c)<=25);const ap=[...m.pastels,...m.accents].filter(c=>Cv(c)>=18);if(np.length<3||ap.length<1)return null;const ns=pickN(np,3);if(ns.length<3)return null;const ac=pick(ap);const pos=Math.floor(Math.random()*4);const all4=[...ns];all4.splice(pos,0,ac);return{outer:all4[0],top:all4[1],bottom:all4[2],shoes:pickShoe(style,all4)};}},
+  all_neutral:{compose(style){const m=STYLE_MOODS[style];const np=[...m.darks,...m.mids,...m.lights].filter(c=>Cv(c)<=30);if(np.length<4)return null;const sel=pickWithLSpread(np,4);if(!sel)return null;return assignPos(sel.sort((a,b)=>L(a)-L(b)),pickShoe(style,sel));}},
+  ratio_211:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const mc=pick(all);const rest=all.filter(c=>c!==mc&&Math.abs(L(c)-L(mc))>=10);if(rest.length<2)return null;const c2=pick(rest),c3=pick(rest.filter(c=>c!==c2));if(!c3)return null;const pats=[[mc,c2,mc,c3],[c2,mc,c3,mc],[mc,c2,c3,mc],[mc,mc,c2,c3],[c2,c3,mc,mc]];const p=pick(pats);return{outer:p[0],top:p[1],bottom:p[2],shoes:pickShoe(style,p)};}},
+  sandwich:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const ft=Math.random()<0.6?'oc':'ti';const fc=pick(all);const fill=all.filter(c=>c!==fc&&Math.abs(L(c)-L(fc))>=12);if(fill.length<2)return null;const f1=pick(fill),f2=pick(fill.filter(c=>c!==f1));if(!f2)return null;const shoes=pickShoe(style,[fc,f1,f2]);return ft==='oc'?{outer:fc,top:f1,bottom:fc,shoes}:{outer:f1,top:fc,bottom:f2,shoes};}},
+};
+
+// CRITIC (점수)
+function scoreCritic(o,style){
+  const cols=[o.outer,o.top,o.bottom,o.shoes];let total=0;
+  const hues=cols.filter(c=>Cv(c)>=15).map(H);let f1=6;
+  if(hues.length>=2){const pairs=[];for(let i=0;i<hues.length;i++)for(let j=i+1;j<hues.length;j++){const d=Math.min(Math.abs(hues[i]-hues[j]),360-Math.abs(hues[i]-hues[j]));pairs.push(d);}const avg=pairs.reduce((a,b)=>a+b,0)/pairs.length;f1=avg<=50?11:avg>=120&&avg<=180?10:avg>=80?8:5;}total+=f1;
+  const ls=cols.map(L),lR=Math.max(...ls)-Math.min(...ls),avgL=ls.reduce((a,b)=>a+b)/4;let f2=6;
+  if(style==='cityboy'&&avgL>65){const v=ls.reduce((a,x)=>a+(x-avgL)**2,0)/4;f2=v>100?13:v>40?10:7;}
+  else if(style==='techwear'&&avgL<45){const v=ls.reduce((a,x)=>a+(x-avgL)**2,0)/4;f2=v>80?13:v>30?10:7;}
+  else{f2=lR>=45?13:lR>=30?10:lR>=15?7:4;}total+=f2;
+  const tc=cols.map(Cv).reduce((a,b)=>a+b)/100;total+=(tc>=0.3&&tc<=2.0)?10:tc<0.3?5:6;
+  const ts=cols.map(temp),wc=ts.filter(t=>t==='w').length,cc=ts.filter(t=>t==='c').length;const bias=STYLE_MOODS[style].tempBias;let f4=5;
+  if(bias==='warm')f4=wc>=2?10:wc>=1?7:3;else if(bias==='neutral')f4=(wc<=3&&cc<=3)?9:6;else f4=Math.abs(wc-cc)<=2?9:5;total+=f4;
+  const m=STYLE_MOODS[style],sp=new Set([...m.darks,...m.mids,...m.lights,...m.pastels,...m.accents,...m.shoes]);let f5=0;cols.forEach(c=>{f5+=sp.has(c)?5:-2;});f5+=m.shoes.includes(o.shoes)?5:-1;f5=Math.max(0,Math.min(25,f5));total+=f5;
+  let f6=10;[[0,1],[1,2],[2,3]].forEach(([i,j])=>{if(cols[i]===cols[j])f6-=4;else if(Math.abs(L(cols[i])-L(cols[j]))<5)f6-=2;});total+=Math.max(0,f6);
+  const uniq=new Set(cols).size;total+=(uniq===4?10:uniq===3?7:uniq===2?4:1);
+  return{total:Math.min(95,Math.max(0,total)),f1,f2,f4,f5,f6};
+}
+
+// STYLE FILTER
+function styleFilter(style,r){
+  const cols=[r.outer,r.top,r.bottom,r.shoes];const ws=cols.map(temp).filter(t=>t==='w').length;const cs=cols.map(temp).filter(t=>t==='c').length;
+  const avgL=cols.map(L).reduce((a,b)=>a+b)/4;const chromatics=cols.filter(c=>Cv(c)>=40);const highChrom=cols.filter(c=>Cv(c)>=60);
+  const pastels=cols.filter(c=>c.startsWith('pastel_'));const darks=cols.filter(c=>L(c)<=30);const lights=cols.filter(c=>L(c)>=80);
+  const purples=cols.filter(c=>['eggplant','dark_purple','plum','mauve','purple','pastel_lavender','pastel_lilac'].includes(c));
+  const pinks=cols.filter(c=>['pastel_pink','pastel_coral','pastel_peach','pastel_rose','dusty_rose','rose','salmon'].includes(c));
+  const deepBlue=cols.filter(c=>['midnight','dark_blue','cobalt','indigo'].includes(c));
+  const earthLight=cols.filter(c=>['cream','ivory','beige','camel','tan','pastel_peach'].includes(c));
+  const heavyGreen=cols.filter(c=>['hunter_green','forest','dark_green','dark_olive'].includes(c));
+  if(ws>=2&&cs>=2)return false;if(r.outer===r.top||r.top===r.bottom)return false;
+  switch(style){
+    case'preppy':case'ralphlook':if(pastels.length>=3)return false;if(darks.length>=3&&lights.length===0)return false;if(purples.length>=2)return false;if(pinks.length>=3)return false;break;
+    case'ivy':if(pastels.length>=2)return false;if(darks.length>=3&&lights.length===0)return false;if(purples.length>=2)return false;break;
+    case'dandy':if(pastels.length>=3)return false;if(highChrom.length>=2)return false;if(darks.length>=3&&lights.length===0)return false;break;
+    case'oldmoney':if(pastels.length>=2)return false;if(chromatics.length>=3)return false;if(highChrom.length>=1)return false;var omH=new Set(cols.filter(c=>Cv(c)>=20).map(c=>Math.round(H(c)/60)%6));if(omH.size>=3)return false;break;
+    case'minimal':if(chromatics.length>=3)return false;var mH=new Set(cols.filter(c=>Cv(c)>=25).map(c=>Math.round(H(c)/60)%6));if(mH.size>=3)return false;break;
+    case'casual':if(highChrom.length>=3)return false;if(darks.length>=3&&lights.length===0&&avgL<35)return false;break;
+    case'cityboy':if(avgL<50)return false;if(darks.length>=3)return false;if(heavyGreen.length>=2)return false;break;
+    case'normcore':if(pastels.length>=2)return false;if(chromatics.length>=2)return false;if(highChrom.length>=1)return false;break;
+    case'athleisure':if(highChrom.length>=2)return false;if(ws>=3)return false;if(lights.length>=3)return false;if(earthLight.length>=2)return false;break;
+    case'amekaji':case'workwear':if(pastels.length>=1)return false;if(cs>=3)return false;if(deepBlue.length>=2)return false;break;
+    case'military':if(pastels.length>=1)return false;if(cs>=3)return false;if(purples.length>=1)return false;if(pinks.length>=1)return false;break;
+    case'british':if(pastels.length>=2)return false;if(cs>=3)return false;if(highChrom.length>=2)return false;break;
+    case'gorpcore':if(purples.length>=2)return false;if(pinks.length>=2)return false;if(cs>=3)return false;break;
+    case'street':if(pastels.length>=3)return false;break;
+    case'grunge':if(pastels.length>=1)return false;if(lights.length>=3)return false;if(cs>=3)return false;break;
+    case'contemporary':if(highChrom.length>=2)return false;var cH=new Set(cols.filter(c=>Cv(c)>=30).map(c=>Math.round(H(c)/60)%6));if(cH.size>=3)return false;break;
+    case'techwear':if(highChrom.length>=2)return false;if(chromatics.length>=3)return false;if(ws>=3)return false;if(lights.length>=3)return false;if(earthLight.length>=2)return false;if(avgL>60)return false;break;
+    case'genderless':if(highChrom.length>=2)return false;if(darks.length>=3&&lights.length===0)return false;break;
+  }
+  return true;
+}
+
+// EXTRA COLOR PICKER
+function pickExtraColor(existingColors,style){
+  const m=STYLE_MOODS[style];const pool=[...new Set([...m.darks,...m.mids,...m.lights,...m.pastels])];const existing=new Set(existingColors);
+  const avgLex=existingColors.map(L).reduce((a,b)=>a+b)/existingColors.length;const exTemps=existingColors.map(temp);
+  const wCount=exTemps.filter(t=>t==='w').length;const cCount=exTemps.filter(t=>t==='c').length;const dominantTemp=wCount>cCount?'w':cCount>wCount?'c':'n';
+  let cands=pool.filter(c=>{if(existing.has(c))return false;const t=temp(c);const nW=wCount+(t==='w'?1:0);const nC=cCount+(t==='c'?1:0);if(nW>=2&&nC>=2)return false;const lc=L(c);const hasContrast=existingColors.some(e=>Math.abs(L(e)-lc)>=8);return hasContrast;});
+  if(cands.length===0){cands=pool.filter(c=>{const t=temp(c);const nW=wCount+(t==='w'?1:0);const nC=cCount+(t==='c'?1:0);return!(nW>=2&&nC>=2);});}
+  if(cands.length===0)return pick(pool);
+  const scored=cands.map(c=>{let score=0;const lc=L(c),hc=H(c);const ls=existingColors.map(L);const minL=Math.min(...ls),maxL=Math.max(...ls);if(lc>minL&&lc<maxL)score+=3;existingColors.forEach(e=>{const d=Math.min(Math.abs(H(e)-hc),360-Math.abs(H(e)-hc));if(d<40)score+=1;});if(temp(c)===dominantTemp)score+=2;if(temp(c)==='n')score+=1;if(m.darks.includes(c)||m.mids.includes(c))score+=1;return{c,score};});
+  scored.sort((a,b)=>b.score-a.score);const top=scored.slice(0,Math.min(8,scored.length));return pick(top).c;
+}
+
+// LAYER ADAPTER
+function adaptToLayer(base4,layerType,style){
+  const ld=LAYER_DEFS[layerType];const bodyN=ld.partKeys.length-(ld.partKeys.includes('shoes')?1:0);
+  if(bodyN===2)return{top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};
+  if(bodyN===3){switch(layerType){case'basic':return base4;case'mid_inner':return{middleware:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};case'scarf_top':return{scarf:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};default:return base4;}}
+  if(bodyN===4){const existing=[base4.outer,base4.top,base4.bottom,base4.shoes];const extra=pickExtraColor(existing,style);switch(layerType){case'layered':return{outer:base4.outer,middleware:extra,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};case'scarf_basic':return{scarf:extra,outer:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};case'scarf_mid':return{scarf:extra,middleware:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};default:return base4;}}
+  if(bodyN===5){const existing=[base4.outer,base4.top,base4.bottom,base4.shoes];const extra1=pickExtraColor(existing,style);const extra2=pickExtraColor([...existing,extra1],style);return{scarf:extra1,outer:base4.outer,middleware:extra2,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};}
+  return base4;
+}
+
+// TECH PICKER
+function pickTech(style){const w=STW[style],ts=Object.keys(w),ws=ts.map(t=>w[t]);return wPick(ts,ws);}
+
+// GENERATE ONE
+function genOne(style){for(let a=0;a<30;a++){const tn=pickTech(style),r=TECHNIQUES[tn].compose(style);if(!r||!r.outer||!r.top||!r.bottom||!r.shoes)continue;if(!COLORS[r.outer]||!COLORS[r.top]||!COLORS[r.bottom]||!COLORS[r.shoes])continue;if(!styleFilter(style,r))continue;const sc=scoreCritic(r,style);if(sc.total>=50)return{...r,technique:tn,score:sc};}return null;}
+
+// GENERATE LAYERED
+function genOneLayered(style,layerType){
+  layerType=layerType||'basic';
+  for(let a=0;a<30;a++){const tn=pickTech(style);const base=TECHNIQUES[tn].compose(style);if(!base||!base.outer||!base.top||!base.bottom||!base.shoes)continue;if(!COLORS[base.outer]||!COLORS[base.top]||!COLORS[base.bottom]||!COLORS[base.shoes])continue;const adapted=adaptToLayer({...base,technique:tn},layerType,style);const ld=LAYER_DEFS[layerType];const allValid=ld.partKeys.every(k=>adapted[k]&&COLORS[adapted[k]]);if(!allValid)continue;if(!styleFilter(style,adapted))continue;const sc=scoreCritic(adapted,style);if(sc.total>=50)return{...adapted,technique:tn,score:sc};}
+  return null;
+}
+
+// BATCH GENERATE
+function generateOutfitsLayered(style,count,layerType){
+  layerType=layerType||'basic';const ld=LAYER_DEFS[layerType];const outfits=[],seen=new Set(),osCount={};let att=0;const mx=count*15;
+  while(outfits.length<count&&att<mx){att++;const o=genOneLayered(style,layerType);if(!o)continue;const key=ld.partKeys.map(k=>o[k]).join('/');if(seen.has(key))continue;const outermost=o[ld.partKeys[0]];const osk=outermost+'_'+o.shoes;osCount[osk]=(osCount[osk]||0)+1;if(osCount[osk]>4)continue;const cc={};ld.partKeys.forEach(k=>{const c=o[k];cc[c]=(cc[c]||0)+1;});if(Object.values(cc).some(v=>v>=3))continue;seen.add(key);outfits.push(o);}
+  return outfits.sort((a,b)=>b.score.total-a.score.total);
+}
+
+// PUBLIC API
+function getDynamicCombos(style,layerType,count){
+  count=count||30;const outfits=generateOutfitsLayered(style,count,layerType);
+  return outfits.map((o,i)=>{const outfit={};LAYER_DEFS[layerType].partKeys.forEach(k=>{outfit[k]=o[k];});return{outfit,score:o.score?o.score.total:0,name:(STYLE_MOODS[style]?.nameKo||style)+' #'+(i+1),technique:o.technique};});
+}
 // === PLACEHOLDER: 5단계에서 UI 로직 + 프롬프트 빌더 추가 ===
 
 </script>
