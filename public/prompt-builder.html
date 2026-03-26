@@ -779,7 +779,162 @@ function getDynamicCombos(style,layerType,count){
   count=count||30;const outfits=generateOutfitsLayered(style,count,layerType);
   return outfits.map((o,i)=>{const outfit={};LAYER_DEFS[layerType].partKeys.forEach(k=>{outfit[k]=o[k];});return{outfit,score:o.score?o.score.total:0,name:(STYLE_MOODS[style]?.nameKo||style)+' #'+(i+1),technique:o.technique};});
 }
-// === PLACEHOLDER: 5단계에서 UI 로직 + 프롬프트 빌더 추가 ===
+// ═══════════════════════════════════════════════
+// 5: UI 상태 + 렌더링 + 프롬프트 빌더
+// ═══════════════════════════════════════════════
+const PART_KO = {outer:'아우터',middleware:'미들웨어',top:'상의',bottom:'하의',shoes:'신발',scarf:'목도리',hat:'모자'};
+const PART_EN = {outer:'outer jacket/coat',middleware:'mid-layer',top:'top',bottom:'bottom',shoes:'shoes',scarf:'scarf',hat:'hat'};
+
+let state = {step:'mood', mood:null, style:null, pickedItems:[], results:[], layerType:'basic', partKeys:['outer','top','bottom','shoes'], selectedIdx:0, promptStyle:'fullbody', gender:'neutral'};
+let history = [];
+
+function pushStep(s){history.push(state.step);state.step=s;render();}
+function goBack(){if(!history.length)return;state.step=history.pop();render();}
+
+function selectMood(m){state.mood=m;if(m){pushStep('style');}else{state.style=null;pushStep('pick');}}
+function selectStyle(s){state.style=s;pushStep('pick');}
+function toggleItem(id){if(state.pickedItems.includes(id))state.pickedItems=state.pickedItems.filter(x=>x!==id);else state.pickedItems.push(id);render();}
+
+function generate(){
+  const info=itemsToLayerInfo(state.pickedItems);
+  state.layerType=info.layerType;state.partKeys=info.partKeys;
+  const allStyles=Object.keys(STYLE_MOODS);
+  const finalStyle=state.style||allStyles[Math.floor(Math.random()*allStyles.length)];
+  state.results=getDynamicCombos(finalStyle,state.layerType,30);
+  state.selectedIdx=0;pushStep('results');
+}
+function regenerate(){
+  const allStyles=Object.keys(STYLE_MOODS);
+  const finalStyle=state.style||allStyles[Math.floor(Math.random()*allStyles.length)];
+  state.results=getDynamicCombos(finalStyle,state.layerType,30);
+  state.selectedIdx=0;render();
+}
+function setIdx(i){state.selectedIdx=i;render();}
+function setPromptStyle(s){state.promptStyle=s;render();}
+function setGender(g){state.gender=g;render();}
+
+function buildPrompt(){
+  const r=state.results[state.selectedIdx];if(!r)return'';
+  const outfit=r.outfit;const pk=state.partKeys;
+  const modelDesc=state.gender==='male'?'a young Korean man in his 20s':state.gender==='female'?'a young Korean woman in her 20s':'a young Korean person with an androgynous look';
+  const parts=[];
+  for(const k of pk){const ck=outfit[k];if(!ck)continue;const c=COLORS_60[ck];if(!c)continue;parts.push('a '+c.nameEn.toLowerCase()+' ('+c.hex+') '+PART_EN[k]);}
+  const desc=parts.join(', ');
+  if(state.promptStyle==='fullbody')return'Fashion outfit coordination photo, full body shot of '+modelDesc+' wearing '+desc+'. Natural relaxed standing pose showing the complete outfit. Clean neutral background, soft natural lighting, high-end Korean fashion magazine editorial style. Focus on color harmony between garments, fabric textures visible, 4:5 aspect ratio for Instagram. Photorealistic, no text.';
+  if(state.promptStyle==='street')return'Street style outfit coordination photo, full body shot of '+modelDesc+' wearing '+desc+'. Casual walking pose on a clean urban sidewalk with soft blurred city background. Natural daylight, warm tones, Korean street fashion editorial look. Emphasis on how the colors coordinate together as a complete outfit, 4:5 aspect ratio for Instagram. Photorealistic, no text.';
+  return'Minimal studio outfit coordination photo, full body shot of '+modelDesc+' wearing '+desc+'. Relaxed standing pose against a plain white or light cream backdrop. Even studio lighting, zero distractions, sharp focus on garment colors and silhouette. Clean Korean fashion lookbook aesthetic, 4:5 aspect ratio for Instagram. Photorealistic, no text.';
+}
+
+function copyPrompt(){
+  const text=buildPrompt();if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copy-btn');btn.classList.add('copied');btn.textContent='복사됨!';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='복사';},2000);
+  });
+}
+
+// ═══ RENDER ═══
+function render(){
+  document.getElementById('back-btn').classList.toggle('hidden',state.step==='mood');
+  document.getElementById('step-mood').classList.toggle('hidden',state.step!=='mood');
+  document.getElementById('step-style').classList.toggle('hidden',state.step!=='style');
+  document.getElementById('step-pick').classList.toggle('hidden',state.step!=='pick');
+  document.getElementById('step-results').classList.toggle('hidden',state.step!=='results');
+
+  if(state.step==='mood') renderMood();
+  if(state.step==='style') renderStyle();
+  if(state.step==='pick') renderPick();
+  if(state.step==='results') renderResults();
+}
+
+function renderMood(){
+  let h='<div class="card"><div class="card-title">어떤 분위기를 원하세요?</div><div class="card-desc">무드를 선택하면 맞춤 스타일을 추천해드려요</div><div class="mood-grid">';
+  for(const[k,mg]of Object.entries(MOOD_GROUPS)){
+    h+='<button class="mood-btn" onclick="selectMood(\''+k+'\')"><span class="icon">'+mg.icon+'</span><span class="name">'+mg.name+'</span><span class="desc">'+mg.description+'</span></button>';
+  }
+  h+='</div><button class="btn-dark" style="margin-top:10px" onclick="selectMood(null)">전체 스타일에서 추천받기</button></div>';
+  document.getElementById('step-mood').innerHTML=h;
+}
+
+function renderStyle(){
+  if(!state.mood)return;const mg=MOOD_GROUPS[state.mood];
+  let h='<div class="card"><div class="card-title">'+mg.icon+' '+mg.name+' 스타일</div><div class="card-desc">원하는 스타일을 선택하세요</div><div class="style-list">';
+  for(const sKey of mg.styles){
+    const sg=STYLE_GUIDE[sKey];const icon=STYLE_ICONS[sKey]||'';
+    h+='<button class="style-btn" onclick="selectStyle(\''+sKey+'\')"><span class="s-icon">'+icon+'</span><div><div class="s-name">'+sg.name+'</div><div class="s-sub">'+sg.subtitle+'</div></div></button>';
+  }
+  h+='</div><button class="btn-dark" style="margin-top:10px" onclick="selectStyle(null)">'+mg.name+' 전체에서 추천받기</button></div>';
+  document.getElementById('step-style').innerHTML=h;
+}
+
+function renderPick(){
+  const clothing=ITEMS_CATALOG.filter(i=>!i.slot);const accessories=ITEMS_CATALOG.filter(i=>i.slot);
+  let h='<div class="card"><div class="card-title">꼭 입고 싶은 옷을 선택하세요</div><div class="card-desc">선택한 아이템 기준으로 코디를 추천합니다</div>';
+  h+='<div class="chip-label">의류</div><div class="chip-group" style="margin-bottom:12px">';
+  for(const item of clothing){const on=state.pickedItems.includes(item.id);h+='<button class="chip '+(on?'on':'off')+'" onclick="toggleItem(\''+item.id+'\')">'+item.emoji+' '+item.label+'</button>';}
+  h+='</div><div class="chip-label">소품</div><div class="chip-group" style="margin-bottom:12px">';
+  for(const item of accessories){const on=state.pickedItems.includes(item.id);h+='<button class="chip '+(on?'on':'off')+'" onclick="toggleItem(\''+item.id+'\')">'+item.emoji+' '+item.label+'</button>';}
+  h+='</div>';
+  if(state.pickedItems.length>0){
+    const names=state.pickedItems.map(id=>{const it=ITEMS_CATALOG.find(i=>i.id===id);return it?it.label:id;}).join(', ');
+    h+='<div class="summary-box">선택: '+names+' + 기본(상의, 하의, 신발)</div>';
+  }
+  h+='<button class="btn-primary" onclick="generate()">'+(state.pickedItems.length>0?'이 아이템으로 추천받기':'기본 구성으로 추천받기')+'</button></div>';
+  document.getElementById('step-pick').innerHTML=h;
+}
+
+function renderResults(){
+  if(!state.results.length){document.getElementById('step-results').innerHTML='<div class="card"><div class="card-title">결과 없음</div><p style="font-size:13px;color:#78716c">추천 결과를 생성하지 못했습니다. 다른 스타일이나 아이템 조합을 시도해보세요.</p><button class="btn-primary" style="margin-top:10px" onclick="goBack()">다시 선택하기</button></div>';return;}
+  const r=state.results[state.selectedIdx];const outfit=r.outfit;
+  let h='';
+
+  // 코디 결과 카드
+  h+='<div class="card"><div class="result-header"><span class="result-counter">'+(state.selectedIdx+1)+' / '+state.results.length+'</span><button class="refresh-btn" onclick="regenerate()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg> 새로 생성</button></div>';
+  h+='<div class="result-info"><div class="result-name">'+r.name+'</div><div class="result-score">조화점수 '+r.score+'점</div></div>';
+
+  // 컬러 블록
+  for(const k of state.partKeys){
+    const ck=outfit[k];if(!ck)continue;const c=COLORS_60[ck];if(!c)continue;
+    const dark=isDarkHex(c.hex);const border=LIGHT_HEX.has(c.hex)?' light-border':'';
+    h+='<div class="outfit-block'+border+'" style="background:'+c.hex+';border:1px solid transparent"><span class="part-tag" style="color:'+(dark?'#fff':'#333')+'">'+(PART_KO[k]||k)+'</span><span class="color-name" style="color:'+(dark?'#fff':'#292524')+'">'+c.name+'</span></div>';
+  }
+
+  // 네비게이션
+  h+='<div class="nav-row"><button class="nav-btn" onclick="setIdx('+(state.selectedIdx-1)+')" '+(state.selectedIdx===0?'disabled':'')+'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button><div class="dot-nav">';
+  const maxDots=Math.min(10,state.results.length);
+  for(let i=0;i<maxDots;i++){h+='<button class="dot '+(i===state.selectedIdx?'on':'off')+'" onclick="setIdx('+i+')"></button>';}
+  if(state.results.length>10)h+='<span style="font-size:10px;color:#a8a29e">+'+( state.results.length-10)+'</span>';
+  h+='</div><button class="nav-btn" onclick="setIdx('+(state.selectedIdx+1)+')" '+(state.selectedIdx>=state.results.length-1?'disabled':'')+'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button></div>';
+  h+='</div>';
+
+  // 코디샷 스타일
+  h+='<div class="card"><div class="card-title" style="margin-bottom:10px">코디샷 스타일</div><div class="toggle-row">';
+  [{k:'fullbody',l:'전신 코디',d:'풀바디 스타일링'},{k:'street',l:'스트릿',d:'야외 배경 코디'},{k:'minimal',l:'미니멀',d:'클린 스튜디오'}].forEach(s=>{
+    const on=state.promptStyle===s.k;h+='<button class="toggle-btn '+(on?'on':'off')+'" onclick="setPromptStyle(\''+s.k+'\')"><div class="t-label">'+s.l+'</div><div class="t-desc">'+s.d+'</div></button>';
+  });
+  h+='</div></div>';
+
+  // 모델
+  h+='<div class="card"><div class="card-title" style="margin-bottom:10px">모델</div><div class="toggle-row">';
+  [{k:'male',l:'남성',d:'한국인 남성'},{k:'neutral',l:'젠더리스',d:'성별 무관'},{k:'female',l:'여성',d:'한국인 여성'}].forEach(g=>{
+    const on=state.gender===g.k;h+='<button class="toggle-btn '+(on?'on':'off')+'" onclick="setGender(\''+g.k+'\')"><div class="t-label">'+g.l+'</div><div class="t-desc">'+g.d+'</div></button>';
+  });
+  h+='</div></div>';
+
+  // 프롬프트 출력
+  const prompt=buildPrompt();
+  if(prompt){
+    h+='<div class="card"><div class="prompt-header"><span class="card-title">생성된 프롬프트</span><button class="copy-btn" id="copy-btn" onclick="copyPrompt()">복사</button></div>';
+    h+='<div class="prompt-box"><div class="prompt-text">'+prompt+'</div></div>';
+    h+='<div class="prompt-hint"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1"/><path d="M6 3.5V6.5L8 7.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>이미지 생성 AI에 붙여넣어서 코디샷을 생성하세요</div></div>';
+  }
+
+  document.getElementById('step-results').innerHTML=h;
+}
+
+// INIT
+render();
+
 
 </script>
 </body>
