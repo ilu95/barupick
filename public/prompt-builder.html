@@ -280,7 +280,240 @@ const COLORS_60 = {
   'chocolate':   { name: '초콜릿', nameEn: 'Chocolate', hex: '#4B3621', hcl: [25,45,22] },
   'espresso':    { name: '에스프레소', nameEn: 'Espresso', hex: '#3D2B1F', hcl: [30,35,18] },
   'dark_brown':  { name: '다크브라운', nameEn: 'Dark Brown', hex: '#3B2F2F', hcl: [0,15,20] },
-  // === 2-b에서 나머지 색상 추가 ===
+  // ═══ 레드/핑크 (26) ═══
+  'shell_pink':  { name: '쉘핑크', nameEn: 'Shell Pink', hex: '#FFE4E1', hcl: [5,15,90] },
+  'pastel_pink': { name: '파스텔핑크', nameEn: 'Pastel Pink', hex: '#FFD1DC', hcl: [350,35,88] },
+  'nude_pink':   { name: '누드핑크', nameEn: 'Nude Pink', hex: '#E8CCD7', hcl: [335,15,82] },
+  'rose_pink':   { name: '로즈핑크', nameEn: 'Rose Pink', hex: '#F4C2C2', hcl: [0,22,78] },
+  'blush':       { name: '블러쉬', nameEn: 'Blush', hex: '#DE6FA1', hcl: [335,45,60] },
+  'old_rose':    { name: '올드로즈', nameEn: 'Old Rose', hex: '#C08081', hcl: [0,25,55] },
+  'dusty_rose':  { name: '더스티로즈', nameEn: 'Dusty Rose', hex: '#B87A85', hcl: [350,30,60] },
+  'rose_gold':   { name: '로즈골드', nameEn: 'Rose Gold', hex: '#B76E79', hcl: [350,28,50] },
+  'salmon':      { name: '살몬', nameEn: 'Salmon', hex: '#FA8072', hcl: [8,55,65] },
+  'carnation':   { name: '카네이션', nameEn: 'Carnation', hex: '#FFA6C9', hcl: [340,40,72] },
+  'flamingo':    { name: '플라밍고', nameEn: 'Flamingo', hex: '#FC8EAC', hcl: [345,50,68] },
+  'coral':       { name: '코랄', nameEn: 'Coral', hex: '#FF7F50', hcl: [15,80,65] },
+  'hot_pink':    { name: '핫핑크', nameEn: 'Hot Pink', hex: '#FF69B4', hcl: [330,80,65] },
+  'pink':        { name: '핑크', nameEn: 'Pink', hex: '#FF1493', hcl: [330,80,55] },
+  'fuchsia':     { name: '퓨시아', nameEn: 'Fuchsia', hex: '#FF00FF', hcl: [300,100,60] },
+  'raspberry':   { name: '라즈베리', nameEn: 'Raspberry', hex: '#E30B5C', hcl: [340,80,42] },
+  'scarlet':     { name: '스칼렛', nameEn: 'Scarlet', hex: '#FF2400', hcl: [8,90,48] },
+  'red':         { name: '레드', nameEn: 'Red', hex: '#FF0000', hcl: [0,85,50] },
+  'cherry':      { name: '체리', nameEn: 'Cherry', hex: '#DE3163', hcl: [345,65,42] },
+  'crimson':     { name: '크림슨', nameEn: 'Crimson', hex: '#CF173C', hcl: [348,80,45] },
+  'cardinal':    { name: '카디널', nameEn: 'Cardinal', hex: '#C41E3A', hcl: [350,70,38] },
+  'ruby':        { name: '루비', nameEn: 'Ruby', hex: '#9B111E', hcl: [355,75,30] },
+  'dark_red':    { name: '다크레드', nameEn: 'Dark Red', hex: '#8B0000', hcl: [0,100,25] },
+  'burgundy':    { name: '버건디', nameEn: 'Burgundy', hex: '#800020', hcl: [345,70,30] },
+  'wine':        { name: '와인', nameEn: 'Wine', hex: '#722F37', hcl: [350,55,32] },
+  'oxblood':     { name: '옥스블러드', nameEn: 'Oxblood', hex: '#4A0000', hcl: [0,100,15] },
+  'maroon':      { name: '마룬', nameEn: 'Maroon', hex: '#800000', hcl: [0,100,25] },
+  // ═══ 오렌지/옐로 (20) ═══
+  'lemon':       { name: '레몬', nameEn: 'Lemon', hex: '#FFFACD', hcl: [52,20,92] },
+  'pastel_yellow':{ name: '파스텔옐로', nameEn: 'Pastel Yellow', hex: '#FDFD96', hcl: [55,40,92] },
+  'butter':      { name: '버터', nameEn: 'Butter', hex: '#F9E4A7', hcl: [42,25,88] },
+  'canary':      { name: '카나리아', nameEn: 'Canary', hex: '#F8DE7E', hcl: [45,40,85] },
+  'yellow':      { name: '옐로', nameEn: 'Yellow', hex: '#FFD700', hcl: [50,80,82] },
+  'saffron':     { name: '사프란', nameEn: 'Saffron', hex: '#F4C430', hcl: [45,65,72] },
+  'gold':        { name: '골드', nameEn: 'Gold', hex: '#D1B561', hcl: [45,55,60] },
+  'mustard':     { name: '머스타드', nameEn: 'Mustard', hex: '#D1B647', hcl: [48,60,55] },
+  'marigold':    { name: '메리골드', nameEn: 'Marigold', hex: '#EAA221', hcl: [38,70,62] },
+  'amber':       { name: '앰버', nameEn: 'Amber', hex: '#D99726', hcl: [38,70,50] },
+  'peach':       { name: '피치', nameEn: 'Peach', hex: '#FFDAB9', hcl: [28,25,86] },
+  'apricot':     { name: '아프리콧', nameEn: 'Apricot', hex: '#FBCEB1', hcl: [25,25,82] },
+  'nectarine':   { name: '넥타린', nameEn: 'Nectarine', hex: '#FF9966', hcl: [22,55,68] },
+  'orange':      { name: '오렌지', nameEn: 'Orange', hex: '#FF8C00', hcl: [25,80,55] },
+  'tangerine':   { name: '탠저린', nameEn: 'Tangerine', hex: '#FF9F00', hcl: [32,80,62] },
+  'pumpkin':     { name: '펌킨', nameEn: 'Pumpkin', hex: '#FF7518', hcl: [22,80,52] },
+  'burnt_orange':{ name: '버닝오렌지', nameEn: 'Burnt Orange', hex: '#BD5528', hcl: [18,65,45] },
+  'terracotta':  { name: '테라코타', nameEn: 'Terracotta', hex: '#B85C3D', hcl: [15,50,48] },
+  'rust':        { name: '러스트', nameEn: 'Rust', hex: '#B14825', hcl: [15,65,42] },
+  'brick':       { name: '브릭', nameEn: 'Brick', hex: '#9E3D2E', hcl: [8,55,40] },
+  // ═══ 그린 (23+5) ═══
+  'pastel_mint':  { name: '파스텔민트', nameEn: 'Pastel Mint', hex: '#C1F0DB', hcl: [150,20,88] },
+  'pastel_green': { name: '파스텔그린', nameEn: 'Pastel Green', hex: '#B2E0D4', hcl: [160,30,82] },
+  'mint':         { name: '민트', nameEn: 'Mint', hex: '#98FB98', hcl: [120,40,85] },
+  'seafoam':      { name: '씨폼', nameEn: 'Seafoam', hex: '#9FE2BF', hcl: [150,30,80] },
+  'pistachio':    { name: '피스타치오', nameEn: 'Pistachio', hex: '#93C572', hcl: [95,35,72] },
+  'apple_green':  { name: '애플그린', nameEn: 'Apple Green', hex: '#8DB600', hcl: [75,70,65] },
+  'lime':         { name: '라임', nameEn: 'Lime', hex: '#32CD32', hcl: [120,70,60] },
+  'chartreuse':   { name: '샤르트뢰즈', nameEn: 'Chartreuse', hex: '#ADFF2F', hcl: [80,80,80] },
+  'kelly_green':  { name: '켈리그린', nameEn: 'Kelly Green', hex: '#4CBB17', hcl: [100,70,55] },
+  'green':        { name: '그린', nameEn: 'Green', hex: '#228B22', hcl: [120,65,45] },
+  'sage':         { name: '세이지', nameEn: 'Sage', hex: '#92AD85', hcl: [100,20,60] },
+  'pastel_sage':  { name: '파스텔세이지', nameEn: 'Pastel Sage', hex: '#C5D5B5', hcl: [90,15,78] },
+  'fern':         { name: '펀', nameEn: 'Fern', hex: '#9DC183', hcl: [95,25,68] },
+  'moss':         { name: '모스', nameEn: 'Moss', hex: '#82A550', hcl: [85,35,48] },
+  'olive':        { name: '올리브', nameEn: 'Olive', hex: '#808000', hcl: [60,50,40] },
+  'dark_olive':   { name: '다크올리브', nameEn: 'Dark Olive', hex: '#556B2F', hcl: [80,50,35] },
+  'avocado':      { name: '아보카도', nameEn: 'Avocado', hex: '#568203', hcl: [80,65,40] },
+  'army_green':   { name: '아미그린', nameEn: 'Army Green', hex: '#4B5320', hcl: [70,45,30] },
+  'jade':         { name: '제이드', nameEn: 'Jade', hex: '#00A86B', hcl: [155,60,50] },
+  'emerald':      { name: '에메랄드', nameEn: 'Emerald', hex: '#50C878', hcl: [140,50,60] },
+  'teal':         { name: '틸', nameEn: 'Teal', hex: '#008080', hcl: [180,65,38] },
+  'turquoise':    { name: '터콰이즈', nameEn: 'Turquoise', hex: '#40E0D0', hcl: [175,60,70] },
+  'peacock':      { name: '피콕', nameEn: 'Peacock', hex: '#006D6F', hcl: [182,55,32] },
+  'hunter_green': { name: '헌터그린', nameEn: 'Hunter Green', hex: '#1D7245', hcl: [150,60,28] },
+  'forest':       { name: '포레스트', nameEn: 'Forest', hex: '#228B22', hcl: [120,65,35] },
+  'pine':         { name: '파인', nameEn: 'Pine', hex: '#01503C', hcl: [160,60,22] },
+  'bottle_green': { name: '보틀그린', nameEn: 'Bottle Green', hex: '#006A4E', hcl: [160,55,25] },
+  'dark_green':   { name: '다크그린', nameEn: 'Dark Green', hex: '#013220', hcl: [150,70,15] },
+  // ═══ 블루 (19) ═══
+  'ice_blue':     { name: '아이스블루', nameEn: 'Ice Blue', hex: '#E0F0FF', hcl: [210,15,92] },
+  'pastel_sky':   { name: '파스텔스카이', nameEn: 'Pastel Sky', hex: '#C1E1F2', hcl: [205,25,85] },
+  'pastel_blue':  { name: '파스텔블루', nameEn: 'Pastel Blue', hex: '#AEC6CF', hcl: [200,25,75] },
+  'baby_blue':    { name: '베이비블루', nameEn: 'Baby Blue', hex: '#89CFF0', hcl: [205,40,75] },
+  'sky_blue':     { name: '스카이블루', nameEn: 'Sky Blue', hex: '#87CEEB', hcl: [200,40,72] },
+  'powder_blue':  { name: '파우더블루', nameEn: 'Powder Blue', hex: '#B9CCD5', hcl: [200,25,78] },
+  'dusty_blue':   { name: '더스티블루', nameEn: 'Dusty Blue', hex: '#B0C4DE', hcl: [215,25,72] },
+  'steel_blue':   { name: '스틸블루', nameEn: 'Steel Blue', hex: '#6A8CAF', hcl: [210,30,55] },
+  'cornflower':   { name: '콘플라워', nameEn: 'Cornflower', hex: '#6495ED', hcl: [220,50,58] },
+  'denim':        { name: '데님', nameEn: 'Denim', hex: '#4D77B3', hcl: [215,40,50] },
+  'azure':        { name: '아쥬르', nameEn: 'Azure', hex: '#007FFF', hcl: [215,80,50] },
+  'blue':         { name: '블루', nameEn: 'Blue', hex: '#0066CC', hcl: [215,85,42] },
+  'cobalt':       { name: '코발트', nameEn: 'Cobalt', hex: '#1D56C9', hcl: [220,75,45] },
+  'royal_blue':   { name: '로얄블루', nameEn: 'Royal Blue', hex: '#4169E1', hcl: [225,75,50] },
+  'sapphire':     { name: '사파이어', nameEn: 'Sapphire', hex: '#0F52BA', hcl: [225,75,38] },
+  'petrol':       { name: '페트롤', nameEn: 'Petrol', hex: '#1B3A4B', hcl: [200,35,25] },
+  'prussian_blue':{ name: '프러시안블루', nameEn: 'Prussian Blue', hex: '#003153', hcl: [210,60,22] },
+  'navy':         { name: '네이비', nameEn: 'Navy', hex: '#000080', hcl: [240,65,20] },
+  'midnight':     { name: '미드나이트', nameEn: 'Midnight', hex: '#191970', hcl: [240,70,18] },
+  // ═══ 퍼플 (17) ═══
+  'pastel_lavender':{ name: '파스텔라벤더', nameEn: 'Pastel Lavender', hex: '#E8DFF5', hcl: [270,15,88] },
+  'lavender':     { name: '라벤더', nameEn: 'Lavender', hex: '#E6E6FA', hcl: [240,15,85] },
+  'pastel_lilac': { name: '파스텔라일락', nameEn: 'Pastel Lilac', hex: '#DCD0FF', hcl: [260,20,82] },
+  'lilac':        { name: '라일락', nameEn: 'Lilac', hex: '#C8A2C8', hcl: [300,20,68] },
+  'periwinkle':   { name: '페리윙클', nameEn: 'Periwinkle', hex: '#CCCCFF', hcl: [240,25,78] },
+  'wisteria':     { name: '위스테리아', nameEn: 'Wisteria', hex: '#C9A0DC', hcl: [280,28,68] },
+  'heather':      { name: '헤더', nameEn: 'Heather', hex: '#B8A9C9', hcl: [270,15,65] },
+  'pastel_purple':{ name: '파스텔퍼플', nameEn: 'Pastel Purple', hex: '#D8BFD8', hcl: [300,20,78] },
+  'orchid':       { name: '오키드', nameEn: 'Orchid', hex: '#DA70D6', hcl: [302,45,58] },
+  'mauve':        { name: '모브', nameEn: 'Mauve', hex: '#A97096', hcl: [320,25,55] },
+  'amethyst':     { name: '아메시스트', nameEn: 'Amethyst', hex: '#9966CC', hcl: [270,40,48] },
+  'purple':       { name: '퍼플', nameEn: 'Purple', hex: '#800080', hcl: [300,60,35] },
+  'violet':       { name: '바이올렛', nameEn: 'Violet', hex: '#7F00FF', hcl: [270,90,40] },
+  'plum':         { name: '플럼', nameEn: 'Plum', hex: '#883A88', hcl: [300,40,38] },
+  'mulberry':     { name: '멀베리', nameEn: 'Mulberry', hex: '#770737', hcl: [340,60,25] },
+  'grape':        { name: '그레이프', nameEn: 'Grape', hex: '#6F2DA8', hcl: [275,55,32] },
+  'eggplant':     { name: '에그플랜트', nameEn: 'Eggplant', hex: '#411C54', hcl: [280,50,22] },
+  'indigo':       { name: '인디고', nameEn: 'Indigo', hex: '#310062', hcl: [275,80,18] },
+  // ═══ 기타/호환 ═══
+  'dark_blue':    { name: '다크블루', nameEn: 'Dark Blue', hex: '#00008B', hcl: [240,80,18] },
+  'dark_purple':  { name: '다크퍼플', nameEn: 'Dark Purple', hex: '#301934', hcl: [285,40,15] },
+  'dark_teal':    { name: '다크틸', nameEn: 'Dark Teal', hex: '#003B3C', hcl: [182,60,18] },
+  'magenta':      { name: '마젠타', nameEn: 'Magenta', hex: '#FF00FF', hcl: [300,100,60] },
+  'cyan':         { name: '시안', nameEn: 'Cyan', hex: '#00FFFF', hcl: [180,80,80] },
+  'pastel_coral': { name: '파스텔코랄', nameEn: 'Pastel Coral', hex: '#F8B4A8', hcl: [12,35,82] },
+  'pastel_rose':  { name: '파스텔로즈', nameEn: 'Pastel Rose', hex: '#F8C8D4', hcl: [345,30,85] },
+  'pastel_lemon': { name: '파스텔레몬', nameEn: 'Pastel Lemon', hex: '#FDFD96', hcl: [52,30,93] },
+  'pastel_aqua':  { name: '파스텔아쿠아', nameEn: 'Pastel Aqua', hex: '#B0E0D8', hcl: [168,25,82] },
+};
+// ═══════════════════════════════════════════════
+// 2-c: HCL 접근함수 + 온도 + 컬러 패밀리 + 콤보
+// ═══════════════════════════════════════════════
+const COLORS = {};
+Object.entries(COLORS_60).forEach(([k,v]) => { COLORS[k] = v.hcl; });
+function hcl(c) { return COLORS[c] || [0,0,50]; }
+function H(c) { return hcl(c)[0]; }
+function Cv(c) { return hcl(c)[1]; }
+function L(c) { return hcl(c)[2]; }
+
+const WARM_SET = new Set([
+  'brown','dark_brown','cognac','rust','sienna','camel','tan','khaki','taupe','fawn','honey','caramel','copper','cinnamon','walnut','mocha','cocoa','chestnut','chocolate',
+  'espresso','cream','ivory','beige','linen','ecru','champagne','bone','wheat','oatmeal','sand',
+  'burgundy','wine','brick','terracotta','red','crimson','scarlet','cherry','cardinal','ruby','oxblood',
+  'maroon','dark_red','amber','mustard','gold','orange','burnt_orange','tangerine','pumpkin','nectarine','marigold','saffron',
+  'olive','dark_olive','forest','moss','avocado','army_green',
+  'peach','apricot','salmon','coral','flamingo','carnation',
+  'pastel_peach','pastel_yellow','pastel_coral','pastel_lemon','pastel_rose','pastel_pink',
+  'dusty_rose','old_rose','rose_pink','rose_gold','blush','shell_pink','nude_pink',
+  'hot_pink','raspberry','lemon','butter','canary','yellow',
+]);
+const COOL_SET = new Set([
+  'navy','dark_blue','indigo','midnight','cobalt','steel_blue','slate','cornflower','azure','sapphire','prussian_blue','petrol',
+  'powder_blue','denim','baby_blue','sky_blue','ice_blue','dusty_blue',
+  'dark_green','hunter_green','teal','dark_teal','pine','bottle_green','peacock','jade',
+  'dark_purple','eggplant','plum','mauve','purple','violet','grape','mulberry','amethyst',
+  'pastel_blue','pastel_mint','pastel_lavender','pastel_sky','pastel_lilac','pastel_green','pastel_sage','pastel_aqua',
+  'lavender','lilac','periwinkle','wisteria','heather','orchid',
+  'cool_gray','graphite','gunmetal',
+  'fuchsia','magenta','cyan','turquoise',
+]);
+function temp(c) { return WARM_SET.has(c) ? 'w' : COOL_SET.has(c) ? 'c' : 'n'; }
+
+const COLOR_FAMILIES = {
+  brown: ['espresso','chocolate','dark_brown','brown','cognac','rust','sienna','camel','tan','khaki','beige','cream','taupe','mocha','cocoa','chestnut','walnut','cinnamon','copper','caramel','honey','fawn'],
+  blue: ['midnight','dark_blue','navy','indigo','cobalt','denim','steel_blue','slate','powder_blue','baby_blue','sky_blue','ice_blue','dusty_blue','cornflower','azure','royal_blue','sapphire','prussian_blue','petrol','pastel_blue','pastel_sky'],
+  green: ['dark_green','hunter_green','forest','pine','bottle_green','dark_olive','olive','moss','sage','teal','jade','emerald','avocado','army_green','kelly_green','lime','mint','seafoam','pistachio','fern','apple_green','chartreuse','pastel_green','pastel_mint','pastel_sage','pastel_aqua','peacock','turquoise'],
+  red: ['maroon','dark_red','burgundy','wine','brick','crimson','terracotta','red','rust','burnt_orange','scarlet','cherry','cardinal','ruby','oxblood','raspberry'],
+  purple: ['eggplant','dark_purple','plum','purple','mauve','violet','grape','mulberry','amethyst','orchid','wisteria','heather','lilac','lavender','periwinkle','pastel_lavender','pastel_lilac','pastel_purple','indigo'],
+  pink: ['dusty_rose','old_rose','rose_pink','rose_gold','blush','salmon','coral','flamingo','carnation','hot_pink','pink','fuchsia','shell_pink','nude_pink','pastel_pink','pastel_coral','pastel_rose'],
+  yellow: ['amber','mustard','gold','orange','burnt_orange','tangerine','pumpkin','nectarine','marigold','saffron','peach','apricot','lemon','butter','canary','yellow','pastel_yellow','pastel_lemon','pastel_peach'],
+  gray: ['black','gunmetal','graphite','charcoal','gray','slate','pewter','ash_gray','cool_gray','warm_gray','silver','lightgray','white','ivory','off_white','cream'],
+};
+
+const PASTEL_COLORS = [
+  'pastel_pink','pastel_blue','pastel_green','pastel_yellow','pastel_purple',
+  'pastel_mint','pastel_peach','pastel_lavender','pastel_coral','pastel_sky',
+  'pastel_lilac','pastel_sage','pastel_lemon','pastel_rose','pastel_aqua',
+  'shell_pink','nude_pink','rose_pink','ice_blue','lavender',
+  'lemon','butter','peach','apricot','mint','seafoam','baby_blue','sky_blue',
+  'lilac','periwinkle','wisteria','heather',
+];
+const EARTH_TONE_COLORS = [
+  'brown','camel','olive','khaki','taupe','beige','cream','ivory',
+  'dark_brown','dark_olive','chocolate','espresso','cognac','sienna',
+  'terracotta','rust','brick','sand','oatmeal','mushroom','greige',
+  'tan','stone','wheat','fawn','mocha','cocoa','walnut','cinnamon',
+  'copper','caramel','honey','chestnut','linen','ecru','bone',
+];
+function getHueDiff(h1,h2) { let d=Math.abs(h1-h2); if(d>180)d=360-d; return d; }
+function isNeutralColor(c) { return c<=12; }
+function getToneGroup(h,c,l) { if(c<=12)return'neutral'; if(l<=35)return'deep'; if(l>=75)return'light'; if(c>=60)return'bright'; return'muted'; }
+function getColorTemperature(h,c,l) {
+  if(c<=12) return{temp:'neutral',score:0};
+  let ws=0;
+  if((h>=0&&h<=70)||(h>=320&&h<=360)){const a=h>=320?h-360:h;ws=1.0-Math.abs(a-30)/70;}
+  else if(h>=200&&h<=280){ws=-1.0+Math.abs(h-240)/80;}
+  if(c<30)ws*=0.5;
+  let t; if(ws>0.3)t='warm'; else if(ws<-0.3)t='cool'; else t='neutral';
+  return{temp:t,score:ws};
+}
+
+const CLASSIC_COMBOS = {
+  'navy':['burgundy','wine','olive','brown','dark_olive','forest','red','maroon','camel','beige','cream','white','cognac'],
+  'burgundy':['navy','olive','dark_green','forest','brown','camel','dark_olive','pink','pastel_pink','beige','cream'],
+  'olive':['burgundy','navy','brown','wine','dark_brown','khaki','taupe','camel','cream','beige'],
+  'brown':['navy','burgundy','olive','dark_green','taupe','khaki','cream','beige','tan'],
+  'wine':['navy','olive','camel','brown','khaki','pastel_pink','cream','beige'],
+  'forest':['burgundy','navy','brown','wine','camel','cream','beige'],
+  'dark_green':['burgundy','brown','camel','navy','wine','khaki','cream'],
+  'dark_olive':['burgundy','navy','wine','camel','cream'],
+  'red':['navy','charcoal','white','black'],
+  'maroon':['navy','camel','beige','khaki','cream'],
+  'taupe':['olive','burgundy','navy','brown','camel','khaki','cream'],
+  'khaki':['olive','burgundy','navy','brown','wine','taupe','dark_green','camel'],
+  'camel':['olive','burgundy','navy','wine','forest','dark_green','dark_olive','khaki','white','cream'],
+  'blue':['purple','royal_blue','navy','white','cream'],
+  'purple':['blue','pink','magenta','burgundy','cream','lavender'],
+  'charcoal':['burgundy','navy','camel','cream','white','dusty_rose'],
+  'black':['white','red','royal_blue','emerald','gold','cream','ivory'],
+};
+const AVOID_COMBOS = {
+  'black':['navy','dark_blue','midnight','charcoal','graphite','gunmetal'],
+  'navy':['black','dark_blue','midnight','indigo','graphite'],
+  'charcoal':['black','graphite','gunmetal'],
+  'red':['orange','magenta','coral','pink','green','lime','emerald','forest','dark_green'],
+  'green':['red','magenta','pink','dark_red','maroon'],
+  'dark_green':['red','dark_red','maroon'],
+  'forest':['red','dark_red','maroon'],
+  'burgundy':['wine','maroon','dark_red','oxblood'],
+  'brown':['dark_brown','chocolate','espresso','mocha'],
+};
+
+const LIGHT_HEX = new Set(['#FFFFFF','#FFFFF0','#FFFDD0','#F5F5F0','#F5F5DC','#FAF0E6','#F5E6CC','#F7E7CE','#FFFACD','#FDFD96','#E0F0FF','#E6E6FA','#E8DFF5','#FFE4E1','#FFD1DC']);
+function isDarkHex(hex) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return(r*0.299+g*0.587+b*0.114)<140; }
+
 // === PLACEHOLDER: 3단계에서 STYLE_MOODS, STW, MOOD_GROUPS 추가 ===
 // === PLACEHOLDER: 4단계에서 추천 엔진 (테크닉, 점수, 필터) 추가 ===
 // === PLACEHOLDER: 5단계에서 UI 로직 + 프롬프트 빌더 추가 ===
