@@ -44,7 +44,6 @@ import EventSubmit from '@/pages/EventSubmit'
 import PcLight from '@/pages/PcLight'
 import PostInsight from '@/pages/PostInsight'
 import DevDiag from '@/pages/DevDiag'
-import PromptBuilder from '@/pages/PromptBuilder'
 import { useAutoSync } from '@/hooks/useAutoSync'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -90,7 +89,6 @@ export default function App() {
                   <Route path="/home/build/improve" element={<BuildCoord />} />
                   <Route path="/home/evaluate" element={<BuildCoord />} />
                   <Route path="/home/recommend" element={<RecommendCoord />} />
-                  <Route path="/home/prompt-builder" element={<PromptBuilder />} />
                   <Route path="/home/today" element={<Navigate to="/closet/combos" replace />} />
                   <Route path="/home/weather" element={<Weather />} />
                   <Route path="/home/saved" element={<SavedCoords />} />

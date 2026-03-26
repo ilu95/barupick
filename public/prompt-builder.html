@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BARUPICK Prompt Builder — 코디 추천 + 이미지 프롬프트 생성기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --accent: #C4622D;
+    --accent-hover: #A8512A;
+    --bg: linear-gradient(165deg, #F7F3EE 0%, #EDE7DF 50%, #E8E0D6 100%);
+    --card: rgba(255,255,255,0.4);
+    --card-border: rgba(255,255,255,0.6);
+    --stone-50: #fafaf9; --stone-100: #f5f5f4; --stone-200: #e7e5e4;
+    --stone-300: #d6d3d1; --stone-400: #a8a29e; --stone-500: #78716c;
+    --stone-600: #57534e; --stone-700: #44403c; --stone-800: #292524;
+  }
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--stone-700);
+    -webkit-font-smoothing: antialiased;
+  }
+  .playfair { font-family: 'Playfair Display', serif; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 16px 80px; }
+
+  /* Header */
+  .header { padding: 24px 0 12px; }
+  .header-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .logo-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 0.05em; color: var(--accent); }
+  .logo-sub { font-size: 10px; letter-spacing: 0.2em; color: var(--stone-400); font-weight: 500; margin-top: 2px; }
+  .header-desc { font-size: 12px; color: var(--stone-500); margin-left: 36px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--stone-700); margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: var(--stone-400); margin-bottom: 12px; }
+
+  /* Back button */
+  .back-btn {
+    display: flex; align-items: center; gap: 4px; margin-bottom: 12px;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 500; color: var(--stone-500);
+  }
+  .back-btn:hover { color: var(--stone-700); }
+
+  /* Mood grid */
+  .mood-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mood-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 14px 8px; border-radius: 14px;
+    border: 1px solid rgba(231,229,228,0.8); background: rgba(255,255,255,0.7);
+    cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .mood-btn:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .mood-btn .icon { font-size: 24px; }
+  .mood-btn .name { font-size: 13px; font-weight: 700; color: var(--stone-800); }
+  .mood-btn .desc { font-size: 10px; color: var(--stone-400); }
+
+  /* Style list */
+  .style-list { display: flex; flex-direction: column; gap: 8px; }
+  .style-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 12px; border-radius: 12px; text-align: left;
+    border: 1px solid rgba(231,229,228,0.8); background: rgba(255,255,255,0.7);
+    cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .style-btn:hover { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .style-btn .s-icon { font-size: 20px; }
+  .style-btn .s-name { font-size: 13px; font-weight: 700; color: var(--stone-800); }
+  .style-btn .s-sub { font-size: 10px; color: var(--stone-400); }
+
+  /* Item chips */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--stone-400); margin-bottom: 6px; }
+  .chip {
+    padding: 5px 11px; border-radius: 8px; font-size: 12px; font-weight: 500;
+    border: none; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .chip.off { background: var(--stone-100); color: var(--stone-600); }
+  .chip.off:hover { background: var(--stone-200); }
+  .chip.on { background: var(--accent); color: #fff; box-shadow: 0 1px 4px rgba(196,98,45,0.3); }
+
+  /* Full-width buttons */
+  .btn-primary {
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    background: var(--accent); color: #fff; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-dark {
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    background: var(--stone-800); color: #fff; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-dark:hover { background: #1c1917; }
+
+  /* Summary box */
+  .summary-box {
+    font-size: 12px; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px;
+    background: rgba(196,98,45,0.08); color: var(--accent);
+  }
+
+  /* Result outfit color blocks */
+  .outfit-block {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 10px; margin-bottom: 5px;
+  }
+  .outfit-block .part-tag {
+    font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
+    background: rgba(0,0,0,0.15);
+  }
+  .outfit-block .color-name { font-size: 12px; font-weight: 600; }
+  .light-border { border: 1px solid #d1d1d1 !important; }
+
+  /* Nav row */
+  .nav-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+  .nav-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: none;
+    background: var(--stone-100); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:hover:not(:disabled) { background: var(--stone-200); }
+  .dot-nav { display: flex; gap: 4px; align-items: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; border: none; cursor: pointer; transition: background 0.15s; }
+  .dot.on { background: var(--accent); }
+  .dot.off { background: var(--stone-300); }
+
+  /* Toggle row (style / gender) */
+  .toggle-row { display: flex; gap: 8px; }
+  .toggle-btn {
+    flex: 1; padding: 10px 8px; border-radius: 12px; text-align: center;
+    border: 1px solid rgba(231,229,228,0.8); cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .toggle-btn.off { background: rgba(255,255,255,0.7); color: var(--stone-600); }
+  .toggle-btn.off:hover { background: #fff; }
+  .toggle-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 2px 8px rgba(196,98,45,0.25); }
+  .toggle-btn .t-label { font-size: 12px; font-weight: 700; }
+  .toggle-btn .t-desc { font-size: 10px; margin-top: 2px; }
+  .toggle-btn.on .t-desc { color: rgba(255,255,255,0.7); }
+  .toggle-btn.off .t-desc { color: var(--stone-400); }
+
+  /* Prompt output */
+  .prompt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .copy-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    border: none; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    background: var(--accent); color: #fff;
+  }
+  .copy-btn:hover { background: var(--accent-hover); }
+  .copy-btn.copied { background: #22c55e; }
+  .prompt-box {
+    padding: 12px; border-radius: 12px; background: var(--stone-50);
+    border: 1px solid rgba(231,229,228,0.8);
+  }
+  .prompt-text {
+    font-size: 12px; color: var(--stone-700); line-height: 1.7;
+    word-break: break-all; user-select: all;
+  }
+  .prompt-hint {
+    margin-top: 8px; display: flex; align-items: center; gap: 6px;
+    font-size: 10px; color: var(--stone-400);
+  }
+
+  /* Refresh btn */
+  .refresh-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
+    background: var(--stone-100); color: var(--stone-600); border: none;
+    cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .refresh-btn:hover { background: var(--stone-200); }
+
+  .hidden { display: none !important; }
+
+  /* Result header row */
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .result-counter { font-size: 12px; font-weight: 700; color: var(--stone-800); }
+  .result-info { text-align: center; margin-bottom: 10px; }
+  .result-name { font-size: 14px; font-weight: 700; color: var(--stone-800); }
+  .result-score { font-size: 11px; color: var(--stone-400); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div class="logo-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L3 6V14H6V10H10V14H13V6L8 2Z" fill="white"/></svg>
+      </div>
+      <span class="playfair logo-text">BARUPICK</span>
+      <span class="logo-sub">PROMPT BUILDER</span>
+    </div>
+    <div class="header-desc">코디 추천 + 이미지 프롬프트 생성기</div>
+  </div>
+
+  <!-- Back button (hidden initially) -->
+  <button class="back-btn hidden" id="back-btn" onclick="goBack()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    뒤로
+  </button>
+
+  <!-- Step containers -->
+  <div id="step-mood"></div>
+  <div id="step-style" class="hidden"></div>
+  <div id="step-pick" class="hidden"></div>
+  <div id="step-results" class="hidden"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA & ENGINE — 바루픽 추천 엔진 전체 (아래에 단계별로 추가됨)
+// ═══════════════════════════════════════════════════════════════
+
+// === PLACEHOLDER: 2단계에서 COLORS_60, HCL 시스템 추가 ===
+// === PLACEHOLDER: 3단계에서 STYLE_MOODS, STW, MOOD_GROUPS 추가 ===
+// === PLACEHOLDER: 4단계에서 추천 엔진 (테크닉, 점수, 필터) 추가 ===
+// === PLACEHOLDER: 5단계에서 UI 로직 + 프롬프트 빌더 추가 ===
+
+</script>
+</body>
+</html>
