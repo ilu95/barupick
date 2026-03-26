@@ -515,7 +515,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
         </div>
         <div className="flex-1 flex flex-col gap-1.5">
           {parts.map((k: string) => {
-            const colorKey = combo.outfit[k]; const c = COLORS_60[colorKey]
+            const colorKey = currentOutfit[k]; const c = COLORS_60[colorKey]
             return (
               <div key={k} className="flex items-center gap-2 text-xs">
                 <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
