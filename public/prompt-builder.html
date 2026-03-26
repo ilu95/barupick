@@ -228,7 +228,59 @@
 // DATA & ENGINE — 바루픽 추천 엔진 전체 (아래에 단계별로 추가됨)
 // ═══════════════════════════════════════════════════════════════
 
-// === PLACEHOLDER: 2단계에서 COLORS_60, HCL 시스템 추가 ===
+// ═══════════════════════════════════════════════
+// 2-a: COLORS_60 — 148색 컬러 팔레트 (name, nameEn, hex, hcl)
+// ═══════════════════════════════════════════════
+const COLORS_60 = {
+  // ═══ 무채색 (16) ═══
+  'white':       { name: '화이트', nameEn: 'White', hex: '#FFFFFF', hcl: [0,0,100] },
+  'off_white':   { name: '오프화이트', nameEn: 'Off White', hex: '#F5F5F0', hcl: [60,3,95] },
+  'ivory':       { name: '아이보리', nameEn: 'Ivory', hex: '#FFFFF0', hcl: [60,5,98] },
+  'cream':       { name: '크림', nameEn: 'Cream', hex: '#FFFDD0', hcl: [55,8,95] },
+  'silver':      { name: '실버', nameEn: 'Silver', hex: '#BFBFBF', hcl: [0,0,75] },
+  'lightgray':   { name: '라이트그레이', nameEn: 'Light Gray', hex: '#D3D3D3', hcl: [0,0,80] },
+  'warm_gray':   { name: '웜그레이', nameEn: 'Warm Gray', hex: '#C8C0B8', hcl: [30,8,72] },
+  'cool_gray':   { name: '쿨그레이', nameEn: 'Cool Gray', hex: '#B0B8BF', hcl: [210,8,70] },
+  'ash_gray':    { name: '애쉬그레이', nameEn: 'Ash Gray', hex: '#B2BEB5', hcl: [140,6,68] },
+  'gray':        { name: '그레이', nameEn: 'Gray', hex: '#808080', hcl: [0,0,50] },
+  'pewter':      { name: '퓨터', nameEn: 'Pewter', hex: '#8E8E8E', hcl: [0,0,55] },
+  'slate':       { name: '슬레이트', nameEn: 'Slate', hex: '#708090', hcl: [210,15,50] },
+  'charcoal':    { name: '차콜', nameEn: 'Charcoal', hex: '#36454F', hcl: [210,10,30] },
+  'graphite':    { name: '그래파이트', nameEn: 'Graphite', hex: '#41424C', hcl: [235,8,28] },
+  'gunmetal':    { name: '건메탈', nameEn: 'Gunmetal', hex: '#2A3439', hcl: [200,10,22] },
+  'black':       { name: '블랙', nameEn: 'Black', hex: '#000000', hcl: [0,0,0] },
+  // ═══ 베이지/브라운 (29+1) ═══
+  'linen':       { name: '리넨', nameEn: 'Linen', hex: '#FAF0E6', hcl: [30,8,92] },
+  'ecru':        { name: '에크루', nameEn: 'Ecru', hex: '#F5E6CC', hcl: [35,12,88] },
+  'champagne':   { name: '샴페인', nameEn: 'Champagne', hex: '#F7E7CE', hcl: [35,10,90] },
+  'bone':        { name: '본', nameEn: 'Bone', hex: '#E3D0B9', hcl: [30,12,82] },
+  'beige':       { name: '베이지', nameEn: 'Beige', hex: '#F5F5DC', hcl: [60,10,90] },
+  'sand':        { name: '샌드', nameEn: 'Sand', hex: '#C2B280', hcl: [45,25,68] },
+  'wheat':       { name: '위트', nameEn: 'Wheat', hex: '#F5DEB3', hcl: [40,18,85] },
+  'oatmeal':     { name: '오트밀', nameEn: 'Oatmeal', hex: '#D4C7A9', hcl: [42,15,76] },
+  'stone':       { name: '스톤', nameEn: 'Stone', hex: '#D4C9B8', hcl: [35,10,78] },
+  'mushroom':    { name: '머쉬룸', nameEn: 'Mushroom', hex: '#BDB1A0', hcl: [32,12,70] },
+  'greige':      { name: '그레이지', nameEn: 'Greige', hex: '#BAB0A1', hcl: [38,10,68] },
+  'khaki':       { name: '카키', nameEn: 'Khaki', hex: '#C3B091', hcl: [45,25,65] },
+  'tan':         { name: '탄', nameEn: 'Tan', hex: '#C6B99F', hcl: [40,25,70] },
+  'camel':       { name: '카멜', nameEn: 'Camel', hex: '#C19A6B', hcl: [40,30,60] },
+  'fawn':        { name: '폰', nameEn: 'Fawn', hex: '#D2B48C', hcl: [32,22,72] },
+  'honey':       { name: '허니', nameEn: 'Honey', hex: '#C68E17', hcl: [38,65,55] },
+  'caramel':     { name: '카라멜', nameEn: 'Caramel', hex: '#C07840', hcl: [25,45,50] },
+  'cognac':      { name: '코냑', nameEn: 'Cognac', hex: '#9E662E', hcl: [30,55,40] },
+  'copper':      { name: '카퍼', nameEn: 'Copper', hex: '#B87333', hcl: [28,50,45] },
+  'cinnamon':    { name: '시나몬', nameEn: 'Cinnamon', hex: '#D2691E', hcl: [22,60,48] },
+  'sienna':      { name: '시에나', nameEn: 'Sienna', hex: '#B25E34', hcl: [20,55,45] },
+  'brown':       { name: '브라운', nameEn: 'Brown', hex: '#8B4513', hcl: [25,50,35] },
+  'walnut':      { name: '월넛', nameEn: 'Walnut', hex: '#795C3E', hcl: [30,30,38] },
+  'mocha':       { name: '모카', nameEn: 'Mocha', hex: '#6F4E37', hcl: [25,30,32] },
+  'cocoa':       { name: '코코아', nameEn: 'Cocoa', hex: '#5C4033', hcl: [18,25,28] },
+  'chestnut':    { name: '체스넛', nameEn: 'Chestnut', hex: '#954535', hcl: [10,45,35] },
+  'taupe':       { name: '토프', nameEn: 'Taupe', hex: '#483C32', hcl: [30,20,25] },
+  'chocolate':   { name: '초콜릿', nameEn: 'Chocolate', hex: '#4B3621', hcl: [25,45,22] },
+  'espresso':    { name: '에스프레소', nameEn: 'Espresso', hex: '#3D2B1F', hcl: [30,35,18] },
+  'dark_brown':  { name: '다크브라운', nameEn: 'Dark Brown', hex: '#3B2F2F', hcl: [0,15,20] },
+  // === 2-b에서 나머지 색상 추가 ===
 // === PLACEHOLDER: 3단계에서 STYLE_MOODS, STW, MOOD_GROUPS 추가 ===
 // === PLACEHOLDER: 4단계에서 추천 엔진 (테크닉, 점수, 필터) 추가 ===
 // === PLACEHOLDER: 5단계에서 UI 로직 + 프롬프트 빌더 추가 ===
