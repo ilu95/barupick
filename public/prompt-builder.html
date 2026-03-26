@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BARUPICK Prompt Builder — 코디 추천 + 이미지 프롬프트 생성기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --accent: #C4622D;
+    --accent-hover: #A8512A;
+    --bg: linear-gradient(165deg, #F7F3EE 0%, #EDE7DF 50%, #E8E0D6 100%);
+    --card: rgba(255,255,255,0.4);
+    --card-border: rgba(255,255,255,0.6);
+    --stone-50: #fafaf9; --stone-100: #f5f5f4; --stone-200: #e7e5e4;
+    --stone-300: #d6d3d1; --stone-400: #a8a29e; --stone-500: #78716c;
+    --stone-600: #57534e; --stone-700: #44403c; --stone-800: #292524;
+  }
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--stone-700);
+    -webkit-font-smoothing: antialiased;
+  }
+  .playfair { font-family: 'Playfair Display', serif; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 16px 80px; }
+
+  /* Header */
+  .header { padding: 24px 0 12px; }
+  .header-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .logo-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 0.05em; color: var(--accent); }
+  .logo-sub { font-size: 10px; letter-spacing: 0.2em; color: var(--stone-400); font-weight: 500; margin-top: 2px; }
+  .header-desc { font-size: 12px; color: var(--stone-500); margin-left: 36px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--stone-700); margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: var(--stone-400); margin-bottom: 12px; }
+
+  /* Back button */
+  .back-btn {
+    display: flex; align-items: center; gap: 4px; margin-bottom: 12px;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 500; color: var(--stone-500);
+  }
+  .back-btn:hover { color: var(--stone-700); }
+
+  /* Mood grid */
+  .mood-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mood-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 14px 8px; border-radius: 14px;
+    border: 1px solid rgba(231,229,228,0.8); background: rgba(255,255,255,0.7);
+    cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .mood-btn:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .mood-btn .icon { font-size: 24px; }
+  .mood-btn .name { font-size: 13px; font-weight: 700; color: var(--stone-800); }
+  .mood-btn .desc { font-size: 10px; color: var(--stone-400); }
+
+  /* Style list */
+  .style-list { display: flex; flex-direction: column; gap: 8px; }
+  .style-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 12px; border-radius: 12px; text-align: left;
+    border: 1px solid rgba(231,229,228,0.8); background: rgba(255,255,255,0.7);
+    cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .style-btn:hover { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .style-btn .s-icon { font-size: 20px; }
+  .style-btn .s-name { font-size: 13px; font-weight: 700; color: var(--stone-800); }
+  .style-btn .s-sub { font-size: 10px; color: var(--stone-400); }
+
+  /* Item chips */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--stone-400); margin-bottom: 6px; }
+  .chip {
+    padding: 5px 11px; border-radius: 8px; font-size: 12px; font-weight: 500;
+    border: none; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .chip.off { background: var(--stone-100); color: var(--stone-600); }
+  .chip.off:hover { background: var(--stone-200); }
+  .chip.on { background: var(--accent); color: #fff; box-shadow: 0 1px 4px rgba(196,98,45,0.3); }
+
+  /* Full-width buttons */
+  .btn-primary {
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    background: var(--accent); color: #fff; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-dark {
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    background: var(--stone-800); color: #fff; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-dark:hover { background: #1c1917; }
+
+  /* Summary box */
+  .summary-box {
+    font-size: 12px; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px;
+    background: rgba(196,98,45,0.08); color: var(--accent);
+  }
+
+  /* Result outfit color blocks */
+  .outfit-block {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 10px; margin-bottom: 5px;
+  }
+  .outfit-block .part-tag {
+    font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
+    background: rgba(0,0,0,0.15);
+  }
+  .outfit-block .color-name { font-size: 12px; font-weight: 600; }
+  .light-border { border: 1px solid #d1d1d1 !important; }
+
+  /* Nav row */
+  .nav-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+  .nav-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: none;
+    background: var(--stone-100); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:hover:not(:disabled) { background: var(--stone-200); }
+  .dot-nav { display: flex; gap: 4px; align-items: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; border: none; cursor: pointer; transition: background 0.15s; }
+  .dot.on { background: var(--accent); }
+  .dot.off { background: var(--stone-300); }
+
+  /* Toggle row (style / gender) */
+  .toggle-row { display: flex; gap: 8px; }
+  .toggle-btn {
+    flex: 1; padding: 10px 8px; border-radius: 12px; text-align: center;
+    border: 1px solid rgba(231,229,228,0.8); cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .toggle-btn.off { background: rgba(255,255,255,0.7); color: var(--stone-600); }
+  .toggle-btn.off:hover { background: #fff; }
+  .toggle-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 2px 8px rgba(196,98,45,0.25); }
+  .toggle-btn .t-label { font-size: 12px; font-weight: 700; }
+  .toggle-btn .t-desc { font-size: 10px; margin-top: 2px; }
+  .toggle-btn.on .t-desc { color: rgba(255,255,255,0.7); }
+  .toggle-btn.off .t-desc { color: var(--stone-400); }
+
+  /* Prompt output */
+  .prompt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .copy-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    border: none; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    background: var(--accent); color: #fff;
+  }
+  .copy-btn:hover { background: var(--accent-hover); }
+  .copy-btn.copied { background: #22c55e; }
+  .prompt-box {
+    padding: 12px; border-radius: 12px; background: var(--stone-50);
+    border: 1px solid rgba(231,229,228,0.8);
+  }
+  .prompt-text {
+    font-size: 12px; color: var(--stone-700); line-height: 1.7;
+    word-break: break-all; user-select: all;
+  }
+  .prompt-hint {
+    margin-top: 8px; display: flex; align-items: center; gap: 6px;
+    font-size: 10px; color: var(--stone-400);
+  }
+
+  /* Refresh btn */
+  .refresh-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
+    background: var(--stone-100); color: var(--stone-600); border: none;
+    cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .refresh-btn:hover { background: var(--stone-200); }
+
+  .hidden { display: none !important; }
+
+  /* Result header row */
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .result-counter { font-size: 12px; font-weight: 700; color: var(--stone-800); }
+  .result-info { text-align: center; margin-bottom: 10px; }
+  .result-name { font-size: 14px; font-weight: 700; color: var(--stone-800); }
+  .result-score { font-size: 11px; color: var(--stone-400); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div class="logo-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L3 6V14H6V10H10V14H13V6L8 2Z" fill="white"/></svg>
+      </div>
+      <span class="playfair logo-text">BARUPICK</span>
+      <span class="logo-sub">PROMPT BUILDER</span>
+    </div>
+    <div class="header-desc">코디 추천 + 이미지 프롬프트 생성기</div>
+  </div>
+
+  <!-- Back button (hidden initially) -->
+  <button class="back-btn hidden" id="back-btn" onclick="goBack()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    뒤로
+  </button>
+
+  <!-- Step containers -->
+  <div id="step-mood"></div>
+  <div id="step-style" class="hidden"></div>
+  <div id="step-pick" class="hidden"></div>
+  <div id="step-results" class="hidden"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA & ENGINE — 바루픽 추천 엔진 전체 (아래에 단계별로 추가됨)
+// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════
+// 2-a: COLORS_60 — 148색 컬러 팔레트 (name, nameEn, hex, hcl)
+// ═══════════════════════════════════════════════
+const COLORS_60 = {
+  // ═══ 무채색 (16) ═══
+  'white':       { name: '화이트', nameEn: 'White', hex: '#FFFFFF', hcl: [0,0,100] },
+  'off_white':   { name: '오프화이트', nameEn: 'Off White', hex: '#F5F5F0', hcl: [60,3,95] },
+  'ivory':       { name: '아이보리', nameEn: 'Ivory', hex: '#FFFFF0', hcl: [60,5,98] },
+  'cream':       { name: '크림', nameEn: 'Cream', hex: '#FFFDD0', hcl: [55,8,95] },
+  'silver':      { name: '실버', nameEn: 'Silver', hex: '#BFBFBF', hcl: [0,0,75] },
+  'lightgray':   { name: '라이트그레이', nameEn: 'Light Gray', hex: '#D3D3D3', hcl: [0,0,80] },
+  'warm_gray':   { name: '웜그레이', nameEn: 'Warm Gray', hex: '#C8C0B8', hcl: [30,8,72] },
+  'cool_gray':   { name: '쿨그레이', nameEn: 'Cool Gray', hex: '#B0B8BF', hcl: [210,8,70] },
+  'ash_gray':    { name: '애쉬그레이', nameEn: 'Ash Gray', hex: '#B2BEB5', hcl: [140,6,68] },
+  'gray':        { name: '그레이', nameEn: 'Gray', hex: '#808080', hcl: [0,0,50] },
+  'pewter':      { name: '퓨터', nameEn: 'Pewter', hex: '#8E8E8E', hcl: [0,0,55] },
+  'slate':       { name: '슬레이트', nameEn: 'Slate', hex: '#708090', hcl: [210,15,50] },
+  'charcoal':    { name: '차콜', nameEn: 'Charcoal', hex: '#36454F', hcl: [210,10,30] },
+  'graphite':    { name: '그래파이트', nameEn: 'Graphite', hex: '#41424C', hcl: [235,8,28] },
+  'gunmetal':    { name: '건메탈', nameEn: 'Gunmetal', hex: '#2A3439', hcl: [200,10,22] },
+  'black':       { name: '블랙', nameEn: 'Black', hex: '#000000', hcl: [0,0,0] },
+  // ═══ 베이지/브라운 (29+1) ═══
+  'linen':       { name: '리넨', nameEn: 'Linen', hex: '#FAF0E6', hcl: [30,8,92] },
+  'ecru':        { name: '에크루', nameEn: 'Ecru', hex: '#F5E6CC', hcl: [35,12,88] },
+  'champagne':   { name: '샴페인', nameEn: 'Champagne', hex: '#F7E7CE', hcl: [35,10,90] },
+  'bone':        { name: '본', nameEn: 'Bone', hex: '#E3D0B9', hcl: [30,12,82] },
+  'beige':       { name: '베이지', nameEn: 'Beige', hex: '#F5F5DC', hcl: [60,10,90] },
+  'sand':        { name: '샌드', nameEn: 'Sand', hex: '#C2B280', hcl: [45,25,68] },
+  'wheat':       { name: '위트', nameEn: 'Wheat', hex: '#F5DEB3', hcl: [40,18,85] },
+  'oatmeal':     { name: '오트밀', nameEn: 'Oatmeal', hex: '#D4C7A9', hcl: [42,15,76] },
+  'stone':       { name: '스톤', nameEn: 'Stone', hex: '#D4C9B8', hcl: [35,10,78] },
+  'mushroom':    { name: '머쉬룸', nameEn: 'Mushroom', hex: '#BDB1A0', hcl: [32,12,70] },
+  'greige':      { name: '그레이지', nameEn: 'Greige', hex: '#BAB0A1', hcl: [38,10,68] },
+  'khaki':       { name: '카키', nameEn: 'Khaki', hex: '#C3B091', hcl: [45,25,65] },
+  'tan':         { name: '탄', nameEn: 'Tan', hex: '#C6B99F', hcl: [40,25,70] },
+  'camel':       { name: '카멜', nameEn: 'Camel', hex: '#C19A6B', hcl: [40,30,60] },
+  'fawn':        { name: '폰', nameEn: 'Fawn', hex: '#D2B48C', hcl: [32,22,72] },
+  'honey':       { name: '허니', nameEn: 'Honey', hex: '#C68E17', hcl: [38,65,55] },
+  'caramel':     { name: '카라멜', nameEn: 'Caramel', hex: '#C07840', hcl: [25,45,50] },
+  'cognac':      { name: '코냑', nameEn: 'Cognac', hex: '#9E662E', hcl: [30,55,40] },
+  'copper':      { name: '카퍼', nameEn: 'Copper', hex: '#B87333', hcl: [28,50,45] },
+  'cinnamon':    { name: '시나몬', nameEn: 'Cinnamon', hex: '#D2691E', hcl: [22,60,48] },
+  'sienna':      { name: '시에나', nameEn: 'Sienna', hex: '#B25E34', hcl: [20,55,45] },
+  'brown':       { name: '브라운', nameEn: 'Brown', hex: '#8B4513', hcl: [25,50,35] },
+  'walnut':      { name: '월넛', nameEn: 'Walnut', hex: '#795C3E', hcl: [30,30,38] },
+  'mocha':       { name: '모카', nameEn: 'Mocha', hex: '#6F4E37', hcl: [25,30,32] },
+  'cocoa':       { name: '코코아', nameEn: 'Cocoa', hex: '#5C4033', hcl: [18,25,28] },
+  'chestnut':    { name: '체스넛', nameEn: 'Chestnut', hex: '#954535', hcl: [10,45,35] },
+  'taupe':       { name: '토프', nameEn: 'Taupe', hex: '#483C32', hcl: [30,20,25] },
+  'chocolate':   { name: '초콜릿', nameEn: 'Chocolate', hex: '#4B3621', hcl: [25,45,22] },
+  'espresso':    { name: '에스프레소', nameEn: 'Espresso', hex: '#3D2B1F', hcl: [30,35,18] },
+  'dark_brown':  { name: '다크브라운', nameEn: 'Dark Brown', hex: '#3B2F2F', hcl: [0,15,20] },
+  // ═══ 레드/핑크 (26) ═══
+  'shell_pink':  { name: '쉘핑크', nameEn: 'Shell Pink', hex: '#FFE4E1', hcl: [5,15,90] },
+  'pastel_pink': { name: '파스텔핑크', nameEn: 'Pastel Pink', hex: '#FFD1DC', hcl: [350,35,88] },
+  'nude_pink':   { name: '누드핑크', nameEn: 'Nude Pink', hex: '#E8CCD7', hcl: [335,15,82] },
+  'rose_pink':   { name: '로즈핑크', nameEn: 'Rose Pink', hex: '#F4C2C2', hcl: [0,22,78] },
+  'blush':       { name: '블러쉬', nameEn: 'Blush', hex: '#DE6FA1', hcl: [335,45,60] },
+  'old_rose':    { name: '올드로즈', nameEn: 'Old Rose', hex: '#C08081', hcl: [0,25,55] },
+  'dusty_rose':  { name: '더스티로즈', nameEn: 'Dusty Rose', hex: '#B87A85', hcl: [350,30,60] },
+  'rose_gold':   { name: '로즈골드', nameEn: 'Rose Gold', hex: '#B76E79', hcl: [350,28,50] },
+  'salmon':      { name: '살몬', nameEn: 'Salmon', hex: '#FA8072', hcl: [8,55,65] },
+  'carnation':   { name: '카네이션', nameEn: 'Carnation', hex: '#FFA6C9', hcl: [340,40,72] },
+  'flamingo':    { name: '플라밍고', nameEn: 'Flamingo', hex: '#FC8EAC', hcl: [345,50,68] },
+  'coral':       { name: '코랄', nameEn: 'Coral', hex: '#FF7F50', hcl: [15,80,65] },
+  'hot_pink':    { name: '핫핑크', nameEn: 'Hot Pink', hex: '#FF69B4', hcl: [330,80,65] },
+  'pink':        { name: '핑크', nameEn: 'Pink', hex: '#FF1493', hcl: [330,80,55] },
+  'fuchsia':     { name: '퓨시아', nameEn: 'Fuchsia', hex: '#FF00FF', hcl: [300,100,60] },
+  'raspberry':   { name: '라즈베리', nameEn: 'Raspberry', hex: '#E30B5C', hcl: [340,80,42] },
+  'scarlet':     { name: '스칼렛', nameEn: 'Scarlet', hex: '#FF2400', hcl: [8,90,48] },
+  'red':         { name: '레드', nameEn: 'Red', hex: '#FF0000', hcl: [0,85,50] },
+  'cherry':      { name: '체리', nameEn: 'Cherry', hex: '#DE3163', hcl: [345,65,42] },
+  'crimson':     { name: '크림슨', nameEn: 'Crimson', hex: '#CF173C', hcl: [348,80,45] },
+  'cardinal':    { name: '카디널', nameEn: 'Cardinal', hex: '#C41E3A', hcl: [350,70,38] },
+  'ruby':        { name: '루비', nameEn: 'Ruby', hex: '#9B111E', hcl: [355,75,30] },
+  'dark_red':    { name: '다크레드', nameEn: 'Dark Red', hex: '#8B0000', hcl: [0,100,25] },
+  'burgundy':    { name: '버건디', nameEn: 'Burgundy', hex: '#800020', hcl: [345,70,30] },
+  'wine':        { name: '와인', nameEn: 'Wine', hex: '#722F37', hcl: [350,55,32] },
+  'oxblood':     { name: '옥스블러드', nameEn: 'Oxblood', hex: '#4A0000', hcl: [0,100,15] },
+  'maroon':      { name: '마룬', nameEn: 'Maroon', hex: '#800000', hcl: [0,100,25] },
+  // ═══ 오렌지/옐로 (20) ═══
+  'lemon':       { name: '레몬', nameEn: 'Lemon', hex: '#FFFACD', hcl: [52,20,92] },
+  'pastel_yellow':{ name: '파스텔옐로', nameEn: 'Pastel Yellow', hex: '#FDFD96', hcl: [55,40,92] },
+  'butter':      { name: '버터', nameEn: 'Butter', hex: '#F9E4A7', hcl: [42,25,88] },
+  'canary':      { name: '카나리아', nameEn: 'Canary', hex: '#F8DE7E', hcl: [45,40,85] },
+  'yellow':      { name: '옐로', nameEn: 'Yellow', hex: '#FFD700', hcl: [50,80,82] },
+  'saffron':     { name: '사프란', nameEn: 'Saffron', hex: '#F4C430', hcl: [45,65,72] },
+  'gold':        { name: '골드', nameEn: 'Gold', hex: '#D1B561', hcl: [45,55,60] },
+  'mustard':     { name: '머스타드', nameEn: 'Mustard', hex: '#D1B647', hcl: [48,60,55] },
+  'marigold':    { name: '메리골드', nameEn: 'Marigold', hex: '#EAA221', hcl: [38,70,62] },
+  'amber':       { name: '앰버', nameEn: 'Amber', hex: '#D99726', hcl: [38,70,50] },
+  'peach':       { name: '피치', nameEn: 'Peach', hex: '#FFDAB9', hcl: [28,25,86] },
+  'apricot':     { name: '아프리콧', nameEn: 'Apricot', hex: '#FBCEB1', hcl: [25,25,82] },
+  'nectarine':   { name: '넥타린', nameEn: 'Nectarine', hex: '#FF9966', hcl: [22,55,68] },
+  'orange':      { name: '오렌지', nameEn: 'Orange', hex: '#FF8C00', hcl: [25,80,55] },
+  'tangerine':   { name: '탠저린', nameEn: 'Tangerine', hex: '#FF9F00', hcl: [32,80,62] },
+  'pumpkin':     { name: '펌킨', nameEn: 'Pumpkin', hex: '#FF7518', hcl: [22,80,52] },
+  'burnt_orange':{ name: '버닝오렌지', nameEn: 'Burnt Orange', hex: '#BD5528', hcl: [18,65,45] },
+  'terracotta':  { name: '테라코타', nameEn: 'Terracotta', hex: '#B85C3D', hcl: [15,50,48] },
+  'rust':        { name: '러스트', nameEn: 'Rust', hex: '#B14825', hcl: [15,65,42] },
+  'brick':       { name: '브릭', nameEn: 'Brick', hex: '#9E3D2E', hcl: [8,55,40] },
+  // ═══ 그린 (23+5) ═══
+  'pastel_mint':  { name: '파스텔민트', nameEn: 'Pastel Mint', hex: '#C1F0DB', hcl: [150,20,88] },
+  'pastel_green': { name: '파스텔그린', nameEn: 'Pastel Green', hex: '#B2E0D4', hcl: [160,30,82] },
+  'mint':         { name: '민트', nameEn: 'Mint', hex: '#98FB98', hcl: [120,40,85] },
+  'seafoam':      { name: '씨폼', nameEn: 'Seafoam', hex: '#9FE2BF', hcl: [150,30,80] },
+  'pistachio':    { name: '피스타치오', nameEn: 'Pistachio', hex: '#93C572', hcl: [95,35,72] },
+  'apple_green':  { name: '애플그린', nameEn: 'Apple Green', hex: '#8DB600', hcl: [75,70,65] },
+  'lime':         { name: '라임', nameEn: 'Lime', hex: '#32CD32', hcl: [120,70,60] },
+  'chartreuse':   { name: '샤르트뢰즈', nameEn: 'Chartreuse', hex: '#ADFF2F', hcl: [80,80,80] },
+  'kelly_green':  { name: '켈리그린', nameEn: 'Kelly Green', hex: '#4CBB17', hcl: [100,70,55] },
+  'green':        { name: '그린', nameEn: 'Green', hex: '#228B22', hcl: [120,65,45] },
+  'sage':         { name: '세이지', nameEn: 'Sage', hex: '#92AD85', hcl: [100,20,60] },
+  'pastel_sage':  { name: '파스텔세이지', nameEn: 'Pastel Sage', hex: '#C5D5B5', hcl: [90,15,78] },
+  'fern':         { name: '펀', nameEn: 'Fern', hex: '#9DC183', hcl: [95,25,68] },
+  'moss':         { name: '모스', nameEn: 'Moss', hex: '#82A550', hcl: [85,35,48] },
+  'olive':        { name: '올리브', nameEn: 'Olive', hex: '#808000', hcl: [60,50,40] },
+  'dark_olive':   { name: '다크올리브', nameEn: 'Dark Olive', hex: '#556B2F', hcl: [80,50,35] },
+  'avocado':      { name: '아보카도', nameEn: 'Avocado', hex: '#568203', hcl: [80,65,40] },
+  'army_green':   { name: '아미그린', nameEn: 'Army Green', hex: '#4B5320', hcl: [70,45,30] },
+  'jade':         { name: '제이드', nameEn: 'Jade', hex: '#00A86B', hcl: [155,60,50] },
+  'emerald':      { name: '에메랄드', nameEn: 'Emerald', hex: '#50C878', hcl: [140,50,60] },
+  'teal':         { name: '틸', nameEn: 'Teal', hex: '#008080', hcl: [180,65,38] },
+  'turquoise':    { name: '터콰이즈', nameEn: 'Turquoise', hex: '#40E0D0', hcl: [175,60,70] },
+  'peacock':      { name: '피콕', nameEn: 'Peacock', hex: '#006D6F', hcl: [182,55,32] },
+  'hunter_green': { name: '헌터그린', nameEn: 'Hunter Green', hex: '#1D7245', hcl: [150,60,28] },
+  'forest':       { name: '포레스트', nameEn: 'Forest', hex: '#228B22', hcl: [120,65,35] },
+  'pine':         { name: '파인', nameEn: 'Pine', hex: '#01503C', hcl: [160,60,22] },
+  'bottle_green': { name: '보틀그린', nameEn: 'Bottle Green', hex: '#006A4E', hcl: [160,55,25] },
+  'dark_green':   { name: '다크그린', nameEn: 'Dark Green', hex: '#013220', hcl: [150,70,15] },
+  // ═══ 블루 (19) ═══
+  'ice_blue':     { name: '아이스블루', nameEn: 'Ice Blue', hex: '#E0F0FF', hcl: [210,15,92] },
+  'pastel_sky':   { name: '파스텔스카이', nameEn: 'Pastel Sky', hex: '#C1E1F2', hcl: [205,25,85] },
+  'pastel_blue':  { name: '파스텔블루', nameEn: 'Pastel Blue', hex: '#AEC6CF', hcl: [200,25,75] },
+  'baby_blue':    { name: '베이비블루', nameEn: 'Baby Blue', hex: '#89CFF0', hcl: [205,40,75] },
+  'sky_blue':     { name: '스카이블루', nameEn: 'Sky Blue', hex: '#87CEEB', hcl: [200,40,72] },
+  'powder_blue':  { name: '파우더블루', nameEn: 'Powder Blue', hex: '#B9CCD5', hcl: [200,25,78] },
+  'dusty_blue':   { name: '더스티블루', nameEn: 'Dusty Blue', hex: '#B0C4DE', hcl: [215,25,72] },
+  'steel_blue':   { name: '스틸블루', nameEn: 'Steel Blue', hex: '#6A8CAF', hcl: [210,30,55] },
+  'cornflower':   { name: '콘플라워', nameEn: 'Cornflower', hex: '#6495ED', hcl: [220,50,58] },
+  'denim':        { name: '데님', nameEn: 'Denim', hex: '#4D77B3', hcl: [215,40,50] },
+  'azure':        { name: '아쥬르', nameEn: 'Azure', hex: '#007FFF', hcl: [215,80,50] },
+  'blue':         { name: '블루', nameEn: 'Blue', hex: '#0066CC', hcl: [215,85,42] },
+  'cobalt':       { name: '코발트', nameEn: 'Cobalt', hex: '#1D56C9', hcl: [220,75,45] },
+  'royal_blue':   { name: '로얄블루', nameEn: 'Royal Blue', hex: '#4169E1', hcl: [225,75,50] },
+  'sapphire':     { name: '사파이어', nameEn: 'Sapphire', hex: '#0F52BA', hcl: [225,75,38] },
+  'petrol':       { name: '페트롤', nameEn: 'Petrol', hex: '#1B3A4B', hcl: [200,35,25] },
+  'prussian_blue':{ name: '프러시안블루', nameEn: 'Prussian Blue', hex: '#003153', hcl: [210,60,22] },
+  'navy':         { name: '네이비', nameEn: 'Navy', hex: '#000080', hcl: [240,65,20] },
+  'midnight':     { name: '미드나이트', nameEn: 'Midnight', hex: '#191970', hcl: [240,70,18] },
+  // ═══ 퍼플 (17) ═══
+  'pastel_lavender':{ name: '파스텔라벤더', nameEn: 'Pastel Lavender', hex: '#E8DFF5', hcl: [270,15,88] },
+  'lavender':     { name: '라벤더', nameEn: 'Lavender', hex: '#E6E6FA', hcl: [240,15,85] },
+  'pastel_lilac': { name: '파스텔라일락', nameEn: 'Pastel Lilac', hex: '#DCD0FF', hcl: [260,20,82] },
+  'lilac':        { name: '라일락', nameEn: 'Lilac', hex: '#C8A2C8', hcl: [300,20,68] },
+  'periwinkle':   { name: '페리윙클', nameEn: 'Periwinkle', hex: '#CCCCFF', hcl: [240,25,78] },
+  'wisteria':     { name: '위스테리아', nameEn: 'Wisteria', hex: '#C9A0DC', hcl: [280,28,68] },
+  'heather':      { name: '헤더', nameEn: 'Heather', hex: '#B8A9C9', hcl: [270,15,65] },
+  'pastel_purple':{ name: '파스텔퍼플', nameEn: 'Pastel Purple', hex: '#D8BFD8', hcl: [300,20,78] },
+  'orchid':       { name: '오키드', nameEn: 'Orchid', hex: '#DA70D6', hcl: [302,45,58] },
+  'mauve':        { name: '모브', nameEn: 'Mauve', hex: '#A97096', hcl: [320,25,55] },
+  'amethyst':     { name: '아메시스트', nameEn: 'Amethyst', hex: '#9966CC', hcl: [270,40,48] },
+  'purple':       { name: '퍼플', nameEn: 'Purple', hex: '#800080', hcl: [300,60,35] },
+  'violet':       { name: '바이올렛', nameEn: 'Violet', hex: '#7F00FF', hcl: [270,90,40] },
+  'plum':         { name: '플럼', nameEn: 'Plum', hex: '#883A88', hcl: [300,40,38] },
+  'mulberry':     { name: '멀베리', nameEn: 'Mulberry', hex: '#770737', hcl: [340,60,25] },
+  'grape':        { name: '그레이프', nameEn: 'Grape', hex: '#6F2DA8', hcl: [275,55,32] },
+  'eggplant':     { name: '에그플랜트', nameEn: 'Eggplant', hex: '#411C54', hcl: [280,50,22] },
+  'indigo':       { name: '인디고', nameEn: 'Indigo', hex: '#310062', hcl: [275,80,18] },
+  // ═══ 기타/호환 ═══
+  'dark_blue':    { name: '다크블루', nameEn: 'Dark Blue', hex: '#00008B', hcl: [240,80,18] },
+  'dark_purple':  { name: '다크퍼플', nameEn: 'Dark Purple', hex: '#301934', hcl: [285,40,15] },
+  'dark_teal':    { name: '다크틸', nameEn: 'Dark Teal', hex: '#003B3C', hcl: [182,60,18] },
+  'magenta':      { name: '마젠타', nameEn: 'Magenta', hex: '#FF00FF', hcl: [300,100,60] },
+  'cyan':         { name: '시안', nameEn: 'Cyan', hex: '#00FFFF', hcl: [180,80,80] },
+  'pastel_coral': { name: '파스텔코랄', nameEn: 'Pastel Coral', hex: '#F8B4A8', hcl: [12,35,82] },
+  'pastel_rose':  { name: '파스텔로즈', nameEn: 'Pastel Rose', hex: '#F8C8D4', hcl: [345,30,85] },
+  'pastel_lemon': { name: '파스텔레몬', nameEn: 'Pastel Lemon', hex: '#FDFD96', hcl: [52,30,93] },
+  'pastel_aqua':  { name: '파스텔아쿠아', nameEn: 'Pastel Aqua', hex: '#B0E0D8', hcl: [168,25,82] },
+};
+// ═══════════════════════════════════════════════
+// 2-c: HCL 접근함수 + 온도 + 컬러 패밀리 + 콤보
+// ═══════════════════════════════════════════════
+const COLORS = {};
+Object.entries(COLORS_60).forEach(([k,v]) => { COLORS[k] = v.hcl; });
+function hcl(c) { return COLORS[c] || [0,0,50]; }
+function H(c) { return hcl(c)[0]; }
+function Cv(c) { return hcl(c)[1]; }
+function L(c) { return hcl(c)[2]; }
+
+const WARM_SET = new Set([
+  'brown','dark_brown','cognac','rust','sienna','camel','tan','khaki','taupe','fawn','honey','caramel','copper','cinnamon','walnut','mocha','cocoa','chestnut','chocolate',
+  'espresso','cream','ivory','beige','linen','ecru','champagne','bone','wheat','oatmeal','sand',
+  'burgundy','wine','brick','terracotta','red','crimson','scarlet','cherry','cardinal','ruby','oxblood',
+  'maroon','dark_red','amber','mustard','gold','orange','burnt_orange','tangerine','pumpkin','nectarine','marigold','saffron',
+  'olive','dark_olive','forest','moss','avocado','army_green',
+  'peach','apricot','salmon','coral','flamingo','carnation',
+  'pastel_peach','pastel_yellow','pastel_coral','pastel_lemon','pastel_rose','pastel_pink',
+  'dusty_rose','old_rose','rose_pink','rose_gold','blush','shell_pink','nude_pink',
+  'hot_pink','raspberry','lemon','butter','canary','yellow',
+]);
+const COOL_SET = new Set([
+  'navy','dark_blue','indigo','midnight','cobalt','steel_blue','slate','cornflower','azure','sapphire','prussian_blue','petrol',
+  'powder_blue','denim','baby_blue','sky_blue','ice_blue','dusty_blue',
+  'dark_green','hunter_green','teal','dark_teal','pine','bottle_green','peacock','jade',
+  'dark_purple','eggplant','plum','mauve','purple','violet','grape','mulberry','amethyst',
+  'pastel_blue','pastel_mint','pastel_lavender','pastel_sky','pastel_lilac','pastel_green','pastel_sage','pastel_aqua',
+  'lavender','lilac','periwinkle','wisteria','heather','orchid',
+  'cool_gray','graphite','gunmetal',
+  'fuchsia','magenta','cyan','turquoise',
+]);
+function temp(c) { return WARM_SET.has(c) ? 'w' : COOL_SET.has(c) ? 'c' : 'n'; }
+
+const COLOR_FAMILIES = {
+  brown: ['espresso','chocolate','dark_brown','brown','cognac','rust','sienna','camel','tan','khaki','beige','cream','taupe','mocha','cocoa','chestnut','walnut','cinnamon','copper','caramel','honey','fawn'],
+  blue: ['midnight','dark_blue','navy','indigo','cobalt','denim','steel_blue','slate','powder_blue','baby_blue','sky_blue','ice_blue','dusty_blue','cornflower','azure','royal_blue','sapphire','prussian_blue','petrol','pastel_blue','pastel_sky'],
+  green: ['dark_green','hunter_green','forest','pine','bottle_green','dark_olive','olive','moss','sage','teal','jade','emerald','avocado','army_green','kelly_green','lime','mint','seafoam','pistachio','fern','apple_green','chartreuse','pastel_green','pastel_mint','pastel_sage','pastel_aqua','peacock','turquoise'],
+  red: ['maroon','dark_red','burgundy','wine','brick','crimson','terracotta','red','rust','burnt_orange','scarlet','cherry','cardinal','ruby','oxblood','raspberry'],
+  purple: ['eggplant','dark_purple','plum','purple','mauve','violet','grape','mulberry','amethyst','orchid','wisteria','heather','lilac','lavender','periwinkle','pastel_lavender','pastel_lilac','pastel_purple','indigo'],
+  pink: ['dusty_rose','old_rose','rose_pink','rose_gold','blush','salmon','coral','flamingo','carnation','hot_pink','pink','fuchsia','shell_pink','nude_pink','pastel_pink','pastel_coral','pastel_rose'],
+  yellow: ['amber','mustard','gold','orange','burnt_orange','tangerine','pumpkin','nectarine','marigold','saffron','peach','apricot','lemon','butter','canary','yellow','pastel_yellow','pastel_lemon','pastel_peach'],
+  gray: ['black','gunmetal','graphite','charcoal','gray','slate','pewter','ash_gray','cool_gray','warm_gray','silver','lightgray','white','ivory','off_white','cream'],
+};
+
+const PASTEL_COLORS = [
+  'pastel_pink','pastel_blue','pastel_green','pastel_yellow','pastel_purple',
+  'pastel_mint','pastel_peach','pastel_lavender','pastel_coral','pastel_sky',
+  'pastel_lilac','pastel_sage','pastel_lemon','pastel_rose','pastel_aqua',
+  'shell_pink','nude_pink','rose_pink','ice_blue','lavender',
+  'lemon','butter','peach','apricot','mint','seafoam','baby_blue','sky_blue',
+  'lilac','periwinkle','wisteria','heather',
+];
+const EARTH_TONE_COLORS = [
+  'brown','camel','olive','khaki','taupe','beige','cream','ivory',
+  'dark_brown','dark_olive','chocolate','espresso','cognac','sienna',
+  'terracotta','rust','brick','sand','oatmeal','mushroom','greige',
+  'tan','stone','wheat','fawn','mocha','cocoa','walnut','cinnamon',
+  'copper','caramel','honey','chestnut','linen','ecru','bone',
+];
+function getHueDiff(h1,h2) { let d=Math.abs(h1-h2); if(d>180)d=360-d; return d; }
+function isNeutralColor(c) { return c<=12; }
+function getToneGroup(h,c,l) { if(c<=12)return'neutral'; if(l<=35)return'deep'; if(l>=75)return'light'; if(c>=60)return'bright'; return'muted'; }
+function getColorTemperature(h,c,l) {
+  if(c<=12) return{temp:'neutral',score:0};
+  let ws=0;
+  if((h>=0&&h<=70)||(h>=320&&h<=360)){const a=h>=320?h-360:h;ws=1.0-Math.abs(a-30)/70;}
+  else if(h>=200&&h<=280){ws=-1.0+Math.abs(h-240)/80;}
+  if(c<30)ws*=0.5;
+  let t; if(ws>0.3)t='warm'; else if(ws<-0.3)t='cool'; else t='neutral';
+  return{temp:t,score:ws};
+}
+
+const CLASSIC_COMBOS = {
+  'navy':['burgundy','wine','olive','brown','dark_olive','forest','red','maroon','camel','beige','cream','white','cognac'],
+  'burgundy':['navy','olive','dark_green','forest','brown','camel','dark_olive','pink','pastel_pink','beige','cream'],
+  'olive':['burgundy','navy','brown','wine','dark_brown','khaki','taupe','camel','cream','beige'],
+  'brown':['navy','burgundy','olive','dark_green','taupe','khaki','cream','beige','tan'],
+  'wine':['navy','olive','camel','brown','khaki','pastel_pink','cream','beige'],
+  'forest':['burgundy','navy','brown','wine','camel','cream','beige'],
+  'dark_green':['burgundy','brown','camel','navy','wine','khaki','cream'],
+  'dark_olive':['burgundy','navy','wine','camel','cream'],
+  'red':['navy','charcoal','white','black'],
+  'maroon':['navy','camel','beige','khaki','cream'],
+  'taupe':['olive','burgundy','navy','brown','camel','khaki','cream'],
+  'khaki':['olive','burgundy','navy','brown','wine','taupe','dark_green','camel'],
+  'camel':['olive','burgundy','navy','wine','forest','dark_green','dark_olive','khaki','white','cream'],
+  'blue':['purple','royal_blue','navy','white','cream'],
+  'purple':['blue','pink','magenta','burgundy','cream','lavender'],
+  'charcoal':['burgundy','navy','camel','cream','white','dusty_rose'],
+  'black':['white','red','royal_blue','emerald','gold','cream','ivory'],
+};
+const AVOID_COMBOS = {
+  'black':['navy','dark_blue','midnight','charcoal','graphite','gunmetal'],
+  'navy':['black','dark_blue','midnight','indigo','graphite'],
+  'charcoal':['black','graphite','gunmetal'],
+  'red':['orange','magenta','coral','pink','green','lime','emerald','forest','dark_green'],
+  'green':['red','magenta','pink','dark_red','maroon'],
+  'dark_green':['red','dark_red','maroon'],
+  'forest':['red','dark_red','maroon'],
+  'burgundy':['wine','maroon','dark_red','oxblood'],
+  'brown':['dark_brown','chocolate','espresso','mocha'],
+};
+
+const LIGHT_HEX = new Set(['#FFFFFF','#FFFFF0','#FFFDD0','#F5F5F0','#F5F5DC','#FAF0E6','#F5E6CC','#F7E7CE','#FFFACD','#FDFD96','#E0F0FF','#E6E6FA','#E8DFF5','#FFE4E1','#FFD1DC']);
+function isDarkHex(hex) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return(r*0.299+g*0.587+b*0.114)<140; }
+
+// ═══════════════════════════════════════════════
+// 3: STYLE_MOODS (20 styles), STW, MOOD_GROUPS, ITEMS_CATALOG
+// ═══════════════════════════════════════════════
+const STYLE_MOODS = {
+  preppy:{nameKo:'프레피',darks:['navy','charcoal','dark_brown','olive','forest','wine','burgundy','indigo','dark_blue','brown','espresso','dark_olive','dark_green','midnight','hunter_green','maroon','plum','eggplant'],mids:['gray','camel','khaki','taupe','slate','brown','cognac','olive','moss','steel_blue','denim','brick','terracotta','dusty_rose','sage','mauve','sienna','tan','mustard','gold'],lights:['white','cream','ivory','beige','lightgray','silver','tan','powder_blue','pastel_sage'],pastels:['pastel_blue','pastel_pink','pastel_sky','pastel_green','pastel_yellow','pastel_coral','pastel_lavender','pastel_mint','pastel_peach','pastel_lilac','pastel_rose','pastel_sage','pastel_lemon','pastel_aqua'],accents:['burgundy','red','wine','forest','crimson','burnt_orange','mustard','teal','cobalt','amber','plum'],shoes:['brown','dark_brown','white','black','navy','burgundy','camel','cognac','espresso','tan'],tempBias:'warm'},
+  ivy:{nameKo:'아이비',darks:['navy','charcoal','dark_brown','midnight','dark_blue','indigo','espresso','wine','burgundy','forest','hunter_green','maroon','dark_olive'],mids:['gray','slate','brown','cognac','camel','khaki','taupe','olive','steel_blue','denim','tan','brick','sienna'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue'],pastels:['pastel_blue','pastel_sky','pastel_sage','pastel_yellow'],accents:['burgundy','wine','forest','navy','crimson','mustard','cobalt','red'],shoes:['brown','dark_brown','black','cognac','burgundy','espresso','navy'],tempBias:'warm'},
+  dandy:{nameKo:'댄디',darks:['charcoal','navy','dark_brown','midnight','espresso','wine','burgundy','eggplant','dark_blue','dark_purple','indigo','maroon','dark_olive'],mids:['gray','slate','taupe','camel','cognac','brown','mauve','dusty_rose','steel_blue','denim','plum','moss','olive','tan','sage'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue'],pastels:['pastel_lavender','pastel_blue','pastel_pink','pastel_rose','pastel_sage','pastel_lilac'],accents:['burgundy','wine','plum','navy','forest','cobalt','mauve','eggplant','mustard'],shoes:['dark_brown','brown','black','cognac','burgundy','espresso','charcoal'],tempBias:'warm'},
+  oldmoney:{nameKo:'올드머니',darks:['charcoal','navy','dark_brown','espresso','midnight','black','dark_blue','indigo','dark_olive','hunter_green','wine','maroon'],mids:['gray','taupe','slate','camel','cognac','brown','steel_blue','olive','tan','khaki','denim'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue'],pastels:['pastel_blue','pastel_sage'],accents:['burgundy','navy','forest','camel','cobalt'],shoes:['dark_brown','brown','black','cognac','espresso','navy','charcoal','white'],tempBias:'neutral'},
+  ralphlook:{nameKo:'랄뽕',darks:['navy','charcoal','dark_brown','forest','burgundy','wine','olive','indigo','dark_blue','espresso','hunter_green','maroon','dark_olive'],mids:['gray','camel','khaki','brown','cognac','olive','moss','sage','steel_blue','denim','brick','terracotta','dusty_rose','sienna','tan','mustard','gold','cobalt'],lights:['white','cream','ivory','beige','lightgray','silver','tan','powder_blue'],pastels:['pastel_blue','pastel_pink','pastel_sky','pastel_green','pastel_yellow','pastel_coral','pastel_lavender','pastel_mint','pastel_peach','pastel_lilac','pastel_rose','pastel_sage','pastel_lemon','pastel_aqua'],accents:['red','burgundy','crimson','forest','cobalt','mustard','teal','amber','wine','burnt_orange','plum','orange'],shoes:['brown','dark_brown','white','black','navy','camel','cognac','burgundy','tan'],tempBias:'warm'},
+  minimal:{nameKo:'미니멀',darks:['black','charcoal','navy','dark_brown','midnight','dark_blue','espresso','dark_olive','eggplant','dark_purple','maroon','indigo','hunter_green'],mids:['gray','taupe','slate','camel','olive','brown','steel_blue','denim','moss','sage','cognac','dusty_rose','mauve','tan','cobalt','plum'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue','tan'],pastels:['pastel_blue','pastel_lavender','pastel_pink','pastel_sage','pastel_lilac','pastel_mint','pastel_rose'],accents:['camel','burgundy','navy','forest','cobalt','plum','mustard','terracotta','teal'],shoes:['white','black','cream','brown','dark_brown','charcoal','beige','tan','cognac','navy','espresso'],tempBias:'neutral'},
+  casual:{nameKo:'캐주얼',darks:['navy','charcoal','dark_brown','black','forest','olive','dark_blue','indigo','espresso','dark_olive','wine','burgundy','midnight','hunter_green'],mids:['gray','denim','khaki','camel','brown','slate','tan','olive','moss','sage','cognac','steel_blue','brick','dusty_rose','sienna','mustard','cobalt','taupe'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue','tan'],pastels:['pastel_blue','pastel_pink','pastel_sky','pastel_green','pastel_mint','pastel_peach','pastel_yellow','pastel_sage','pastel_coral','pastel_lavender'],accents:['red','burgundy','mustard','cobalt','forest','teal','burnt_orange','amber','crimson','wine'],shoes:['white','black','brown','dark_brown','navy','cream','beige','charcoal','cognac','tan'],tempBias:'balanced'},
+  cityboy:{nameKo:'시티보이',darks:['navy','charcoal','dark_blue','olive','forest','indigo','dark_olive','hunter_green'],mids:['gray','khaki','sage','moss','steel_blue','denim','slate','camel','tan','dusty_rose','mauve','cobalt'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue','tan'],pastels:['pastel_blue','pastel_mint','pastel_lavender','pastel_peach','pastel_pink','pastel_sky','pastel_green','pastel_aqua','pastel_yellow','pastel_lilac','pastel_rose','pastel_sage','pastel_lemon','pastel_coral'],accents:['pastel_blue','pastel_mint','pastel_lavender','pastel_pink','cobalt','teal','sage','mustard'],shoes:['white','cream','beige','lightgray','silver','pastel_blue','tan'],tempBias:'balanced'},
+  normcore:{nameKo:'놈코어',darks:['navy','charcoal','black','dark_blue','espresso','dark_brown','midnight'],mids:['gray','slate','denim','taupe','khaki','olive','brown','tan','steel_blue','camel'],lights:['white','cream','ivory','beige','lightgray','silver'],pastels:['pastel_blue','pastel_sage'],accents:['navy','burgundy','forest','cobalt'],shoes:['white','black','cream','gray','brown','navy','charcoal','beige'],tempBias:'neutral'},
+  athleisure:{nameKo:'애슬레저',darks:['black','charcoal','navy','dark_blue','midnight','dark_olive','espresso','dark_green','hunter_green','indigo'],mids:['gray','slate','olive','steel_blue','denim','cobalt','taupe','moss','brown'],lights:['white','cream','lightgray','silver','ivory'],pastels:['pastel_mint','pastel_sage','pastel_blue','pastel_sky'],accents:['cobalt','crimson','teal','burnt_orange','amber','red','orange'],shoes:['white','black','charcoal','navy','cream','gray'],tempBias:'neutral'},
+  amekaji:{nameKo:'아메카지',darks:['dark_brown','brown','espresso','chocolate','burgundy','navy','forest','dark_olive','wine','indigo','maroon','hunter_green','dark_green','charcoal','dark_blue','midnight'],mids:['brown','cognac','olive','camel','khaki','rust','sienna','brick','terracotta','taupe','moss','sage','denim','tan','mustard','amber','gold','gray','slate','dusty_rose'],lights:['cream','ivory','beige','white','tan','khaki','lightgray'],pastels:[],accents:['red','burgundy','wine','crimson','burnt_orange','rust','mustard','amber','forest','teal'],shoes:['brown','dark_brown','cognac','espresso','tan','black','burgundy','rust'],tempBias:'warm'},
+  workwear:{nameKo:'워크웨어',darks:['dark_brown','charcoal','navy','espresso','chocolate','dark_olive','forest','indigo','brown','hunter_green','midnight','black','maroon'],mids:['brown','cognac','olive','khaki','denim','taupe','rust','sienna','brick','camel','tan','moss','gray','slate','mustard','amber','terracotta'],lights:['cream','ivory','beige','white','tan','khaki','lightgray'],pastels:[],accents:['rust','burgundy','red','mustard','burnt_orange','amber','crimson','forest'],shoes:['brown','dark_brown','black','cognac','espresso','tan','rust'],tempBias:'warm'},
+  military:{nameKo:'밀리터리',darks:['dark_olive','charcoal','black','navy','forest','hunter_green','dark_green','espresso','midnight','dark_brown','dark_blue','brown'],mids:['olive','khaki','gray','slate','moss','denim','taupe','brown','sage','tan','camel','steel_blue','rust','brick','sienna','cobalt'],lights:['cream','ivory','beige','white','khaki','tan','lightgray'],pastels:[],accents:['rust','burgundy','burnt_orange','crimson','mustard','teal','amber'],shoes:['black','dark_brown','brown','espresso','dark_olive','charcoal','tan'],tempBias:'warm'},
+  british:{nameKo:'브리티시',darks:['charcoal','navy','dark_brown','espresso','forest','hunter_green','wine','burgundy','dark_olive','midnight','indigo','dark_blue','maroon','dark_green'],mids:['brown','cognac','olive','camel','khaki','taupe','gray','slate','moss','sage','brick','sienna','denim','tan','steel_blue','dusty_rose','rust','terracotta','mustard'],lights:['cream','ivory','beige','white','lightgray','tan','powder_blue'],pastels:['pastel_sage','pastel_blue'],accents:['burgundy','wine','forest','hunter_green','mustard','teal','burnt_orange','crimson','cobalt','plum'],shoes:['dark_brown','brown','cognac','black','espresso','burgundy','tan'],tempBias:'warm'},
+  gorpcore:{nameKo:'고프코어',darks:['dark_olive','charcoal','navy','forest','hunter_green','dark_green','black','espresso','dark_brown','midnight','dark_blue','indigo'],mids:['olive','khaki','moss','sage','denim','gray','slate','camel','brown','tan','steel_blue','cobalt','taupe','rust','brick','sienna','terracotta','mustard','amber'],lights:['cream','ivory','beige','white','lightgray','tan','powder_blue','silver'],pastels:['pastel_sage','pastel_mint','pastel_green','pastel_aqua','pastel_blue','pastel_sky'],accents:['cobalt','teal','burnt_orange','crimson','amber','mustard','rust','orange','forest','red'],shoes:['brown','dark_brown','black','charcoal','dark_olive','tan','espresso','cream'],tempBias:'warm'},
+  street:{nameKo:'스트릿',darks:['black','charcoal','navy','dark_blue','midnight','dark_olive','espresso','dark_brown','indigo','dark_green','dark_purple','maroon','hunter_green'],mids:['gray','olive','denim','slate','brown','cobalt','steel_blue','khaki','tan','camel','moss','sage','dusty_rose','brick','taupe','mustard','terracotta'],lights:['white','cream','ivory','beige','lightgray','silver'],pastels:['pastel_blue','pastel_pink','pastel_mint','pastel_lavender','pastel_sky','pastel_yellow','pastel_coral','pastel_lilac'],accents:['red','crimson','cobalt','teal','orange','burnt_orange','amber','mustard','burgundy','purple','forest'],shoes:['white','black','cream','charcoal','brown','navy','dark_brown','beige'],tempBias:'balanced'},
+  grunge:{nameKo:'그런지',darks:['black','charcoal','dark_brown','espresso','navy','dark_olive','midnight','maroon','wine','burgundy','dark_blue','eggplant','dark_purple','dark_green','hunter_green'],mids:['gray','olive','denim','taupe','slate','brown','moss','brick','rust','sienna','dusty_rose','cognac','khaki','dark_olive','plum','mauve','terracotta','mustard'],lights:['cream','ivory','white','beige','lightgray'],pastels:[],accents:['burgundy','wine','rust','crimson','burnt_orange','plum','mustard','maroon','red'],shoes:['black','dark_brown','brown','charcoal','espresso','burgundy'],tempBias:'warm'},
+  contemporary:{nameKo:'컨템포러리',darks:['black','charcoal','navy','midnight','dark_brown','espresso','dark_blue','dark_olive','eggplant','dark_purple','indigo','hunter_green','maroon'],mids:['gray','slate','taupe','camel','olive','steel_blue','denim','cognac','moss','sage','brown','mauve','dusty_rose','plum','cobalt','tan','mustard'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue'],pastels:['pastel_blue','pastel_lavender','pastel_sage','pastel_mint','pastel_pink','pastel_lilac','pastel_rose'],accents:['cobalt','burgundy','teal','plum','forest','mustard','terracotta','eggplant','mauve'],shoes:['black','white','dark_brown','charcoal','cream','cognac','brown','navy','espresso','beige'],tempBias:'neutral'},
+  techwear:{nameKo:'테크웨어',darks:['black','charcoal','dark_blue','navy','midnight','dark_olive','dark_green','hunter_green','forest','indigo','slate','eggplant','dark_purple'],mids:['gray','olive','slate','steel_blue','denim','moss','dark_olive','cobalt','taupe','espresso'],lights:['white','cream','lightgray','silver','powder_blue'],pastels:['pastel_sage','pastel_mint'],accents:['olive','teal','cobalt','burnt_orange','crimson'],shoes:['black','charcoal','dark_brown','espresso','dark_olive','navy','slate'],tempBias:'neutral'},
+  genderless:{nameKo:'젠더리스',darks:['charcoal','navy','black','dark_brown','midnight','espresso','dark_blue','dark_olive','eggplant','dark_purple','indigo','hunter_green'],mids:['gray','taupe','slate','camel','olive','denim','sage','moss','steel_blue','dusty_rose','mauve','brown','cognac','tan','plum','cobalt','mustard'],lights:['white','cream','ivory','beige','lightgray','silver','powder_blue','tan'],pastels:['pastel_lavender','pastel_pink','pastel_blue','pastel_sage','pastel_mint','pastel_lilac','pastel_rose','pastel_peach','pastel_sky','pastel_aqua','pastel_yellow'],accents:['mauve','plum','cobalt','teal','dusty_rose','mustard','burgundy','sage','terracotta'],shoes:['white','black','cream','charcoal','brown','beige','tan','dark_brown','cognac'],tempBias:'neutral'},
+};
+
+const STW = {
+  preppy:{monochrome:.04,tone_on_tone:.10,gradient:.03,tone_in_tone:.08,one_point:.14,complementary:.06,analogous:.12,split_complementary:.05,color_blocking:.06,light_dark_contrast:.10,neutral_accent:.06,all_neutral:.04,ratio_211:.07,sandwich:.05},
+  ivy:{monochrome:.06,tone_on_tone:.12,gradient:.04,tone_in_tone:.06,one_point:.12,complementary:.04,analogous:.12,split_complementary:.04,color_blocking:.04,light_dark_contrast:.10,neutral_accent:.06,all_neutral:.06,ratio_211:.08,sandwich:.06},
+  dandy:{monochrome:.08,tone_on_tone:.12,gradient:.06,tone_in_tone:.08,one_point:.10,complementary:.04,analogous:.10,split_complementary:.04,color_blocking:.03,light_dark_contrast:.08,neutral_accent:.08,all_neutral:.06,ratio_211:.06,sandwich:.07},
+  oldmoney:{monochrome:.12,tone_on_tone:.14,gradient:.08,tone_in_tone:.06,one_point:.06,complementary:.02,analogous:.08,split_complementary:.02,color_blocking:.02,light_dark_contrast:.10,neutral_accent:.10,all_neutral:.10,ratio_211:.05,sandwich:.05},
+  ralphlook:{monochrome:.04,tone_on_tone:.08,gradient:.03,tone_in_tone:.10,one_point:.16,complementary:.06,analogous:.12,split_complementary:.05,color_blocking:.08,light_dark_contrast:.08,neutral_accent:.05,all_neutral:.03,ratio_211:.07,sandwich:.05},
+  minimal:{monochrome:.12,tone_on_tone:.12,gradient:.10,tone_in_tone:.06,one_point:.08,complementary:.02,analogous:.08,split_complementary:.02,color_blocking:.03,light_dark_contrast:.10,neutral_accent:.10,all_neutral:.08,ratio_211:.05,sandwich:.04},
+  casual:{monochrome:.04,tone_on_tone:.10,gradient:.04,tone_in_tone:.08,one_point:.12,complementary:.05,analogous:.12,split_complementary:.04,color_blocking:.06,light_dark_contrast:.08,neutral_accent:.08,all_neutral:.05,ratio_211:.08,sandwich:.06},
+  cityboy:{monochrome:.03,tone_on_tone:.10,gradient:.06,tone_in_tone:.12,one_point:.14,complementary:.03,analogous:.14,split_complementary:.03,color_blocking:.04,light_dark_contrast:.04,neutral_accent:.08,all_neutral:.03,ratio_211:.08,sandwich:.08},
+  normcore:{monochrome:.10,tone_on_tone:.12,gradient:.08,tone_in_tone:.04,one_point:.06,complementary:.02,analogous:.06,split_complementary:.02,color_blocking:.02,light_dark_contrast:.10,neutral_accent:.10,all_neutral:.14,ratio_211:.06,sandwich:.08},
+  athleisure:{monochrome:.14,tone_on_tone:.10,gradient:.10,tone_in_tone:.04,one_point:.08,complementary:.02,analogous:.06,split_complementary:.02,color_blocking:.04,light_dark_contrast:.12,neutral_accent:.08,all_neutral:.10,ratio_211:.06,sandwich:.04},
+  amekaji:{monochrome:.04,tone_on_tone:.14,gradient:.04,tone_in_tone:.08,one_point:.10,complementary:.04,analogous:.14,split_complementary:.04,color_blocking:.06,light_dark_contrast:.06,neutral_accent:.06,all_neutral:.06,ratio_211:.08,sandwich:.06},
+  workwear:{monochrome:.04,tone_on_tone:.14,gradient:.04,tone_in_tone:.06,one_point:.10,complementary:.04,analogous:.14,split_complementary:.04,color_blocking:.06,light_dark_contrast:.06,neutral_accent:.06,all_neutral:.08,ratio_211:.08,sandwich:.06},
+  military:{monochrome:.06,tone_on_tone:.12,gradient:.06,tone_in_tone:.06,one_point:.08,complementary:.03,analogous:.14,split_complementary:.03,color_blocking:.04,light_dark_contrast:.08,neutral_accent:.06,all_neutral:.10,ratio_211:.08,sandwich:.06},
+  british:{monochrome:.06,tone_on_tone:.12,gradient:.04,tone_in_tone:.08,one_point:.10,complementary:.04,analogous:.14,split_complementary:.04,color_blocking:.04,light_dark_contrast:.08,neutral_accent:.06,all_neutral:.06,ratio_211:.08,sandwich:.06},
+  gorpcore:{monochrome:.04,tone_on_tone:.10,gradient:.04,tone_in_tone:.08,one_point:.12,complementary:.04,analogous:.12,split_complementary:.04,color_blocking:.06,light_dark_contrast:.06,neutral_accent:.08,all_neutral:.06,ratio_211:.08,sandwich:.08},
+  street:{monochrome:.06,tone_on_tone:.08,gradient:.04,tone_in_tone:.08,one_point:.14,complementary:.06,analogous:.10,split_complementary:.04,color_blocking:.08,light_dark_contrast:.08,neutral_accent:.06,all_neutral:.04,ratio_211:.08,sandwich:.06},
+  grunge:{monochrome:.08,tone_on_tone:.14,gradient:.06,tone_in_tone:.08,one_point:.08,complementary:.04,analogous:.12,split_complementary:.04,color_blocking:.04,light_dark_contrast:.08,neutral_accent:.06,all_neutral:.08,ratio_211:.06,sandwich:.04},
+  contemporary:{monochrome:.10,tone_on_tone:.10,gradient:.08,tone_in_tone:.08,one_point:.08,complementary:.03,analogous:.10,split_complementary:.03,color_blocking:.04,light_dark_contrast:.08,neutral_accent:.08,all_neutral:.06,ratio_211:.06,sandwich:.08},
+  techwear:{monochrome:.16,tone_on_tone:.12,gradient:.12,tone_in_tone:.06,one_point:.04,complementary:.01,analogous:.08,split_complementary:.01,color_blocking:.03,light_dark_contrast:.12,neutral_accent:.06,all_neutral:.10,ratio_211:.05,sandwich:.04},
+  genderless:{monochrome:.06,tone_on_tone:.10,gradient:.06,tone_in_tone:.10,one_point:.10,complementary:.03,analogous:.10,split_complementary:.03,color_blocking:.04,light_dark_contrast:.08,neutral_accent:.10,all_neutral:.06,ratio_211:.06,sandwich:.08},
+};
+
+const MOOD_GROUPS = {
+  semi_formal:{name:'세미포멀',icon:'👔',description:'격식과 세련미를 갖춘 스타일',styles:['preppy','ivy','dandy','oldmoney','ralphlook']},
+  casual:{name:'캐주얼',icon:'👕',description:'편안하면서 센스 있는 일상 스타일',styles:['minimal','casual','cityboy','normcore','athleisure']},
+  work_outdoor:{name:'워크·아웃도어',icon:'🥾',description:'실용적이고 거친 매력의 스타일',styles:['amekaji','workwear','military','british','gorpcore']},
+  street:{name:'스트릿',icon:'🧢',description:'자유롭고 개성 넘치는 거리 문화',styles:['street','grunge','contemporary','techwear','genderless']},
+};
+
+const STYLE_GUIDE = {
+  preppy:{name:'프레피 룩',subtitle:'아이비리그 명문대의 단정한 세련미'},
+  ivy:{name:'아이비 룩',subtitle:'정통 미국 동부 캠퍼스 스타일'},
+  dandy:{name:'댄디 룩',subtitle:'신사의 품격, 세련된 어른의 스타일'},
+  oldmoney:{name:'올드머니 룩',subtitle:'조용한 고급스러움의 정석'},
+  ralphlook:{name:'랄뽕',subtitle:'랄프 로렌으로 완성하는 아메리칸 트래디셔널'},
+  minimal:{name:'미니멀 룩',subtitle:'최소한의 요소로 최대한의 세련미'},
+  casual:{name:'캐주얼 룩',subtitle:'편안하면서도 센스 있는 일상 코디'},
+  cityboy:{name:'시티보이 룩',subtitle:'도시의 자유로움, 내추럴 파스텔'},
+  normcore:{name:'놈코어',subtitle:'의도적으로 평범하게, 힘 빼기의 미학'},
+  athleisure:{name:'애슬레저',subtitle:'운동복과 일상복의 경계를 넘다'},
+  amekaji:{name:'아메카지',subtitle:'데님과 워크부츠의 빈티지 감성'},
+  workwear:{name:'워크웨어',subtitle:'실용적인 노동자의 미학'},
+  military:{name:'밀리터리 룩',subtitle:'군복에서 영감받은 강인한 스타일'},
+  british:{name:'브리티시 헤리티지',subtitle:'영국 시골의 품격 있는 아웃도어'},
+  gorpcore:{name:'고프코어',subtitle:'아웃도어 브랜드를 도시에서 즐기다'},
+  street:{name:'스트릿 룩',subtitle:'힙합과 스케이트보드 문화에서 온 자유'},
+  grunge:{name:'그런지 룩',subtitle:'90년대 얼터너티브 록의 반항'},
+  contemporary:{name:'컨템포러리 룩',subtitle:'도시적 실험, 모던 아방가르드'},
+  techwear:{name:'테크웨어',subtitle:'기능성 소재의 도시적 미래감'},
+  genderless:{name:'젠더리스',subtitle:'성별의 경계를 넘는 자유로운 스타일'},
+};
+const STYLE_ICONS = {preppy:'🏫',ivy:'🎓',dandy:'🎩',oldmoney:'💎',ralphlook:'🐎',minimal:'◻️',casual:'👟',cityboy:'🌿',normcore:'🤍',athleisure:'🏃',amekaji:'👖',workwear:'🔧',military:'🪖',british:'🧥',gorpcore:'⛰️',street:'🛹',grunge:'🎸',contemporary:'🖤',techwear:'⚡',genderless:'🌈'};
+
+const ITEMS_CATALOG = [
+  {id:'padding',emoji:'🧥',label:'패딩',outerness:100,outerType:'padding'},
+  {id:'coat',emoji:'🧥',label:'코트',outerness:95,outerType:'coat'},
+  {id:'jacket',emoji:'🧥',label:'자켓',outerness:90,outerType:'jacket'},
+  {id:'hood_zip',emoji:'🧥',label:'후드집업',outerness:60,outerType:'jacket'},
+  {id:'cardigan',emoji:'🧶',label:'가디건',outerness:55,midType:'cardigan'},
+  {id:'knit_zip',emoji:'🧶',label:'니트집업',outerness:53,midType:'knit'},
+  {id:'vest',emoji:'🧶',label:'조끼',outerness:50,midType:'vest'},
+  {id:'hoodie',emoji:'👕',label:'후디',outerness:45},
+  {id:'knit',emoji:'🧶',label:'니트',outerness:43,midType:'knit'},
+  {id:'mtm',emoji:'👕',label:'맨투맨',outerness:40},
+  {id:'shirt',emoji:'👕',label:'셔츠',outerness:30},
+  {id:'tshirt',emoji:'👕',label:'티셔츠',outerness:10},
+  {id:'scarf',emoji:'🧣',label:'목도리',outerness:0,slot:'scarf'},
+  {id:'hat',emoji:'🧢',label:'모자',outerness:0,slot:'hat'},
+];
+
+const LAYER_LEVELS = {
+  simple:{name:'심플',parts:['상의','하의','신발'],partKeys:['top','bottom','shoes']},
+  basic:{name:'아우터+이너',parts:['아우터','이너','하의','신발'],partKeys:['outer','top','bottom','shoes']},
+  mid_inner:{name:'미들웨어+이너',parts:['미들웨어','이너','하의','신발'],partKeys:['middleware','top','bottom','shoes']},
+  scarf_top:{name:'목도리+상의',parts:['목도리','상의','하의','신발'],partKeys:['scarf','top','bottom','shoes']},
+  layered:{name:'아우터+미들웨어+이너',parts:['아우터','미들웨어','이너','하의','신발'],partKeys:['outer','middleware','top','bottom','shoes']},
+  scarf_basic:{name:'목도리+아우터+이너',parts:['목도리','아우터','이너','하의','신발'],partKeys:['scarf','outer','top','bottom','shoes']},
+  scarf_mid:{name:'목도리+미들웨어+이너',parts:['목도리','미들웨어','이너','하의','신발'],partKeys:['scarf','middleware','top','bottom','shoes']},
+  full:{name:'풀 레이어드',parts:['목도리','아우터','미들웨어','이너','하의','신발'],partKeys:['scarf','outer','middleware','top','bottom','shoes']},
+};
+const LAYER_DEFS = LAYER_LEVELS; // alias
+
+const PART_KO = {outer:'아우터',middleware:'미들웨어',top:'상의',bottom:'하의',shoes:'신발',scarf:'목도리',hat:'모자'};
+
+function itemsToLayerInfo(itemIds) {
+  const items = itemIds.map(id => ITEMS_CATALOG.find(i => i.id === id)).filter(Boolean);
+  const sorted = [...items].sort((a,b) => b.outerness - a.outerness);
+  let hasOuter=false,hasMid=false,hasScarf=false,hasHat=false;
+  let outerType='coat',midType='knit';
+  for (const item of sorted) {
+    if (item.outerType) { hasOuter=true; outerType=item.outerType; }
+    else if (item.midType) { hasMid=true; midType=item.midType; }
+    else if (item.slot==='scarf') { hasScarf=true; }
+    else if (item.slot==='hat') { hasHat=true; }
+  }
+  let layerType='simple';
+  if (hasOuter&&hasMid&&hasScarf) layerType='full';
+  else if (hasOuter&&hasMid) layerType='layered';
+  else if (hasScarf&&hasOuter) layerType='scarf_basic';
+  else if (hasScarf&&hasMid) layerType='scarf_mid';
+  else if (hasScarf) layerType='scarf_top';
+  else if (hasOuter) layerType='basic';
+  else if (hasMid) layerType='mid_inner';
+  let partKeys = LAYER_LEVELS[layerType]?.partKeys || ['top','bottom','shoes'];
+  if (hasHat && !partKeys.includes('hat')) partKeys = [...partKeys,'hat'];
+  return {layerType,outerType,midType,partKeys,hasOuter,hasMid,hasScarf,hasHat};
+}
+// ═══════════════════════════════════════════════
+// 4: 추천 엔진 — 헬퍼, 14 테크닉, 점수, 필터, 생성
+// ═══════════════════════════════════════════════
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function pickN(a,n){return shuffle(a).slice(0,Math.min(n,a.length));}
+function wPick(items,weights){const r=Math.random();let c=0;for(let i=0;i<items.length;i++){c+=weights[i];if(r<=c)return items[i];}return items[items.length-1];}
+function pick4Spread(sorted){if(sorted.length<=4)return sorted.slice(0,4);const n=sorted.length,step=(n-1)/3;return[sorted[0],sorted[Math.round(step)],sorted[Math.round(step*2)],sorted[n-1]];}
+function selectGradient(sorted,count,minGap){for(let a=0;a<30;a++){const sel=[pick(sorted)];const pool=shuffle(sorted.filter(c=>c!==sel[0]));for(const c of pool){if(sel.length>=count)break;if(sel.every(s=>Math.abs(L(c)-L(s))>=minGap))sel.push(c);}if(sel.length>=count)return sel.sort((a,b)=>L(a)-L(b));}return null;}
+function pickDiverseHues(pool,n){for(let a=0;a<30;a++){const sel=[pick(pool)];const rest=shuffle(pool.filter(c=>c!==sel[0]));for(const c of rest){if(sel.length>=n)break;if(sel.every(s=>{const d=Math.min(Math.abs(H(c)-H(s)),360-Math.abs(H(c)-H(s)));return d>=25||(Cv(c)<10&&Cv(s)<10);}))sel.push(c);}if(sel.length>=n)return sel;}return null;}
+function pickWithLSpread(pool,n){for(let a=0;a<20;a++){const s=pickN(pool,n);if(s.length<n)continue;const ls=s.map(L);if(Math.max(...ls)-Math.min(...ls)>=20)return s;}const sorted=[...pool].sort((a,b)=>L(a)-L(b));return sorted.length>=n?pick4Spread(sorted):null;}
+function pickShoe(style,ctx){const pool=STYLE_MOODS[style].shoes;const ok=pool.filter(s=>{const c=ctx.filter(x=>x===s).length;return c<2;});return pick(ok.length?ok:pool);}
+function assignPos(sorted,shoes){const patterns=[s=>({outer:s[0],top:s[3],bottom:s[1],shoes}),s=>({outer:s[3],top:s[1],bottom:s[2],shoes}),s=>({outer:s[1],top:s[3],bottom:s[0],shoes}),s=>({outer:s[0],top:s[2],bottom:s[3],shoes}),s=>({outer:s[2],top:s[0],bottom:s[3],shoes}),s=>({outer:s[3],top:s[0],bottom:s[2],shoes})];return pick(patterns)(sorted);}
+
+// 14 TECHNIQUES
+const TECHNIQUES={
+  monochrome:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights];const fams=Object.keys(COLOR_FAMILIES).filter(f=>COLOR_FAMILIES[f].filter(c=>all.includes(c)).length>=4);if(!fams.length)return null;const pool=COLOR_FAMILIES[pick(fams)].filter(c=>all.includes(c)||m.pastels.includes(c));if(pool.length<4)return null;const sorted=[...pool].sort((a,b)=>L(a)-L(b));const colors=pick4Spread(sorted);return assignPos(colors.sort((a,b)=>L(a)-L(b)),pickShoe(style,colors));}},
+  tone_on_tone:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const fams=Object.keys(COLOR_FAMILIES).filter(f=>{const p=COLOR_FAMILIES[f].filter(c=>all.includes(c));return p.length>=3;});if(!fams.length)return null;const pool=COLOR_FAMILIES[pick(fams)].filter(c=>all.includes(c)).sort((a,b)=>L(a)-L(b));if(pool.length<3||L(pool[pool.length-1])-L(pool[0])<25)return null;const colors=pick4Spread(pool);return assignPos(colors.sort((a,b)=>L(a)-L(b)),pickShoe(style,colors));}},
+  gradient:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const dir=Math.random()<0.5?'d2l':'l2d';const sel=selectGradient(shuffle(all).sort((a,b)=>L(a)-L(b)),4,10);if(!sel)return null;const shoes=pickShoe(style,sel);return dir==='d2l'?{outer:sel[0],top:sel[1],bottom:sel[2],shoes}:{outer:sel[3],top:sel[2],bottom:sel[1],shoes};}},
+  tone_in_tone:{compose(style){const m=STYLE_MOODS[style],tgt=30+Math.random()*50,rng=15;const all=[...m.darks,...m.mids,...m.lights,...m.pastels];const cands=all.filter(c=>Math.abs(L(c)-tgt)<=rng);if(cands.length<4)return null;const sel=pickDiverseHues(cands,4);if(!sel)return null;const shoes=pickShoe(style,sel);return{outer:sel[0],top:sel[1],bottom:sel[2],shoes};}},
+  one_point:{compose(style){const m=STYLE_MOODS[style];const base=[...m.darks,...m.mids,...m.lights].filter(c=>Cv(c)<50);const accent=[...m.pastels,...m.accents].filter(c=>Cv(c)>=20);if(base.length<3||accent.length<1)return null;const ac=pick(accent);const bases=pickWithLSpread(base,3);if(!bases)return null;const pos=Math.floor(Math.random()*4);const all4=[...bases];all4.splice(pos,0,ac);const shoes=pickShoe(style,all4);return{outer:all4[0],top:all4[1],bottom:all4[2],shoes};}},
+  complementary:{compose(style){const m=STYLE_MOODS[style];const chrom=[...m.darks,...m.mids,...m.accents].filter(c=>Cv(c)>=25);if(chrom.length<2)return null;const c1=pick(chrom),h1=H(c1);const comp=chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-h1),360-Math.abs(H(c)-h1));return d>=120&&d<=210&&c!==c1;});if(!comp.length)return null;const c2=pick(comp);const neut=[...m.lights,...m.mids].filter(c=>Cv(c)<35);const n1=pick(neut),n2=pick(neut.filter(c=>c!==n1));if(!n2)return null;const shoes=pickShoe(style,[c1,c2,n1,n2]);const arr=pick([[c1,n1,c2,n2],[n1,c1,n2,c2],[c1,n2,n1,c2],[n1,c2,c1,n2]]);return{outer:arr[0],top:arr[1],bottom:arr[2],shoes};}},
+  analogous:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels,...m.accents];const chrom=all.filter(c=>Cv(c)>=15);if(chrom.length<2)return null;const anchor=pick(chrom),hA=H(anchor);const nearby=all.filter(c=>{if(c===anchor)return false;const d=Math.min(Math.abs(H(c)-hA),360-Math.abs(H(c)-hA));return d<=70;});if(nearby.length<3)return null;const others=pickWithLSpread(nearby,3);if(!others)return null;const all4=[anchor,...others].sort((a,b)=>L(a)-L(b));return assignPos(all4,pickShoe(style,all4));}},
+  split_complementary:{compose(style){const m=STYLE_MOODS[style];const chrom=[...m.darks,...m.mids,...m.accents,...m.pastels].filter(c=>Cv(c)>=20);if(chrom.length<3)return null;const base=pick(chrom),hB=H(base);const s1p=chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-hB),360-Math.abs(H(c)-hB));return d>=110&&d<=160&&c!==base;});const s2p=chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-hB),360-Math.abs(H(c)-hB));return d>=160&&d<=210&&c!==base;});if(!s1p.length||!s2p.length)return null;const s1=pick(s1p),s2=pick(s2p);const neut=pick([...m.lights,...m.mids].filter(c=>Cv(c)<30));if(!neut)return null;const shoes=pickShoe(style,[base,s1,s2,neut]);const arr=shuffle([base,s1,s2,neut]);return{outer:arr[0],top:arr[1],bottom:arr[2],shoes};}},
+  color_blocking:{compose(style){const m=STYLE_MOODS[style];const chrom=[...m.darks,...m.mids,...m.accents].filter(c=>Cv(c)>=20);if(chrom.length<3)return null;const c1=pick(chrom);const c2=pick(chrom.filter(c=>{const d=Math.min(Math.abs(H(c)-H(c1)),360-Math.abs(H(c)-H(c1)));return d>=40&&c!==c1;}));if(!c2)return null;const pool3=[...m.lights,...m.mids].filter(c=>c!==c1&&c!==c2);const c3=pick(pool3);if(!c3)return null;const shoes=pickShoe(style,[c1,c2,c3]);const arr=shuffle([c1,c2,c3]);return{outer:arr[0],top:arr[1],bottom:arr[2],shoes};}},
+  light_dark_contrast:{compose(style){const m=STYLE_MOODS[style];const dp=m.darks.filter(c=>L(c)<=40),lp=[...m.lights,...m.pastels].filter(c=>L(c)>=70);if(dp.length<1||lp.length<1)return null;const pat=pick(['2d2l','1d3l','3d1l']);let colors;if(pat==='2d2l'){const d1=pick(dp),d2=pick(dp.filter(c=>c!==d1))||d1,l1=pick(lp),l2=pick(lp.filter(c=>c!==l1))||l1;colors=shuffle([d1,d2,l1,l2]);}else if(pat==='1d3l'){colors=shuffle([pick(dp),...pickN(lp,3)]);}else{colors=shuffle([...pickN(dp,3),pick(lp)]);}const shoes=pickShoe(style,colors);return{outer:colors[0],top:colors[1],bottom:colors[2],shoes};}},
+  neutral_accent:{compose(style){const m=STYLE_MOODS[style];const np=[...m.darks,...m.mids,...m.lights].filter(c=>Cv(c)<=25);const ap=[...m.pastels,...m.accents].filter(c=>Cv(c)>=18);if(np.length<3||ap.length<1)return null;const ns=pickN(np,3);if(ns.length<3)return null;const ac=pick(ap);const pos=Math.floor(Math.random()*4);const all4=[...ns];all4.splice(pos,0,ac);return{outer:all4[0],top:all4[1],bottom:all4[2],shoes:pickShoe(style,all4)};}},
+  all_neutral:{compose(style){const m=STYLE_MOODS[style];const np=[...m.darks,...m.mids,...m.lights].filter(c=>Cv(c)<=30);if(np.length<4)return null;const sel=pickWithLSpread(np,4);if(!sel)return null;return assignPos(sel.sort((a,b)=>L(a)-L(b)),pickShoe(style,sel));}},
+  ratio_211:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const mc=pick(all);const rest=all.filter(c=>c!==mc&&Math.abs(L(c)-L(mc))>=10);if(rest.length<2)return null;const c2=pick(rest),c3=pick(rest.filter(c=>c!==c2));if(!c3)return null;const pats=[[mc,c2,mc,c3],[c2,mc,c3,mc],[mc,c2,c3,mc],[mc,mc,c2,c3],[c2,c3,mc,mc]];const p=pick(pats);return{outer:p[0],top:p[1],bottom:p[2],shoes:pickShoe(style,p)};}},
+  sandwich:{compose(style){const m=STYLE_MOODS[style],all=[...m.darks,...m.mids,...m.lights,...m.pastels];const ft=Math.random()<0.6?'oc':'ti';const fc=pick(all);const fill=all.filter(c=>c!==fc&&Math.abs(L(c)-L(fc))>=12);if(fill.length<2)return null;const f1=pick(fill),f2=pick(fill.filter(c=>c!==f1));if(!f2)return null;const shoes=pickShoe(style,[fc,f1,f2]);return ft==='oc'?{outer:fc,top:f1,bottom:fc,shoes}:{outer:f1,top:fc,bottom:f2,shoes};}},
+};
+
+// CRITIC (점수)
+function scoreCritic(o,style){
+  const cols=[o.outer,o.top,o.bottom,o.shoes];let total=0;
+  const hues=cols.filter(c=>Cv(c)>=15).map(H);let f1=6;
+  if(hues.length>=2){const pairs=[];for(let i=0;i<hues.length;i++)for(let j=i+1;j<hues.length;j++){const d=Math.min(Math.abs(hues[i]-hues[j]),360-Math.abs(hues[i]-hues[j]));pairs.push(d);}const avg=pairs.reduce((a,b)=>a+b,0)/pairs.length;f1=avg<=50?11:avg>=120&&avg<=180?10:avg>=80?8:5;}total+=f1;
+  const ls=cols.map(L),lR=Math.max(...ls)-Math.min(...ls),avgL=ls.reduce((a,b)=>a+b)/4;let f2=6;
+  if(style==='cityboy'&&avgL>65){const v=ls.reduce((a,x)=>a+(x-avgL)**2,0)/4;f2=v>100?13:v>40?10:7;}
+  else if(style==='techwear'&&avgL<45){const v=ls.reduce((a,x)=>a+(x-avgL)**2,0)/4;f2=v>80?13:v>30?10:7;}
+  else{f2=lR>=45?13:lR>=30?10:lR>=15?7:4;}total+=f2;
+  const tc=cols.map(Cv).reduce((a,b)=>a+b)/100;total+=(tc>=0.3&&tc<=2.0)?10:tc<0.3?5:6;
+  const ts=cols.map(temp),wc=ts.filter(t=>t==='w').length,cc=ts.filter(t=>t==='c').length;const bias=STYLE_MOODS[style].tempBias;let f4=5;
+  if(bias==='warm')f4=wc>=2?10:wc>=1?7:3;else if(bias==='neutral')f4=(wc<=3&&cc<=3)?9:6;else f4=Math.abs(wc-cc)<=2?9:5;total+=f4;
+  const m=STYLE_MOODS[style],sp=new Set([...m.darks,...m.mids,...m.lights,...m.pastels,...m.accents,...m.shoes]);let f5=0;cols.forEach(c=>{f5+=sp.has(c)?5:-2;});f5+=m.shoes.includes(o.shoes)?5:-1;f5=Math.max(0,Math.min(25,f5));total+=f5;
+  let f6=10;[[0,1],[1,2],[2,3]].forEach(([i,j])=>{if(cols[i]===cols[j])f6-=4;else if(Math.abs(L(cols[i])-L(cols[j]))<5)f6-=2;});total+=Math.max(0,f6);
+  const uniq=new Set(cols).size;total+=(uniq===4?10:uniq===3?7:uniq===2?4:1);
+  return{total:Math.min(95,Math.max(0,total)),f1,f2,f4,f5,f6};
+}
+
+// STYLE FILTER
+function styleFilter(style,r){
+  const cols=[r.outer,r.top,r.bottom,r.shoes];const ws=cols.map(temp).filter(t=>t==='w').length;const cs=cols.map(temp).filter(t=>t==='c').length;
+  const avgL=cols.map(L).reduce((a,b)=>a+b)/4;const chromatics=cols.filter(c=>Cv(c)>=40);const highChrom=cols.filter(c=>Cv(c)>=60);
+  const pastels=cols.filter(c=>c.startsWith('pastel_'));const darks=cols.filter(c=>L(c)<=30);const lights=cols.filter(c=>L(c)>=80);
+  const purples=cols.filter(c=>['eggplant','dark_purple','plum','mauve','purple','pastel_lavender','pastel_lilac'].includes(c));
+  const pinks=cols.filter(c=>['pastel_pink','pastel_coral','pastel_peach','pastel_rose','dusty_rose','rose','salmon'].includes(c));
+  const deepBlue=cols.filter(c=>['midnight','dark_blue','cobalt','indigo'].includes(c));
+  const earthLight=cols.filter(c=>['cream','ivory','beige','camel','tan','pastel_peach'].includes(c));
+  const heavyGreen=cols.filter(c=>['hunter_green','forest','dark_green','dark_olive'].includes(c));
+  if(ws>=2&&cs>=2)return false;if(r.outer===r.top||r.top===r.bottom)return false;
+  switch(style){
+    case'preppy':case'ralphlook':if(pastels.length>=3)return false;if(darks.length>=3&&lights.length===0)return false;if(purples.length>=2)return false;if(pinks.length>=3)return false;break;
+    case'ivy':if(pastels.length>=2)return false;if(darks.length>=3&&lights.length===0)return false;if(purples.length>=2)return false;break;
+    case'dandy':if(pastels.length>=3)return false;if(highChrom.length>=2)return false;if(darks.length>=3&&lights.length===0)return false;break;
+    case'oldmoney':if(pastels.length>=2)return false;if(chromatics.length>=3)return false;if(highChrom.length>=1)return false;var omH=new Set(cols.filter(c=>Cv(c)>=20).map(c=>Math.round(H(c)/60)%6));if(omH.size>=3)return false;break;
+    case'minimal':if(chromatics.length>=3)return false;var mH=new Set(cols.filter(c=>Cv(c)>=25).map(c=>Math.round(H(c)/60)%6));if(mH.size>=3)return false;break;
+    case'casual':if(highChrom.length>=3)return false;if(darks.length>=3&&lights.length===0&&avgL<35)return false;break;
+    case'cityboy':if(avgL<50)return false;if(darks.length>=3)return false;if(heavyGreen.length>=2)return false;break;
+    case'normcore':if(pastels.length>=2)return false;if(chromatics.length>=2)return false;if(highChrom.length>=1)return false;break;
+    case'athleisure':if(highChrom.length>=2)return false;if(ws>=3)return false;if(lights.length>=3)return false;if(earthLight.length>=2)return false;break;
+    case'amekaji':case'workwear':if(pastels.length>=1)return false;if(cs>=3)return false;if(deepBlue.length>=2)return false;break;
+    case'military':if(pastels.length>=1)return false;if(cs>=3)return false;if(purples.length>=1)return false;if(pinks.length>=1)return false;break;
+    case'british':if(pastels.length>=2)return false;if(cs>=3)return false;if(highChrom.length>=2)return false;break;
+    case'gorpcore':if(purples.length>=2)return false;if(pinks.length>=2)return false;if(cs>=3)return false;break;
+    case'street':if(pastels.length>=3)return false;break;
+    case'grunge':if(pastels.length>=1)return false;if(lights.length>=3)return false;if(cs>=3)return false;break;
+    case'contemporary':if(highChrom.length>=2)return false;var cH=new Set(cols.filter(c=>Cv(c)>=30).map(c=>Math.round(H(c)/60)%6));if(cH.size>=3)return false;break;
+    case'techwear':if(highChrom.length>=2)return false;if(chromatics.length>=3)return false;if(ws>=3)return false;if(lights.length>=3)return false;if(earthLight.length>=2)return false;if(avgL>60)return false;break;
+    case'genderless':if(highChrom.length>=2)return false;if(darks.length>=3&&lights.length===0)return false;break;
+  }
+  return true;
+}
+
+// EXTRA COLOR PICKER
+function pickExtraColor(existingColors,style){
+  const m=STYLE_MOODS[style];const pool=[...new Set([...m.darks,...m.mids,...m.lights,...m.pastels])];const existing=new Set(existingColors);
+  const avgLex=existingColors.map(L).reduce((a,b)=>a+b)/existingColors.length;const exTemps=existingColors.map(temp);
+  const wCount=exTemps.filter(t=>t==='w').length;const cCount=exTemps.filter(t=>t==='c').length;const dominantTemp=wCount>cCount?'w':cCount>wCount?'c':'n';
+  let cands=pool.filter(c=>{if(existing.has(c))return false;const t=temp(c);const nW=wCount+(t==='w'?1:0);const nC=cCount+(t==='c'?1:0);if(nW>=2&&nC>=2)return false;const lc=L(c);const hasContrast=existingColors.some(e=>Math.abs(L(e)-lc)>=8);return hasContrast;});
+  if(cands.length===0){cands=pool.filter(c=>{const t=temp(c);const nW=wCount+(t==='w'?1:0);const nC=cCount+(t==='c'?1:0);return!(nW>=2&&nC>=2);});}
+  if(cands.length===0)return pick(pool);
+  const scored=cands.map(c=>{let score=0;const lc=L(c),hc=H(c);const ls=existingColors.map(L);const minL=Math.min(...ls),maxL=Math.max(...ls);if(lc>minL&&lc<maxL)score+=3;existingColors.forEach(e=>{const d=Math.min(Math.abs(H(e)-hc),360-Math.abs(H(e)-hc));if(d<40)score+=1;});if(temp(c)===dominantTemp)score+=2;if(temp(c)==='n')score+=1;if(m.darks.includes(c)||m.mids.includes(c))score+=1;return{c,score};});
+  scored.sort((a,b)=>b.score-a.score);const top=scored.slice(0,Math.min(8,scored.length));return pick(top).c;
+}
+
+// LAYER ADAPTER
+function adaptToLayer(base4,layerType,style){
+  const ld=LAYER_DEFS[layerType];const bodyN=ld.partKeys.length-(ld.partKeys.includes('shoes')?1:0);
+  if(bodyN===2)return{top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};
+  if(bodyN===3){switch(layerType){case'basic':return base4;case'mid_inner':return{middleware:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};case'scarf_top':return{scarf:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};default:return base4;}}
+  if(bodyN===4){const existing=[base4.outer,base4.top,base4.bottom,base4.shoes];const extra=pickExtraColor(existing,style);switch(layerType){case'layered':return{outer:base4.outer,middleware:extra,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};case'scarf_basic':return{scarf:extra,outer:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};case'scarf_mid':return{scarf:extra,middleware:base4.outer,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};default:return base4;}}
+  if(bodyN===5){const existing=[base4.outer,base4.top,base4.bottom,base4.shoes];const extra1=pickExtraColor(existing,style);const extra2=pickExtraColor([...existing,extra1],style);return{scarf:extra1,outer:base4.outer,middleware:extra2,top:base4.top,bottom:base4.bottom,shoes:base4.shoes,technique:base4.technique};}
+  return base4;
+}
+
+// TECH PICKER
+function pickTech(style){const w=STW[style],ts=Object.keys(w),ws=ts.map(t=>w[t]);return wPick(ts,ws);}
+
+// GENERATE ONE
+function genOne(style){for(let a=0;a<30;a++){const tn=pickTech(style),r=TECHNIQUES[tn].compose(style);if(!r||!r.outer||!r.top||!r.bottom||!r.shoes)continue;if(!COLORS[r.outer]||!COLORS[r.top]||!COLORS[r.bottom]||!COLORS[r.shoes])continue;if(!styleFilter(style,r))continue;const sc=scoreCritic(r,style);if(sc.total>=50)return{...r,technique:tn,score:sc};}return null;}
+
+// GENERATE LAYERED
+function genOneLayered(style,layerType){
+  layerType=layerType||'basic';
+  for(let a=0;a<30;a++){const tn=pickTech(style);const base=TECHNIQUES[tn].compose(style);if(!base||!base.outer||!base.top||!base.bottom||!base.shoes)continue;if(!COLORS[base.outer]||!COLORS[base.top]||!COLORS[base.bottom]||!COLORS[base.shoes])continue;const adapted=adaptToLayer({...base,technique:tn},layerType,style);const ld=LAYER_DEFS[layerType];const allValid=ld.partKeys.every(k=>adapted[k]&&COLORS[adapted[k]]);if(!allValid)continue;if(!styleFilter(style,adapted))continue;const sc=scoreCritic(adapted,style);if(sc.total>=50)return{...adapted,technique:tn,score:sc};}
+  return null;
+}
+
+// BATCH GENERATE
+function generateOutfitsLayered(style,count,layerType){
+  layerType=layerType||'basic';const ld=LAYER_DEFS[layerType];const outfits=[],seen=new Set(),osCount={};let att=0;const mx=count*15;
+  while(outfits.length<count&&att<mx){att++;const o=genOneLayered(style,layerType);if(!o)continue;const key=ld.partKeys.map(k=>o[k]).join('/');if(seen.has(key))continue;const outermost=o[ld.partKeys[0]];const osk=outermost+'_'+o.shoes;osCount[osk]=(osCount[osk]||0)+1;if(osCount[osk]>4)continue;const cc={};ld.partKeys.forEach(k=>{const c=o[k];cc[c]=(cc[c]||0)+1;});if(Object.values(cc).some(v=>v>=3))continue;seen.add(key);outfits.push(o);}
+  return outfits.sort((a,b)=>b.score.total-a.score.total);
+}
+
+// PUBLIC API
+function getDynamicCombos(style,layerType,count){
+  count=count||30;const outfits=generateOutfitsLayered(style,count,layerType);
+  return outfits.map((o,i)=>{const outfit={};LAYER_DEFS[layerType].partKeys.forEach(k=>{outfit[k]=o[k];});return{outfit,score:o.score?o.score.total:0,name:(STYLE_MOODS[style]?.nameKo||style)+' #'+(i+1),technique:o.technique};});
+}
+// ═══════════════════════════════════════════════
+// 5: UI 상태 + 렌더링 + 프롬프트 빌더
+// ═══════════════════════════════════════════════
+const PART_KO = {outer:'아우터',middleware:'미들웨어',top:'상의',bottom:'하의',shoes:'신발',scarf:'목도리',hat:'모자'};
+const PART_EN = {outer:'outer jacket/coat',middleware:'mid-layer',top:'top',bottom:'bottom',shoes:'shoes',scarf:'scarf',hat:'hat'};
+
+let state = {step:'mood', mood:null, style:null, pickedItems:[], results:[], layerType:'basic', partKeys:['outer','top','bottom','shoes'], selectedIdx:0, promptStyle:'fullbody', gender:'neutral'};
+let history = [];
+
+function pushStep(s){history.push(state.step);state.step=s;render();}
+function goBack(){if(!history.length)return;state.step=history.pop();render();}
+
+function selectMood(m){state.mood=m;if(m){pushStep('style');}else{state.style=null;pushStep('pick');}}
+function selectStyle(s){state.style=s;pushStep('pick');}
+function toggleItem(id){if(state.pickedItems.includes(id))state.pickedItems=state.pickedItems.filter(x=>x!==id);else state.pickedItems.push(id);render();}
+
+function generate(){
+  const info=itemsToLayerInfo(state.pickedItems);
+  state.layerType=info.layerType;state.partKeys=info.partKeys;
+  const allStyles=Object.keys(STYLE_MOODS);
+  const finalStyle=state.style||allStyles[Math.floor(Math.random()*allStyles.length)];
+  state.results=getDynamicCombos(finalStyle,state.layerType,30);
+  state.selectedIdx=0;pushStep('results');
+}
+function regenerate(){
+  const allStyles=Object.keys(STYLE_MOODS);
+  const finalStyle=state.style||allStyles[Math.floor(Math.random()*allStyles.length)];
+  state.results=getDynamicCombos(finalStyle,state.layerType,30);
+  state.selectedIdx=0;render();
+}
+function setIdx(i){state.selectedIdx=i;render();}
+function setPromptStyle(s){state.promptStyle=s;render();}
+function setGender(g){state.gender=g;render();}
+
+function buildPrompt(){
+  const r=state.results[state.selectedIdx];if(!r)return'';
+  const outfit=r.outfit;const pk=state.partKeys;
+  const modelDesc=state.gender==='male'?'a young Korean man in his 20s':state.gender==='female'?'a young Korean woman in her 20s':'a young Korean person with an androgynous look';
+  const parts=[];
+  for(const k of pk){const ck=outfit[k];if(!ck)continue;const c=COLORS_60[ck];if(!c)continue;parts.push('a '+c.nameEn.toLowerCase()+' ('+c.hex+') '+PART_EN[k]);}
+  const desc=parts.join(', ');
+  if(state.promptStyle==='fullbody')return'Fashion outfit coordination photo, full body shot of '+modelDesc+' wearing '+desc+'. Natural relaxed standing pose showing the complete outfit. Clean neutral background, soft natural lighting, high-end Korean fashion magazine editorial style. Focus on color harmony between garments, fabric textures visible, 4:5 aspect ratio for Instagram. Photorealistic, no text.';
+  if(state.promptStyle==='street')return'Street style outfit coordination photo, full body shot of '+modelDesc+' wearing '+desc+'. Casual walking pose on a clean urban sidewalk with soft blurred city background. Natural daylight, warm tones, Korean street fashion editorial look. Emphasis on how the colors coordinate together as a complete outfit, 4:5 aspect ratio for Instagram. Photorealistic, no text.';
+  return'Minimal studio outfit coordination photo, full body shot of '+modelDesc+' wearing '+desc+'. Relaxed standing pose against a plain white or light cream backdrop. Even studio lighting, zero distractions, sharp focus on garment colors and silhouette. Clean Korean fashion lookbook aesthetic, 4:5 aspect ratio for Instagram. Photorealistic, no text.';
+}
+
+function copyPrompt(){
+  const text=buildPrompt();if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copy-btn');btn.classList.add('copied');btn.textContent='복사됨!';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='복사';},2000);
+  });
+}
+
+// ═══ RENDER ═══
+function render(){
+  document.getElementById('back-btn').classList.toggle('hidden',state.step==='mood');
+  document.getElementById('step-mood').classList.toggle('hidden',state.step!=='mood');
+  document.getElementById('step-style').classList.toggle('hidden',state.step!=='style');
+  document.getElementById('step-pick').classList.toggle('hidden',state.step!=='pick');
+  document.getElementById('step-results').classList.toggle('hidden',state.step!=='results');
+
+  if(state.step==='mood') renderMood();
+  if(state.step==='style') renderStyle();
+  if(state.step==='pick') renderPick();
+  if(state.step==='results') renderResults();
+}
+
+function renderMood(){
+  let h='<div class="card"><div class="card-title">어떤 분위기를 원하세요?</div><div class="card-desc">무드를 선택하면 맞춤 스타일을 추천해드려요</div><div class="mood-grid">';
+  for(const[k,mg]of Object.entries(MOOD_GROUPS)){
+    h+='<button class="mood-btn" onclick="selectMood(\''+k+'\')"><span class="icon">'+mg.icon+'</span><span class="name">'+mg.name+'</span><span class="desc">'+mg.description+'</span></button>';
+  }
+  h+='</div><button class="btn-dark" style="margin-top:10px" onclick="selectMood(null)">전체 스타일에서 추천받기</button></div>';
+  document.getElementById('step-mood').innerHTML=h;
+}
+
+function renderStyle(){
+  if(!state.mood)return;const mg=MOOD_GROUPS[state.mood];
+  let h='<div class="card"><div class="card-title">'+mg.icon+' '+mg.name+' 스타일</div><div class="card-desc">원하는 스타일을 선택하세요</div><div class="style-list">';
+  for(const sKey of mg.styles){
+    const sg=STYLE_GUIDE[sKey];const icon=STYLE_ICONS[sKey]||'';
+    h+='<button class="style-btn" onclick="selectStyle(\''+sKey+'\')"><span class="s-icon">'+icon+'</span><div><div class="s-name">'+sg.name+'</div><div class="s-sub">'+sg.subtitle+'</div></div></button>';
+  }
+  h+='</div><button class="btn-dark" style="margin-top:10px" onclick="selectStyle(null)">'+mg.name+' 전체에서 추천받기</button></div>';
+  document.getElementById('step-style').innerHTML=h;
+}
+
+function renderPick(){
+  const clothing=ITEMS_CATALOG.filter(i=>!i.slot);const accessories=ITEMS_CATALOG.filter(i=>i.slot);
+  let h='<div class="card"><div class="card-title">꼭 입고 싶은 옷을 선택하세요</div><div class="card-desc">선택한 아이템 기준으로 코디를 추천합니다</div>';
+  h+='<div class="chip-label">의류</div><div class="chip-group" style="margin-bottom:12px">';
+  for(const item of clothing){const on=state.pickedItems.includes(item.id);h+='<button class="chip '+(on?'on':'off')+'" onclick="toggleItem(\''+item.id+'\')">'+item.emoji+' '+item.label+'</button>';}
+  h+='</div><div class="chip-label">소품</div><div class="chip-group" style="margin-bottom:12px">';
+  for(const item of accessories){const on=state.pickedItems.includes(item.id);h+='<button class="chip '+(on?'on':'off')+'" onclick="toggleItem(\''+item.id+'\')">'+item.emoji+' '+item.label+'</button>';}
+  h+='</div>';
+  if(state.pickedItems.length>0){
+    const names=state.pickedItems.map(id=>{const it=ITEMS_CATALOG.find(i=>i.id===id);return it?it.label:id;}).join(', ');
+    h+='<div class="summary-box">선택: '+names+' + 기본(상의, 하의, 신발)</div>';
+  }
+  h+='<button class="btn-primary" onclick="generate()">'+(state.pickedItems.length>0?'이 아이템으로 추천받기':'기본 구성으로 추천받기')+'</button></div>';
+  document.getElementById('step-pick').innerHTML=h;
+}
+
+function renderResults(){
+  if(!state.results.length){document.getElementById('step-results').innerHTML='<div class="card"><div class="card-title">결과 없음</div><p style="font-size:13px;color:#78716c">추천 결과를 생성하지 못했습니다. 다른 스타일이나 아이템 조합을 시도해보세요.</p><button class="btn-primary" style="margin-top:10px" onclick="goBack()">다시 선택하기</button></div>';return;}
+  const r=state.results[state.selectedIdx];const outfit=r.outfit;
+  let h='';
+
+  // 코디 결과 카드
+  h+='<div class="card"><div class="result-header"><span class="result-counter">'+(state.selectedIdx+1)+' / '+state.results.length+'</span><button class="refresh-btn" onclick="regenerate()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg> 새로 생성</button></div>';
+  h+='<div class="result-info"><div class="result-name">'+r.name+'</div><div class="result-score">조화점수 '+r.score+'점</div></div>';
+
+  // 컬러 블록
+  for(const k of state.partKeys){
+    const ck=outfit[k];if(!ck)continue;const c=COLORS_60[ck];if(!c)continue;
+    const dark=isDarkHex(c.hex);const border=LIGHT_HEX.has(c.hex)?' light-border':'';
+    h+='<div class="outfit-block'+border+'" style="background:'+c.hex+';border:1px solid transparent"><span class="part-tag" style="color:'+(dark?'#fff':'#333')+'">'+(PART_KO[k]||k)+'</span><span class="color-name" style="color:'+(dark?'#fff':'#292524')+'">'+c.name+'</span></div>';
+  }
+
+  // 네비게이션
+  h+='<div class="nav-row"><button class="nav-btn" onclick="setIdx('+(state.selectedIdx-1)+')" '+(state.selectedIdx===0?'disabled':'')+'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button><div class="dot-nav">';
+  const maxDots=Math.min(10,state.results.length);
+  for(let i=0;i<maxDots;i++){h+='<button class="dot '+(i===state.selectedIdx?'on':'off')+'" onclick="setIdx('+i+')"></button>';}
+  if(state.results.length>10)h+='<span style="font-size:10px;color:#a8a29e">+'+( state.results.length-10)+'</span>';
+  h+='</div><button class="nav-btn" onclick="setIdx('+(state.selectedIdx+1)+')" '+(state.selectedIdx>=state.results.length-1?'disabled':'')+'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button></div>';
+  h+='</div>';
+
+  // 코디샷 스타일
+  h+='<div class="card"><div class="card-title" style="margin-bottom:10px">코디샷 스타일</div><div class="toggle-row">';
+  [{k:'fullbody',l:'전신 코디',d:'풀바디 스타일링'},{k:'street',l:'스트릿',d:'야외 배경 코디'},{k:'minimal',l:'미니멀',d:'클린 스튜디오'}].forEach(s=>{
+    const on=state.promptStyle===s.k;h+='<button class="toggle-btn '+(on?'on':'off')+'" onclick="setPromptStyle(\''+s.k+'\')"><div class="t-label">'+s.l+'</div><div class="t-desc">'+s.d+'</div></button>';
+  });
+  h+='</div></div>';
+
+  // 모델
+  h+='<div class="card"><div class="card-title" style="margin-bottom:10px">모델</div><div class="toggle-row">';
+  [{k:'male',l:'남성',d:'한국인 남성'},{k:'neutral',l:'젠더리스',d:'성별 무관'},{k:'female',l:'여성',d:'한국인 여성'}].forEach(g=>{
+    const on=state.gender===g.k;h+='<button class="toggle-btn '+(on?'on':'off')+'" onclick="setGender(\''+g.k+'\')"><div class="t-label">'+g.l+'</div><div class="t-desc">'+g.d+'</div></button>';
+  });
+  h+='</div></div>';
+
+  // 프롬프트 출력
+  const prompt=buildPrompt();
+  if(prompt){
+    h+='<div class="card"><div class="prompt-header"><span class="card-title">생성된 프롬프트</span><button class="copy-btn" id="copy-btn" onclick="copyPrompt()">복사</button></div>';
+    h+='<div class="prompt-box"><div class="prompt-text">'+prompt+'</div></div>';
+    h+='<div class="prompt-hint"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1"/><path d="M6 3.5V6.5L8 7.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>이미지 생성 AI에 붙여넣어서 코디샷을 생성하세요</div></div>';
+  }
+
+  document.getElementById('step-results').innerHTML=h;
+}
+
+// INIT
+render();
+
+
+</script>
+</body>
+</html>
