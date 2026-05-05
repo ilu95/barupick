@@ -117,6 +117,15 @@ workflows:
       - name: Sync Capacitor
         script: npx cap sync android
 
+
+      - name: Increment version code
+        script: |
+          cd android/app
+          NEW_VERSION_CODE=$(date +%s)
+          sed -i "s/versionCode [0-9]*/versionCode $NEW_VERSION_CODE/" build.gradle
+          echo "Version code set to $NEW_VERSION_CODE"
+
+
       - name: Set up signing
         script: |
           echo $CM_KEYSTORE | base64 --decode > /tmp/keystore.jks
