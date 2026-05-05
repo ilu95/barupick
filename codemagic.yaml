@@ -10,6 +10,7 @@ workflows:
     environment:
       groups:
         - signing
+        - android_signing
         - app
       vars:
         BUNDLE_ID: "kr.co.barusa.barupick"
