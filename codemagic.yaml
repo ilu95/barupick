@@ -84,3 +84,70 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
+
+  android-release:
+    name: Android Release
+    max_build_duration: 30
+    instance_type: linux_x2
+
+    environment:
+      groups:
+        - android_signing
+      vars:
+        PACKAGE_NAME: "kr.co.barusa.barupick"
+      node: 22
+      java: 17
+
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Build web app
+        script: npm run build
+
+      - name: Install Capacitor Android
+        script: npm install @capacitor/android
+
+      - name: Add Android platform
+        script: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+
+      - name: Sync Capacitor
+        script: npx cap sync android
+
+      - name: Set up signing
+        script: |
+          echo $CM_KEYSTORE | base64 --decode > /tmp/keystore.jks
+          cat >> android/key.properties <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=/tmp/keystore.jks
+          EOF
+
+      - name: Configure signing in gradle
+        script: |
+          cd android/app
+          # Add signing config to build.gradle
+          sed -i 's/android {/android {\n    signingConfigs {\n        release {\n            def keystoreProperties = new Properties()\n            def keystorePropertiesFile = rootProject.file("key.properties")\n            if (keystorePropertiesFile.exists()) {\n                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n            }\n            keyAlias keystoreProperties["keyAlias"]\n            keyPassword keystoreProperties["keyPassword"]\n            storeFile file(keystoreProperties["storeFile"])\n            storePassword keystoreProperties["storePassword"]\n        }\n    }/' build.gradle
+          # Use release signing config
+          sed -i 's/buildTypes {/buildTypes {\n        release {\n            signingConfig signingConfigs.release\n        }/' build.gradle
+
+      - name: Build AAB
+        script: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease
+
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+
+    publishing:
+      email:
+        recipients:
+          - ilu62241@gmail.com
+        notify:
+          success: true
+          failure: true
