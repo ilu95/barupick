@@ -94,6 +94,7 @@ workflows:
     environment:
       groups:
         - android_signing
+        - app
       vars:
         PACKAGE_NAME: "kr.co.barusa.barupick"
       node: 22
