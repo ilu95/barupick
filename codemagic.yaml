@@ -120,12 +120,10 @@ workflows:
       - name: Set up signing
         script: |
           echo $CM_KEYSTORE | base64 --decode > /tmp/keystore.jks
-          cat >> android/key.properties <<EOF
-          storePassword=$CM_KEYSTORE_PASSWORD
-          keyPassword=$CM_KEY_PASSWORD
-          keyAlias=$CM_KEY_ALIAS
-          storeFile=/tmp/keystore.jks
-          EOF
+          echo "storePassword=$CM_KEYSTORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$CM_KEY_PASSWORD" >> android/key.properties
+          echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
+          echo "storeFile=/tmp/keystore.jks" >> android/key.properties
 
       - name: Configure signing in gradle
         script: |
