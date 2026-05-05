@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
+import { Capacitor } from '@capacitor/core'
+import { Preferences } from '@capacitor/preferences'
 
 // 개발: .env.local 또는 fallback
 // 프로덕션: Vercel 환경변수
@@ -13,11 +15,30 @@ if (typeof window !== 'undefined' && SUPABASE_URL !== DEV_URL) {
   console.log('[BaruPick] Production DB connected')
 }
 
+// 네이티브 앱(iOS/Android)용 스토리지 어댑터
+// Android WebView는 프로세스 종료 시 localStorage가 날아갈 수 있으므로
+// Capacitor Preferences를 사용하여 세션을 안정적으로 유지
+const capacitorStorage = {
+  getItem: async (key: string): Promise<string | null> => {
+    const { value } = await Preferences.get({ key })
+    return value
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    await Preferences.set({ key, value })
+  },
+  removeItem: async (key: string): Promise<void> => {
+    await Preferences.remove({ key })
+  },
+}
+
+const isNative = Capacitor.isNativePlatform()
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    ...(isNative && { storage: capacitorStorage }),
   },
 })
 
