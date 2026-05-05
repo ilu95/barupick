@@ -125,13 +125,12 @@ workflows:
           echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
           echo "storeFile=/tmp/keystore.jks" >> android/key.properties
 
-      - name: Configure signing in gradle
+      - name: Verify keystore
         script: |
-          cd android/app
-          # Add signing config to build.gradle
-          sed -i 's/android {/android {\n    signingConfigs {\n        release {\n            def keystoreProperties = new Properties()\n            def keystorePropertiesFile = rootProject.file("key.properties")\n            if (keystorePropertiesFile.exists()) {\n                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n            }\n            keyAlias keystoreProperties["keyAlias"]\n            keyPassword keystoreProperties["keyPassword"]\n            storeFile file(keystoreProperties["storeFile"])\n            storePassword keystoreProperties["storePassword"]\n        }\n    }/' build.gradle
-          # Use release signing config
-          sed -i 's/buildTypes {/buildTypes {\n        release {\n            signingConfig signingConfigs.release\n        }/' build.gradle
+          echo "File size: $(wc -c < /tmp/keystore.jks) bytes"
+          echo "Password length: ${#CM_KEYSTORE_PASSWORD}"
+          echo "Alias: $CM_KEY_ALIAS"
+          keytool -list -keystore /tmp/keystore.jks -storepass "$CM_KEYSTORE_PASSWORD" -alias "$CM_KEY_ALIAS" 2>&1 || echo "KEYSTORE VERIFICATION FAILED"
 
       - name: Build AAB
         script: |
