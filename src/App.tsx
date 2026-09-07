@@ -8,6 +8,7 @@ import { ModalProvider } from '@/components/ui/Modal'
 import BottomNav from '@/components/layout/BottomNav'
 import AppHeader from '@/components/layout/AppHeader'
 import OfflineBanner from '@/components/ui/OfflineBanner'
+import StorageFullToaster from '@/components/ui/StorageFullToaster'
 import { useAnalytics } from '@/hooks/useAnalytics'
 
 // Pages — 탭 루트·온보딩·로그인은 즉시, 나머지는 첫 진입 때 로드 (초기 번들 축소)
@@ -107,6 +108,7 @@ export default function App() {
             <AutoSyncProvider>
               <AppHeader />
               <OfflineBanner />
+              <StorageFullToaster />
               <Suspense fallback={<PageLoading />}>
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" replace />} />

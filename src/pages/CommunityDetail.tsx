@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { setJSON } from '@/lib/storage'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -119,7 +120,7 @@ export default function CommunityDetail() {
 
     if (already) {
       const newSaved = saved.filter((s: any) => s.commPostId !== postId)
-      localStorage.setItem('cs_saved', JSON.stringify(newSaved))
+      setJSON('cs_saved', newSaved)
       setBookmarked(false)
       toast.toast({ message: t('communityDetail.saveSuccess') })
       setPost((p: any) => p ? { ...p, save_count: Math.max(0, (p.save_count || 1) - 1) } : p)
@@ -140,7 +141,7 @@ export default function CommunityDetail() {
         midType: 'knit',
         createdAt: new Date().toISOString(),
       })
-      localStorage.setItem('cs_saved', JSON.stringify(saved))
+      setJSON('cs_saved', saved)
       setBookmarked(true)
       toast.success(t('communityDetail.saveSuccess'))
       setPost((p: any) => p ? { ...p, save_count: (p.save_count || 0) + 1 } : p)
@@ -186,7 +187,7 @@ export default function CommunityDetail() {
       const ootdRecord = recs.find((r: any) => r.postId === postId)
       if (ootdRecord) {
         // OOTD 기록이 있으면 기존 편집 흐름 활용
-        localStorage.setItem('_ootd_edit', JSON.stringify(ootdRecord))
+        setJSON('_ootd_edit', ootdRecord)
         navigate('/record?edit=' + ootdRecord.id)
         return
       }
@@ -212,9 +213,9 @@ export default function CommunityDetail() {
     try {
       const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
       recs.unshift(tempRecord)
-      localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
+      setJSON('sp_ootd_records', recs)
     } catch {}
-    localStorage.setItem('_ootd_edit', JSON.stringify(tempRecord))
+    setJSON('_ootd_edit', tempRecord)
     navigate('/record?edit=' + tempRecord.id)
   }
 
@@ -234,7 +235,7 @@ export default function CommunityDetail() {
           try {
             const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
             const ri = recs.findIndex((r: any) => r.postId === postId)
-            if (ri >= 0) { recs[ri].postId = null; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
+            if (ri >= 0) { recs[ri].postId = null; setJSON('sp_ootd_records', recs) }
           } catch {}
           toast.success(t('communityDetail.deleteSuccess'))
           navigate('/community', { replace: true })

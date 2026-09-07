@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════
 
 export const STORAGE_EVENT = 'bp:storage'
+export const STORAGE_FULL_EVENT = 'bp:storage-full'
 
 export class StorageQuotaError extends Error {
   constructor(key: string) { super(`localStorage quota exceeded while writing "${key}"`); this.name = 'StorageQuotaError' }
@@ -25,16 +26,26 @@ export function getJSON<T>(key: string, fallback: T): T {
   } catch { return fallback }
 }
 
-/** 성공하면 true. 용량 초과면 StorageQuotaError를 던진다(호출자가 사용자에게 알려야 함). 그 외 예외는 false. */
-export function setJSON(key: string, value: unknown): boolean {
+function notifyFull(key: string) {
+  console.warn('[storage] quota exceeded:', key)
+  try { window.dispatchEvent(new CustomEvent(STORAGE_FULL_EVENT, { detail: { key } })) } catch {}
+}
+
+/** 문자열 저장. 성공하면 true. 용량 초과면 bp:storage-full 이벤트(StorageFullToaster 가 알림) + false. */
+export function setString(key: string, value: string): boolean {
   try {
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, value)
     return true
   } catch (e) {
-    if (isQuotaError(e)) throw new StorageQuotaError(key)
-    console.warn('[storage] set failed:', key, e)
+    if (isQuotaError(e)) notifyFull(key)
+    else console.warn('[storage] set failed:', key, e)
     return false
   }
+}
+
+/** JSON 저장. 성공하면 true. 용량 초과면 bp:storage-full 이벤트 + false — 호출자는 false 면 "저장 안 됨"으로 다룬다. */
+export function setJSON(key: string, value: unknown): boolean {
+  return setString(key, JSON.stringify(value))
 }
 
 export function removeKeys(keys: readonly string[]) {

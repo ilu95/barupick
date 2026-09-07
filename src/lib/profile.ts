@@ -4,6 +4,7 @@
 // 원본: 바루픽_최신본.html 6405~6444행
 // ================================================================
 
+import { setJSON } from '@/lib/storage'
 import { PERSONAL_COLOR_12 } from './personalColor'
 import { BODY_GUIDE_DATA } from './bodyType'
 import i18n from '@/i18n'
@@ -16,7 +17,7 @@ export const profile = {
     },
     set(data) {
         const current = this.get();
-        localStorage.setItem('cs_profile', JSON.stringify({ ...current, ...data }));
+        setJSON('cs_profile', { ...current, ...data });
     },
     getPersonalColor() { return this.get().personalColor || null; },
     getBodyEffect() { return this.get().bodyEffect || null; },

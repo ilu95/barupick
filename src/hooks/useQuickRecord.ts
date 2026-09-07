@@ -4,6 +4,7 @@
 // 전체 조합 리스트에서 "오늘 이거 입었어요" / "날짜 선택" 지원
 // 기존 sp_ootd_records 포맷 호환
 // ═══════════════════════════════════════════════════════
+import { setJSON } from '@/lib/storage'
 import { useCallback } from 'react'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
@@ -93,7 +94,7 @@ function saveRecord(outfit: Record<string, string>, dateStr: string): { success:
     // 기존 useOotd와 동일하게 최신 기록을 맨 앞에 삽입
     records.unshift(record)
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+    setJSON(STORAGE_KEY, records)
 
     return { success: true, id, date: dateStr }
   } catch (e) {

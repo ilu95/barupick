@@ -8,7 +8,6 @@ export const ROW_SYNC_KEYS = ['sp_ootd_records', 'cs_saved', 'sp_wardrobe'] as c
 
 /** 통짜 blob(user_data)으로 동기화되는 작은 설정 키 */
 export const SYNC_KEYS = [
-  'sp_gamification',    // 레벨/배지/XP
   'cs_personal_color',  // 퍼스널컬러
   'cs_body_effect',     // 체형 효과
   'cs_body_type',       // 체형
@@ -30,6 +29,7 @@ export const USER_SCOPED_KEYS: readonly string[] = [
   'bp_rows_snapshot',
   'bp_rows_since',
   'bp_post_queue',
+  'sp_gamification', // 옛 XP 카운터 (이제 파생 계산, 남아 있으면 지운다)
   'sp_follows',   // 옛 팔로우 캐시 (이제 서버가 진실, 남아 있으면 지운다)
   'sp_friends',
 ]

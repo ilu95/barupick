@@ -59,7 +59,8 @@
     "loadError": "로딩 실패",
     "rankingLoadError": "랭킹 로딩 실패",
     "offline": "오프라인 — 연결되면 자동으로 이어집니다",
-    "actionFailed": "서버 반영에 실패했어요. 잠시 후 다시 시도해 주세요"
+    "actionFailed": "서버 반영에 실패했어요. 잠시 후 다시 시도해 주세요",
+    "storageFull": "저장 공간이 가득 찼어요. 오래된 기록의 사진을 정리해 주세요"
   },
   "nav": {
     "coord": "코디",

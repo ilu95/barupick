@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { setJSON } from '@/lib/storage'
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -115,7 +116,7 @@ export default function ClosetAdd() {
         createdAt: new Date().toISOString(),
       })
       if (items.length > 200) items.length = 200
-      localStorage.setItem('sp_wardrobe', JSON.stringify(items))
+      setJSON('sp_wardrobe', items)
       setSaved(true)
       setTimeout(() => { setSaved(false); resetForm(); setMode('select') }, 1200)
     } catch {}

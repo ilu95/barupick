@@ -1,3 +1,4 @@
+import { setString } from '@/lib/storage'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Check } from 'lucide-react'
@@ -9,7 +10,7 @@ export default function LanguageSettings() {
 
   const changeLanguage = (code: string) => {
     i18n.changeLanguage(code)
-    localStorage.setItem('sp_language', code)
+    setString('sp_language', code)
   }
 
   return (

@@ -3,6 +3,7 @@
 // TodayCoord.tsx — "오늘 뭐 입지?" 결과 페이지
 // 옷장 기반 3개 추천 + 상황 필터 + 마네킹 카드
 // ═══════════════════════════════════════════════════════
+import { setJSON } from '@/lib/storage'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Shirt, Calendar } from 'lucide-react'
@@ -182,7 +183,7 @@ function CoordCard({ result, rank, total, navigate }: {
       postId: null,
       createdAt: Date.now(),
     }
-    localStorage.setItem('_ootd_edit', JSON.stringify(tempRecord))
+    setJSON('_ootd_edit', tempRecord)
     navigate('/record?edit=' + tempRecord.id)
   }
 

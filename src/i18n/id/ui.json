@@ -59,7 +59,8 @@
     "loadError": "Gagal memuat",
     "rankingLoadError": "Gagal memuat peringkat",
     "offline": "Offline — akan dilanjutkan saat terhubung",
-    "actionFailed": "Tidak dapat terhubung ke server. Coba lagi sebentar lagi"
+    "actionFailed": "Tidak dapat terhubung ke server. Coba lagi sebentar lagi",
+    "storageFull": "Penyimpanan penuh. Hapus foto dari catatan lama"
   },
   "nav": {
     "coord": "Padu padan",

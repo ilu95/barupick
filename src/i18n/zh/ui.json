@@ -59,7 +59,8 @@
     "loadError": "加载失败",
     "rankingLoadError": "排行榜加载失败",
     "offline": "离线 — 连接后将自动继续",
-    "actionFailed": "未能同步到服务器，请稍后重试"
+    "actionFailed": "未能同步到服务器，请稍后重试",
+    "storageFull": "存储空间已满。请清理旧记录中的照片"
   },
   "nav": {
     "coord": "搭配",

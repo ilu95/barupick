@@ -308,12 +308,7 @@ export function Challenges() {
     const ok = gamification.claimChallenge(ch.cKey)
     if (ok) {
       setClaimedMsg(`${ch.name} +${20}XP`)
-      // XP 추가
-      try {
-        const gd = JSON.parse(localStorage.getItem('sp_gamification') || '{}')
-        gd.totalXp = (gd.totalXp || 0) + 20
-        localStorage.setItem('sp_gamification', JSON.stringify(gd))
-      } catch {}
+      // XP 는 gamification.getXP() 가 sp_challenges_done 에서 계산한다
       reload()
       setTimeout(() => setClaimedMsg(''), 2500)
     }

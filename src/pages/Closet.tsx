@@ -1,3 +1,4 @@
+import { setJSON } from '@/lib/storage'
 import { useState, useMemo, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -66,7 +67,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
 
   // localStorage 저장 헬퍼
   const persist = useCallback((nextItems: any[]) => {
-    localStorage.setItem('sp_wardrobe', JSON.stringify(nextItems))
+    setJSON('sp_wardrobe', nextItems)
   }, [])
 
   const handleDelete = (id: string) => {
@@ -92,7 +93,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
             // 복원: 원래 위치에 다시 삽입
             const current = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
             current.push(target)
-            localStorage.setItem('sp_wardrobe', JSON.stringify(current))
+            setJSON('sp_wardrobe', current)
             setItems(current)
           },
         })
