@@ -58,7 +58,8 @@
     "addPhoto": "사진 추가",
     "loadError": "로딩 실패",
     "rankingLoadError": "랭킹 로딩 실패",
-    "offline": "오프라인 — 연결되면 자동으로 이어집니다"
+    "offline": "오프라인 — 연결되면 자동으로 이어집니다",
+    "actionFailed": "서버 반영에 실패했어요. 잠시 후 다시 시도해 주세요"
   },
   "nav": {
     "coord": "코디",

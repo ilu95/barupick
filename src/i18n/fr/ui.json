@@ -58,7 +58,8 @@
     "addPhoto": "Ajouter une photo",
     "loadError": "Échec du chargement",
     "rankingLoadError": "Échec du chargement du classement",
-    "offline": "Hors ligne — reprise automatique à la reconnexion"
+    "offline": "Hors ligne — reprise automatique à la reconnexion",
+    "actionFailed": "Impossible de joindre le serveur. Réessayez dans un instant"
   },
   "nav": {
     "coord": "Coord",

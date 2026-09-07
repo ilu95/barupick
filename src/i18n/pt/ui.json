@@ -58,7 +58,8 @@
     "addPhoto": "Adicionar foto",
     "loadError": "Falha ao carregar",
     "rankingLoadError": "Falha ao carregar o ranking",
-    "offline": "Offline — continuará ao reconectar"
+    "offline": "Offline — continuará ao reconectar",
+    "actionFailed": "Não foi possível conectar ao servidor. Tente novamente em instantes"
   },
   "nav": {
     "coord": "Coord",

@@ -58,7 +58,8 @@
     "addPhoto": "添加照片",
     "loadError": "加载失败",
     "rankingLoadError": "排行榜加载失败",
-    "offline": "离线 — 连接后将自动继续"
+    "offline": "离线 — 连接后将自动继续",
+    "actionFailed": "未能同步到服务器，请稍后重试"
   },
   "nav": {
     "coord": "搭配",

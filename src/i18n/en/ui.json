@@ -58,7 +58,8 @@
     "addPhoto": "Add photo",
     "loadError": "Failed to load",
     "rankingLoadError": "Failed to load rankings",
-    "offline": "Offline — will resume when connected"
+    "offline": "Offline — will resume when connected",
+    "actionFailed": "Couldn't reach the server. Please try again in a moment"
   },
   "nav": {
     "coord": "Coord",
