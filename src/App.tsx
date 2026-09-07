@@ -135,6 +135,7 @@ export default function App() {
                   <Route path="/profile/personal-color" element={<PcSelect />} />
                   <Route path="/profile/personal-color/light" element={<PcLight />} />
 
+                  <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
                   <Route path="/auth/login" element={<Auth />} />
                   <Route path="/auth/signup" element={<Auth />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />

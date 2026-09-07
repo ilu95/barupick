@@ -1,10 +1,13 @@
 // @ts-nocheck
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { COLORS_60 } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import i18n from '@/i18n'
+import { useAuth } from '@/contexts/AuthContext'
+import { useWeather } from '@/hooks/useWeather'
+import { setJSON, StorageQuotaError } from '@/lib/storage'
 
 export interface OotdRecord {
   id: string
@@ -70,6 +73,8 @@ function weatherText(code: number): string {
 }
 
 export function useOotd() {
+  const { user } = useAuth()
+  const { weather: weatherData } = useWeather()
   const [colors, setColors] = useState<Record<string, string | null>>({
     top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null,
   })
@@ -82,20 +87,6 @@ export function useOotd() {
   const [itemTypes, setItemTypes] = useState<Record<string, string>>({})
   const [openPicker, setOpenPicker] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
-  const [weatherData, setWeatherData] = useState<any>(null)
-
-  // 날씨 자동 로드
-  useEffect(() => {
-    navigator.geolocation?.getCurrentPosition(async (pos) => {
-      try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m`)
-        const data = await res.json()
-        const c = data.current
-        setWeatherData({ temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature), humidity: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m), code: c.weather_code })
-      } catch {}
-    }, () => {}, { timeout: 5000 })
-  }, [])
-
   const getRecords = useCallback((): OotdRecord[] => {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
@@ -196,12 +187,18 @@ export function useOotd() {
       records.unshift(record)
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+    // 용량 초과(사진 base64 누적)면 저장 자체가 실패한다 — 호출자에게 알린다
+    try {
+      if (!setJSON(STORAGE_KEY, records)) return false
+    } catch (e) {
+      if (e instanceof StorageQuotaError) throw e
+      return false
+    }
 
     // 커뮤니티 공유 (public/friends일 때 Supabase에도 저장) (#9, #19)
     if (record.visibility !== 'private') { (async () => {
       try {
-        const userId = (await supabase.auth.getUser())?.data?.user?.id
+        const userId = user?.id
         if (userId) {
           const outfit: Record<string,string> = {}
           Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v })
@@ -235,7 +232,7 @@ export function useOotd() {
       // 비공개 전환: 기존 커뮤니티 게시물의 visibility를 private으로 업데이트
       (async () => {
         try {
-          const userId = (await supabase.auth.getUser())?.data?.user?.id
+          const userId = user?.id
           if (userId) {
             await supabase.from('posts').update({ visibility: 'private' })
               .eq('id', record.postId).eq('user_id', userId)
@@ -254,12 +251,18 @@ export function useOotd() {
     } catch {}
 
     return record
-  }, [colors, photos, situation, mood, memo, visibility, showInstagram, editId, getRecords, weatherData])
+  }, [colors, photos, situation, mood, memo, visibility, showInstagram, editId, getRecords, weatherData, user])
 
   const deleteRecord = useCallback((id: string) => {
+    const target = getRecords().find(r => r.id === id)
     const records = getRecords().filter(r => r.id !== id)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
-  }, [getRecords])
+    try { setJSON(STORAGE_KEY, records) } catch {}
+    // 공개했던 기록이면 커뮤니티 게시물도 함께 내린다 (고아 게시물 방지)
+    if (target?.postId && user?.id) {
+      supabase.from('posts').delete().eq('id', target.postId).eq('user_id', user.id)
+        .then(({ error }) => { if (error) console.warn('Community post delete error:', error) })
+    }
+  }, [getRecords, user])
 
   const resetForm = useCallback(() => {
     setColors({ top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null })

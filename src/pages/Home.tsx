@@ -14,7 +14,7 @@ export default function Home() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { profile, user } = useAuth()
-  const { weather, loading: wLoading } = useWeather()
+  const { weather, loading: wLoading, refresh: refreshWeather } = useWeather()
 
   // 온보딩 체크
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function Home() {
             )}
           </button>
         ) : (
-          <button onClick={() => navigate('/home/weather')} className="w-full flex items-center gap-2 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-4 py-3.5 text-sm text-warm-500 dark:text-warm-400 shadow-warm-sm active:scale-[0.98] transition-all mb-3">
+          <button onClick={() => { refreshWeather(); navigate('/home/weather') }} className="w-full flex items-center gap-2 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-4 py-3.5 text-sm text-warm-500 dark:text-warm-400 shadow-warm-sm active:scale-[0.98] transition-all mb-3">
             <CloudSun size={16} /> {wLoading ? t('common.loading') : t('weather.noLocation')}
           </button>
         )}

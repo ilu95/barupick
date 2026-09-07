@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { useWeather } from '@/hooks/useWeather'
 // ================================================================
 // RemainingPages.tsx — 나머지 페이지 모음
 // ================================================================
@@ -22,27 +23,7 @@ import { useTranslation } from 'react-i18next'
 export function Weather() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const [weather, setWeather] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // sessionStorage 캐시 먼저 확인
-    try {
-      const cached = JSON.parse(sessionStorage.getItem('_weather') || 'null')
-      if (cached) { setWeather(cached); setLoading(false); return }
-    } catch {}
-
-    navigator.geolocation?.getCurrentPosition(async (pos) => {
-      try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m`)
-        const data = await res.json()
-        const c = data.current
-        const w = { temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature), humidity: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m), code: c.weather_code }
-        setWeather(w)
-        sessionStorage.setItem('_weather', JSON.stringify(w))
-      } catch { setWeather(null) } finally { setLoading(false) }
-    }, () => { setLoading(false) })
-  }, [])
+  const { weather, loading, denied, refresh } = useWeather()
 
   const getAdvice = (feels: number) => {
     if (feels >= 28) return { layer: 'simple', title: t('weather.advice.hotSummer.title'), desc: t('weather.advice.hotSummer.desc'), emoji: '☀️', detail: t('weather.advice.hotSummer.detail'), items: t('weather.advice.hotSummer.items', { returnObjects: true }) as string[], colorTip: t('weather.advice.hotSummer.colorTip') }
@@ -125,6 +106,9 @@ export function Weather() {
           <div className="text-4xl mb-3">📍</div>
           <div className="text-sm text-warm-600 dark:text-warm-400 mb-1">{t('weather.noLocation')}</div>
           <div className="text-xs text-warm-500 dark:text-warm-500">{t('weather.noLocationDesc')}</div>
+          <button onClick={() => refresh()} className="mt-5 px-5 py-2.5 rounded-full bg-terra-500 text-white text-sm font-semibold active:scale-95 transition-all shadow-terra">
+            {denied ? t('weather.noLocation') : t('common.retry')}
+          </button>
         </div>
       )}
     </div>

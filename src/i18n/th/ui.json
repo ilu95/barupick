@@ -57,7 +57,8 @@
     "generateFailed": "การสร้างล้มเหลว",
     "addPhoto": "เพิ่มรูปภาพ",
     "loadError": "โหลดไม่สำเร็จ",
-    "rankingLoadError": "โหลดอันดับไม่สำเร็จ"
+    "rankingLoadError": "โหลดอันดับไม่สำเร็จ",
+    "offline": "ออฟไลน์ — จะดำเนินการต่อเมื่อเชื่อมต่อ"
   },
   "nav": {
     "coord": "จับคู่",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "กรุณาพิมพ์ \"DELETE\" ให้ถูกต้อง",
     "deleteAccountSuccess": "บัญชีของคุณถูกลบแล้ว ขอบคุณที่ใช้ BaruPick",
-    "deleteAccountError": "เกิดข้อผิดพลาดในการลบบัญชี: {{error}}"
+    "deleteAccountError": "เกิดข้อผิดพลาดในการลบบัญชี: {{error}}",
+    "syncPending": "รอการอัปโหลดการเปลี่ยนแปลง",
+    "syncErrorState": "ซิงค์ครั้งล่าสุดล้มเหลว — แตะ ซิงค์ตอนนี้ เพื่อลองใหม่"
   },
   "feedbackModal": {
     "title": "ส่งความคิดเห็น",
@@ -570,7 +573,8 @@
     "moodLabel": "อารมณ์",
     "visibilityLabel": "การมองเห็น",
     "publicNotice": "🌐 แชร์ไปชุมชนทันที · ต้องมีรูปภาพ",
-    "viewCalendar": "ดูปฏิทินการจับคู่"
+    "viewCalendar": "ดูปฏิทินการจับคู่",
+    "storageFull": "พื้นที่จัดเก็บเต็ม กรุณาลบรูปจากบันทึกเก่า"
   },
   "ootdCalendar": {
     "weekDays": [

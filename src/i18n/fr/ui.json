@@ -57,7 +57,8 @@
     "generateFailed": "Échec de la génération",
     "addPhoto": "Ajouter une photo",
     "loadError": "Échec du chargement",
-    "rankingLoadError": "Échec du chargement du classement"
+    "rankingLoadError": "Échec du chargement du classement",
+    "offline": "Hors ligne — reprise automatique à la reconnexion"
   },
   "nav": {
     "coord": "Coord",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "Veuillez taper \"DELETE\" exactement",
     "deleteAccountSuccess": "Votre compte a été supprimé. Merci d'avoir utilisé BaruPick.",
-    "deleteAccountError": "Erreur lors de la suppression du compte : {{error}}"
+    "deleteAccountError": "Erreur lors de la suppression du compte : {{error}}",
+    "syncPending": "Modifications en attente d’envoi",
+    "syncErrorState": "Dernière synchronisation échouée — appuyez sur Synchroniser"
   },
   "feedbackModal": {
     "title": "Envoyer un commentaire",
@@ -570,7 +573,8 @@
     "moodLabel": "Humeur",
     "visibilityLabel": "Visibilité",
     "publicNotice": "🌐 Partagé dans la communauté immédiatement · Photo requise",
-    "viewCalendar": "Voir le calendrier de coords"
+    "viewCalendar": "Voir le calendrier de coords",
+    "storageFull": "Stockage plein. Supprimez des photos d’anciens enregistrements"
   },
   "ootdCalendar": {
     "weekDays": [

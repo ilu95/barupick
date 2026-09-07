@@ -57,7 +57,8 @@
     "generateFailed": "Tạo thất bại",
     "addPhoto": "Thêm ảnh",
     "loadError": "Tải thất bại",
-    "rankingLoadError": "Tải bảng xếp hạng thất bại"
+    "rankingLoadError": "Tải bảng xếp hạng thất bại",
+    "offline": "Ngoại tuyến — sẽ tiếp tục khi có kết nối"
   },
   "nav": {
     "coord": "Phối đồ",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "Vui lòng nhập chính xác \"DELETE\"",
     "deleteAccountSuccess": "Tài khoản của bạn đã bị xóa. Cảm ơn bạn đã sử dụng BaruPick.",
-    "deleteAccountError": "Lỗi khi xóa tài khoản: {{error}}"
+    "deleteAccountError": "Lỗi khi xóa tài khoản: {{error}}",
+    "syncPending": "Thay đổi đang chờ tải lên",
+    "syncErrorState": "Đồng bộ lần cuối thất bại — nhấn Đồng bộ ngay để thử lại"
   },
   "feedbackModal": {
     "title": "Gửi phản hồi",
@@ -570,7 +573,8 @@
     "moodLabel": "Tâm trạng",
     "visibilityLabel": "Hiển thị",
     "publicNotice": "🌐 Chia sẻ ngay lên cộng đồng · Cần có ảnh",
-    "viewCalendar": "Xem lịch phối đồ"
+    "viewCalendar": "Xem lịch phối đồ",
+    "storageFull": "Bộ nhớ đã đầy. Hãy xóa ảnh ở các bản ghi cũ"
   },
   "ootdCalendar": {
     "weekDays": [

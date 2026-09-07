@@ -57,7 +57,8 @@
     "generateFailed": "生成失败",
     "addPhoto": "添加照片",
     "loadError": "加载失败",
-    "rankingLoadError": "排行榜加载失败"
+    "rankingLoadError": "排行榜加载失败",
+    "offline": "离线 — 连接后将自动继续"
   },
   "nav": {
     "coord": "搭配",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "删除账号",
     "deleteAccountValidation": "请准确输入\"删除账号\"",
     "deleteAccountSuccess": "账号已删除。感谢您的使用。",
-    "deleteAccountError": "删除账号时出错：{{error}}"
+    "deleteAccountError": "删除账号时出错：{{error}}",
+    "syncPending": "更改等待上传",
+    "syncErrorState": "上次同步失败 — 点击“立即同步”重试"
   },
   "feedbackModal": {
     "title": "发送反馈",
@@ -570,7 +573,8 @@
     "moodLabel": "心情",
     "visibilityLabel": "可见范围",
     "publicNotice": "🌐 记录后将立即在社区公开 · 需要穿搭照",
-    "viewCalendar": "查看搭配日历"
+    "viewCalendar": "查看搭配日历",
+    "storageFull": "存储空间已满。请清理旧记录中的照片"
   },
   "ootdCalendar": {
     "weekDays": [
