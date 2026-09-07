@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useWeather } from '@/hooks/useWeather'
 import { setJSON, StorageQuotaError } from '@/lib/storage'
 import { enqueuePost } from '@/lib/postQueue'
+import { sortRecordsDesc } from '@/lib/records'
 
 export interface OotdRecord {
   id: string
@@ -89,10 +90,10 @@ export function useOotd() {
   const getRecords = useCallback((): OotdRecord[] => {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-      return raw.map((r: any) => {
+      return sortRecordsDesc(raw.map((r: any) => {
         if (!r.id) r.id = r.date + '_' + ((r.createdAt || Date.now()).toString(36))
         return r
-      })
+      }))
     } catch { return [] }
   }, [])
 

@@ -8,6 +8,7 @@
 // ═══════════════════════════════════════════════════════
 import { supabase } from '@/lib/supabase'
 import { getJSON, setJSON } from '@/lib/storage'
+import { sortRecordsDesc } from '@/lib/records'
 
 export type RowKind = 'ootd' | 'saved' | 'wardrobe'
 export const ROW_KINDS: { kind: RowKind; key: string }[] = [
@@ -121,13 +122,8 @@ export async function pullRows(userId: string): Promise<{ applied: number; faile
         prev[row.id] = rh
       }
       if (changed) {
-        // 순서: 기존 순서 유지 + 새 항목은 createdAt 내림차순 위치로 (없으면 앞에)
-        const merged = arr.filter(it => byId.has(it.id)).map(it => byId.get(it.id)!)
-        const known = new Set(merged.map(it => it.id))
-        const added = [...byId.values()].filter(it => !known.has(it.id))
-        const ts = (it: Item) => { const c = it.createdAt; return typeof c === 'number' ? c : c ? new Date(c).getTime() || 0 : 0 }
-        const out = [...added, ...merged].sort((a, b) => ts(b) - ts(a))
-        setJSON(key, out)
+        // 순서: 날짜 내림차순 → createdAt 내림차순 (기기마다 "최근"이 달라 보이지 않게)
+        setJSON(key, sortRecordsDesc([...byId.values()]))
         applied++
       }
       s[kind] = prev
