@@ -9,13 +9,14 @@
 // - 변경 감지는 lib/storage의 전역 watcher 구독 (setItem 몽키패치를 user마다 걸고 풀지 않음)
 // - 상태(syncing/error/lastAt)를 useSyncStatus로 노출
 //
-// 아직 통짜 blob(LWW)이다. 행 단위 전환은 다음 단계.
+// 기록·저장 코디·옷장은 행 단위(lib/rowSync, user_items). 작은 설정만 blob(user_data).
 // ═══════════════════════════════════════════════════════
 import { useEffect, useRef, useCallback, useSyncExternalStore } from 'react'
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import i18n, { getLocale } from '@/i18n'
-import { SYNC_KEYS, MERGEABLE_ARRAY_KEYS } from '@/lib/localKeys'
+import { SYNC_KEYS, ROW_SYNC_KEYS } from '@/lib/localKeys'
+import { pushRows, pullRows, bootstrapRows, hasLocalRowChanges } from '@/lib/rowSync'
 import { onStorageChange } from '@/lib/storage'
 import { onAppResume, onAppBackground, onNetworkChange, isOnline } from '@/lib/appLifecycle'
 
@@ -64,9 +65,8 @@ function parseArray(v: unknown): Array<{ id?: string }> | null {
 }
 
 /**
- * 게스트 → 로그인 승격 병합.
- * id 배열 키는 서버 ∪ 로컬(서버에 없는 id만 추가), 나머지는 서버 값이 있으면 서버, 없으면 로컬.
- * 반환: 로컬에 써야 할 최종 값 맵, 그리고 서버에 없던 것이 있어 push가 필요한지.
+ * 게스트 → 로그인 승격 병합 (blob 키): 서버 값이 있으면 서버, 없으면 로컬.
+ * 옛 blob 에 배열 키(기록·옷장·저장)가 남아 있으면 rowSync 부트스트랩 전에 로컬로 내려 행으로 올라가게 한다.
  */
 function mergeGuestData(server: Payload): { merged: Payload; needsPush: boolean } {
   const merged: Payload = {}
@@ -74,18 +74,16 @@ function mergeGuestData(server: Payload): { merged: Payload; needsPush: boolean 
   SYNC_KEYS.forEach(key => {
     const sv = server[key]
     const lv = localStorage.getItem(key)
-    if ((MERGEABLE_ARRAY_KEYS as readonly string[]).includes(key)) {
-      const sArr = parseArray(sv) || []
-      const lArr = parseArray(lv) || []
-      if (lArr.length === 0) { if (sv != null) merged[key] = asString(sv); return }
-      const ids = new Set(sArr.map(r => r?.id).filter(Boolean))
-      const extra = lArr.filter(r => r?.id && !ids.has(r.id))
-      if (extra.length > 0) needsPush = true
-      merged[key] = JSON.stringify([...sArr, ...extra])
-      return
-    }
     if (sv != null) merged[key] = asString(sv)
     else if (lv != null) { merged[key] = lv; needsPush = true }
+  })
+  ROW_SYNC_KEYS.forEach(key => {
+    const sArr = parseArray(server[key]) || []
+    const lArr = parseArray(localStorage.getItem(key)) || []
+    if (sArr.length === 0) return
+    const ids = new Set(lArr.map(r => r?.id).filter(Boolean))
+    const extra = sArr.filter(r => r?.id && !ids.has(r.id))
+    if (extra.length > 0) merged[key] = JSON.stringify([...lArr, ...extra])
   })
   return { merged, needsPush }
 }
@@ -125,13 +123,18 @@ export function useAutoSync() {
         })
         localStorage.setItem('_sync_owner', userId)
         if (serverTime) localStorage.setItem('_sync_ts', String(serverTime))
-        if (changed > 0) window.dispatchEvent(new CustomEvent('sync-pulled', { detail: { count: changed } }))
+        // 기록·옷장·저장 코디: 서버에 행이 없으면 로컬 전부 올리고, 있으면 받아 병합
+        await bootstrapRows(userId)
+        const boot = await pullRows(userId)
+        if (changed > 0 || boot.applied > 0) window.dispatchEvent(new CustomEvent('sync-pulled', { detail: { count: changed + boot.applied } }))
         if (needsPush || !serverData) schedulePushRef.current?.(0)
-        setStatus({ state: 'idle', lastError: null })
+        setStatus({ state: boot.failed ? 'error' : 'idle', lastError: boot.failed ? 'rows' : null })
         return
       }
 
-      if (!serverData) { setStatus({ state: 'idle', lastError: null }); return }
+      const rows = await pullRows(userId)
+      if (rows.applied > 0) window.dispatchEvent(new CustomEvent('sync-pulled', { detail: { count: rows.applied } }))
+      if (!serverData) { setStatus({ state: rows.failed ? 'error' : 'idle', lastError: rows.failed ? 'rows' : null }); return }
 
       if (serverTime > localTime) {
         let pulled = 0
@@ -158,12 +161,14 @@ export function useAutoSync() {
   const pushToServer = useCallback(async (opts: { keepalive?: boolean } = {}) => {
     if (!userId) return
     if (!isOnline()) { setStatus({ state: 'offline', pending: true }); return }
+    setStatus({ state: 'syncing' })
+    // 1) 기록·옷장·저장 코디: 바뀐 행만 (keepalive 경로에서도 supabase-js 로 시도 — 실패하면 다음 기회에)
+    const rows = await pushRows(userId)
     const payload = collectLocal()
     const now = Date.now()
     payload._synced_at = new Date(now).toISOString()
     const row = { user_id: userId, data: payload, updated_at: new Date(now).toISOString() }
 
-    setStatus({ state: 'syncing' })
     try {
       if (opts.keepalive) {
         const { data: { session } } = await supabase.auth.getSession()
@@ -185,7 +190,8 @@ export function useAutoSync() {
         if (error) throw error
       }
       localStorage.setItem('_sync_ts', String(now))
-      setStatus({ state: 'idle', lastAt: now, lastError: null, pending: false })
+      if (rows.failed) setStatus({ state: 'error', lastAt: now, lastError: 'rows', pending: true })
+      else setStatus({ state: 'idle', lastAt: now, lastError: null, pending: false })
     } catch (e) {
       console.warn('[Sync] Push failed:', e)
       setStatus({ state: 'error', lastError: (e as Error)?.message || String(e), pending: true })
@@ -206,13 +212,13 @@ export function useAutoSync() {
   const flushPending = useCallback((keepalive = false) => {
     if (!userId) return
     if (pushTimerRef.current) { clearTimeout(pushTimerRef.current); pushTimerRef.current = null; return pushToServer({ keepalive }) }
-    if (status.pending) return pushToServer({ keepalive })
+    if (status.pending || hasLocalRowChanges()) return pushToServer({ keepalive })
   }, [userId, pushToServer])
 
   // ── 로컬 변경 감지 ──
   useEffect(() => {
     if (!userId) return
-    const off = onStorageChange(SYNC_KEYS, () => schedulePush())
+    const off = onStorageChange([...SYNC_KEYS, ...ROW_SYNC_KEYS], () => schedulePush())
     return () => { off(); if (pushTimerRef.current) clearTimeout(pushTimerRef.current) }
   }, [userId, schedulePush])
 
