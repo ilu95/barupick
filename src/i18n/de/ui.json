@@ -57,7 +57,8 @@
     "generateFailed": "Generierung fehlgeschlagen",
     "addPhoto": "Foto hinzufügen",
     "loadError": "Laden fehlgeschlagen",
-    "rankingLoadError": "Rangliste konnte nicht geladen werden"
+    "rankingLoadError": "Rangliste konnte nicht geladen werden",
+    "offline": "Offline — wird bei Verbindung fortgesetzt"
   },
   "nav": {
     "coord": "Outfit",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "Bitte gib genau \"DELETE\" ein",
     "deleteAccountSuccess": "Dein Konto wurde gelöscht. Vielen Dank für die Nutzung von BaruPick.",
-    "deleteAccountError": "Fehler beim Löschen des Kontos: {{error}}"
+    "deleteAccountError": "Fehler beim Löschen des Kontos: {{error}}",
+    "syncPending": "Änderungen warten auf Upload",
+    "syncErrorState": "Letzte Synchronisierung fehlgeschlagen — „Jetzt synchronisieren“ tippen"
   },
   "feedbackModal": {
     "title": "Feedback senden",
@@ -570,7 +573,8 @@
     "moodLabel": "Stimmung",
     "visibilityLabel": "Sichtbarkeit",
     "publicNotice": "🌐 Sofort in der Community geteilt · Foto erforderlich",
-    "viewCalendar": "Outfit-Kalender ansehen"
+    "viewCalendar": "Outfit-Kalender ansehen",
+    "storageFull": "Speicher voll. Entferne Fotos aus älteren Einträgen"
   },
   "ootdCalendar": {
     "weekDays": [
@@ -610,7 +614,9 @@
     "alreadyShared": "Dieser Eintrag wurde bereits geteilt",
     "todaysCoord": "Heutiges Outfit",
     "shareError": "Beim Teilen ist ein Fehler aufgetreten",
-    "recordCount": "{{count}} Einträge"
+    "recordCount": "{{count}} Einträge",
+    "publishPending": "Wartet auf Veröffentlichung — tippen zum Wiederholen",
+    "publishQueued": "Eingereiht — erscheint nach dem Foto-Upload"
   },
   "community": {
     "tabs": {
@@ -637,7 +643,9 @@
       "events": "Events"
     },
     "empty": "Noch keine Beiträge",
-    "feedCardLabel": "{{nick}}s Outfit{{title}}"
+    "feedCardLabel": "{{nick}}s Outfit{{title}}",
+    "likeFailed": "Like konnte nicht gespeichert werden. Bitte erneut versuchen",
+    "followFailed": "Folgen konnte nicht aktualisiert werden. Bitte erneut versuchen"
   },
   "communityDetail": {
     "like": "Gefällt mir",

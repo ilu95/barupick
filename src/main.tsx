@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom/client'
 import './i18n'
 import App from './App'
 import './index.css'
+import { installStorageWatcher } from './lib/storage'
+import { installAppLifecycle } from './lib/appLifecycle'
+
+installStorageWatcher()
+installAppLifecycle()
 
 // ─── localStorage 마이그레이션 (HTML→React 전환 시 1회 실행) ───
 ;(function migrateLocalStorage() {

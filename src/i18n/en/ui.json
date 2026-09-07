@@ -57,7 +57,8 @@
     "generateFailed": "Generation failed",
     "addPhoto": "Add photo",
     "loadError": "Failed to load",
-    "rankingLoadError": "Failed to load rankings"
+    "rankingLoadError": "Failed to load rankings",
+    "offline": "Offline — will resume when connected"
   },
   "nav": {
     "coord": "Coord",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "Please type \"DELETE\" exactly",
     "deleteAccountSuccess": "Your account has been deleted. Thank you for using BaruPick.",
-    "deleteAccountError": "Error deleting account: {{error}}"
+    "deleteAccountError": "Error deleting account: {{error}}",
+    "syncPending": "Changes waiting to upload",
+    "syncErrorState": "Last sync failed — tap Sync now to retry"
   },
   "feedbackModal": {
     "title": "Send Feedback",
@@ -570,7 +573,8 @@
     "moodLabel": "Mood",
     "visibilityLabel": "Visibility",
     "publicNotice": "🌐 Shared to community immediately · Photo required",
-    "viewCalendar": "View coord calendar"
+    "viewCalendar": "View coord calendar",
+    "storageFull": "Storage is full. Remove photos from older records to continue"
   },
   "ootdCalendar": {
     "weekDays": [
@@ -610,7 +614,9 @@
     "alreadyShared": "This record is already shared",
     "todaysCoord": "Today's Outfit",
     "shareError": "An error occurred while sharing",
-    "recordCount": "{{count}} records"
+    "recordCount": "{{count}} records",
+    "publishPending": "Waiting to post to community — tap to retry now",
+    "publishQueued": "Queued — will appear in community after photos upload"
   },
   "community": {
     "tabs": {
@@ -637,7 +643,9 @@
       "events": "Events"
     },
     "empty": "No posts yet",
-    "feedCardLabel": "{{nick}}'s outfit{{title}}"
+    "feedCardLabel": "{{nick}}'s outfit{{title}}",
+    "likeFailed": "Couldn't save your like. Please try again",
+    "followFailed": "Couldn't update follow. Please try again"
   },
   "communityDetail": {
     "like": "Like",

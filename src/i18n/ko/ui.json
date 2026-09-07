@@ -57,7 +57,8 @@
     "generateFailed": "생성 실패",
     "addPhoto": "사진 추가",
     "loadError": "로딩 실패",
-    "rankingLoadError": "랭킹 로딩 실패"
+    "rankingLoadError": "랭킹 로딩 실패",
+    "offline": "오프라인 — 연결되면 자동으로 이어집니다"
   },
   "nav": {
     "coord": "코디",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "계정삭제",
     "deleteAccountValidation": "\"계정삭제\"를 정확히 입력해주세요",
     "deleteAccountSuccess": "계정이 삭제되었어요. 이용해주셔서 감사합니다.",
-    "deleteAccountError": "계정 삭제 중 오류: {{error}}"
+    "deleteAccountError": "계정 삭제 중 오류: {{error}}",
+    "syncPending": "변경사항 업로드 대기 중",
+    "syncErrorState": "마지막 동기화 실패 — 지금 동기화를 눌러 다시 시도하세요"
   },
   "feedbackModal": {
     "title": "피드백 보내기",
@@ -570,7 +573,8 @@
     "moodLabel": "기분",
     "visibilityLabel": "공개 범위",
     "publicNotice": "🌐 기록 시 커뮤니티에 바로 공개 · 착용샷 필수",
-    "viewCalendar": "코디 캘린더 보기"
+    "viewCalendar": "코디 캘린더 보기",
+    "storageFull": "저장 공간이 가득 찼어요. 오래된 기록의 사진을 정리해 주세요"
   },
   "ootdCalendar": {
     "weekDays": [
@@ -610,7 +614,9 @@
     "alreadyShared": "이미 공유된 기록이에요",
     "todaysCoord": "오늘의 코디",
     "shareError": "공유 중 오류가 발생했어요",
-    "recordCount": "{{count}}개의 기록"
+    "recordCount": "{{count}}개의 기록",
+    "publishPending": "커뮤니티 게시 대기 중 — 탭하면 지금 다시 시도",
+    "publishQueued": "게시 예약됨 — 사진 업로드 후 커뮤니티에 올라가요"
   },
   "community": {
     "tabs": {
@@ -637,7 +643,9 @@
       "events": "이벤트"
     },
     "empty": "아직 게시물이 없어요",
-    "feedCardLabel": "{{nick}}의 코디{{title}}"
+    "feedCardLabel": "{{nick}}의 코디{{title}}",
+    "likeFailed": "좋아요 반영에 실패했어요. 다시 시도해 주세요",
+    "followFailed": "팔로우 반영에 실패했어요. 다시 시도해 주세요"
   },
   "communityDetail": {
     "like": "좋아요",

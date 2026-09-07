@@ -57,7 +57,8 @@
     "generateFailed": "Gagal membuat",
     "addPhoto": "Tambah foto",
     "loadError": "Gagal memuat",
-    "rankingLoadError": "Gagal memuat peringkat"
+    "rankingLoadError": "Gagal memuat peringkat",
+    "offline": "Offline — akan dilanjutkan saat terhubung"
   },
   "nav": {
     "coord": "Padu padan",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "Silakan ketik \"DELETE\" dengan tepat",
     "deleteAccountSuccess": "Akun Anda telah dihapus. Terima kasih telah menggunakan BaruPick.",
-    "deleteAccountError": "Gagal menghapus akun: {{error}}"
+    "deleteAccountError": "Gagal menghapus akun: {{error}}",
+    "syncPending": "Perubahan menunggu diunggah",
+    "syncErrorState": "Sinkronisasi terakhir gagal — ketuk Sinkronkan sekarang"
   },
   "feedbackModal": {
     "title": "Kirim Masukan",
@@ -570,7 +573,8 @@
     "moodLabel": "Suasana hati",
     "visibilityLabel": "Visibilitas",
     "publicNotice": "🌐 Dibagikan ke komunitas segera · Foto diperlukan",
-    "viewCalendar": "Lihat kalender padu padan"
+    "viewCalendar": "Lihat kalender padu padan",
+    "storageFull": "Penyimpanan penuh. Hapus foto dari catatan lama"
   },
   "ootdCalendar": {
     "weekDays": [
@@ -610,7 +614,9 @@
     "alreadyShared": "Catatan ini sudah dibagikan",
     "todaysCoord": "Outfit Hari Ini",
     "shareError": "Terjadi kesalahan saat membagikan",
-    "recordCount": "{{count}} catatan"
+    "recordCount": "{{count}} catatan",
+    "publishPending": "Menunggu diposting ke komunitas — ketuk untuk coba lagi",
+    "publishQueued": "Dalam antrean — tampil setelah foto terunggah"
   },
   "community": {
     "tabs": {
@@ -637,7 +643,9 @@
       "events": "Event"
     },
     "empty": "Belum ada postingan",
-    "feedCardLabel": "Outfit {{nick}}{{title}}"
+    "feedCardLabel": "Outfit {{nick}}{{title}}",
+    "likeFailed": "Suka gagal disimpan. Coba lagi",
+    "followFailed": "Ikuti gagal diperbarui. Coba lagi"
   },
   "communityDetail": {
     "like": "Suka",

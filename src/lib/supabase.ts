@@ -7,8 +7,20 @@ import { Preferences } from '@capacitor/preferences'
 const DEV_URL = 'https://ywqaxxcvzhwhascbkyhp.supabase.co'
 const DEV_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3cWF4eGN2emh3aGFzY2JreWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjkwNzQsImV4cCI6MjA4ODU0NTA3NH0.J6cG4PRaG0ldNYcXzVOCAvcI1qypjmxh1NRA5Dc2tsw'
 
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || DEV_URL
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || DEV_KEY
+const envUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+
+// 프로덕션 빌드가 조용히 개발 DB에 붙는 사고를 막는다.
+// - 기본: 빌드 로그에 경고 (vite.config.ts) + 런타임 콘솔 경고
+// - VITE_STRICT_ENV=1 (Vercel Production 에 설정 권장): env 없으면 앱 시작 자체를 막는다
+if (import.meta.env.PROD && (!envUrl || !envKey)) {
+  const msg = '[BaruPick] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY 미설정 — 개발 DB로 동작 중'
+  if (import.meta.env.VITE_STRICT_ENV === '1') throw new Error(msg)
+  console.warn(msg)
+}
+
+export const SUPABASE_URL = envUrl || DEV_URL
+export const SUPABASE_ANON_KEY = envKey || DEV_KEY
 
 // 프로덕션 감지 로그
 if (typeof window !== 'undefined' && SUPABASE_URL !== DEV_URL) {

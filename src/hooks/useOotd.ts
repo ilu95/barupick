@@ -1,10 +1,12 @@
 // @ts-nocheck
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { COLORS_60 } from '@/lib/colors'
-import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
-import i18n from '@/i18n'
+import { useAuth } from '@/contexts/AuthContext'
+import { useWeather } from '@/hooks/useWeather'
+import { setJSON, StorageQuotaError } from '@/lib/storage'
+import { enqueuePost } from '@/lib/postQueue'
 
 export interface OotdRecord {
   id: string
@@ -70,6 +72,8 @@ function weatherText(code: number): string {
 }
 
 export function useOotd() {
+  const { user } = useAuth()
+  const { weather: weatherData } = useWeather()
   const [colors, setColors] = useState<Record<string, string | null>>({
     top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null,
   })
@@ -82,20 +86,6 @@ export function useOotd() {
   const [itemTypes, setItemTypes] = useState<Record<string, string>>({})
   const [openPicker, setOpenPicker] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
-  const [weatherData, setWeatherData] = useState<any>(null)
-
-  // 날씨 자동 로드
-  useEffect(() => {
-    navigator.geolocation?.getCurrentPosition(async (pos) => {
-      try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m`)
-        const data = await res.json()
-        const c = data.current
-        setWeatherData({ temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature), humidity: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m), code: c.weather_code })
-      } catch {}
-    }, () => {}, { timeout: 5000 })
-  }, [])
-
   const getRecords = useCallback((): OotdRecord[] => {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
@@ -196,52 +186,19 @@ export function useOotd() {
       records.unshift(record)
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+    // 용량 초과(사진 base64 누적)면 저장 자체가 실패한다 — 호출자에게 알린다
+    try {
+      if (!setJSON(STORAGE_KEY, records)) return false
+    } catch (e) {
+      if (e instanceof StorageQuotaError) throw e
+      return false
+    }
 
-    // 커뮤니티 공유 (public/friends일 때 Supabase에도 저장) (#9, #19)
-    if (record.visibility !== 'private') { (async () => {
-      try {
-        const userId = (await supabase.auth.getUser())?.data?.user?.id
-        if (userId) {
-          const outfit: Record<string,string> = {}
-          Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v })
-          
-          if (record.postId) {
-            // 수정
-            await supabase.from('posts').update({
-              outfit, score: record.score, caption: record.memo || null,
-              visibility: record.visibility, show_instagram: record.showInstagram,
-            }).eq('id', record.postId)
-          } else {
-            // 신규
-            const { data: inserted } = await supabase.from('posts').insert({
-              user_id: userId, title: record.memo?.slice(0,100) || i18n.t('ootdDetail.todaysCoord'),
-              outfit, score: record.score, style: null, layer_type: 'basic',
-              caption: record.memo?.slice(0,200) || null, photo_urls: record.photos.length > 0 ? record.photos : null,
-              status: 'approved', visibility: record.visibility,
-              show_instagram: record.showInstagram, hide_counts: false,
-            }).select('id').single()
-            if (inserted?.id) {
-              record.postId = inserted.id
-              // localStorage 업데이트
-              const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-              const ri = recs.findIndex((r: any) => r.id === record.id)
-              if (ri >= 0) { recs[ri].postId = inserted.id; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
-            }
-          }
-        }
-      } catch(e) { console.warn('Community post error:', e) } })()
+    // 커뮤니티 반영은 큐로 (실패해도 잃지 않고, 재개·온라인 복귀 때 다시 시도)
+    if (record.visibility !== 'private') {
+      enqueuePost({ recordId: record.id, op: 'publish', visibility: record.visibility })
     } else if (record.postId) {
-      // 비공개 전환: 기존 커뮤니티 게시물의 visibility를 private으로 업데이트
-      (async () => {
-        try {
-          const userId = (await supabase.auth.getUser())?.data?.user?.id
-          if (userId) {
-            await supabase.from('posts').update({ visibility: 'private' })
-              .eq('id', record.postId).eq('user_id', userId)
-          }
-        } catch(e) { console.warn('Visibility update error:', e) }
-      })()
+      enqueuePost({ recordId: record.id, op: 'private' })
     }
 
     // gamification
@@ -254,11 +211,14 @@ export function useOotd() {
     } catch {}
 
     return record
-  }, [colors, photos, situation, mood, memo, visibility, showInstagram, editId, getRecords, weatherData])
+  }, [colors, photos, situation, mood, memo, visibility, showInstagram, editId, getRecords, weatherData, user])
 
   const deleteRecord = useCallback((id: string) => {
+    const target = getRecords().find(r => r.id === id)
     const records = getRecords().filter(r => r.id !== id)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+    try { setJSON(STORAGE_KEY, records) } catch {}
+    // 공개했던 기록이면 커뮤니티 게시물도 함께 내린다 (고아 게시물 방지) — 큐로, 실패해도 재시도
+    if (target?.postId) enqueuePost({ recordId: id, op: 'delete', postId: target.postId })
   }, [getRecords])
 
   const resetForm = useCallback(() => {

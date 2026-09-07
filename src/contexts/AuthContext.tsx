@@ -3,6 +3,8 @@ import { registerPlugin } from '@capacitor/core'
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { trackSocialLogin, trackSignup, setAnalyticsUser } from '@/lib/analytics'
+import { USER_SCOPED_KEYS } from '@/lib/localKeys'
+import { removeKeys } from '@/lib/storage'
 
 // iOS 번들 ID — Apple 네이티브 로그인 시 id_token의 aud 클레임에 사용됨
 const IOS_BUNDLE_ID = 'kr.co.barusa.barupick'
@@ -237,6 +239,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch { }
     await supabase.auth.signOut()
+    // 이 계정의 로컬 데이터를 지운다 — 다음에 로그인하는 사람이 앞 사람 기록을 보거나,
+    // 동기화가 앞 사람 데이터를 새 계정으로 올리는 일을 막는다. 기기 설정(다크모드 등)은 남긴다.
+    removeKeys(USER_SCOPED_KEYS)
     setUser(null)
     setProfile(null)
   }

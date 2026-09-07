@@ -7,12 +7,19 @@ import { useCommunity, type CommTab, type SortMode, type ContentFilter, type Fri
 import { STYLE_GUIDE } from '@/lib/styles'
 import { useAuth } from '@/contexts/AuthContext'
 import { useScrollRestore } from '@/hooks/useScrollRestore'
+import { useToast } from '@/components/ui/Toast'
 
 export default function Community() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { user } = useAuth()
   const comm = useCommunity()
+  const toast = useToast()
+  const onLike = useCallback(async (postId: string) => {
+    if (!user) { toast.toast({ message: t('common.loginRequired'), variant: 'info' }); navigate('/auth/login'); return }
+    const r = await comm.toggleLike(postId)
+    if (!r.ok) toast.error(r.message)
+  }, [user, comm.toggleLike, toast, navigate, t])
   const observerRef = useRef<IntersectionObserver | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
@@ -79,7 +86,7 @@ export default function Community() {
               <FeedCard
                 post={post}
                 isLiked={comm.myLikes.has(post.id)}
-                onLike={comm.toggleLike}
+                onLike={onLike}
                 showComments={comm.tab === 'friends'}
               />
             </div>

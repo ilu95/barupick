@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
@@ -9,42 +9,62 @@ import BottomNav from '@/components/layout/BottomNav'
 import AppHeader from '@/components/layout/AppHeader'
 import { useAnalytics } from '@/hooks/useAnalytics'
 
-// Pages
+// Pages — 탭 루트·온보딩·로그인은 즉시, 나머지는 첫 진입 때 로드 (초기 번들 축소)
 import Home from '@/pages/Home'
 import Community from '@/pages/Community'
-import CommunityDetail from '@/pages/CommunityDetail'
-import CommunityPost from '@/pages/CommunityPost'
+const CommunityDetail = lazy(() => import('@/pages/CommunityDetail'))
+const CommunityPost = lazy(() => import('@/pages/CommunityPost'))
 import RecommendCoord from '@/pages/RecommendCoord'
 import BuildCoord from '@/pages/BuildCoord'
 import Profile from '@/pages/Profile'
 import Auth from '@/pages/Auth'
 import AuthCallback from '@/pages/AuthCallback'
-import Settings from '@/pages/Settings'
-import LanguageSettings from '@/pages/LanguageSettings'
+const Settings = lazy(() => import('@/pages/Settings'))
+const LanguageSettings = lazy(() => import('@/pages/LanguageSettings'))
 import OotdRecord from '@/pages/OotdRecord'
 import Closet from '@/pages/Closet'
-import ClosetAdd from '@/pages/ClosetAdd'
-import OotdCalendar from '@/pages/OotdCalendar'
-import OotdDetail from '@/pages/OotdDetail'
-import BestCoord from '@/pages/BestCoord'
-import UserDiscover from '@/pages/UserDiscover'
-import UserProfile from '@/pages/UserProfile'
-import FollowList from '@/pages/FollowList'
-import BlockList from '@/pages/BlockList'
-import Notifications from '@/pages/Notifications'
-import { MyLevel, MyBadges, ColorRanking, ColorPattern, Challenges, TitleExam, MyPosts, Insights, SavedCoords } from '@/pages/ProfileSubPages'
-import { Weather, Quiz, FabricGuide, BodyGuide, Shop, Terms, Privacy, Support, EventDetail, PcSelect } from '@/pages/RemainingPages'
+const ClosetAdd = lazy(() => import('@/pages/ClosetAdd'))
+const OotdCalendar = lazy(() => import('@/pages/OotdCalendar'))
+const OotdDetail = lazy(() => import('@/pages/OotdDetail'))
+const BestCoord = lazy(() => import('@/pages/BestCoord'))
+const UserDiscover = lazy(() => import('@/pages/UserDiscover'))
+const UserProfile = lazy(() => import('@/pages/UserProfile'))
+const FollowList = lazy(() => import('@/pages/FollowList'))
+const BlockList = lazy(() => import('@/pages/BlockList'))
+const Notifications = lazy(() => import('@/pages/Notifications'))
+const MyLevel = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.MyLevel })))
+const MyBadges = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.MyBadges })))
+const ColorRanking = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.ColorRanking })))
+const ColorPattern = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.ColorPattern })))
+const Challenges = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.Challenges })))
+const TitleExam = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.TitleExam })))
+const MyPosts = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.MyPosts })))
+const Insights = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.Insights })))
+const SavedCoords = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.SavedCoords })))
+const Weather = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Weather })))
+const Quiz = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Quiz })))
+const FabricGuide = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.FabricGuide })))
+const BodyGuide = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.BodyGuide })))
+const Shop = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Shop })))
+const Terms = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Terms })))
+const Privacy = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Privacy })))
+const Support = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Support })))
+const EventDetail = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.EventDetail })))
+const PcSelect = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.PcSelect })))
 
 import Onboarding from '@/pages/Onboarding'
-import ClosetCoord from '@/pages/ClosetCoord'
-import PurchaseSimulate from '@/pages/PurchaseSimulate'
-import WardrobeReport from '@/pages/WardrobeReport'
-import AllCombos from '@/pages/AllCombos'
-import EventSubmit from '@/pages/EventSubmit'
-import PcLight from '@/pages/PcLight'
-import PostInsight from '@/pages/PostInsight'
-import DevDiag from '@/pages/DevDiag'
+const ClosetCoord = lazy(() => import('@/pages/ClosetCoord'))
+const PurchaseSimulate = lazy(() => import('@/pages/PurchaseSimulate'))
+const WardrobeReport = lazy(() => import('@/pages/WardrobeReport'))
+const AllCombos = lazy(() => import('@/pages/AllCombos'))
+const EventSubmit = lazy(() => import('@/pages/EventSubmit'))
+const PcLight = lazy(() => import('@/pages/PcLight'))
+const PostInsight = lazy(() => import('@/pages/PostInsight'))
+const DevDiag = lazy(() => import('@/pages/DevDiag'))
 import { useAutoSync } from '@/hooks/useAutoSync'
+import { useBindSocialUser } from '@/lib/socialStore'
+import { bindPostQueueUser } from '@/lib/postQueue'
+import { useBindNotifUser } from '@/lib/notifStore'
 import { useAuth } from '@/contexts/AuthContext'
 
 
@@ -56,6 +76,10 @@ if ((window as any).Capacitor?.isNativePlatform?.()) {
 // 자동 동기화 래퍼 (AuthProvider 내부에서 실행)
 function AutoSyncProvider({ children }: { children: React.ReactNode }) {
   useAutoSync()
+  const { user } = useAuth()
+  useBindSocialUser(user?.id ?? null)
+  useEffect(() => { bindPostQueueUser(user?.id ?? null) }, [user?.id])
+  useBindNotifUser(user?.id ?? null)
   return <>{children}</>
 }
 
@@ -135,6 +159,7 @@ export default function App() {
                   <Route path="/profile/personal-color" element={<PcSelect />} />
                   <Route path="/profile/personal-color/light" element={<PcLight />} />
 
+                  <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
                   <Route path="/auth/login" element={<Auth />} />
                   <Route path="/auth/signup" element={<Auth />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />

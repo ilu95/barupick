@@ -167,9 +167,9 @@ export default function OotdRecord() {
         setSaveError(t('ootdRecord.saveFailed'))
         setTimeout(() => setSaveError(''), 2000)
       }
-    } catch (e) {
-      setSaveError(t('ootdRecord.saveError'))
-      setTimeout(() => setSaveError(''), 2000)
+    } catch (e: any) {
+      setSaveError(e?.name === 'StorageQuotaError' ? t('ootdRecord.storageFull') : t('ootdRecord.saveError'))
+      setTimeout(() => setSaveError(''), 3500)
     }
   }
 

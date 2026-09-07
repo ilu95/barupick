@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
@@ -10,7 +10,7 @@ import { COLORS_60, getColorName } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
-import { updateCachedLike } from '@/hooks/useCommunity'
+import { useSocialState, ensureLikes, toggleLike as storeToggleLike, LIKE_EVENT, type LikeEventDetail } from '@/lib/socialStore'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 
@@ -53,7 +53,8 @@ export default function CommunityDetail() {
 
   const [post, setPost] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [liked, setLiked] = useState(false)
+  const social = useSocialState()
+  const liked = !!postId && social.likes.has(postId)
   const [bookmarked, setBookmarked] = useState(false)
   const [comments, setComments] = useState<any[]>([])
   const [commentText, setCommentText] = useState('')
@@ -77,12 +78,8 @@ export default function CommunityDetail() {
       setPost(data)
       // 조회수
       supabase.rpc('increment_view_count', { p_post_id: postId }).then(null, () => {})
-      // 좋아요 확인
-      if (user) {
-        const { data: likeData, error: likeErr } = await supabase.from('likes').select('user_id').eq('user_id', user.id).eq('post_id', postId)
-        if (likeErr) console.warn('[Like] Check failed:', likeErr.message)
-        setLiked(!!(likeData && likeData.length > 0))
-      }
+      // 좋아요 확인 (저장소가 모르는 경우만 서버에 묻는다)
+      if (user && postId) ensureLikes([postId])
       // 댓글 로드 (친구 공개 게시물만)
       if (data?.visibility === 'friends') {
         const { data: cmts } = await supabase.from('comments')
@@ -93,44 +90,26 @@ export default function CommunityDetail() {
     } catch (e) { console.error(e) } finally { setLoading(false) }
   }
 
-  // ── 좋아요 ──
-  const likingRef = useRef(false)
+  // ── 좋아요 ── (상태·서버 반영은 socialStore, 여기선 결과만 알린다)
+  useEffect(() => {
+    const h = (e: Event) => {
+      const d = (e as CustomEvent<LikeEventDetail>).detail
+      if (d.postId !== postId) return
+      setPost((p: any) => p ? { ...p, likes_count: Math.max(0, (p.likes_count || 0) + d.delta) } : p)
+    }
+    window.addEventListener(LIKE_EVENT, h)
+    return () => window.removeEventListener(LIKE_EVENT, h)
+  }, [postId])
   const toggleLike = async () => {
-    if (!user) { toast.toast({ message: t('common.loginRequired') }); navigate('/auth'); return }
+    if (!user) { toast.toast({ message: t('common.loginRequired'), variant: 'info' }); navigate('/auth/login'); return }
     if (!postId) return
-    if (likingRef.current) return
-    likingRef.current = true
-    const was = liked
-    const prevCount = post?.likes_count || 0
-    setLiked(!was)
-    setPost((p: any) => p ? { ...p, likes_count: prevCount + (was ? -1 : 1) } : p)
-    try {
-      if (was) {
-        const { error } = await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
-        if (error) {
-          if (error.code === '23505') { /* already liked, ignore */ }
-          else throw error
-        }
-        // 알림 (실패해도 무시)
-        if (post?.user_id !== user.id) {
-          supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'like', p_message: t('communityDetail.likeSuccess'), p_related_id: postId }).then(null, () => {})
-        }
-      }
-      // 피드 페이지 캐시와 동기화
-      updateCachedLike(postId!, !was)
-    } catch (e) {
-      console.error('[Like] Failed:', e)
-      setLiked(was)
-      setPost((p: any) => p ? { ...p, likes_count: prevCount } : p)
-    } finally { likingRef.current = false }
+    const r = await storeToggleLike(postId, post?.user_id)
+    if (!r.ok) toast.error(r.message)
   }
 
   // ── 저장 (북마크) ──
   const toggleBookmark = async () => {
-    if (!user) { toast.toast({ message: t('common.loginRequired') }); navigate('/auth'); return }
+    if (!user) { toast.toast({ message: t('common.loginRequired'), variant: 'info' }); navigate('/auth/login'); return }
     if (!post) return
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     const already = saved.find((s: any) => s.commPostId === postId)

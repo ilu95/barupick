@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ChevronLeft, Home, User, Bell } from 'lucide-react'
+import { useUnreadCount } from '@/lib/notifStore'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -73,6 +74,7 @@ function resolveTitleKey(pathname: string): string {
 
 export default function AppHeader() {
   const navigate = useNavigate()
+  const unread = useUnreadCount()
   const location = useLocation()
   const { profile } = useAuth()
   const { t } = useTranslation()
@@ -130,6 +132,11 @@ export default function AppHeader() {
         className="w-9 h-9 rounded-full bg-white/80 dark:bg-warm-800/80 flex items-center justify-center shadow-warm-sm active:scale-90 transition-transform relative"
       >
         <Bell size={17} strokeWidth={2} />
+        {unread > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-terra-500 text-white text-[10px] font-bold leading-4 text-center shadow-warm-sm">
+            {unread > 99 ? '99+' : unread}
+          </span>
+        )}
       </button>
 
       {/* 프로필 */}

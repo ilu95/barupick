@@ -57,7 +57,8 @@
     "generateFailed": "Échec de la génération",
     "addPhoto": "Ajouter une photo",
     "loadError": "Échec du chargement",
-    "rankingLoadError": "Échec du chargement du classement"
+    "rankingLoadError": "Échec du chargement du classement",
+    "offline": "Hors ligne — reprise automatique à la reconnexion"
   },
   "nav": {
     "coord": "Coord",
@@ -221,7 +222,9 @@
     "deleteAccountPlaceholder": "DELETE",
     "deleteAccountValidation": "Veuillez taper \"DELETE\" exactement",
     "deleteAccountSuccess": "Votre compte a été supprimé. Merci d'avoir utilisé BaruPick.",
-    "deleteAccountError": "Erreur lors de la suppression du compte : {{error}}"
+    "deleteAccountError": "Erreur lors de la suppression du compte : {{error}}",
+    "syncPending": "Modifications en attente d’envoi",
+    "syncErrorState": "Dernière synchronisation échouée — appuyez sur Synchroniser"
   },
   "feedbackModal": {
     "title": "Envoyer un commentaire",
@@ -570,7 +573,8 @@
     "moodLabel": "Humeur",
     "visibilityLabel": "Visibilité",
     "publicNotice": "🌐 Partagé dans la communauté immédiatement · Photo requise",
-    "viewCalendar": "Voir le calendrier de coords"
+    "viewCalendar": "Voir le calendrier de coords",
+    "storageFull": "Stockage plein. Supprimez des photos d’anciens enregistrements"
   },
   "ootdCalendar": {
     "weekDays": [
@@ -610,7 +614,9 @@
     "alreadyShared": "Cet enregistrement est déjà partagé",
     "todaysCoord": "Tenue du jour",
     "shareError": "Une erreur est survenue lors du partage",
-    "recordCount": "{{count}} enregistrements"
+    "recordCount": "{{count}} enregistrements",
+    "publishPending": "En attente de publication — touchez pour réessayer",
+    "publishQueued": "En file — publié après l’envoi des photos"
   },
   "community": {
     "tabs": {
@@ -637,7 +643,9 @@
       "events": "Événements"
     },
     "empty": "Pas encore de publications",
-    "feedCardLabel": "Tenue de {{nick}}{{title}}"
+    "feedCardLabel": "Tenue de {{nick}}{{title}}",
+    "likeFailed": "Impossible d'enregistrer le j'aime. Réessayez",
+    "followFailed": "Impossible de mettre à jour l'abonnement. Réessayez"
   },
   "communityDetail": {
     "like": "J'aime",

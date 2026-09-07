@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { useAutoSync, useLastSyncTime } from '@/hooks/useAutoSync'
+import { useAutoSync, useLastSyncTime, useSyncStatus } from '@/hooks/useAutoSync'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +16,7 @@ export default function Settings() {
   const { user, logout } = useAuth()
   const { syncNow } = useAutoSync()
   const lastSync = useLastSyncTime()
+  const syncStatus = useSyncStatus()
   const modal = useModal()
   const toast = useToast()
   const { t, i18n } = useTranslation()
@@ -123,10 +124,15 @@ export default function Settings() {
           <SectionHeader icon={<Cloud size={14} />} title={t('settings.data')} />
 
           <div className="flex items-center gap-2.5 py-3 border-b border-warm-300">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${syncStatus.state === 'error' ? 'bg-red-400' : syncStatus.state === 'offline' ? 'bg-warm-400' : syncStatus.pending || syncStatus.state === 'syncing' ? 'bg-amber-400 animate-pulse' : 'bg-green-400'}`} />
             <div className="flex-1">
               <div className="text-[13px] text-warm-900 dark:text-warm-100">{t('settings.autoSyncActive')}</div>
-              <div className="text-[11px] text-warm-500">{lastSync || t('settings.notSynced')}</div>
+              <div className={`text-[11px] ${syncStatus.state === 'error' ? 'text-red-500' : 'text-warm-500'}`}>
+                {syncStatus.state === 'error' ? t('settings.syncErrorState')
+                  : syncStatus.state === 'offline' ? t('common.offline')
+                  : syncStatus.pending ? t('settings.syncPending')
+                  : (lastSync || t('settings.notSynced'))}
+              </div>
             </div>
           </div>
 
