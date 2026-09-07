@@ -641,7 +641,9 @@
       "events": "イベント"
     },
     "empty": "まだ投稿がありません",
-    "feedCardLabel": "{{nick}}のコーデ{{title}}"
+    "feedCardLabel": "{{nick}}のコーデ{{title}}",
+    "likeFailed": "いいねを反映できませんでした。もう一度お試しください",
+    "followFailed": "フォローを反映できませんでした。もう一度お試しください"
   },
   "communityDetail": {
     "like": "いいね",

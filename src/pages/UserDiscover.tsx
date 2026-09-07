@@ -18,7 +18,7 @@ export default function UserDiscover() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { isFollowing, isFriend, toggleFollow } = useSocial()
+  const { follows, isFollowing, isFriend, toggleFollow } = useSocial()
   const toast = useToast()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<UserRow[] | null>(null)
@@ -32,7 +32,7 @@ export default function UserDiscover() {
 
   const loadSuggested = async () => {
     try {
-      const myFollows = JSON.parse(localStorage.getItem('sp_follows') || '[]')
+      const myFollows = [...follows]
       const exclude = user ? [user.id, ...myFollows] : myFollows
 
       const { data } = await supabase.from('profiles')

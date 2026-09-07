@@ -641,7 +641,9 @@
       "events": "Eventos"
     },
     "empty": "Nenhuma publicação ainda",
-    "feedCardLabel": "Look de {{nick}}{{title}}"
+    "feedCardLabel": "Look de {{nick}}{{title}}",
+    "likeFailed": "Não foi possível salvar a curtida. Tente novamente",
+    "followFailed": "Não foi possível atualizar o seguir. Tente novamente"
   },
   "communityDetail": {
     "like": "Curtir",

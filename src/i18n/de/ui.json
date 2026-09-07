@@ -641,7 +641,9 @@
       "events": "Events"
     },
     "empty": "Noch keine Beiträge",
-    "feedCardLabel": "{{nick}}s Outfit{{title}}"
+    "feedCardLabel": "{{nick}}s Outfit{{title}}",
+    "likeFailed": "Like konnte nicht gespeichert werden. Bitte erneut versuchen",
+    "followFailed": "Folgen konnte nicht aktualisiert werden. Bitte erneut versuchen"
   },
   "communityDetail": {
     "like": "Gefällt mir",

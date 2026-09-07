@@ -641,7 +641,9 @@
       "events": "Sự kiện"
     },
     "empty": "Chưa có bài đăng",
-    "feedCardLabel": "Trang phục của {{nick}}{{title}}"
+    "feedCardLabel": "Trang phục của {{nick}}{{title}}",
+    "likeFailed": "Không lưu được lượt thích. Vui lòng thử lại",
+    "followFailed": "Không cập nhật được theo dõi. Vui lòng thử lại"
   },
   "communityDetail": {
     "like": "Thích",

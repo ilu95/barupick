@@ -3,6 +3,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import i18n from '@/i18n'
+import { useSocialState, ensureLikes, toggleLike as storeToggleLike, friendIds, LIKE_EVENT, type LikeEventDetail } from '@/lib/socialStore'
 
 export interface CommunityPost {
   id: string
@@ -50,20 +51,7 @@ let _cache: {
   rankingMode: RankingMode
   page: number
   hasMore: boolean
-  myLikes: Set<string>
 } | null = null
-
-/** 외부에서 캐시의 좋아요 상태를 직접 갱신 (언마운트 상태에서도 동작) */
-export function updateCachedLike(postId: string, liked: boolean) {
-  if (!_cache) return
-  const next = new Set(_cache.myLikes)
-  if (liked) next.add(postId)
-  else next.delete(postId)
-  _cache.myLikes = next
-  _cache.posts = _cache.posts.map(p =>
-    p.id === postId ? { ...p, likes_count: Math.max(0, p.likes_count + (liked ? 1 : -1)) } : p
-  )
-}
 
 export function useCommunity() {
   const { user } = useAuth()
@@ -80,32 +68,26 @@ export function useCommunity() {
   const [hasMore, setHasMore] = useState(_cache?.hasMore ?? true)
   const [error, setError] = useState<string | null>(null)
 
-  const [myLikes, setMyLikes] = useState<Set<string>>(_cache?.myLikes || new Set())
-  const [myFollows, setMyFollows] = useState<Set<string>>(new Set())
+  const social = useSocialState()
+  const myLikes = social.likes
+  const myFollows = social.follows
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set())
 
   const pageRef = useRef(_cache?.page || 0)
   const loadVerRef = useRef(0)
   const hasCacheRef = useRef(!!_cache)
 
-  // 팔로우 목록 로드
+  // 차단 목록 로드 (팔로우는 socialStore 가 관리)
   useEffect(() => {
     if (!user) return
-    const loadFollows = async () => {
-      try {
-        const { data } = await supabase.from('follows').select('following_id').eq('follower_id', user.id)
-        setMyFollows(new Set((data || []).map(f => f.following_id)))
-      } catch (e) { console.warn('Follows load error:', e) }
-    }
     const loadBlocks = async () => {
       try {
         const { data } = await supabase.from('blocks').select('blocked_id').eq('blocker_id', user.id)
         setBlockedUsers(new Set((data || []).map(b => b.blocked_id)))
       } catch (e) { console.warn('Blocks load error:', e) }
     }
-    loadFollows()
     loadBlocks()
-  }, [user])
+  }, [user?.id])
 
   // 메인 로드 함수
   const loadPosts = useCallback(async (reset = false) => {
@@ -140,7 +122,7 @@ export function useCommunity() {
           return
         }
         if (friendsMode === 'mutual') {
-          const friends = JSON.parse(localStorage.getItem('sp_friends') || '[]')
+          const friends = friendIds()
           if (friends.length === 0) {
             setPosts([])
             setHasMore(false)
@@ -179,20 +161,8 @@ export function useCommunity() {
       setHasMore(newPosts.length === PAGE_SIZE)
       pageRef.current = serverPage + 1
 
-      // 내 좋아요 로드
-      if (user && newPosts.length > 0) {
-        try {
-          const pids = newPosts.map(p => p.id)
-          const { data: likes } = await supabase.from('likes').select('post_id').eq('user_id', user.id).in('post_id', pids)
-          if (likes) {
-            setMyLikes(prev => {
-              const next = new Set(prev)
-              likes.forEach(l => next.add(l.post_id))
-              return next
-            })
-          }
-        } catch (e) { /* ignore */ }
-      }
+      // 내 좋아요 로드 (모르는 것만 서버에 묻는다)
+      if (user && newPosts.length > 0) ensureLikes(newPosts.map(p => p.id))
     } catch (e: any) {
       console.error('Community load error:', e)
       if (myVer !== loadVerRef.current) return
@@ -237,53 +207,21 @@ export function useCommunity() {
     }
   }
 
-  // 좋아요 토글
-  const likingRef = useRef<Set<string>>(new Set())
-  const toggleLike = useCallback(async (postId: string) => {
-    if (!user) return
-    if (likingRef.current.has(postId)) return
-    likingRef.current.add(postId)
-
-    const isLiked = myLikes.has(postId)
-
-    // 낙관적 업데이트
-    setMyLikes(prev => {
-      const next = new Set(prev)
-      if (isLiked) next.delete(postId)
-      else next.add(postId)
-      return next
-    })
-    setPosts(prev => prev.map(p =>
-      p.id === postId ? { ...p, likes_count: p.likes_count + (isLiked ? -1 : 1) } : p
-    ))
-
-    try {
-      if (isLiked) {
-        const { error } = await supabase.from('likes').delete().eq('user_id', user.id).eq('post_id', postId)
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from('likes').insert({ user_id: user.id, post_id: postId })
-        if (error) {
-          // UNIQUE 제약 위반 (이미 좋아요함) → 무시
-          if (error.code === '23505') { /* already liked, ignore */ }
-          else throw error
-        }
-      }
-    } catch (e) {
-      console.error('Like toggle failed:', e)
-      setMyLikes(prev => {
-        const next = new Set(prev)
-        if (isLiked) next.add(postId)
-        else next.delete(postId)
-        return next
-      })
-      setPosts(prev => prev.map(p =>
-        p.id === postId ? { ...p, likes_count: p.likes_count + (isLiked ? 1 : -1) } : p
-      ))
-    } finally {
-      likingRef.current.delete(postId)
+  // 좋아요 수는 socialStore 이벤트로 맞춘다 (상세 화면에서 눌러도 목록이 같이 움직인다)
+  useEffect(() => {
+    const h = (e: Event) => {
+      const { postId, delta } = (e as CustomEvent<LikeEventDetail>).detail
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes_count: Math.max(0, (p.likes_count || 0) + delta) } : p))
     }
-  }, [user, myLikes])
+    window.addEventListener(LIKE_EVENT, h)
+    return () => window.removeEventListener(LIKE_EVENT, h)
+  }, [])
+
+  // 좋아요 토글 — 결과를 돌려주므로 화면이 실패를 알릴 수 있다
+  const toggleLike = useCallback((postId: string) => {
+    const owner = posts.find(p => p.id === postId)?.user_id
+    return storeToggleLike(postId, owner)
+  }, [posts])
 
   // 필터링된 posts (차단 유저 + 콘텐츠 필터)
   const filteredPosts = posts.filter(p => {
@@ -304,7 +242,7 @@ export function useCommunity() {
   // 캐시 저장 (언마운트 시)
   useEffect(() => {
     return () => {
-      _cache = { posts, tab, sort, contentFilter, styleFilter, friendsMode, rankingMode, page: pageRef.current, hasMore, myLikes }
+      _cache = { posts, tab, sort, contentFilter, styleFilter, friendsMode, rankingMode, page: pageRef.current, hasMore }
     }
   })
 

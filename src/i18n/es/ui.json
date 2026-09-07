@@ -641,7 +641,9 @@
       "events": "Eventos"
     },
     "empty": "Aún no hay publicaciones",
-    "feedCardLabel": "Outfit de {{nick}}{{title}}"
+    "feedCardLabel": "Outfit de {{nick}}{{title}}",
+    "likeFailed": "No se pudo guardar tu me gusta. Inténtalo de nuevo",
+    "followFailed": "No se pudo actualizar el seguimiento. Inténtalo de nuevo"
   },
   "communityDetail": {
     "like": "Me gusta",

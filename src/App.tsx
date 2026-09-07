@@ -45,6 +45,7 @@ import PcLight from '@/pages/PcLight'
 import PostInsight from '@/pages/PostInsight'
 import DevDiag from '@/pages/DevDiag'
 import { useAutoSync } from '@/hooks/useAutoSync'
+import { useBindSocialUser } from '@/lib/socialStore'
 import { useAuth } from '@/contexts/AuthContext'
 
 
@@ -56,6 +57,8 @@ if ((window as any).Capacitor?.isNativePlatform?.()) {
 // 자동 동기화 래퍼 (AuthProvider 내부에서 실행)
 function AutoSyncProvider({ children }: { children: React.ReactNode }) {
   useAutoSync()
+  const { user } = useAuth()
+  useBindSocialUser(user?.id ?? null)
   return <>{children}</>
 }
 

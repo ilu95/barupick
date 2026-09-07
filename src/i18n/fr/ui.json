@@ -641,7 +641,9 @@
       "events": "Événements"
     },
     "empty": "Pas encore de publications",
-    "feedCardLabel": "Tenue de {{nick}}{{title}}"
+    "feedCardLabel": "Tenue de {{nick}}{{title}}",
+    "likeFailed": "Impossible d'enregistrer le j'aime. Réessayez",
+    "followFailed": "Impossible de mettre à jour l'abonnement. Réessayez"
   },
   "communityDetail": {
     "like": "J'aime",

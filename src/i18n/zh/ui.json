@@ -641,7 +641,9 @@
       "events": "活动"
     },
     "empty": "还没有帖子",
-    "feedCardLabel": "{{nick}}的搭配{{title}}"
+    "feedCardLabel": "{{nick}}的搭配{{title}}",
+    "likeFailed": "点赞未能保存，请重试",
+    "followFailed": "关注未能保存，请重试"
   },
   "communityDetail": {
     "like": "点赞",

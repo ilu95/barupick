@@ -641,7 +641,9 @@
       "events": "Event"
     },
     "empty": "Belum ada postingan",
-    "feedCardLabel": "Outfit {{nick}}{{title}}"
+    "feedCardLabel": "Outfit {{nick}}{{title}}",
+    "likeFailed": "Suka gagal disimpan. Coba lagi",
+    "followFailed": "Ikuti gagal diperbarui. Coba lagi"
   },
   "communityDetail": {
     "like": "Suka",

@@ -641,7 +641,9 @@
       "events": "กิจกรรม"
     },
     "empty": "ยังไม่มีโพสต์",
-    "feedCardLabel": "ชุดของ {{nick}}{{title}}"
+    "feedCardLabel": "ชุดของ {{nick}}{{title}}",
+    "likeFailed": "บันทึกการถูกใจไม่สำเร็จ กรุณาลองใหม่",
+    "followFailed": "อัปเดตการติดตามไม่สำเร็จ กรุณาลองใหม่"
   },
   "communityDetail": {
     "like": "ถูกใจ",

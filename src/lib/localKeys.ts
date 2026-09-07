@@ -13,8 +13,6 @@ export const SYNC_KEYS = [
   'cs_body_effect',     // 체형 효과
   'cs_body_type',       // 체형
   'cs_profile',         // 로컬 프로필 설정
-  'sp_follows',         // 팔로우 캐시
-  'sp_friends',         // 친구 캐시
   'sp_dark_mode',       // 다크모드
   'sp_a11y_labels',     // 접근성
   'sp_hide_counts',     // 카운트 숨김
@@ -31,4 +29,6 @@ export const USER_SCOPED_KEYS: readonly string[] = [
   ...SYNC_KEYS.filter(k => k !== 'sp_dark_mode' && k !== 'sp_a11y_labels'),
   '_sync_ts',
   '_sync_owner',
+  'sp_follows',   // 옛 팔로우 캐시 (이제 서버가 진실, 남아 있으면 지운다)
+  'sp_friends',
 ]
