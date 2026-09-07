@@ -6,6 +6,7 @@ import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
+import { sortRecordsDesc } from '@/lib/records'
 import i18n, { getLocale } from '@/i18n'
 
 import { profile as profileLib } from '@/lib/profile'
@@ -44,7 +45,7 @@ export default function Home() {
   const recentOotd = useMemo(() => {
     try {
       const records = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-      return records[0] || null
+      return sortRecordsDesc<any>(records)[0] || null
     } catch { return null }
   }, [])
 
