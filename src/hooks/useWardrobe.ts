@@ -3,6 +3,7 @@
 // useWardrobe.ts — 옷장 데이터 공통 훅
 // 6대 기능(오늘의코디, 구매시뮬, 상황추천, 활용도, 컴포트존, 등급)의 공통 인프라
 // ═══════════════════════════════════════════════════════
+import { setJSON } from '@/lib/storage'
 import { useState, useCallback, useMemo } from 'react'
 import { COLORS_60, hcl } from '@/lib/colors'
 import { evaluationSystem } from '@/lib/evaluation'
@@ -428,7 +429,7 @@ export function useWardrobe() {
         }
       })
       if (changed) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stored))
+        setJSON(STORAGE_KEY, stored)
         setItems(stored)
       }
     } catch {}

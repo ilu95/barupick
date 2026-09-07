@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { setJSON } from '@/lib/storage'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, RefreshCw, Pin, Bookmark, Share, Users, ChevronRight, Palette, X, ChevronDown } from 'lucide-react'
@@ -474,7 +475,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now() })
     if (saved.length > 100) saved.length = 100
-    localStorage.setItem('cs_saved', JSON.stringify(saved))
+    setJSON('cs_saved', saved)
     setSaveModal(false)
     setSaveName('')
     trackSave('recommend', finalScore)
@@ -568,7 +569,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
           className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Share size={16} /> {t('recommend.share')}
         </button>
-        <button onClick={() => { localStorage.setItem('_pending_post_outfit', JSON.stringify(combo.outfit)); window.location.href = '/community/post' }}
+        <button onClick={() => { setJSON('_pending_post_outfit', combo.outfit); window.location.href = '/community/post' }}
           className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Users size={16} /> {t('recommend.communityShare')}
         </button>

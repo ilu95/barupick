@@ -4,6 +4,7 @@
 // 원본: 바루픽_최신본.html 6483~6760행
 // ================================================================
 
+import { setJSON } from '@/lib/storage'
 import { profile } from './profile'
 import i18n from '@/i18n'
 
@@ -240,7 +241,7 @@ export const gamification = {
         try { done = JSON.parse(localStorage.getItem('sp_challenges_done') || '[]'); } catch(e) {}
         if (!done.includes(cKey)) {
             done.push(cKey);
-            localStorage.setItem('sp_challenges_done', JSON.stringify(done));
+            setJSON('sp_challenges_done', done);
             this.invalidate();
             return true;
         }
@@ -281,7 +282,7 @@ export const gamification = {
         const existing = results.findIndex(r => r.id === examId);
         if (existing >= 0) { results[existing] = { id: examId, score, passed, date: new Date().toISOString().slice(0,10) }; }
         else { results.push({ id: examId, score, passed, date: new Date().toISOString().slice(0,10) }); }
-        localStorage.setItem('sp_title_results', JSON.stringify(results));
+        setJSON('sp_title_results', results);
         this.invalidate();
     }
 };

@@ -1,3 +1,4 @@
+import { setJSON } from '@/lib/storage'
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
@@ -22,7 +23,7 @@ function addRecentColor(key: string) {
   try {
     const recent = getRecentColors().filter(k => k !== key)
     recent.unshift(key)
-    localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)))
+    setJSON(RECENT_KEY, recent.slice(0, MAX_RECENT))
   } catch {}
 }
 

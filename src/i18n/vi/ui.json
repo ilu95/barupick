@@ -59,7 +59,8 @@
     "loadError": "Tải thất bại",
     "rankingLoadError": "Tải bảng xếp hạng thất bại",
     "offline": "Ngoại tuyến — sẽ tiếp tục khi có kết nối",
-    "actionFailed": "Không thể kết nối máy chủ. Vui lòng thử lại sau"
+    "actionFailed": "Không thể kết nối máy chủ. Vui lòng thử lại sau",
+    "storageFull": "Bộ nhớ đã đầy. Hãy xóa ảnh ở các bản ghi cũ"
   },
   "nav": {
     "coord": "Phối đồ",

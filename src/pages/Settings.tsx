@@ -1,3 +1,4 @@
+import { setString } from '@/lib/storage'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight } from 'lucide-react'
@@ -28,7 +29,7 @@ export default function Settings() {
   const toggleDark = () => {
     const next = !darkMode
     setDarkMode(next)
-    localStorage.setItem('sp_dark_mode', next ? '1' : '0')
+    setString('sp_dark_mode', next ? '1' : '0')
     document.documentElement.classList.toggle('dark', next)
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next ? '#1C1917' : '#F7F5F2')
   }
@@ -36,7 +37,7 @@ export default function Settings() {
   const toggleHide = () => {
     const next = !hideCounts
     setHideCounts(next)
-    localStorage.setItem('sp_hide_counts', next ? '1' : '0')
+    setString('sp_hide_counts', next ? '1' : '0')
   }
 
   const syncData = async () => {

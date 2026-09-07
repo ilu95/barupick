@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { setJSON } from '@/lib/storage'
 import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
@@ -642,13 +643,13 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now() })
     if (saved.length > 100) saved.length = 100
-    localStorage.setItem('cs_saved', JSON.stringify(saved))
+    setJSON('cs_saved', saved)
     trackSave('build', score)
     toast.success(t('recommend.saveSuccess'))
   }
 
   const handleShare = () => { navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
-  const handleCommunityShare = () => { localStorage.setItem("_pending_post_outfit", JSON.stringify(outfit)); navigate("/community/post") }
+  const handleCommunityShare = () => { setJSON("_pending_post_outfit", outfit); navigate("/community/post") }
 
   const scoreGrade = score >= 90 ? { label: t('build.scoreGrade.perfect'), emoji: '🏆', color: 'text-amber-600' }
     : score >= 80 ? { label: t('build.scoreGrade.great'), emoji: '✨', color: 'text-terra-600' }

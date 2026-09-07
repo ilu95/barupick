@@ -59,7 +59,8 @@
     "loadError": "Falha ao carregar",
     "rankingLoadError": "Falha ao carregar o ranking",
     "offline": "Offline — continuará ao reconectar",
-    "actionFailed": "Não foi possível conectar ao servidor. Tente novamente em instantes"
+    "actionFailed": "Não foi possível conectar ao servidor. Tente novamente em instantes",
+    "storageFull": "Armazenamento cheio. Remova fotos de registros antigos"
   },
   "nav": {
     "coord": "Coord",

@@ -59,7 +59,8 @@
     "loadError": "Laden fehlgeschlagen",
     "rankingLoadError": "Rangliste konnte nicht geladen werden",
     "offline": "Offline — wird bei Verbindung fortgesetzt",
-    "actionFailed": "Server nicht erreichbar. Bitte gleich noch einmal versuchen"
+    "actionFailed": "Server nicht erreichbar. Bitte gleich noch einmal versuchen",
+    "storageFull": "Speicher voll. Entferne Fotos aus älteren Einträgen"
   },
   "nav": {
     "coord": "Outfit",

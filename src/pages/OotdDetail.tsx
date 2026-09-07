@@ -1,3 +1,4 @@
+import { setJSON } from '@/lib/storage'
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, Trash2, Share, Globe, Calendar, Tag, Smile, Cloud, ArrowLeft, Image } from 'lucide-react'
@@ -139,7 +140,7 @@ export default function OotdDetail() {
   }
 
   const handleEdit = () => {
-    localStorage.setItem("_ootd_edit", JSON.stringify(record))
+    setJSON("_ootd_edit", record)
     navigate("/record?edit=" + record.id)
   }
 
@@ -166,7 +167,7 @@ export default function OotdDetail() {
       // 로컬은 즉시 공개로, 서버 반영은 큐가 (사진 업로드 포함)
       const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
       const ri = recs.findIndex((r: any) => r.id === record.id)
-      if (ri >= 0) { recs[ri].visibility = 'public'; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
+      if (ri >= 0) { recs[ri].visibility = 'public'; setJSON('sp_ootd_records', recs) }
       enqueuePost({ recordId: record.id, op: 'publish', visibility: 'public' })
       setShareMsg(t('ootdDetail.publishQueued'))
     } catch (e) {

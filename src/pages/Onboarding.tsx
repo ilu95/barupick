@@ -1,3 +1,4 @@
+import { setString } from '@/lib/storage'
 import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -82,12 +83,12 @@ export default function Onboarding() {
 
   const selectLanguage = (code: string) => {
     i18n.changeLanguage(code)
-    localStorage.setItem('sp_language', code)
+    setString('sp_language', code)
     goTo(0, 'left')
   }
 
   const finish = () => {
-    localStorage.setItem('sp_onboarded', '1')
+    setString('sp_onboarded', '1')
     navigate('/home', { replace: true })
   }
 

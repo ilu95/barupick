@@ -5,7 +5,7 @@ import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather } from '@/hooks/useWeather'
-import { setJSON, StorageQuotaError } from '@/lib/storage'
+import { setJSON } from '@/lib/storage'
 import { enqueuePost } from '@/lib/postQueue'
 import { sortRecordsDesc } from '@/lib/records'
 
@@ -187,13 +187,8 @@ export function useOotd() {
       records.unshift(record)
     }
 
-    // 용량 초과(사진 base64 누적)면 저장 자체가 실패한다 — 호출자에게 알린다
-    try {
-      if (!setJSON(STORAGE_KEY, records)) return false
-    } catch (e) {
-      if (e instanceof StorageQuotaError) throw e
-      return false
-    }
+    // 용량 초과면 저장 자체가 실패한다 (전역 토스터가 이유를 알리고, 여기선 false)
+    if (!setJSON(STORAGE_KEY, records)) return false
 
     // 커뮤니티 반영은 큐로 (실패해도 잃지 않고, 재개·온라인 복귀 때 다시 시도)
     if (record.visibility !== 'private') {
@@ -202,14 +197,7 @@ export function useOotd() {
       enqueuePost({ recordId: record.id, op: 'private' })
     }
 
-    // gamification
-    try {
-      const gd = JSON.parse(localStorage.getItem('sp_gamification') || '{}')
-      if (!gd.records) gd.records = []
-      gd.records.push({ date: dateStr, colors: Object.values(outfit), score })
-      gd.totalXp = (gd.totalXp || 0) + 20
-      localStorage.setItem('sp_gamification', JSON.stringify(gd))
-    } catch {}
+    // XP·레벨은 gamification.getXP() 가 기록/저장/옷장에서 계산한다 — 별도 카운터를 두지 않는다
 
     return record
   }, [colors, photos, situation, mood, memo, visibility, showInstagram, editId, getRecords, weatherData, user])
@@ -217,7 +205,7 @@ export function useOotd() {
   const deleteRecord = useCallback((id: string) => {
     const target = getRecords().find(r => r.id === id)
     const records = getRecords().filter(r => r.id !== id)
-    try { setJSON(STORAGE_KEY, records) } catch {}
+    setJSON(STORAGE_KEY, records)
     // 공개했던 기록이면 커뮤니티 게시물도 함께 내린다 (고아 게시물 방지) — 큐로, 실패해도 재시도
     if (target?.postId) enqueuePost({ recordId: id, op: 'delete', postId: target.postId })
   }, [getRecords])
