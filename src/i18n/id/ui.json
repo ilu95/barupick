@@ -58,7 +58,8 @@
     "addPhoto": "Tambah foto",
     "loadError": "Gagal memuat",
     "rankingLoadError": "Gagal memuat peringkat",
-    "offline": "Offline — akan dilanjutkan saat terhubung"
+    "offline": "Offline — akan dilanjutkan saat terhubung",
+    "actionFailed": "Tidak dapat terhubung ke server. Coba lagi sebentar lagi"
   },
   "nav": {
     "coord": "Padu padan",

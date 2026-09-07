@@ -58,7 +58,8 @@
     "addPhoto": "Thêm ảnh",
     "loadError": "Tải thất bại",
     "rankingLoadError": "Tải bảng xếp hạng thất bại",
-    "offline": "Ngoại tuyến — sẽ tiếp tục khi có kết nối"
+    "offline": "Ngoại tuyến — sẽ tiếp tục khi có kết nối",
+    "actionFailed": "Không thể kết nối máy chủ. Vui lòng thử lại sau"
   },
   "nav": {
     "coord": "Phối đồ",

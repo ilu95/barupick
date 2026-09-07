@@ -8,6 +8,7 @@ import { STYLE_GUIDE } from '@/lib/styles'
 import { useAuth } from '@/contexts/AuthContext'
 import { useScrollRestore } from '@/hooks/useScrollRestore'
 import { useToast } from '@/components/ui/Toast'
+import { useOnResume } from '@/lib/appLifecycle'
 
 export default function Community() {
   const navigate = useNavigate()
@@ -32,6 +33,13 @@ export default function Community() {
     }
     comm.loadPosts(true)
   }, [comm.tab, comm.sort, comm.styleFilter, comm.friendsMode, comm.rankingMode])
+
+  // 앱 재개·온라인 복귀: 마지막 로드가 10분 넘었으면 새로 받는다 (그 안이면 보던 화면 유지)
+  const lastLoadRef = useRef(Date.now())
+  useEffect(() => { if (!comm.loading) lastLoadRef.current = Date.now() }, [comm.loading])
+  useOnResume(useCallback(() => {
+    if (Date.now() - lastLoadRef.current > 10 * 60_000) comm.loadPosts(true)
+  }, [comm.loadPosts]), 60_000)
 
   // 스크롤 위치 복원 (포스트가 로드된 후)
   useScrollRestore(comm.posts.length > 0 || !comm.loading)

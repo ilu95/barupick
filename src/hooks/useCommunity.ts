@@ -39,6 +39,14 @@ export type FriendsMode = 'mutual' | 'following'
 export type RankingMode = 'weekly' | 'monthly' | 'user' | 'event'
 
 const PAGE_SIZE = 20
+const FEED_CACHE_KEY = 'bp_feed_cache' // 기본 탭(전체·최신) 첫 페이지. 오프라인/재시작 첫 화면용
+
+function readFeedCache(): CommunityPost[] {
+  try { const v = JSON.parse(localStorage.getItem(FEED_CACHE_KEY) || 'null'); return Array.isArray(v?.posts) ? v.posts : [] } catch { return [] }
+}
+function writeFeedCache(posts: CommunityPost[]) {
+  try { localStorage.setItem(FEED_CACHE_KEY, JSON.stringify({ posts: posts.slice(0, PAGE_SIZE), ts: Date.now() })) } catch { /* 용량 초과 등은 무시 — 캐시일 뿐 */ }
+}
 
 // 모듈 레벨 캐시: 페이지 이동 후 돌아왔을 때 즉시 복원
 let _cache: {
@@ -63,7 +71,7 @@ export function useCommunity() {
   const [friendsMode, setFriendsMode] = useState<FriendsMode>(_cache?.friendsMode || 'mutual')
   const [rankingMode, setRankingMode] = useState<RankingMode>(_cache?.rankingMode || 'weekly')
 
-  const [posts, setPosts] = useState<CommunityPost[]>(_cache?.posts || [])
+  const [posts, setPosts] = useState<CommunityPost[]>(_cache?.posts || readFeedCache())
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(_cache?.hasMore ?? true)
   const [error, setError] = useState<string | null>(null)
@@ -155,6 +163,7 @@ export function useCommunity() {
 
       if (reset) {
         setPosts(newPosts)
+        if (tab === 'all' && sort === 'latest' && !styleFilter) writeFeedCache(newPosts)
       } else {
         setPosts(prev => [...prev, ...newPosts])
       }
@@ -167,6 +176,11 @@ export function useCommunity() {
       console.error('Community load error:', e)
       if (myVer !== loadVerRef.current) return
       setError(e.message || i18n.t('common.loadError'))
+      // 오프라인/실패: 기본 탭이면 마지막으로 본 피드라도 보여준다
+      if (reset && tab === 'all' && sort === 'latest' && !styleFilter) {
+        const cached = readFeedCache()
+        if (cached.length > 0) { setPosts(cached); setHasMore(false) }
+      }
     } finally {
       if (myVer === loadVerRef.current) setLoading(false)
     }

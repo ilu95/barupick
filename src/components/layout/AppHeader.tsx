@@ -48,7 +48,7 @@ const TITLE_KEYS: Record<string, string> = {
 const PREFIX_TITLE_KEYS: [string, string][] = [
   ['/profile/insights/', 'header.insights'],
   ['/community/event/', 'header.eventDetail'],
-  ['/community/', 'communityDetail.like'],
+  ['/community/', 'header.community'],
   ['/closet/ootd/', 'header.record'],
   ['/user/', 'header.profile'],
 ]

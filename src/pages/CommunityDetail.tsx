@@ -53,6 +53,7 @@ export default function CommunityDetail() {
 
   const [post, setPost] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const social = useSocialState()
   const liked = !!postId && social.likes.has(postId)
   const [bookmarked, setBookmarked] = useState(false)
@@ -71,10 +72,12 @@ export default function CommunityDetail() {
   }, [postId])
 
   const loadPost = async () => {
+    setLoadError(false)
     try {
-      const { data } = await supabase.from('posts')
+      const { data, error } = await supabase.from('posts')
         .select('*, profiles!posts_user_id_fkey(nickname, avatar_url, instagram_id)')
-        .eq('id', postId).single()
+        .eq('id', postId).maybeSingle()
+      if (error) throw error
       setPost(data)
       // 조회수
       supabase.rpc('increment_view_count', { p_post_id: postId }).then(null, () => {})
@@ -87,7 +90,7 @@ export default function CommunityDetail() {
           .eq('post_id', postId).order('created_at', { ascending: true })
         setComments(cmts || [])
       }
-    } catch (e) { console.error(e) } finally { setLoading(false) }
+    } catch (e) { console.error(e); setLoadError(true) } finally { setLoading(false) }
   }
 
   // ── 좋아요 ── (상태·서버 반영은 socialStore, 여기선 결과만 알린다)
@@ -119,9 +122,8 @@ export default function CommunityDetail() {
       localStorage.setItem('cs_saved', JSON.stringify(newSaved))
       setBookmarked(false)
       toast.toast({ message: t('communityDetail.saveSuccess') })
-      supabase.rpc('decrement_save_count', { p_post_id: postId }).then(null, () => {})
       setPost((p: any) => p ? { ...p, save_count: Math.max(0, (p.save_count || 1) - 1) } : p)
-      console.log('[Save] Removed bookmark')
+      supabase.rpc('decrement_save_count', { p_post_id: postId }).then(({ error }) => { if (error) toast.error(t('common.actionFailed')) }, () => toast.error(t('common.actionFailed')))
     } else {
       if (saved.length >= 50) { toast.error(t('communityDetail.saveSuccess')); return }
       const nick = post.profiles?.nickname || t('common.user')
@@ -141,12 +143,11 @@ export default function CommunityDetail() {
       localStorage.setItem('cs_saved', JSON.stringify(saved))
       setBookmarked(true)
       toast.success(t('communityDetail.saveSuccess'))
-      supabase.rpc('increment_save_count', { p_post_id: postId }).then(null, () => {})
       setPost((p: any) => p ? { ...p, save_count: (p.save_count || 0) + 1 } : p)
+      supabase.rpc('increment_save_count', { p_post_id: postId }).then(({ error }) => { if (error) toast.error(t('common.actionFailed')) }, () => toast.error(t('common.actionFailed')))
       if (post.user_id && post.user_id !== user.id) {
         supabase.rpc('send_notification', { p_user_id: post.user_id, p_actor_id: user.id, p_type: 'save', p_message: t('communityDetail.saveSuccess'), p_related_id: postId }).then(null, () => {})
       }
-      console.log('[Save] Added bookmark')
     }
   }
 
@@ -171,7 +172,7 @@ export default function CommunityDetail() {
           if (error?.code === '23505') toast.toast({ message: t('communityDetail.reportSuccess') })
           else if (error) toast.error(t('communityDetail.report'))
           else toast.success(t('communityDetail.reportSuccess'))
-        } catch {}
+        } catch { toast.error(t('common.actionFailed')) }
       },
     })
   }
@@ -227,7 +228,8 @@ export default function CommunityDetail() {
       variant: 'danger',
       onConfirm: async () => {
         try {
-          await supabase.from('posts').delete().eq('id', postId).eq('user_id', user.id)
+          const { error: delErr } = await supabase.from('posts').delete().eq('id', postId).eq('user_id', user.id)
+          if (delErr) throw delErr
           // localStorage에서 postId 제거
           try {
             const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
@@ -284,7 +286,14 @@ export default function CommunityDetail() {
 
   // ── 로딩/에러 상태 ──
   if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('common.loading')}</div>
-  if (!post) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('communityDetail.deleteSuccess')}</div>
+  if (!post) return (
+    <div className="animate-screen-fade px-5 pt-6 text-center py-20">
+      <div className="text-sm text-warm-600 mb-4">{loadError ? t('common.loadError') : t('postInsight.notFound')}</div>
+      {loadError && (
+        <button onClick={loadPost} className="px-5 py-2.5 rounded-full bg-terra-500 text-white text-sm font-semibold active:scale-95 transition-all shadow-terra">{t('common.retry')}</button>
+      )}
+    </div>
+  )
 
   const outfit = post.outfit || {}
   const outfitHex: Record<string, string> = {}

@@ -58,7 +58,8 @@
     "addPhoto": "Foto hinzufügen",
     "loadError": "Laden fehlgeschlagen",
     "rankingLoadError": "Rangliste konnte nicht geladen werden",
-    "offline": "Offline — wird bei Verbindung fortgesetzt"
+    "offline": "Offline — wird bei Verbindung fortgesetzt",
+    "actionFailed": "Server nicht erreichbar. Bitte gleich noch einmal versuchen"
   },
   "nav": {
     "coord": "Outfit",
