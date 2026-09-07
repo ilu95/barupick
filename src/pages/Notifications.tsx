@@ -4,6 +4,9 @@ import { Bell, User, Heart, UserPlus, Trophy, MessageSquare, Trash2 } from 'luci
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { useModal } from '@/components/ui/Modal'
+import { useOnResume } from '@/lib/appLifecycle'
+import { markAllReadLocally, refreshUnread } from '@/lib/notifStore'
 
 interface Notification {
   id: string; type: string; message: string; related_id: string | null; read: boolean; created_at: string
@@ -14,10 +17,12 @@ export default function Notifications() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const modal = useModal()
   const [notis, setNotis] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { loadNotis() }, [user])
+  useEffect(() => { loadNotis() }, [user?.id])
+  useOnResume(() => { loadNotis() })
 
   const loadNotis = async () => {
     if (!user) { setLoading(false); return }
@@ -26,15 +31,25 @@ export default function Notifications() {
         .select('*, actor:profiles!notifications_actor_id_profiles_fkey(nickname, avatar_url)')
         .eq('user_id', user.id).order('created_at', { ascending: false }).limit(50)
       setNotis(data || [])
-      // 읽음 처리
-      await supabase.rpc('mark_notifications_read', { p_user_id: user.id })
+      // 읽음 처리 → 헤더 배지도 즉시 0
+      const { error } = await supabase.rpc('mark_notifications_read', { p_user_id: user.id })
+      if (!error) markAllReadLocally(); else refreshUnread()
     } catch (e) { console.error(e) } finally { setLoading(false) }
   }
 
-  const clearAll = async () => {
-    if (!user || !confirm(t('notifications.clearConfirm'))) return
-    await supabase.from('notifications').delete().eq('user_id', user.id)
-    setNotis([])
+  const clearAll = () => {
+    if (!user) return
+    modal.confirm({
+      title: t('notifications.clearAll'),
+      message: t('notifications.clearConfirm'),
+      confirmLabel: t('common.delete'),
+      variant: 'danger',
+      onConfirm: async () => {
+        const { error } = await supabase.from('notifications').delete().eq('user_id', user.id)
+        if (error) { console.warn('[notif] clear failed:', error); return }
+        setNotis([]); markAllReadLocally()
+      },
+    })
   }
 
   const icon = (type: string) => {
