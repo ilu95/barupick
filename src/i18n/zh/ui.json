@@ -614,7 +614,9 @@
     "alreadyShared": "此记录已分享过",
     "todaysCoord": "今日搭配",
     "shareError": "分享时出错",
-    "recordCount": "{{count}}条记录"
+    "recordCount": "{{count}}条记录",
+    "publishPending": "等待发布到社区 — 点击立即重试",
+    "publishQueued": "已排队 — 照片上传后将发布到社区"
   },
   "community": {
     "tabs": {

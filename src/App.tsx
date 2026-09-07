@@ -46,6 +46,8 @@ import PostInsight from '@/pages/PostInsight'
 import DevDiag from '@/pages/DevDiag'
 import { useAutoSync } from '@/hooks/useAutoSync'
 import { useBindSocialUser } from '@/lib/socialStore'
+import { bindPostQueueUser } from '@/lib/postQueue'
+import { useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 
 
@@ -59,6 +61,7 @@ function AutoSyncProvider({ children }: { children: React.ReactNode }) {
   useAutoSync()
   const { user } = useAuth()
   useBindSocialUser(user?.id ?? null)
+  useEffect(() => { bindPostQueueUser(user?.id ?? null) }, [user?.id])
   return <>{children}</>
 }
 

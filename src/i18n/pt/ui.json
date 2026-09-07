@@ -614,7 +614,9 @@
     "alreadyShared": "Este registro já foi compartilhado",
     "todaysCoord": "Look de hoje",
     "shareError": "Ocorreu um erro ao compartilhar",
-    "recordCount": "{{count}} registros"
+    "recordCount": "{{count}} registros",
+    "publishPending": "Aguardando publicação — toque para tentar agora",
+    "publishQueued": "Na fila — aparecerá após o envio das fotos"
   },
   "community": {
     "tabs": {

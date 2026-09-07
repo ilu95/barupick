@@ -614,7 +614,9 @@
     "alreadyShared": "บันทึกนี้ถูกแชร์แล้ว",
     "todaysCoord": "ชุดวันนี้",
     "shareError": "เกิดข้อผิดพลาดขณะแชร์",
-    "recordCount": "{{count}} บันทึก"
+    "recordCount": "{{count}} บันทึก",
+    "publishPending": "รอโพสต์ลงคอมมูนิตี้ — แตะเพื่อลองใหม่",
+    "publishQueued": "อยู่ในคิว — จะโพสต์หลังอัปโหลดรูป"
   },
   "community": {
     "tabs": {

@@ -1,13 +1,12 @@
 // @ts-nocheck
 import { useState, useCallback } from 'react'
 import { COLORS_60 } from '@/lib/colors'
-import { supabase } from '@/lib/supabase'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
-import i18n from '@/i18n'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather } from '@/hooks/useWeather'
 import { setJSON, StorageQuotaError } from '@/lib/storage'
+import { enqueuePost } from '@/lib/postQueue'
 
 export interface OotdRecord {
   id: string
@@ -195,50 +194,11 @@ export function useOotd() {
       return false
     }
 
-    // 커뮤니티 공유 (public/friends일 때 Supabase에도 저장) (#9, #19)
-    if (record.visibility !== 'private') { (async () => {
-      try {
-        const userId = user?.id
-        if (userId) {
-          const outfit: Record<string,string> = {}
-          Object.entries(record.colors).forEach(([k,v]) => { if(v) outfit[k] = v })
-          
-          if (record.postId) {
-            // 수정
-            await supabase.from('posts').update({
-              outfit, score: record.score, caption: record.memo || null,
-              visibility: record.visibility, show_instagram: record.showInstagram,
-            }).eq('id', record.postId)
-          } else {
-            // 신규
-            const { data: inserted } = await supabase.from('posts').insert({
-              user_id: userId, title: record.memo?.slice(0,100) || i18n.t('ootdDetail.todaysCoord'),
-              outfit, score: record.score, style: null, layer_type: 'basic',
-              caption: record.memo?.slice(0,200) || null, photo_urls: record.photos.length > 0 ? record.photos : null,
-              status: 'approved', visibility: record.visibility,
-              show_instagram: record.showInstagram, hide_counts: false,
-            }).select('id').single()
-            if (inserted?.id) {
-              record.postId = inserted.id
-              // localStorage 업데이트
-              const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-              const ri = recs.findIndex((r: any) => r.id === record.id)
-              if (ri >= 0) { recs[ri].postId = inserted.id; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
-            }
-          }
-        }
-      } catch(e) { console.warn('Community post error:', e) } })()
+    // 커뮤니티 반영은 큐로 (실패해도 잃지 않고, 재개·온라인 복귀 때 다시 시도)
+    if (record.visibility !== 'private') {
+      enqueuePost({ recordId: record.id, op: 'publish', visibility: record.visibility })
     } else if (record.postId) {
-      // 비공개 전환: 기존 커뮤니티 게시물의 visibility를 private으로 업데이트
-      (async () => {
-        try {
-          const userId = user?.id
-          if (userId) {
-            await supabase.from('posts').update({ visibility: 'private' })
-              .eq('id', record.postId).eq('user_id', userId)
-          }
-        } catch(e) { console.warn('Visibility update error:', e) }
-      })()
+      enqueuePost({ recordId: record.id, op: 'private' })
     }
 
     // gamification
@@ -257,12 +217,9 @@ export function useOotd() {
     const target = getRecords().find(r => r.id === id)
     const records = getRecords().filter(r => r.id !== id)
     try { setJSON(STORAGE_KEY, records) } catch {}
-    // 공개했던 기록이면 커뮤니티 게시물도 함께 내린다 (고아 게시물 방지)
-    if (target?.postId && user?.id) {
-      supabase.from('posts').delete().eq('id', target.postId).eq('user_id', user.id)
-        .then(({ error }) => { if (error) console.warn('Community post delete error:', error) })
-    }
-  }, [getRecords, user])
+    // 공개했던 기록이면 커뮤니티 게시물도 함께 내린다 (고아 게시물 방지) — 큐로, 실패해도 재시도
+    if (target?.postId) enqueuePost({ recordId: id, op: 'delete', postId: target.postId })
+  }, [getRecords])
 
   const resetForm = useCallback(() => {
     setColors({ top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null })

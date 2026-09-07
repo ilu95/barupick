@@ -614,7 +614,9 @@
     "alreadyShared": "This record is already shared",
     "todaysCoord": "Today's Outfit",
     "shareError": "An error occurred while sharing",
-    "recordCount": "{{count}} records"
+    "recordCount": "{{count}} records",
+    "publishPending": "Waiting to post to community — tap to retry now",
+    "publishQueued": "Queued — will appear in community after photos upload"
   },
   "community": {
     "tabs": {

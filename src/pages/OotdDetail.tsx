@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import ShareCard, { useShareCard } from '@/components/ui/ShareCard'
-import { supabase } from '@/lib/supabase'
+import { enqueuePost, usePostQueue } from '@/lib/postQueue'
 import { evaluationSystem } from '@/lib/evaluation'
 import { getScorePercentile } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
@@ -91,7 +91,8 @@ export default function OotdDetail() {
   const [searchParams] = useSearchParams()
   const recordId = searchParams.get('id')
   const { getRecords, deleteRecord } = useOotd()
-  const { profile: authProfile } = useAuth()
+  const postQueue = usePostQueue()
+  const { user } = useAuth()
   const modal = useModal()
   const toast = useToast()
   const { open: shareOpen, cardData, showShareCard, hideShareCard } = useShareCard()
@@ -150,70 +151,24 @@ export default function OotdDetail() {
       setTimeout(() => setShareMsg(''), 3000)
       return
     }
+    if (!user) {
+      setShareMsg(t('common.loginRequired'))
+      navigate('/auth/login')
+      return
+    }
+    if (record.postId && record.visibility !== 'private' && !postQueue.isPending(record.id)) {
+      setShareMsg(t('ootdDetail.alreadyShared'))
+      setTimeout(() => setShareMsg(''), 3000)
+      return
+    }
     setSharing(true)
     try {
-      const userId = (await supabase.auth.getUser())?.data?.user?.id
-      if (!userId) {
-        setShareMsg(t('common.loginRequired'))
-        navigate('/auth/login')
-        return
-      }
-      const outfit: Record<string, string> = {}
-      Object.entries(record.colors || {}).forEach(([k, v]) => { if (v) outfit[k] = v as string })
-
-      // 자동 배색 이론 감지
-      let autoStyle = null
-      try {
-        const theories = evaluationSystem.detectTheory(outfit)
-        if (Array.isArray(theories) && theories.length > 0) autoStyle = theories.join(', ')
-      } catch {}
-
-      if (record.postId && record.visibility !== 'private') {
-        setShareMsg(t('ootdDetail.alreadyShared'))
-      } else if (record.postId && record.visibility === 'private') {
-        // 비공개→다시 공개: 기존 게시물 visibility 업데이트
-        await supabase.from('posts').update({
-          visibility: 'public', outfit, score: record.score,
-          caption: record.memo?.slice(0, 200) || null,
-          photo_urls: record.photos,
-          show_instagram: record.showInstagram || false,
-        }).eq('id', record.postId)
-        // localStorage 업데이트
-        const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-        const ri = recs.findIndex((r: any) => r.id === record.id)
-        if (ri >= 0) {
-          recs[ri].visibility = 'public'
-          localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
-        }
-        setShareMsg(t('ootdDetail.communityShareSuccess'))
-      } else {
-        const { data: inserted } = await supabase.from('posts').insert({
-          user_id: userId,
-          title: record.memo?.slice(0, 100) || t('ootdDetail.todaysCoord'),
-          outfit,
-          score: record.score,
-          style: autoStyle,
-          layer_type: 'basic',
-          caption: record.memo?.slice(0, 200) || null,
-          photo_urls: record.photos,
-          status: 'approved',
-          visibility: 'public',
-          show_instagram: record.showInstagram || false,
-          hide_counts: false,
-        }).select('id').single()
-
-        if (inserted?.id) {
-          // localStorage 업데이트
-          const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-          const ri = recs.findIndex((r: any) => r.id === record.id)
-          if (ri >= 0) {
-            recs[ri].postId = inserted.id
-            recs[ri].visibility = 'public'
-            localStorage.setItem('sp_ootd_records', JSON.stringify(recs))
-          }
-          setShareMsg(t('ootdDetail.communityShareSuccess'))
-        }
-      }
+      // 로컬은 즉시 공개로, 서버 반영은 큐가 (사진 업로드 포함)
+      const recs = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
+      const ri = recs.findIndex((r: any) => r.id === record.id)
+      if (ri >= 0) { recs[ri].visibility = 'public'; localStorage.setItem('sp_ootd_records', JSON.stringify(recs)) }
+      enqueuePost({ recordId: record.id, op: 'publish', visibility: 'public' })
+      setShareMsg(t('ootdDetail.publishQueued'))
     } catch (e) {
       console.error('Share error:', e)
       setShareMsg(t('ootdDetail.shareError'))
@@ -363,6 +318,11 @@ export default function OotdDetail() {
         </button>
       )}
 
+      {postQueue.isPending(record.id) && (
+        <button onClick={() => postQueue.retry()} className="w-full mb-3 flex items-center justify-center gap-2 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl py-2 active:scale-[0.99]">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> {t('ootdDetail.publishPending')}
+        </button>
+      )}
       {shareMsg && (
         <div className="mb-3 text-center text-xs font-medium text-terra-600 dark:text-terra-400 bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 rounded-xl py-2 animate-screen-fade">
           {shareMsg}
@@ -374,7 +334,7 @@ export default function OotdDetail() {
         disabled={sharing}
         className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
       >
-        <Globe size={16} /> {sharing ? '...' : (record.postId && record.visibility !== 'private') ? t('ootdDetail.communityShareSuccess') : t('ootdDetail.communityShare')}
+        <Globe size={16} /> {sharing ? '...' : (record.postId && record.visibility !== 'private' && !postQueue.isPending(record.id)) ? t('ootdDetail.communityShareSuccess') : t('ootdDetail.communityShare')}
       </button>
 
       {/* 공유 카드 모달 */}

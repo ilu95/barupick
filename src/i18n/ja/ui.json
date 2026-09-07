@@ -614,7 +614,9 @@
     "alreadyShared": "すでにシェア済みの記録です",
     "todaysCoord": "今日のコーデ",
     "shareError": "シェア中にエラーが発生しました",
-    "recordCount": "{{count}}件の記録"
+    "recordCount": "{{count}}件の記録",
+    "publishPending": "コミュニティ投稿待ち — タップして今すぐ再試行",
+    "publishQueued": "投稿を予約しました — 写真アップロード後に公開されます"
   },
   "community": {
     "tabs": {

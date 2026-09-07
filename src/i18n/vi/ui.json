@@ -614,7 +614,9 @@
     "alreadyShared": "Bản ghi này đã được chia sẻ",
     "todaysCoord": "Trang phục hôm nay",
     "shareError": "Đã xảy ra lỗi khi chia sẻ",
-    "recordCount": "{{count}} bản ghi"
+    "recordCount": "{{count}} bản ghi",
+    "publishPending": "Đang chờ đăng lên cộng đồng — chạm để thử lại",
+    "publishQueued": "Đã xếp hàng — sẽ đăng sau khi tải ảnh lên"
   },
   "community": {
     "tabs": {

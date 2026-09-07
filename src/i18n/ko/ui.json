@@ -614,7 +614,9 @@
     "alreadyShared": "이미 공유된 기록이에요",
     "todaysCoord": "오늘의 코디",
     "shareError": "공유 중 오류가 발생했어요",
-    "recordCount": "{{count}}개의 기록"
+    "recordCount": "{{count}}개의 기록",
+    "publishPending": "커뮤니티 게시 대기 중 — 탭하면 지금 다시 시도",
+    "publishQueued": "게시 예약됨 — 사진 업로드 후 커뮤니티에 올라가요"
   },
   "community": {
     "tabs": {

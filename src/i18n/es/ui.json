@@ -614,7 +614,9 @@
     "alreadyShared": "Este registro ya fue compartido",
     "todaysCoord": "Outfit de hoy",
     "shareError": "Ocurrió un error al compartir",
-    "recordCount": "{{count}} registros"
+    "recordCount": "{{count}} registros",
+    "publishPending": "Pendiente de publicar — toca para reintentar",
+    "publishQueued": "En cola — aparecerá tras subir las fotos"
   },
   "community": {
     "tabs": {

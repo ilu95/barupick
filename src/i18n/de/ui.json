@@ -614,7 +614,9 @@
     "alreadyShared": "Dieser Eintrag wurde bereits geteilt",
     "todaysCoord": "Heutiges Outfit",
     "shareError": "Beim Teilen ist ein Fehler aufgetreten",
-    "recordCount": "{{count}} Einträge"
+    "recordCount": "{{count}} Einträge",
+    "publishPending": "Wartet auf Veröffentlichung — tippen zum Wiederholen",
+    "publishQueued": "Eingereiht — erscheint nach dem Foto-Upload"
   },
   "community": {
     "tabs": {

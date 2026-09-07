@@ -614,7 +614,9 @@
     "alreadyShared": "Cet enregistrement est déjà partagé",
     "todaysCoord": "Tenue du jour",
     "shareError": "Une erreur est survenue lors du partage",
-    "recordCount": "{{count}} enregistrements"
+    "recordCount": "{{count}} enregistrements",
+    "publishPending": "En attente de publication — touchez pour réessayer",
+    "publishQueued": "En file — publié après l’envoi des photos"
   },
   "community": {
     "tabs": {

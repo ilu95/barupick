@@ -614,7 +614,9 @@
     "alreadyShared": "Catatan ini sudah dibagikan",
     "todaysCoord": "Outfit Hari Ini",
     "shareError": "Terjadi kesalahan saat membagikan",
-    "recordCount": "{{count}} catatan"
+    "recordCount": "{{count}} catatan",
+    "publishPending": "Menunggu diposting ke komunitas — ketuk untuk coba lagi",
+    "publishQueued": "Dalam antrean — tampil setelah foto terunggah"
   },
   "community": {
     "tabs": {
