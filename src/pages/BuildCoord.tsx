@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { setJSON } from '@/lib/storage'
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
@@ -11,7 +11,8 @@ import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styl
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
 import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType, predictSlot } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
-import { trackSave, trackClick } from '@/lib/analytics'
+import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare } from '@/lib/analytics'
+import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
 import { useWeather, weatherEmoji, getLayerAdvice } from '@/hooks/useWeather'
 import { getScorePercentile } from '@/hooks/useWardrobe'
 import { useTranslation } from 'react-i18next'
@@ -25,6 +26,9 @@ type BH = BuildHook
 export default function BuildCoord() {
   const navigate = useNavigate()
   const build = useBuild('coord')
+
+  // 계측: 단계 진입 (퍼널 기준선)
+  useEffect(() => { trackBuildStep(build.step, { mode: build.state.mode, style: build.state.style }) }, [build.step])
 
   return (
     <div className="min-h-screen dark:bg-[#1C1917]">
@@ -163,19 +167,24 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
   const handleConfirm = useCallback(() => {
     if (!tmpColor) return
     if (editMode.type === 'edit_simple') {
+      trackColorConfirm({ slot: editMode.target, item: null, color: tmpColor, action: 'simple', score_before: score })
       build.setSimpleColor(editMode.target, tmpColor)
     } else if (editMode.type === 'edit_upper') {
       const idx = editMode.index
       const itemId = tmpItem || upper[idx]?.itemId
-      if (itemId) build.editUpper(idx, itemId, tmpColor)
+      if (itemId) {
+        trackColorConfirm({ slot: predictedSlot, item: itemId, color: tmpColor, action: 'edit', score_before: score })
+        build.editUpper(idx, itemId, tmpColor)
+      }
     } else if (tmpItem) {
       if (upper.length >= 4) { toast.warning(t('build.maxLayerWarning')); return }
       if (usedItemIds.has(tmpItem)) { toast.warning(t('build.duplicateWarning')); return }
+      trackColorConfirm({ slot: predictedSlot, item: tmpItem, color: tmpColor, action: 'add', score_before: score })
       build.addUpper(tmpItem, tmpColor)
     }
     setTmpItem(null); setTmpColor(null); setPreviewHex(null)
     build.setEditMode({ type: 'idle' })
-  }, [editMode, tmpItem, tmpColor, upper, usedItemIds, build, toast])
+  }, [editMode, tmpItem, tmpColor, upper, usedItemIds, build, toast, predictedSlot, score])
 
   // 아이템 탭 → 아이템 그리드 숨기고 컬러 피커 보이기
   const handleItemTap = useCallback((itemId: string) => {
@@ -404,13 +413,13 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
                   )}
                 </div>
                 <div className="grid grid-cols-5 gap-1.5 mb-3">
-                  {recommendations.slice(0, 10).map(rec => {
+                  {recommendations.slice(0, 10).map((rec, idx) => {
                     const c = COLORS_60[rec.key]
                     if (!c) return null
                     const light = (c.hcl[2] > 55)
                     const delta = currentSlot ? build.calcScoreDelta(currentSlot, rec.key) : 0
                     return (
-                      <button key={rec.key} onClick={() => handleColorSelect(rec.key)}
+                      <button key={rec.key} onClick={() => { trackColorPick('build', { slot: currentSlot, color: rec.key, src: 'rec', pos: idx, delta }); handleColorSelect(rec.key) }}
                         className="h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90"
                         style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
                         {getColorName(rec.key)}
@@ -435,6 +444,8 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               selected={tmpColor || (editMode.type === 'edit_upper' ? upper[editMode.index]?.colorKey : editMode.type === 'edit_simple' ? build.state[editMode.target + 'Color'] : null) || null}
               onSelect={(key) => handleColorSelect(key)}
               scoreDeltaFn={currentSlot ? (key) => build.calcScoreDelta(currentSlot, key) : undefined}
+              ctx="build"
+              slot={currentSlot}
             />
           </>
         )}
@@ -628,6 +639,11 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const outfit = getFilledOutfit(build.state)
   const filledParts = Object.entries(outfit).filter(([_, v]) => v)
 
+  // 계측: 결과 화면 도달 = 만들기 완료 (한 번만)
+  useEffect(() => {
+    trackBuildComplete({ score, n_upper: build.state.upper.length, colors: outfit, style: build.state.style, mode: build.state.mode, fabric: !!build.state.fabricMode })
+  }, [])
+
   const scoreItems = evalResult ? [
     { label: t('build.scoreItems.colorPlacement'), value: evalResult.goldilocks, max: 33, desc: '' },
     { label: t('build.scoreItems.colorRatio'), value: evalResult.ratio, max: 17, desc: '' },
@@ -641,15 +657,15 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const handleSave = () => {
     const name = build.state.style || t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now() })
+    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION })
     if (saved.length > 100) saved.length = 100
     setJSON('cs_saved', saved)
     trackSave('build', score)
     toast.success(t('recommend.saveSuccess'))
   }
 
-  const handleShare = () => { navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
-  const handleCommunityShare = () => { setJSON("_pending_post_outfit", outfit); navigate("/community/post") }
+  const handleShare = () => { trackShare('native', 'build', score); navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
+  const handleCommunityShare = () => { trackShare('community', 'build', score); setJSON("_pending_post_outfit", outfit); navigate("/community/post") }
 
   const scoreGrade = score >= 90 ? { label: t('build.scoreGrade.perfect'), emoji: '🏆', color: 'text-amber-600' }
     : score >= 80 ? { label: t('build.scoreGrade.great'), emoji: '✨', color: 'text-terra-600' }

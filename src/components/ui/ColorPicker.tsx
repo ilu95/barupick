@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { useTranslation } from 'react-i18next'
+import { trackColorTab, trackColorPick } from '@/lib/analytics'
 
 interface Props {
   selected: string | null
@@ -11,6 +12,10 @@ interface Props {
   onClose?: () => void
   inline?: boolean
   scoreDeltaFn?: (colorKey: string) => number
+  /** 계측용: 어느 화면의 피커인지 (build | recommend_pin | recommend_edit | other) */
+  ctx?: string
+  /** 계측용: 지금 색을 고르는 자리 (outer/top/bottom/...) */
+  slot?: string | null
 }
 
 const RECENT_KEY = 'sp_recent_colors'
@@ -27,7 +32,7 @@ function addRecentColor(key: string) {
   } catch {}
 }
 
-export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn }: Props) {
+export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn, ctx = 'other', slot = null }: Props) {
   const [tab, setTab] = useState(COLOR_TABS[0].id)
   const [recent, setRecent] = useState<string[]>([])
   const { t } = useTranslation()
@@ -35,9 +40,15 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 
   useEffect(() => { setRecent(getRecentColors()) }, [])
 
-  const handleSelect = (key: string) => {
+  // 계측: 탭이 보일 때마다 노출 기록 (첫 렌더 포함) → 노출 대비 선택률의 분모
+  useEffect(() => { trackColorTab(ctx, group.id, group.keys.length) }, [ctx, group.id])
+
+  const handleSelect = (key: string, src: 'grid' | 'recent' = 'grid', pos?: number) => {
     addRecentColor(key)
     setRecent(getRecentColors())
+    let delta: number | undefined
+    if (scoreDeltaFn) { try { delta = scoreDeltaFn(key) } catch { delta = undefined } }
+    trackColorPick(ctx, { slot, color: key, src, tab: group.id, pos, delta })
     onSelect(key)
   }
 
@@ -65,14 +76,14 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
         <>
           <div className="text-[9px] font-semibold text-warm-400 dark:text-warm-500 tracking-wider uppercase mb-1.5">{t('common.recentColors')}</div>
           <div className="flex gap-1.5 mb-2.5 pb-2.5 border-b border-warm-300 dark:border-warm-600">
-            {recent.map(k => {
+            {recent.map((k, i) => {
               const c = COLORS_60[k]
               if (!c) return null
               const needsBorder = c.hcl[2] > 90
               return (
                 <button
                   key={k}
-                  onClick={() => handleSelect(k)}
+                  onClick={() => handleSelect(k, 'recent', i)}
                   className={`w-8 h-8 rounded-lg transition-all active:scale-90 ${
                     selected === k ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
                   }`}
@@ -87,7 +98,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 
       {/* 컬러 그리드 */}
       <div className="grid grid-cols-5 gap-1.5">
-        {group.keys.map(k => {
+        {group.keys.map((k, i) => {
           const c = COLORS_60[k]
           if (!c) return null
           const isSelected = selected === k
@@ -98,7 +109,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
           return (
             <div key={k} className="relative">
               <button
-                onClick={() => handleSelect(k)}
+                onClick={() => handleSelect(k, 'grid', i)}
                 aria-label={getColorName(k)}
                 className={`w-full aspect-square rounded-xl flex items-center justify-center text-[8px] font-semibold leading-tight transition-all active:scale-90 ${
                   isSelected ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
