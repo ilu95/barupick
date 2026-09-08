@@ -1659,6 +1659,7 @@
     "retry": "Retry",
     "failAnswer": "Couldn't send it. Try again shortly",
     "failCreate": "Couldn't create the poll. Check your connection",
-    "homeLink": "See your friends' votes"
+    "homeLink": "See your friends' votes",
+    "singleSub": "Tap like or not-for-me once"
   }
 }

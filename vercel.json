@@ -14,6 +14,11 @@
     { "source": "/bridge.html", "destination": "/bridge.html" },
     { "source": "/static-privacy.html", "destination": "/static-privacy.html" },
     { "source": "/static-terms.html", "destination": "/static-terms.html" },
+    {
+      "source": "/v/:code",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(kakaotalk-scrap|facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|LinkedInBot|TelegramBot|WhatsApp|Line/|Yeti|Daum|Googlebot|bingbot|Applebot).*" }],
+      "destination": "/api/og/vote?code=:code"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

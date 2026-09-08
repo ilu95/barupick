@@ -15,7 +15,7 @@ import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit,
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide } from '@/lib/analytics'
 import type { Move } from '@/lib/guide'
-import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
+import { drawCoordCard, drawVoteOg, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { createVote, type VoteSide } from '@/lib/votes'
 import { trackVote } from '@/lib/analytics'
 import { useAuth } from '@/contexts/AuthContext'
@@ -747,7 +747,10 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
           score: m.score, label: t('vote.labelB'),
         }
       }
-      const v = await createVote({ a, b: bSide, question: t('vote.defaultQ'), situ: build.state.situ || null, temp: weather?.feels ?? null, ownerId: user?.id || null })
+      const sub = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null, bSide ? t('vote.shareText') : t('vote.singleSub')].filter(Boolean).join(' · ')
+      let ogDataUrl: string | null = null
+      try { ogDataUrl = await drawVoteOg(a, bSide, t('vote.defaultQ'), sub); if (import.meta.env.DEV) (window as any).__bp_lastOg = ogDataUrl } catch { ogDataUrl = null }
+      const v = await createVote({ a, b: bSide, question: t('vote.defaultQ'), situ: build.state.situ || null, temp: weather?.feels ?? null, ownerId: user?.id || null, ogDataUrl })
       trackVote('create', { code: v.code, two: !!bSide, score })
       navigate('/v/' + v.code)
     } catch { toast.error(t('vote.failCreate')) } finally { setAskBusy(false) }
