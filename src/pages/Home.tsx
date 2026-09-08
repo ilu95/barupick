@@ -11,10 +11,12 @@ import i18n, { getLocale } from '@/i18n'
 
 import { profile as profileLib } from '@/lib/profile'
 import { loadTaste } from '@/lib/taste'
+import { myVotes } from '@/lib/votes'
 
 export default function Home() {
   const navigate = useNavigate()
   const tasteLabel = useMemo(() => loadTaste()?.name || null, [])
+  const lastVote = useMemo(() => myVotes()[0] || null, [])
   const { t } = useTranslation()
   const { profile, user } = useAuth()
   const { weather, loading: wLoading, refresh: refreshWeather } = useWeather()
@@ -205,6 +207,12 @@ export default function Home() {
           </div>
           <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
         </button>
+
+        {lastVote && (
+          <button onClick={() => navigate('/v/' + lastVote.code)} className="w-full text-left px-4 py-2.5 rounded-2xl bg-[#FEE500]/40 border border-[#E8D34A]/60 text-[12.5px] font-semibold text-warm-800 flex items-center justify-between active:scale-[0.98]">
+            <span>🗳 {t('vote.homeLink')}</span><ChevronRight size={14} className="opacity-60" />
+          </button>
+        )}
 
         {/* 하단 2열 */}
         <div className="grid grid-cols-2 gap-3">

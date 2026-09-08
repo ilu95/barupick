@@ -140,6 +140,7 @@ export function trackBodyType(type: string) {
 //   outfit_*       1단계 옷 조합 {id, situ, temp, via|kind|rank}
 //   guide_*        2단계 안내 층 {slot, from, to, gain}
 //   taste_*        취향 온보딩 {i, ax, which | name, 축 6 | id, rank}
+//   vote_*         웹 투표 {code, two | choice}. share kind='card' 는 코디 카드
 // meta 는 jsonb 라 스키마 변경 없음. 조회 예시는 scripts/03_analytics.sql.
 // ════════════════════════════════════════════════════════════════
 
@@ -214,4 +215,9 @@ export function trackGuide(kind: 'moves_open' | 'move_apply' | 'move_undo', meta
 // 취향 온보딩: start · answer · reveal · fall_view · pick(카드 → 만들기) · share
 export function trackTaste(kind: 'start' | 'answer' | 'reveal' | 'fall_view' | 'pick' | 'share', meta: Record<string, any>) {
   trackEvent('taste_' + kind, { ...meta, ...VER })
+}
+
+// 웹 투표(루프 L3): create(만든 사람) · view · answer · share · cta(받은 사람이 취향 테스트로)
+export function trackVote(kind: 'create' | 'view' | 'answer' | 'share' | 'cta', meta: Record<string, any>) {
+  trackEvent('vote_' + kind, { ...meta, ...VER })
 }

@@ -56,6 +56,7 @@ const PcSelect = lazy(() => import('@/pages/RemainingPages').then(m => ({ defaul
 
 import Onboarding from '@/pages/Onboarding'
 const TasteQuiz = lazy(() => import('@/pages/TasteQuiz'))
+const VotePage = lazy(() => import('@/pages/Vote'))
 const ClosetCoord = lazy(() => import('@/pages/ClosetCoord'))
 const PurchaseSimulate = lazy(() => import('@/pages/PurchaseSimulate'))
 const WardrobeReport = lazy(() => import('@/pages/WardrobeReport'))
@@ -116,6 +117,7 @@ export default function App() {
                   <Route path="/home" element={<Home />} />
                   <Route path="/home/build" element={<BuildCoord />} />
                   <Route path="/home/taste" element={<TasteQuiz />} />
+                  <Route path="/v/:code" element={<VotePage />} />
                   <Route path="/home/build/improve" element={<BuildCoord />} />
                   <Route path="/home/evaluate" element={<BuildCoord />} />
                   <Route path="/home/recommend" element={<RecommendCoord />} />

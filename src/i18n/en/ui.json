@@ -1624,5 +1624,41 @@
       "watermark": "My color taste",
       "fail": "Couldn't make the card"
     }
+  },
+  "card": {
+    "btn": "Outfit card",
+    "title": "Today's outfit card",
+    "making": "Making…",
+    "share": "Share",
+    "saved": "Image saved",
+    "fail": "Couldn't make the card",
+    "watermark": "today's outfit"
+  },
+  "vote": {
+    "ask": "Ask a friend",
+    "asking": "Creating the poll…",
+    "defaultQ": "What should I wear tomorrow?",
+    "labelA": "As is",
+    "labelB": "One color changed",
+    "title": "How is this outfit?",
+    "noApp": "No app needed · one tap",
+    "answered": "{{n}} answered",
+    "hint": "Your pick goes straight to them",
+    "thanks": "Sent. Thanks!",
+    "myPick": "my pick",
+    "up": "Like it",
+    "down": "Not for me",
+    "cta": "Decide your own outfit for tomorrow",
+    "shareLink": "Send the link",
+    "shareText": "What should I wear tomorrow? Pick one",
+    "copied": "Link copied",
+    "copyFail": "Couldn't copy the link",
+    "refresh": "Refresh results",
+    "backBuild": "Back to the builder",
+    "loadFail": "Couldn't load this poll",
+    "retry": "Retry",
+    "failAnswer": "Couldn't send it. Try again shortly",
+    "failCreate": "Couldn't create the poll. Check your connection",
+    "homeLink": "See your friends' votes"
   }
 }

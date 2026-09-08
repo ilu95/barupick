@@ -15,6 +15,10 @@ import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit,
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide } from '@/lib/analytics'
 import type { Move } from '@/lib/guide'
+import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
+import { createVote, type VoteSide } from '@/lib/votes'
+import { trackVote } from '@/lib/analytics'
+import { useAuth } from '@/contexts/AuthContext'
 import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
 import { useWeather, weatherEmoji, getLayerAdvice } from '@/hooks/useWeather'
 import { getScorePercentile } from '@/hooks/useWardrobe'
@@ -670,6 +674,11 @@ function getBuildPartLabel(partKey: string, upper: any[]): string {
 function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const { t } = useTranslation()
   const toast = useToast()
+  const { user, profile: authProfile } = useAuth() as any
+  const { weather } = useWeather()
+  const [card, setCard] = useState<{ url: string; ratio: CardRatio } | null>(null)
+  const [cardBusy, setCardBusy] = useState(false)
+  const [askBusy, setAskBusy] = useState(false)
   const score = build.getScore()
   const evalResult = build.getEvalResult()
   const circumference = 2 * Math.PI * 52
@@ -698,8 +707,51 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     toast.success(t('recommend.saveSuccess'))
   }
 
-  const handleShare = () => { trackShare('native', 'build', score); navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
   const handleCommunityShare = () => { trackShare('community', 'build', score); setJSON("_pending_post_outfit", outfit); navigate("/community/post") }
+
+  // ── 루프 L1: 오늘의 코디 카드 ──
+  const sceneNow = charSceneFromBuild(build.state.upper, build.outfitHex, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem })
+  const colorsNow = filledParts.map(([, key]) => ({ key: key as string, hex: COLORS_60[key as string]?.hex || '#ccc', name: getColorName(key as string) }))
+  const stampText = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null].filter(Boolean).join(' ')
+  const makeCard = async (ratio: CardRatio) => {
+    if (cardBusy) return
+    setCardBusy(true)
+    try {
+      const tags = (evalResult ? evalResult.reasons.filter(r => r.w > 0).slice(0, 2).map(r => r.txt.split(/[,—]/)[0].trim()) : [])
+      const url = await drawCoordCard({
+        scene: sceneNow, score, grade: scoreGrade.label, tags, colors: colorsNow,
+        dateText: new Date().toLocaleDateString(i18n.language.startsWith('ko') ? 'ko-KR' : 'en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+        stamp: stampText || undefined, handle: authProfile?.nickname ? '@' + authProfile.nickname : undefined,
+        link: 'barupick.vercel.app', watermark: t('card.watermark'),
+      }, ratio)
+      setCard({ url, ratio })
+      trackShare('card', 'build', score)
+    } catch { toast.error(t('card.fail')) } finally { setCardBusy(false) }
+  }
+  const shareCard = async () => { if (!card) return; const r = await shareDataUrl(card.url, `barupick-${Date.now()}.png`, t('card.title')); if (r === 'downloaded') toast.success(t('card.saved')) }
+
+  // ── 루프 L3: 친구에게 물어보기 (A = 지금, B = 한 수 바꾼 버전) ──
+  const ask = async () => {
+    if (askBusy) return
+    setAskBusy(true)
+    try {
+      const a: VoteSide = { scene: sceneNow, colors: colorsNow, score, label: t('vote.labelA') }
+      let bSide: VoteSide | null = null
+      const m = build.getBestMoves(1)[0]
+      if (m) {
+        const hexB = { ...build.outfitHex, [m.slot]: COLORS_60[m.to]?.hex }
+        const outfitB = { ...outfit, [m.slot]: m.to }
+        bSide = {
+          scene: charSceneFromBuild(build.state.upper, hexB, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem }),
+          colors: Object.entries(outfitB).filter(([, v]) => v).map(([, key]) => ({ key: key as string, hex: COLORS_60[key as string]?.hex || '#ccc', name: getColorName(key as string) })),
+          score: m.score, label: t('vote.labelB'),
+        }
+      }
+      const v = await createVote({ a, b: bSide, question: t('vote.defaultQ'), situ: build.state.situ || null, temp: weather?.feels ?? null, ownerId: user?.id || null })
+      trackVote('create', { code: v.code, two: !!bSide, score })
+      navigate('/v/' + v.code)
+    } catch { toast.error(t('vote.failCreate')) } finally { setAskBusy(false) }
+  }
 
   // 등급 기준은 v7.1 분포로 올렸다: 완벽 92 · 훌륭 84 · 좋음 72 · 괜찮 60 (연구 11장)
   const scoreGrade = score >= 92 ? { label: t('build.scoreGrade.perfect'), emoji: '🏆', color: 'text-amber-600' }
@@ -791,12 +843,15 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       <button onClick={() => build.goBack()} className="w-full py-3 border border-terra-400 dark:border-terra-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-2">
         <Edit3 size={16} /> {t('build.editColors')}
       </button>
-      <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-3">
+      <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-2">
         <Bookmark size={18} /> {t('build.saveCoord')}
       </button>
+      <button onClick={ask} disabled={askBusy} className="w-full py-3.5 bg-[#FEE500] text-[#1C1917] rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-3 disabled:opacity-60">
+        <Users size={18} /> {askBusy ? t('vote.asking') : t('vote.ask')}
+      </button>
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <button onClick={handleShare} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm">
-          <Share size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{t('build.shareCoord')}</span>
+        <button onClick={() => makeCard('story')} disabled={cardBusy} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm disabled:opacity-60">
+          <Share size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{cardBusy ? t('card.making') : t('card.btn')}</span>
         </button>
         <button onClick={handleCommunityShare} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm">
           <Users size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{t('build.communityBtn')}</span>
@@ -806,6 +861,25 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </button>
       </div>
       <button onClick={() => navigate('/home')} className="w-full py-2 text-sm text-warm-600 text-center active:opacity-70 mb-6">{t('build.goHome')}</button>
+
+      {/* 오늘의 코디 카드 미리보기 */}
+      {card && (
+        <div className="fixed inset-0 z-[300] bg-black/60 flex items-center justify-center px-6" onClick={() => setCard(null)}>
+          <div className="w-full max-w-[360px] bg-white dark:bg-warm-800 rounded-3xl p-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-bold text-warm-900 dark:text-warm-100">{t('card.title')}</div>
+              <div className="flex bg-warm-100 dark:bg-warm-700 rounded-full p-0.5">
+                {(['story', 'feed'] as CardRatio[]).map(r => (
+                  <button key={r} onClick={() => card.ratio !== r && makeCard(r)} className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${card.ratio === r ? 'bg-warm-900 text-white' : 'text-warm-600'}`}>{r === 'story' ? '9:16' : '4:5'}</button>
+                ))}
+              </div>
+              <button onClick={() => setCard(null)} aria-label={t('common.close')} className="w-8 h-8 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center"><X size={14} /></button>
+            </div>
+            <img src={card.url} alt="" className={`w-full rounded-2xl border border-warm-300 dark:border-warm-600 object-contain ${card.ratio === 'story' ? 'max-h-[60vh]' : ''}`} />
+            <button onClick={shareCard} className="mt-3 w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"><Share size={15} /> {t('card.share')}</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
