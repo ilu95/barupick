@@ -124,6 +124,7 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
       shoes: p.shoes ? { plate: p.shoes, colorKey: pal.shoes || FALLBACK_PAL.shoes } : undefined,
       style: STYLE_KEY[hero.c.st] ?? null,
       templateId: hero.c.id,
+      situ,
     })
   }
 

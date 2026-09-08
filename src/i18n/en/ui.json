@@ -515,6 +515,14 @@
       "undo": "Undo",
       "applied": "{{part}} → {{color}} (+{{n}})",
       "hint": "What one color change can add. Tap to apply."
+    },
+    "v7parts": {
+      "structure": "Light & dark structure",
+      "count": "Color count & area",
+      "harmony": "Harmony",
+      "focus": "Focal point",
+      "situation": "Occasion & season",
+      "me": "For me"
     }
   },
   "weatherConditions": {

@@ -48,6 +48,12 @@ const PREFER: Record<SlotKey, CharSlot[]> = {
   hidden: ['inner', 'mid1', 'mid2', 'outer'],
 }
 
+/** 아이템 종류 + 자리 → 기본 판 (1단계 없이 직접 고른 옷의 면적 모델용) */
+export function defaultPlateFor(itemId: string, appSlot: SlotKey): string | null {
+  const cands = PLATES[itemId]; if (!cands) return null
+  const slot = PREFER[appSlot]?.find(s => cands[s]) ; return slot ? cands[slot]! : null
+}
+
 export const DEFAULT_BOTTOM = '03_slacks_straight'
 export const DEFAULT_SHOE = '71_sneaker_canvas'
 export const DEFAULT_SCARF = '54_scarf'
@@ -95,4 +101,21 @@ export function charSceneFromBuild(upper: UpperLayer[], hex: Record<string, stri
   const body: CharBody = { sex, hair: DEFAULT_HAIR[sex], hairColor: DEFAULT_HAIR_COLOR }
   if (hex.hat) { body.hat = DEFAULT_HAT; body.hatColor = hex.hat }
   return { items, body }
+}
+
+/** 만들기 상태 → 자리별 판 id (엔진 v7.1 의 면적 모델 입력) */
+export function platesOf(state: { upper: UpperLayer[]; bottomItem?: string | null; shoesItem?: string | null }): Record<string, string> {
+  const out: Record<string, string> = {}
+  const sorted = sortUpper(state.upper)
+  sorted.forEach((l, i) => {
+    const slot = getSlotKey(i, sorted.length, l)
+    if (slot === 'hidden') return
+    const p = l.plate || defaultPlateFor(l.itemId, slot)
+    if (p) out[slot] = p
+  })
+  out.bottom = state.bottomItem || DEFAULT_BOTTOM
+  out.shoes = state.shoesItem || DEFAULT_SHOE
+  out.scarf = DEFAULT_SCARF
+  out.hat = DEFAULT_HAT
+  return out
 }
