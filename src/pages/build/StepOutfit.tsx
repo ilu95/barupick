@@ -7,6 +7,8 @@ import { useWeather } from '@/hooks/useWeather'
 import type { BuildHook } from '@/hooks/useBuild'
 import { useToast } from '@/components/ui/Toast'
 import { trackOutfit } from '@/lib/analytics'
+import { loadTaste } from '@/lib/taste'
+import { useNavigate } from 'react-router-dom'
 import {
   SITU, PARTS, NEU, CHG, PLATE_TO_ITEM, STYLE_KEY,
   ranked, direction, alternatives, reasons, nameOf, plateName, styleName, partOptions,
@@ -27,8 +29,10 @@ const TEMP_STEPS = [15, 21, 26]
 export default function StepOutfit({ build }: { build: BuildHook }) {
   const { t } = useTranslation()
   const toast = useToast()
+  const navigate = useNavigate()
   const { weather } = useWeather()
   const sex = charSex()
+  const taste = useMemo(loadTaste, [])
 
   const [situ, setSitu] = useState<Situ>(defaultSitu)
   const [tempOverride, setTempOverride] = useState<number | null>(null)
@@ -139,7 +143,10 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
   return (
     <div className="animate-screen-fade">
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('outfit.title')}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('outfit.subtitle')}</p>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-3">{t('outfit.subtitle')}</p>
+      <button onClick={() => navigate('/home/taste')} className="mb-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 text-[11.5px] font-semibold text-terra-700 dark:text-terra-300 active:scale-95">
+        ✦ {taste ? t('outfit.tasteChip', { name: taste.name }) : t('outfit.tasteCta')}
+      </button>
 
       {/* 상황 · 기온 */}
       <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-5 px-5 mb-3 [scrollbar-width:none]">

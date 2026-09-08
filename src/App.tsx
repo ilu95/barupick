@@ -55,6 +55,7 @@ const EventDetail = lazy(() => import('@/pages/RemainingPages').then(m => ({ def
 const PcSelect = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.PcSelect })))
 
 import Onboarding from '@/pages/Onboarding'
+const TasteQuiz = lazy(() => import('@/pages/TasteQuiz'))
 const ClosetCoord = lazy(() => import('@/pages/ClosetCoord'))
 const PurchaseSimulate = lazy(() => import('@/pages/PurchaseSimulate'))
 const WardrobeReport = lazy(() => import('@/pages/WardrobeReport'))
@@ -114,6 +115,7 @@ export default function App() {
                   <Route path="/" element={<Navigate to="/home" replace />} />
                   <Route path="/home" element={<Home />} />
                   <Route path="/home/build" element={<BuildCoord />} />
+                  <Route path="/home/taste" element={<TasteQuiz />} />
                   <Route path="/home/build/improve" element={<BuildCoord />} />
                   <Route path="/home/evaluate" element={<BuildCoord />} />
                   <Route path="/home/recommend" element={<RecommendCoord />} />

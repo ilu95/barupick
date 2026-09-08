@@ -10,9 +10,11 @@ import { sortRecordsDesc } from '@/lib/records'
 import i18n, { getLocale } from '@/i18n'
 
 import { profile as profileLib } from '@/lib/profile'
+import { loadTaste } from '@/lib/taste'
 
 export default function Home() {
   const navigate = useNavigate()
+  const tasteLabel = useMemo(() => loadTaste()?.name || null, [])
   const { t } = useTranslation()
   const { profile, user } = useAuth()
   const { weather, loading: wLoading, refresh: refreshWeather } = useWeather()
@@ -188,6 +190,18 @@ export default function Home() {
           <div className="flex-1 min-w-0">
             <div className="text-[15px] font-semibold text-warm-900 tracking-tight">{t('home.mainCta.build')}</div>
             <div className="text-xs text-warm-600 mt-0.5">{t('recommend.resultSubtitle')}</div>
+          </div>
+          <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
+        </button>
+
+        {/* 내 컬러 취향 (30초) */}
+        <button onClick={() => navigate('/home/taste')} className="group w-full bg-white border border-warm-400 rounded-2xl p-4 flex items-center gap-3.5 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
+          <div className="w-11 h-11 rounded-xl bg-terra-100 flex items-center justify-center flex-shrink-0">
+            <Sparkles size={20} className="text-terra-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[15px] font-semibold text-warm-900 tracking-tight">{tasteLabel ? t('home.taste.done', { name: tasteLabel }) : t('home.taste.title')}</div>
+            <div className="text-xs text-warm-600 mt-0.5">{tasteLabel ? t('home.taste.doneSub') : t('home.taste.sub')}</div>
           </div>
           <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
         </button>

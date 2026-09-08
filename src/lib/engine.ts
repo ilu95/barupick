@@ -11,6 +11,7 @@
 import * as V7 from './engine/v7'
 import { COLORS_60, getColorName } from './colors'
 import { profile } from './profile'
+import { tasteContrast } from './taste'
 
 const TO_V7: Record<string, string> = { outer: 'outer', middleware: 'layer', top: 'top', inner: 'inner', bottom: 'bottom', shoes: 'shoes', scarf: 'scarf', hat: 'hat' }
 const FROM_V7: Record<string, string> = Object.fromEntries(Object.entries(TO_V7).map(([a, b]) => [b, a]))
@@ -43,7 +44,14 @@ export function toItems(input: EngineInput) {
     .filter(([, key]) => key && COLORS_60[key])
     .map(([slot, key]) => ({ slot: TO_V7[slot] || slot, id: input.plates?.[slot] || slot, hex: COLORS_60[key!].hex, color: getColorName(key!), key: key! }))
 }
-export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason() })
+export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason(), contrast: tasteContrast() })
+
+/** 조합표 그대로 채점: parts = v7 slot → 판 id, keys = slot → 색 키 (취향 폭포·1단계가 쓴다) */
+export function scoreTemplate(parts: Record<string, string>, keys: Record<string, string>, situ?: string | null) {
+  const items = Object.entries(parts).filter(([s]) => keys[s] && COLORS_60[keys[s]]).map(([s, id]) => ({ slot: s, id, hex: COLORS_60[keys[s]].hex, color: getColorName(keys[s]) }))
+  if (items.length < 2) return null
+  return V7.evaluate(items, ctxOf({ outfit: {}, situ }))
+}
 
 /** 148색 팔레트를 v7 guide/bestMoves 가 받는 꼴로 (한 번만) */
 let PAL: Record<string, { hex: string; name: string }> | null = null

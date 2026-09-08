@@ -151,6 +151,12 @@
       "fabricGuide": "소재 가이드",
       "bodyGuide": "체형별 코디",
       "quiz": "퀴즈"
+    },
+    "taste": {
+      "title": "내 컬러 취향 알아보기",
+      "sub": "그림 열 장 고르면 30초, 내 취향 코디 30벌",
+      "done": "내 취향: {{name}}",
+      "doneSub": "취향 코디 30벌 다시 보기 · 공유"
     }
   },
   "auth": {
@@ -1590,6 +1596,33 @@
       "lastWeek": "최근에 안 입은 옷들이에요"
     },
     "likedToast": "이 옷들을 더 자주 보여 드릴게요",
-    "dislikedToast": "이 조합은 다음부터 뒤로 보낼게요"
+    "dislikedToast": "이 조합은 다음부터 뒤로 보낼게요",
+    "tasteChip": "내 취향 · {{name}}",
+    "tasteCta": "내 컬러 취향 30초 테스트"
+  },
+  "taste": {
+    "title": "내 컬러 취향",
+    "pickOne": "더 끌리는 쪽을 골라 주세요",
+    "revealEyebrow": "당신의 컬러 취향은",
+    "seeFall": "내 취향 코디 30벌 보기",
+    "redo": "다시 하기",
+    "goBuild": "오늘 뭐 입지 →",
+    "sections": {
+      "first": "가장 나다운",
+      "second": "조금 다르게",
+      "secondSub": "같은 취향, 다른 옷",
+      "third": "과감하게",
+      "thirdSafe": "계절에 맞게",
+      "thirdSub": "한 발 더"
+    },
+    "share": {
+      "btn": "취향 카드 공유",
+      "making": "카드 만드는 중…",
+      "title": "내 컬러 취향 카드",
+      "send": "공유하기",
+      "eyebrow": "내 컬러 취향은",
+      "watermark": "내 컬러 취향",
+      "fail": "카드를 만들지 못했어요"
+    }
   }
 }
