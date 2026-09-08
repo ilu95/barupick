@@ -13,6 +13,7 @@ import { profile } from '@/lib/profile'
 import i18n from '@/i18n'
 import { evaluationSystem } from '@/lib/evaluation'
 import { calculateHarmonyV6 } from '@/lib/recommend'
+import { colorGuide, bestMoves, type Move } from '@/lib/guide'
 
 export type BuildMode = 'coord' | 'evaluate'
 export type BuildStep = 'outfit' | 'style' | 'builder' | 'fabric' | 'result' | 'improve'
@@ -322,6 +323,30 @@ export function useBuild(mode: BuildMode = 'coord') {
   }, [state])
 
   // ── 색상 추천 ──
+  // ── 안내 층: 자리 하나의 ●/△, 최선의 한 수, 한 수 적용(되돌리기 반환) ──
+  const getGuide = useCallback((slot: string) => {
+    const outfit = getFilledOutfit(state)
+    return colorGuide(k => calcScoreDelta(slot, k), outfit[slot] || null)
+  }, [state, calcScoreDelta])
+
+  const getBestMoves = useCallback((k = 3): Move[] => {
+    const outfit = getFilledOutfit(state)
+    if (Object.keys(outfit).length < 2) return []
+    try { return bestMoves(outfit, k) } catch { return [] }
+  }, [state])
+
+  const applyMove = useCallback((move: { slot: string; to: string }): (() => void) => {
+    const prev = state
+    setState(p => {
+      if (['bottom', 'shoes', 'scarf', 'hat'].includes(move.slot)) return { ...p, [move.slot + 'Color']: move.to }
+      const sorted = sortUpper(p.upper)
+      const idx = sorted.findIndex((l, i) => getSlotKey(i, sorted.length, l) === move.slot)
+      if (idx < 0) return p
+      return { ...p, upper: sorted.map((l, i) => i === idx ? { ...l, colorKey: move.to } : l) }
+    })
+    return () => setState(prev)
+  }, [state])
+
   const getColorRecommendations = useCallback((slotName: string) => {
     if (state.mode === 'evaluate') return []
 
@@ -457,7 +482,7 @@ export function useBuild(mode: BuildMode = 'coord') {
     pushStep, goBack, update, reset,
     selectStyle,
     addUpper, editUpper, removeUpper, setSimpleColor, applyOutfit,
-    getColorRecommendations, getScore, getEvalResult, calcScoreDelta,
+    getColorRecommendations, getScore, getEvalResult, calcScoreDelta, getGuide, getBestMoves, applyMove,
     predictSlot: (tmpItemId: string, editIdx?: number) => predictSlot(state.upper, tmpItemId, editIdx),
     outfitHex, isComplete,
     get outerType() { return getOuterType(state.upper) },

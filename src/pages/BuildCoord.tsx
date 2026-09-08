@@ -13,7 +13,8 @@ import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styl
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
 import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType, predictSlot } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
-import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare } from '@/lib/analytics'
+import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide } from '@/lib/analytics'
+import type { Move } from '@/lib/guide'
 import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
 import { useWeather, weatherEmoji, getLayerAdvice } from '@/hooks/useWeather'
 import { getScorePercentile } from '@/hooks/useWardrobe'
@@ -107,6 +108,8 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
   const [tmpColor, setTmpColor] = useState<string | null>(null)
   const [mannCollapsed, setMannCollapsed] = useState(false)
   const [previewHex, setPreviewHex] = useState<Record<string, string> | null>(null)
+  const [moves, setMoves] = useState<Move[] | null>(null)          // "더 올리려면?" 패널
+  const [undoMove, setUndoMove] = useState<(() => void) | null>(null)
 
   const editMode = build.editMode
   const upper = build.state.upper
@@ -142,6 +145,14 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
   }, [currentSlot, build.state])
 
   const recKeys = useMemo(() => new Set(recommendations.slice(0, 10).map(r => r.key)), [recommendations])
+
+  // 안내 층: 이 자리의 ● 추천 / △ 주의. 퍼스널컬러·체형 배지가 붙은 추천은 ● 탭에 두 개까지 얹는다
+  const guide = useMemo(() => (currentSlot && build.state.mode !== 'evaluate') ? build.getGuide(currentSlot) : null, [currentSlot, build.state])
+  const guideRec = useMemo(() => {
+    if (!guide) return undefined
+    const extra = recommendations.filter(r => (r.badges?.pc || r.badges?.body) && !guide.rec.includes(r.key)).slice(0, 2).map(r => r.key)
+    return [...guide.rec, ...extra]
+  }, [guide, recommendations])
 
   // 실시간 마네킹 프리뷰
   const handleColorTap = useCallback((colorKey: string) => {
@@ -403,45 +414,8 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               )}
             </div>
 
-            {/* 추천 색상 */}
-            {recommendations.length > 0 && (
-              <>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">{t('build.recommendedColors')}</div>
-                  {recommendations.some(r => r.badges?.pc || r.badges?.body) && (
-                    <div className="flex items-center gap-2 text-[9px] text-warm-400">
-                      {recommendations.some(r => r.badges?.pc) && <span>{'👤 ' + t('build.personalColorBadge')}</span>}
-                      {recommendations.some(r => r.badges?.body) && <span>{'📐 ' + t('build.bodyTypeBadge')}</span>}
-                    </div>
-                  )}
-                </div>
-                <div className="grid grid-cols-5 gap-1.5 mb-3">
-                  {recommendations.slice(0, 10).map((rec, idx) => {
-                    const c = COLORS_60[rec.key]
-                    if (!c) return null
-                    const light = (c.hcl[2] > 55)
-                    const delta = currentSlot ? build.calcScoreDelta(currentSlot, rec.key) : 0
-                    return (
-                      <button key={rec.key} onClick={() => { trackColorPick('build', { slot: currentSlot, color: rec.key, src: 'rec', pos: idx, delta }); handleColorSelect(rec.key) }}
-                        className="h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90"
-                        style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
-                        {getColorName(rec.key)}
-                        {delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{delta}</span>}
-                        {delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{delta}</span>}
-                        {(rec.badges?.pc || rec.badges?.body) && (
-                          <span className="absolute -bottom-1 -left-1 flex gap-px">
-                            {rec.badges.pc && <span className="bg-purple-100 text-purple-600 text-[6px] font-bold px-0.5 rounded leading-none py-px">👤</span>}
-                            {rec.badges.body && <span className="bg-blue-100 text-blue-600 text-[6px] font-bold px-0.5 rounded leading-none py-px">📐</span>}
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-              </>
-            )}
-
-            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{recommendations.length > 0 ? t('build.allColors') : t('build.colors')}</div>
+            {/* 추천 색상 스트립은 피커의 "● 추천" 탭으로 옮겼다 (안내 층) */}
+            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{t('build.colors')}</div>
             <ColorPicker
               inline
               selected={tmpColor || (editMode.type === 'edit_upper' ? upper[editMode.index]?.colorKey : editMode.type === 'edit_simple' ? build.state[editMode.target + 'Color'] : null) || null}
@@ -449,8 +423,60 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
               scoreDeltaFn={currentSlot ? (key) => build.calcScoreDelta(currentSlot, key) : undefined}
               ctx="build"
               slot={currentSlot}
+              marks={guide?.marks}
+              recommended={guideRec}
             />
           </>
+        )}
+
+        {/* 안내 층: 더 올리려면? — 옷 하나의 색만 바꿔 얻는 최선의 한 수 */}
+        {editMode.type === 'idle' && build.isComplete && score > 0 && (
+          <div className="mb-2">
+            {moves === null ? (
+              <div className="flex gap-2">
+                <button onClick={() => { const m = build.getBestMoves(3); setMoves(m); trackGuide('moves_open', { score, n: m.length, best: m[0]?.gain ?? 0 }) }}
+                  className="flex-1 py-2.5 rounded-xl bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-[12.5px] font-semibold text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                  <Sparkles size={14} className="text-terra-500" /> {t('build.moves.title')}
+                </button>
+                {undoMove && (
+                  <button onClick={() => { undoMove(); setUndoMove(null); trackGuide('move_undo', {}) }}
+                    className="px-3 py-2.5 rounded-xl bg-warm-200 dark:bg-warm-700 text-[12px] font-medium text-warm-700 dark:text-warm-300 active:scale-[0.98]">{t('build.moves.undo')}</button>
+                )}
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[12px] font-semibold text-warm-800 dark:text-warm-200 flex items-center gap-1"><Sparkles size={13} className="text-terra-500" /> {t('build.moves.title')}</div>
+                  <button onClick={() => setMoves(null)} className="text-[11px] text-warm-500">{t('common.close')}</button>
+                </div>
+                {moves.length === 0 ? (
+                  <div className="text-[12px] text-warm-600 dark:text-warm-400 py-1">{t('build.moves.none')}</div>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    {moves.map(m => {
+                      const from = COLORS_60[m.from], to = COLORS_60[m.to]
+                      return (
+                        <button key={m.slot} onClick={() => {
+                            const undo = build.applyMove(m); setUndoMove(() => undo); setMoves(null)
+                            trackGuide('move_apply', { slot: m.slot, from: m.from, to: m.to, gain: m.gain, score_before: score })
+                            toast.success(t('build.moves.applied', { part: getBuildPartLabel(m.slot, upper), color: getColorName(m.to), n: m.gain }))
+                          }}
+                          className="flex items-center gap-2 px-2 py-2 rounded-xl bg-warm-50 dark:bg-warm-900/40 active:scale-[0.98] text-left">
+                          <span className="text-[11.5px] font-semibold text-warm-800 dark:text-warm-200 w-16 truncate">{getBuildPartLabel(m.slot, upper)}</span>
+                          <span className="w-4 h-4 rounded border border-black/10" style={{ background: from?.hex }} />
+                          <span className="text-warm-400 text-[11px]">→</span>
+                          <span className="w-4 h-4 rounded border border-black/10" style={{ background: to?.hex }} />
+                          <span className="text-[11.5px] text-warm-800 dark:text-warm-200 flex-1 truncate">{getColorName(m.to)}</span>
+                          <span className="text-[11.5px] font-bold text-green-600">+{m.gain}</span>
+                        </button>
+                      )
+                    })}
+                    <div className="text-[10px] text-warm-500 mt-0.5">{t('build.moves.hint')}</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
 
         {/* idle 상태 + 아이템 있을 때: 안내 */}

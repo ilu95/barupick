@@ -508,6 +508,13 @@
       "style": "스타일 추천",
       "basic": "기본 아이템",
       "harmony": "컬러 조화"
+    },
+    "moves": {
+      "title": "더 올리려면?",
+      "none": "지금이 가장 좋은 조합이에요",
+      "undo": "되돌리기",
+      "applied": "{{part}} → {{color}} (+{{n}})",
+      "hint": "옷 하나의 색만 바꿔서 올릴 수 있는 만큼이에요. 눌러서 바로 적용해요."
     }
   },
   "weatherConditions": {
@@ -1271,7 +1278,9 @@
   "colorPicker": {
     "title": "색상 선택",
     "reset": "초기화",
-    "closeLabel": "닫기"
+    "closeLabel": "닫기",
+    "recTab": "● 추천",
+    "recHint": "● 는 지금 조합에 잘 붙는 색, △ 는 점수가 크게 떨어지는 색이에요"
   },
   "cropOverlay": {
     "profilePhoto": "프로필 사진",
