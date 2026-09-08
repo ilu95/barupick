@@ -10,7 +10,8 @@ import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } fr
 import { CATEGORY_NAMES } from '@/lib/categories'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
-import { trackRecommendComplete, trackSave, trackClick } from '@/lib/analytics'
+import { trackRecommendComplete, trackSave, trackClick, trackShare } from '@/lib/analytics'
+import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
 import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
 import { useToast } from '@/components/ui/Toast'
 import { useModal } from '@/components/ui/Modal'
@@ -359,6 +360,8 @@ function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
             selected={pinned[pinPart]}
             onSelect={(k) => rec.togglePin(pinPart, k)}
             onClear={() => rec.clearPin(pinPart)}
+            ctx="recommend_pin"
+            slot={pinPart}
           />
           <div className="flex gap-2 mt-2">
             <button onClick={() => setPinPart(null)} className="flex-1 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">{t('common.close')}</button>
@@ -473,7 +476,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const handleSave = () => {
     const name = saveName.trim() || combo.name
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now() })
+    saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION })
     if (saved.length > 100) saved.length = 100
     setJSON('cs_saved', saved)
     setSaveModal(false)
@@ -565,11 +568,11 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
           className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
           <Bookmark size={18} /> {t('recommend.save')}
         </button>
-        <button onClick={() => { navigator.share?.({ title: t('ootdDetail.shareTitle'), text: combo?.name + ' ' + t('common.score', { score: finalScore }), url: 'https://barupick.vercel.app' }).catch(() => {}) }}
+        <button onClick={() => { trackShare('native', 'recommend', finalScore); navigator.share?.({ title: t('ootdDetail.shareTitle'), text: combo?.name + ' ' + t('common.score', { score: finalScore }), url: 'https://barupick.vercel.app' }).catch(() => {}) }}
           className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Share size={16} /> {t('recommend.share')}
         </button>
-        <button onClick={() => { setJSON('_pending_post_outfit', combo.outfit); window.location.href = '/community/post' }}
+        <button onClick={() => { trackShare('community', 'recommend', finalScore); setJSON('_pending_post_outfit', combo.outfit); window.location.href = '/community/post' }}
           className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <Users size={16} /> {t('recommend.communityShare')}
         </button>
@@ -673,6 +676,8 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
                 setEditedOutfit(prev => ({ ...(prev || combo.outfit), [editingPart]: k }))
               }}
               onClear={() => setEditingPart(null)}
+              ctx="recommend_edit"
+              slot={editingPart}
               scoreDeltaFn={(k) => {
                 try {
                   const testOutfit = { ...currentOutfit, [editingPart]: k }

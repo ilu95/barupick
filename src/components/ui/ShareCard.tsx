@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { X, Download, Share } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { trackShare } from '@/lib/analytics'
 
 // ═══════════════════════════════════════════════════════
 // ShareCard v3 — 실제 앱 마네킹 SVG 사용
@@ -214,6 +215,7 @@ export default function ShareCard({ data, onClose }: ShareCardProps) {
 
   const handleShare = async () => {
     if (!imageUrl) return
+    trackShare('card', 'card')
     try {
       const blob = await (await fetch(imageUrl)).blob()
       const file = new File([blob], 'barupick-coord.png', { type: 'image/png' })
