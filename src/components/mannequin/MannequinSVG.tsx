@@ -283,5 +283,6 @@ export default MannequinSVG
 export function getMidTypeLabel(key: string): string { return i18n.t(`categories:names.mid_${key}`, { defaultValue: key }) }
 export function getOuterTypeLabel(key: string): string { return i18n.t(`categories:names.outer_${key}`, { defaultValue: key }) }
 // 하위 호환용 getter
-export const MID_TYPE_LABELS = new Proxy({} as Record<string, string>, { get: (_, k: string) => getMidTypeLabel(k) })
-export const OUTER_TYPE_LABELS = new Proxy({} as Record<string, string>, { get: (_, k: string) => getOuterTypeLabel(k) })
+// Symbol 키(toPrimitive 등)로 읽히면 i18n.t 가 던진다 — 문자열 키만 번역한다
+export const MID_TYPE_LABELS = new Proxy({} as Record<string, string>, { get: (_, k) => typeof k === 'string' ? getMidTypeLabel(k) : undefined })
+export const OUTER_TYPE_LABELS = new Proxy({} as Record<string, string>, { get: (_, k) => typeof k === 'string' ? getOuterTypeLabel(k) : undefined })
