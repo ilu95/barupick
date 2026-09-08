@@ -138,6 +138,7 @@ export function trackBodyType(type: string) {
 //   build_complete 결과 도달   {score, n_upper, n_parts, layered, colors, style, mode, fabric, picks, confirms, ms, engine, pal}
 //   share          공유        {kind: native|community|card, ctx, score}
 //   outfit_*       1단계 옷 조합 {id, situ, temp, via|kind|rank}
+//   guide_*        2단계 안내 층 {slot, from, to, gain}
 // meta 는 jsonb 라 스키마 변경 없음. 조회 예시는 scripts/03_analytics.sql.
 // ════════════════════════════════════════════════════════════════
 
@@ -202,4 +203,9 @@ export function trackShare(kind: 'native' | 'community' | 'card', ctx: string, s
 // 1단계 옷 조합: view(카드 노출) · adopt(방향/대안 채택) · pick(색 고르기로 진행) · feedback(👍👎) · anchor
 export function trackOutfit(kind: 'view' | 'adopt' | 'pick' | 'feedback' | 'anchor', meta: Record<string, any>) {
   trackEvent('outfit_' + kind, { ...meta, ...VER })
+}
+
+// 2단계 안내 층: 더 올리려면? 열기 · 한 수 적용 · 되돌리기 (● 탭 노출·선택은 color_tab/color_pick 의 tab='rec' 로 잡힌다)
+export function trackGuide(kind: 'moves_open' | 'move_apply' | 'move_undo', meta: Record<string, any>) {
+  trackEvent('guide_' + kind, { ...meta, ...VER })
 }

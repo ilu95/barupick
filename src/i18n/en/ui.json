@@ -508,6 +508,13 @@
       "style": "Style Pick",
       "basic": "Basic Item",
       "harmony": "Color Harmony"
+    },
+    "moves": {
+      "title": "Raise the score?",
+      "none": "This is already the best combination",
+      "undo": "Undo",
+      "applied": "{{part}} → {{color}} (+{{n}})",
+      "hint": "What one color change can add. Tap to apply."
     }
   },
   "weatherConditions": {
@@ -1271,7 +1278,9 @@
   "colorPicker": {
     "title": "Select Color",
     "reset": "Reset",
-    "closeLabel": "Close"
+    "closeLabel": "Close",
+    "recTab": "● Picks",
+    "recHint": "● works with what you have on, △ drops the score a lot"
   },
   "cropOverlay": {
     "profilePhoto": "Profile Photo",

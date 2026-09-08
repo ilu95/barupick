@@ -16,6 +16,10 @@ interface Props {
   ctx?: string
   /** 계측용: 지금 색을 고르는 자리 (outer/top/bottom/...) */
   slot?: string | null
+  /** 안내 층: 칩마다 ● 추천 / △ 주의. 주면 숫자 배지 대신 표시만 한다 */
+  marks?: Record<string, 'rec' | 'warn'>
+  /** 안내 층: 맨 앞 "● 추천" 탭에 놓을 색들 */
+  recommended?: string[]
 }
 
 const RECENT_KEY = 'sp_recent_colors'
@@ -32,11 +36,14 @@ function addRecentColor(key: string) {
   } catch {}
 }
 
-export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn, ctx = 'other', slot = null }: Props) {
-  const [tab, setTab] = useState(COLOR_TABS[0].id)
+export default function ColorPicker({ selected, onSelect, onClear, onClose, inline, scoreDeltaFn, ctx = 'other', slot = null, marks, recommended }: Props) {
+  const hasRec = !!(recommended && recommended.length)
+  const [tab, setTab] = useState(() => hasRec ? 'rec' : COLOR_TABS[0].id)
   const [recent, setRecent] = useState<string[]>([])
   const { t } = useTranslation()
-  const group = COLOR_TABS.find(t => t.id === tab) || COLOR_TABS[0]
+  // 안내 층이 있으면 "● 추천" 탭이 맨 앞에 선다 — 148칸을 다 훑지 않아도 되게
+  const tabs = hasRec ? [{ id: 'rec', label: t('colorPicker.recTab'), emoji: '●', keys: recommended! }, ...COLOR_TABS] : COLOR_TABS
+  const group = tabs.find(t => t.id === tab) || tabs[0]
 
   useEffect(() => { setRecent(getRecentColors()) }, [])
 
@@ -56,7 +63,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
     <div className={inline ? 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3' : ''}>
       {/* 2열 그리드 탭 */}
       <div className="grid grid-cols-4 gap-1.5 mb-2.5">
-        {COLOR_TABS.map(t => (
+        {tabs.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -105,6 +112,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
           const isLight = c.hcl[2] > 55
           const needsBorder = c.hcl[2] > 90
           const delta = scoreDeltaFn ? scoreDeltaFn(k) : 0
+          const mark = marks ? marks[k] : undefined
 
           return (
             <div key={k} className="relative">
@@ -122,7 +130,15 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
               >
                 <span className="text-center px-0.5">{breakName(getColorName(k))}</span>
               </button>
-              {delta !== 0 && (
+              {marks ? (
+                mark === 'rec' ? (
+                  <span className="absolute -top-2 -right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full pointer-events-none bg-terra-500 text-white">
+                    ●{delta > 0 ? ` +${delta}` : ''}
+                  </span>
+                ) : mark === 'warn' ? (
+                  <span className="absolute -top-2 -right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full pointer-events-none bg-warm-900 text-white">△</span>
+                ) : null
+              ) : delta !== 0 && (
                 <span className={`absolute -top-2 -right-2 text-[9px] font-bold px-1 py-0.5 rounded-full pointer-events-none ${
                   delta > 0 ? 'bg-green-500 text-white' : 'bg-red-400 text-white'
                 }`}>
@@ -136,7 +152,7 @@ export default function ColorPicker({ selected, onSelect, onClear, onClose, inli
 
       {/* 탭 정보 */}
       <div className="text-center text-[10px] text-warm-400 dark:text-warm-500 mt-2">
-        {group.emoji} {group.label} · {t('common.colorCount', { count: group.keys.length })}
+        {group.id === 'rec' ? t('colorPicker.recHint') : <>{group.emoji} {group.label} · {t('common.colorCount', { count: group.keys.length })}</>}
       </div>
     </div>
   )
