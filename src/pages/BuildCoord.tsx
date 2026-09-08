@@ -3,7 +3,8 @@ import { setJSON } from '@/lib/storage'
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { charSceneFromBuild } from '@/lib/char/map'
 import { useToast } from '@/components/ui/Toast'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
@@ -244,7 +245,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           <div className="flex gap-1" style={{ minHeight: 200 }}>
             {/* 좌: 마네킹 */}
             <div className="flex flex-col items-center justify-center" style={{ width: 120 }}>
-              <MannequinSVG outfit={previewHex || build.outfitHex} options={{ outerType: build.outerType, midType: build.midType }} size={110} />
+              <CharacterCanvas {...charSceneFromBuild(upper, previewHex || build.outfitHex)} width={114} />
             </div>
 
             {/* 우: 안내+점수 → 상체+하체 */}
@@ -681,7 +682,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       </button>
       {!build.vizCollapsed && (
         <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
-          <MannequinSVG outfit={build.outfitHex} options={{ outerType: build.outerType, midType: build.midType }} size={200} />
+          <CharacterCanvas {...charSceneFromBuild(build.state.upper, build.outfitHex)} width={180} />
         </div>
       )}
 
@@ -815,7 +816,7 @@ function StepImprove({ build }: { build: BH }) {
             const newOutfitHex = { ...build.outfitHex, [imp.part]: newC.hex }
             return (
               <div key={idx} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm">
-                <MannequinSVG outfit={newOutfitHex} options={{ outerType: build.outerType, midType: build.midType }} size={60} />
+                <CharacterCanvas {...charSceneFromBuild(build.state.upper, newOutfitHex)} width={60} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[11px] text-warm-600">{getBuildPartLabel(imp.part, build.state.upper)}</span>
