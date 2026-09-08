@@ -2,7 +2,8 @@
 // ================================================================
 // evaluation.ts — 코디 점수 평가 알고리즘 (HCL 색상 이론 기반)
 // 원본: 바루픽_최신본.html 5309~6160행
-// ⚠️ 이 알고리즘의 점수 계산은 기존과 100% 동일해야 합니다.
+// v6. 만들기 흐름은 lib/engine.ts(v7.1)로 옮겼고(2026-09-08), 추천·기록·옷장은 아직 이 파일을 쓴다.
+// 저장 기록에는 어느 엔진의 점수인지 engine 필드가 남는다 — 과거 점수는 다시 계산하지 않는다.
 // ================================================================
 
 import { COLORS_60, COLORS, hcl, H, Cv, L, hex, temp, COLOR_FAMILIES, WARM_SET, COOL_SET, getHueDiff, isNeutralColor, getToneGroup, getColorTemperature, PASTEL_COLORS, EARTH_TONE_COLORS, CLASSIC_COMBOS, AVOID_COMBOS, getColorName } from './colors'

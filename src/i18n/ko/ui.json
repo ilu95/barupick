@@ -515,6 +515,14 @@
       "undo": "되돌리기",
       "applied": "{{part}} → {{color}} (+{{n}})",
       "hint": "옷 하나의 색만 바꿔서 올릴 수 있는 만큼이에요. 눌러서 바로 적용해요."
+    },
+    "v7parts": {
+      "structure": "명도 구조",
+      "count": "색 수·면적",
+      "harmony": "조화",
+      "focus": "시선 정리",
+      "situation": "상황·계절",
+      "me": "나에게"
     }
   },
   "weatherConditions": {

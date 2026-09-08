@@ -14,6 +14,8 @@ import i18n from '@/i18n'
 import { evaluationSystem } from '@/lib/evaluation'
 import { calculateHarmonyV6 } from '@/lib/recommend'
 import { colorGuide, bestMoves, type Move } from '@/lib/guide'
+import { scoreOutfit, scoreDelta, type EngineInput, type EngineResult } from '@/lib/engine'
+import { platesOf } from '@/lib/char/map'
 
 export type BuildMode = 'coord' | 'evaluate'
 export type BuildStep = 'outfit' | 'style' | 'builder' | 'fabric' | 'result' | 'improve'
@@ -48,6 +50,8 @@ export interface BuildState {
   shoesItem?: string | null
   /** 1단계 조합 id (계측·기록용) */
   templateId?: string | null
+  /** 1단계에서 고른 상황 (엔진 v7.1 의 상황 엄격도) */
+  situ?: string | null
 }
 
 // ═══ 자동 슬롯 매핑 ═══
@@ -234,6 +238,7 @@ export function useBuild(mode: BuildMode = 'coord') {
     shoes?: { plate: string; colorKey: string }
     style?: string | null
     templateId?: string | null
+    situ?: string | null
   }) => {
     setState(prev => {
       const upper: UpperLayer[] = []
@@ -251,6 +256,7 @@ export function useBuild(mode: BuildMode = 'coord') {
         bottomItem: o.bottom?.plate ?? null,
         shoesItem: o.shoes?.plate ?? null,
         templateId: o.templateId ?? null,
+        situ: o.situ ?? prev.situ ?? null,
       }
     })
     setEditMode({ type: 'idle' })
@@ -289,51 +295,39 @@ export function useBuild(mode: BuildMode = 'coord') {
     setEditMode({ type: 'idle' })
   }, [])
 
+  // ── 엔진 v7.1 입력: 자리별 색 + 판 + 상황 ──
+  const engineInput = useCallback((): EngineInput => ({ outfit: getFilledOutfit(state), plates: platesOf(state), situ: state.situ || 'daily' }), [state])
+
   // ── 점수 ──
   const getScore = useCallback((): number => {
     const outfit = getFilledOutfit(state)
     if (Object.keys(outfit).length < 2) return 0
-    try {
-      const pc = profile.getPersonalColor()
-      return evaluationSystem.evaluate(outfit, pc).total
-    } catch { return 0 }
-  }, [state])
+    try { return scoreOutfit(engineInput()).total } catch { return 0 }
+  }, [state, engineInput])
 
-  // ── 평가 결과 ──
-  const getEvalResult = useCallback(() => {
+  // ── 평가 결과 (parts · reasons) ──
+  const getEvalResult = useCallback((): EngineResult | null => {
     const outfit = getFilledOutfit(state)
     if (Object.keys(outfit).length < 2) return null
-    try {
-      const pc = profile.getPersonalColor()
-      return evaluationSystem.evaluate(outfit, pc)
-    } catch { return null }
-  }, [state])
+    try { return scoreOutfit(engineInput()) } catch { return null }
+  }, [state, engineInput])
 
   // ── 점수 변화 미리보기 ──
   const calcScoreDelta = useCallback((slot: string, newColorKey: string): number => {
     const outfit = getFilledOutfit(state)
     if (Object.keys(outfit).length < 1) return 0
-    try {
-      const pc = profile.getPersonalColor()
-      const baseScore = evaluationSystem.evaluate(outfit, pc).total
-      const testOutfit = { ...outfit, [slot]: newColorKey }
-      const newScore = evaluationSystem.evaluate(testOutfit, pc).total
-      return newScore - baseScore
-    } catch { return 0 }
-  }, [state])
+    try { return scoreDelta(engineInput(), slot, newColorKey) } catch { return 0 }
+  }, [state, engineInput])
 
   // ── 색상 추천 ──
   // ── 안내 층: 자리 하나의 ●/△, 최선의 한 수, 한 수 적용(되돌리기 반환) ──
-  const getGuide = useCallback((slot: string) => {
-    const outfit = getFilledOutfit(state)
-    return colorGuide(k => calcScoreDelta(slot, k), outfit[slot] || null)
-  }, [state, calcScoreDelta])
+  const getGuide = useCallback((slot: string) => colorGuide(engineInput(), slot), [engineInput])
 
   const getBestMoves = useCallback((k = 3): Move[] => {
     const outfit = getFilledOutfit(state)
     if (Object.keys(outfit).length < 2) return []
-    try { return bestMoves(outfit, k) } catch { return [] }
-  }, [state])
+    return bestMoves(engineInput(), k)
+  }, [state, engineInput])
 
   const applyMove = useCallback((move: { slot: string; to: string }): (() => void) => {
     const prev = state

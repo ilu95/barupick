@@ -247,7 +247,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
   }
 
   // 점수 색상
-  const scoreColor = score >= 85 ? 'bg-green-100 text-green-600' : score >= 70 ? 'bg-yellow-100 text-yellow-600' : score > 0 ? 'bg-red-100 text-red-500' : 'bg-warm-200 text-warm-500'
+  const scoreColor = score >= 84 ? 'bg-green-100 text-green-600' : score >= 72 ? 'bg-yellow-100 text-yellow-600' : score > 0 ? 'bg-red-100 text-red-500' : 'bg-warm-200 text-warm-500'
 
   return (
     <div className="animate-screen-enter -mx-5 -my-4">
@@ -673,15 +673,11 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     trackBuildComplete({ score, n_upper: build.state.upper.length, colors: outfit, style: build.state.style, mode: build.state.mode, fabric: !!build.state.fabricMode })
   }, [])
 
-  const scoreItems = evalResult ? [
-    { label: t('build.scoreItems.colorPlacement'), value: evalResult.goldilocks, max: 33, desc: '' },
-    { label: t('build.scoreItems.colorRatio'), value: evalResult.ratio, max: 17, desc: '' },
-    { label: t('build.scoreItems.colorHarmony'), value: evalResult.harmony, max: 17, desc: '' },
-    { label: t('build.scoreItems.seasonal'), value: evalResult.season, max: 17, desc: '' },
-    { label: t('build.scoreItems.balance'), value: evalResult.balance, max: 8, desc: '' },
-    ...(evalResult.hasPersonalColor ? [{ label: t('build.scoreItems.personalColor'), value: evalResult.personal, max: 17, desc: '' }] : []),
-    ...(evalResult.hasBodyFit ? [{ label: t('build.scoreItems.bodyFit'), value: evalResult.bodyFit, max: 8, desc: '' }] : []),
-  ].filter(item => item.value > 0) : []
+  // 엔진 v7.1: 명도 구조 30 · 색 수·면적 20 · 조화 20 · 시선 정리 10 · 상황·계절 10 · 나에게 15(퍼스널컬러 있을 때)
+  const scoreItems = evalResult ? evalResult.parts.map(p => ({ label: t('build.v7parts.' + p.key, { defaultValue: p.label }), value: p.value, max: p.max, desc: '' })) : []
+  const reasonLines = evalResult && i18n.language.startsWith('ko')
+    ? [...evalResult.reasons.filter(r => r.w < 0).slice(0, 2), ...evalResult.reasons.filter(r => r.w > 0).slice(0, 2)]
+    : []
 
   const handleSave = () => {
     const name = build.state.style || t('common.coord')
@@ -696,12 +692,13 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const handleShare = () => { trackShare('native', 'build', score); navigator.share?.({ title: t('ootdDetail.shareTitle'), text: `${t('common.score', { score })}`, url: "https://barupick.vercel.app" }).catch(() => {}) }
   const handleCommunityShare = () => { trackShare('community', 'build', score); setJSON("_pending_post_outfit", outfit); navigate("/community/post") }
 
-  const scoreGrade = score >= 90 ? { label: t('build.scoreGrade.perfect'), emoji: '🏆', color: 'text-amber-600' }
-    : score >= 80 ? { label: t('build.scoreGrade.great'), emoji: '✨', color: 'text-terra-600' }
-    : score >= 65 ? { label: t('build.scoreGrade.good'), emoji: '👍', color: 'text-sage' }
-    : score >= 50 ? { label: t('build.scoreGrade.okay'), emoji: '🙂', color: 'text-warm-600' }
+  // 등급 기준은 v7.1 분포로 올렸다: 완벽 92 · 훌륭 84 · 좋음 72 · 괜찮 60 (연구 11장)
+  const scoreGrade = score >= 92 ? { label: t('build.scoreGrade.perfect'), emoji: '🏆', color: 'text-amber-600' }
+    : score >= 84 ? { label: t('build.scoreGrade.great'), emoji: '✨', color: 'text-terra-600' }
+    : score >= 72 ? { label: t('build.scoreGrade.good'), emoji: '👍', color: 'text-sage' }
+    : score >= 60 ? { label: t('build.scoreGrade.okay'), emoji: '🙂', color: 'text-warm-600' }
     : { label: t('build.scoreGrade.improve'), emoji: '💪', color: 'text-warm-500' }
-  const isHighScore = score >= 80
+  const isHighScore = score >= 84
 
   return (
     <div className="animate-screen-enter">
@@ -753,8 +750,12 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
               </div>
             ))}
           </div>
-          {evalResult?.theory && Array.isArray(evalResult.theory) && (
-            <div className="mt-3 text-[11px] text-terra-600 font-medium">💡 {evalResult.theory.map((k: string) => t(k)).join(' · ')}</div>
+          {reasonLines.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1">
+              {reasonLines.map((r, i) => (
+                <div key={i} className={`text-[11px] font-medium leading-snug ${r.w < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-terra-600'}`}>{r.w < 0 ? '△' : '●'} {r.txt}</div>
+              ))}
+            </div>
           )}
         </div>
       )}
