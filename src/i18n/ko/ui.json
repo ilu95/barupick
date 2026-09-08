@@ -1506,5 +1506,73 @@
     "faq3A": "설정 > 계정 삭제에서 진행할 수 있습니다. 삭제된 계정은 복구할 수 없습니다.",
     "developer": "개발사",
     "developerName": "바루사 (Barusa)"
+  },
+  "outfit": {
+    "title": "오늘 뭐 입을까요?",
+    "subtitle": "상황과 기온에 맞는 한 벌을 먼저 골라요. 색은 다음 화면에서 하나씩.",
+    "situ": {
+      "work": "출근",
+      "daily": "일상",
+      "date": "데이트·모임",
+      "formal": "격식",
+      "active": "활동·여행",
+      "home": "집 앞"
+    },
+    "weatherTap": "눌러서 기온 바꾸기",
+    "manual": "직접",
+    "pickColors": "이걸로 색 고르기",
+    "like": "좋아요",
+    "dislike": "별로",
+    "dirs": {
+      "formal": "더 단정하게",
+      "relax": "더 편하게",
+      "warm": "더 따뜻하게",
+      "cool": "더 시원하게",
+      "twist": "한 끗 다르게"
+    },
+    "dirName": {
+      "formal": "한 단계 단정하게",
+      "relax": "한 단계 편하게",
+      "warm": "한 단계 따뜻하게",
+      "cool": "한 단계 시원하게",
+      "twist": "느낌은 그대로, 옷 하나만"
+    },
+    "dirLabel": {
+      "formal": "격식 한 단계 위로",
+      "relax": "격식 한 단계 편하게",
+      "warm": "한 단계 따뜻하게",
+      "cool": "한 단계 시원하게",
+      "twist": "느낌은 그대로, 옷 하나만"
+    },
+    "remove": "빼기",
+    "none": "없음",
+    "reset": "처음 추천으로",
+    "altsTitle": "다른 방향",
+    "more": "다른 조합 더 보기",
+    "less": "접기",
+    "anchorTitle": "입을 옷이 정해져 있어요",
+    "anchorHint": "그 옷이 들어간 조합만 보여 드려요",
+    "anchorClear": "해제",
+    "styleFirst": "스타일부터 고를래요",
+    "noFail": "실패 없는 조합",
+    "combo": "{{st}} 조합",
+    "alt": {
+      "safe": "가장 무난한",
+      "dressy": "조금 멋 낸",
+      "evening": "저녁 쌀쌀할 때",
+      "noon": "한낮 더울 때",
+      "lastWeek": "지난주와 다르게",
+      "rank": "{{n}}순위"
+    },
+    "altWhy": {
+      "safe": "격식·기온 모두 여유 있어요",
+      "dressy": "{{st}} 느낌으로 한 단계 멋 냈어요",
+      "likedStyle": "좋아요 누른 {{st}} 쪽이에요",
+      "layerWarm": "레이어드로 한 단계 따뜻해요",
+      "cooler": "한 단계 시원해요",
+      "lastWeek": "최근에 안 입은 옷들이에요"
+    },
+    "likedToast": "이 옷들을 더 자주 보여 드릴게요",
+    "dislikedToast": "이 조합은 다음부터 뒤로 보낼게요"
   }
 }

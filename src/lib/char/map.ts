@@ -8,6 +8,7 @@
 // ================================================================
 import { getSlotKey, sortUpper, type UpperLayer, type SlotKey } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
+import { PLATE_SLOT } from '@/lib/outfits'
 
 export type CharSlot = 'inner' | 'mid1' | 'mid2' | 'outer'
 export interface CharItem { id: string; color: string }
@@ -63,16 +64,24 @@ export function charSex(): 'm' | 'w' {
  * hex 는 useBuild.outfitHex 와 같은 꼴: { outer, middleware, top, inner, bottom, shoes, scarf, hat }.
  * 한 칸에 두 벌이 겹치면 바깥쪽 옷이 다른 칸으로 비켜서고, 자리가 없으면 그 옷은 그리지 않는다.
  */
-export function charSceneFromBuild(upper: UpperLayer[], hex: Record<string, string | undefined>, sex: 'm' | 'w' = charSex()): CharScene {
+export function charSceneFromBuild(upper: UpperLayer[], hex: Record<string, string | undefined>, opts: { sex?: 'm' | 'w'; bottomItem?: string | null; shoesItem?: string | null } = {}): CharScene {
+  const sex = opts.sex || charSex()
   const items: CharItem[] = []
   const used = new Set<CharSlot>()
   const sorted = sortUpper(upper)              // 바깥 → 안쪽
-  // 안쪽 옷부터 자리를 잡는다 — 이너가 밀려나면 겹침이 더 티 난다
+  // 1단계에서 고른 판이 있으면 그 판을 먼저 앉힌다 (칸도 판이 정한다)
+  const pending: { i: number; layer: UpperLayer; appSlot: SlotKey; color: string }[] = []
   for (let i = sorted.length - 1; i >= 0; i--) {
     const layer = sorted[i]
     const appSlot = getSlotKey(i, sorted.length, layer)
     const color = hex[appSlot]
     if (!color) continue
+    const ps = layer.plate ? PLATE_SLOT[layer.plate] as CharSlot | undefined : undefined
+    if (layer.plate && ps && ['inner', 'mid1', 'mid2', 'outer'].includes(ps) && !used.has(ps)) { used.add(ps); items.push({ id: layer.plate, color }); continue }
+    pending.push({ i, layer, appSlot, color })
+  }
+  // 나머지는 아이템 종류로 판을 고른다 — 안쪽 옷부터 자리를 잡는다 (이너가 밀려나면 겹침이 더 티 난다)
+  for (const { layer, appSlot, color } of pending) {
     const cands = PLATES[layer.itemId]
     if (!cands) continue
     const slot = PREFER[appSlot].find(s => cands[s] && !used.has(s))
@@ -80,8 +89,8 @@ export function charSceneFromBuild(upper: UpperLayer[], hex: Record<string, stri
     used.add(slot)
     items.push({ id: cands[slot]!, color })
   }
-  items.push({ id: DEFAULT_BOTTOM, color: hex.bottom || '#1C1917' })
-  if (hex.shoes) items.push({ id: DEFAULT_SHOE, color: hex.shoes })
+  items.push({ id: opts.bottomItem || DEFAULT_BOTTOM, color: hex.bottom || '#1C1917' })
+  if (hex.shoes) items.push({ id: opts.shoesItem || DEFAULT_SHOE, color: hex.shoes })
   if (hex.scarf) items.push({ id: DEFAULT_SCARF, color: hex.scarf })
   const body: CharBody = { sex, hair: DEFAULT_HAIR[sex], hairColor: DEFAULT_HAIR_COLOR }
   if (hex.hat) { body.hat = DEFAULT_HAT; body.hatColor = hex.hat }

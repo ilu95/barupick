@@ -1506,5 +1506,73 @@
     "faq3A": "You can do this in Settings > Delete Account. Deleted accounts cannot be recovered.",
     "developer": "Developer",
     "developerName": "Barusa"
+  },
+  "outfit": {
+    "title": "What to wear today?",
+    "subtitle": "Pick one outfit for the occasion and temperature first. Colors come next, one at a time.",
+    "situ": {
+      "work": "Work",
+      "daily": "Everyday",
+      "date": "Date · Meetup",
+      "formal": "Formal",
+      "active": "Active · Travel",
+      "home": "Around home"
+    },
+    "weatherTap": "Tap to change temperature",
+    "manual": "manual",
+    "pickColors": "Choose colors for this",
+    "like": "Like",
+    "dislike": "Not for me",
+    "dirs": {
+      "formal": "Dressier",
+      "relax": "More relaxed",
+      "warm": "Warmer",
+      "cool": "Cooler",
+      "twist": "One small twist"
+    },
+    "dirName": {
+      "formal": "One step dressier",
+      "relax": "One step more relaxed",
+      "warm": "One step warmer",
+      "cool": "One step cooler",
+      "twist": "Same feel, one piece changed"
+    },
+    "dirLabel": {
+      "formal": "one step up in formality",
+      "relax": "one step more relaxed",
+      "warm": "one step warmer",
+      "cool": "one step cooler",
+      "twist": "same feel, one piece changed"
+    },
+    "remove": "remove",
+    "none": "none",
+    "reset": "Back to the first pick",
+    "altsTitle": "Other directions",
+    "more": "See more outfits",
+    "less": "Show less",
+    "anchorTitle": "I already know one piece I'll wear",
+    "anchorHint": "Show only outfits that include it",
+    "anchorClear": "Clear",
+    "styleFirst": "I'd rather start from a style",
+    "noFail": "Can't-miss outfit",
+    "combo": "{{st}} outfit",
+    "alt": {
+      "safe": "Safest",
+      "dressy": "A bit dressier",
+      "evening": "For a chilly evening",
+      "noon": "For a hot noon",
+      "lastWeek": "Different from last week",
+      "rank": "#{{n}}"
+    },
+    "altWhy": {
+      "safe": "Room to spare on both formality and temperature",
+      "dressy": "One step dressier with a {{st}} feel",
+      "likedStyle": "Leans toward the {{st}} you liked",
+      "layerWarm": "One step warmer with layering",
+      "cooler": "One step cooler",
+      "lastWeek": "Pieces you haven't worn lately"
+    },
+    "likedToast": "We'll show these pieces more often",
+    "dislikedToast": "We'll push this outfit down from now on"
   }
 }
