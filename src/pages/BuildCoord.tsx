@@ -747,7 +747,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
           score: m.score, label: t('vote.labelB'),
         }
       }
-      const sub = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null, bSide ? t('vote.shareText') : t('vote.singleSub')].filter(Boolean).join(' · ')
+      const sub = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null, bSide ? t('vote.twoSub') : t('vote.singleSub')].filter(Boolean).join(' · ')
       let ogDataUrl: string | null = null
       try { ogDataUrl = await drawVoteOg(a, bSide, t('vote.defaultQ'), sub); if (import.meta.env.DEV) (window as any).__bp_lastOg = ogDataUrl } catch { ogDataUrl = null }
       const v = await createVote({ a, b: bSide, question: t('vote.defaultQ'), situ: build.state.situ || null, temp: weather?.feels ?? null, ownerId: user?.id || null, ogDataUrl })

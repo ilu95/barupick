@@ -1660,6 +1660,7 @@
     "failAnswer": "Couldn't send it. Try again shortly",
     "failCreate": "Couldn't create the poll. Check your connection",
     "homeLink": "See your friends' votes",
-    "singleSub": "Tap like or not-for-me once"
+    "singleSub": "Tap like or not-for-me once",
+    "twoSub": "Pick one of the two"
   }
 }
