@@ -10,4 +10,4 @@
 export const ENGINE_VERSION = 'v6'
 
 /** 팔레트 hex 판. 1 = 웹 기본색 hex. 2 = 의류색 보정 hex(50색). */
-export const PALETTE_VERSION = 1
+export const PALETTE_VERSION = 2
