@@ -33,6 +33,15 @@ export default function BuildCoord() {
   // 계측: 단계 진입 (퍼널 기준선)
   useEffect(() => { trackBuildStep(build.step, { mode: build.state.mode, style: build.state.style }) }, [build.step])
 
+  // 취향 폭포(/home/taste)에서 고른 카드가 있으면 바로 2단계로
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('sp_taste_pick'); if (!raw) return
+      sessionStorage.removeItem('sp_taste_pick')
+      build.applyOutfit(JSON.parse(raw))
+    } catch {}
+  }, [])
+
   return (
     <div className="min-h-screen dark:bg-[#1C1917]">
       <div className="max-w-[480px] mx-auto px-5 py-4 pb-8">

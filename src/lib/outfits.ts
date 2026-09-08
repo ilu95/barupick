@@ -1369,7 +1369,7 @@ const ga = (w: string) => w + (jong(w) ? '이' : '가')
 /* ── 계산 ── */
 export const partsOf = (c: Template, sex: 'm' | 'w'): Parts => ({ ...c.p, ...((sex === 'w' && c.w) || {}) })
 export const sig = (p: Parts) => PARTS.map(k => p[k] || '-').join('|')
-const formality = (p: Parts) => { const ks = PARTS.filter(k => p[k]); let f = ks.reduce((a, k) => a + (F[p[k]!] ?? 3), 0) / Math.max(1, ks.length); if (p.outer && F[p.outer] >= 4) f += .2; return Math.min(5, f) }
+export const formality = (p: Parts) => { const ks = PARTS.filter(k => p[k]); let f = ks.reduce((a, k) => a + (F[p[k]!] ?? 3), 0) / Math.max(1, ks.length); if (p.outer && F[p.outer] >= 4) f += .2; return Math.min(5, f) }
 const warmth = (p: Parts) => PARTS.filter(k => p[k] && W[p[k]!] !== undefined).reduce((a, k) => a + W[p[k]!], 0)
 export const idealW = (t: number): [number, number] => t >= 26 ? [0, 1] : t >= 20 ? [1, 2] : t >= 15 ? [2, 3.2] : [3, 5]
 const dist = (x: number, [a, b]: [number, number]) => x < a ? a - x : x > b ? x - b : 0

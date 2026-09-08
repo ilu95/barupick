@@ -151,6 +151,12 @@
       "fabricGuide": "Fabric Guide",
       "bodyGuide": "Body Type Guide",
       "quiz": "Quiz"
+    },
+    "taste": {
+      "title": "Find my color taste",
+      "sub": "Pick 10 pictures in 30 seconds, get 30 outfits",
+      "done": "My taste: {{name}}",
+      "doneSub": "See the 30 outfits again · share"
     }
   },
   "auth": {
@@ -1590,6 +1596,33 @@
       "lastWeek": "Pieces you haven't worn lately"
     },
     "likedToast": "We'll show these pieces more often",
-    "dislikedToast": "We'll push this outfit down from now on"
+    "dislikedToast": "We'll push this outfit down from now on",
+    "tasteChip": "My taste · {{name}}",
+    "tasteCta": "30-second color taste test"
+  },
+  "taste": {
+    "title": "My color taste",
+    "pickOne": "Pick the one you like more",
+    "revealEyebrow": "Your color taste is",
+    "seeFall": "See 30 outfits for my taste",
+    "redo": "Start over",
+    "goBuild": "What to wear →",
+    "sections": {
+      "first": "Most like me",
+      "second": "A little different",
+      "secondSub": "Same taste, other pieces",
+      "third": "Bolder",
+      "thirdSafe": "In season",
+      "thirdSub": "One step further"
+    },
+    "share": {
+      "btn": "Share taste card",
+      "making": "Making the card…",
+      "title": "My color taste card",
+      "send": "Share",
+      "eyebrow": "My color taste is",
+      "watermark": "My color taste",
+      "fail": "Couldn't make the card"
+    }
   }
 }
