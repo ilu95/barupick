@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import StepOutfit from '@/pages/build/StepOutfit'
 import { charSceneFromBuild } from '@/lib/char/map'
 import { useToast } from '@/components/ui/Toast'
 import ColorPicker from '@/components/ui/ColorPicker'
@@ -34,6 +35,7 @@ export default function BuildCoord() {
   return (
     <div className="min-h-screen dark:bg-[#1C1917]">
       <div className="max-w-[480px] mx-auto px-5 py-4 pb-8">
+        {build.step === 'outfit' && <StepOutfit build={build} />}
         {build.step === 'style' && <StepStyle build={build} />}
         {build.step === 'builder' && <StepBuilder build={build} navigate={navigate} />}
         {build.step === 'fabric' && <StepFabric build={build} />}
@@ -245,7 +247,7 @@ function StepBuilder({ build, navigate }: { build: BH; navigate: any }) {
           <div className="flex gap-1" style={{ minHeight: 200 }}>
             {/* 좌: 마네킹 */}
             <div className="flex flex-col items-center justify-center" style={{ width: 120 }}>
-              <CharacterCanvas {...charSceneFromBuild(upper, previewHex || build.outfitHex)} width={114} />
+              <CharacterCanvas {...charSceneFromBuild(upper, previewHex || build.outfitHex, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem })} width={114} />
             </div>
 
             {/* 우: 안내+점수 → 상체+하체 */}
@@ -658,7 +660,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const handleSave = () => {
     const name = build.state.style || t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION })
+    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null })
     if (saved.length > 100) saved.length = 100
     setJSON('cs_saved', saved)
     trackSave('build', score)
@@ -682,7 +684,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       </button>
       {!build.vizCollapsed && (
         <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
-          <CharacterCanvas {...charSceneFromBuild(build.state.upper, build.outfitHex)} width={180} />
+          <CharacterCanvas {...charSceneFromBuild(build.state.upper, build.outfitHex, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem })} width={180} />
         </div>
       )}
 
@@ -816,7 +818,7 @@ function StepImprove({ build }: { build: BH }) {
             const newOutfitHex = { ...build.outfitHex, [imp.part]: newC.hex }
             return (
               <div key={idx} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm">
-                <CharacterCanvas {...charSceneFromBuild(build.state.upper, newOutfitHex)} width={60} />
+                <CharacterCanvas {...charSceneFromBuild(build.state.upper, newOutfitHex, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem })} width={60} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[11px] text-warm-600">{getBuildPartLabel(imp.part, build.state.upper)}</span>

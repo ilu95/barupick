@@ -137,6 +137,7 @@ export function trackBodyType(type: string) {
 //   build_step     단계 진입   {step, mode, style, ms}
 //   build_complete 결과 도달   {score, n_upper, n_parts, layered, colors, style, mode, fabric, picks, confirms, ms, engine, pal}
 //   share          공유        {kind: native|community|card, ctx, score}
+//   outfit_*       1단계 옷 조합 {id, situ, temp, via|kind|rank}
 // meta 는 jsonb 라 스키마 변경 없음. 조회 예시는 scripts/03_analytics.sql.
 // ════════════════════════════════════════════════════════════════
 
@@ -173,7 +174,7 @@ export function trackColorConfirm(meta: { slot?: string | null; item?: string | 
 
 // 만들기 단계 진입
 export function trackBuildStep(step: string, meta: { mode: string; style: string | null }) {
-  if (step === 'style') markFunnel('build')
+  if (step === 'outfit' || (step === 'style' && !funnels.build)) markFunnel('build')
   trackEvent('build_step', { step, ...meta, ms: Date.now() - funnel('build').t0 })
 }
 
@@ -196,4 +197,9 @@ export function trackBuildComplete(meta: { score: number; n_upper: number; color
 // 공유
 export function trackShare(kind: 'native' | 'community' | 'card', ctx: string, score?: number) {
   trackEvent('share', { kind, ctx, score: score ?? null })
+}
+
+// 1단계 옷 조합: view(카드 노출) · adopt(방향/대안 채택) · pick(색 고르기로 진행) · feedback(👍👎) · anchor
+export function trackOutfit(kind: 'view' | 'adopt' | 'pick' | 'feedback' | 'anchor', meta: Record<string, any>) {
+  trackEvent('outfit_' + kind, { ...meta, ...VER })
 }

@@ -15,7 +15,7 @@ import { evaluationSystem } from '@/lib/evaluation'
 import { calculateHarmonyV6 } from '@/lib/recommend'
 
 export type BuildMode = 'coord' | 'evaluate'
-export type BuildStep = 'style' | 'builder' | 'fabric' | 'result' | 'improve'
+export type BuildStep = 'outfit' | 'style' | 'builder' | 'fabric' | 'result' | 'improve'
 export type SlotKey = 'outer' | 'middleware' | 'top' | 'inner' | 'hidden'
 export type EditMode =
   | { type: 'idle' }
@@ -28,6 +28,8 @@ export interface UpperLayer {
   itemId: string
   colorKey: string
   outerness: number
+  /** 1단계에서 고른 캐릭터 판 id (있으면 렌더러가 이 판을 그린다) */
+  plate?: string
 }
 
 export interface BuildState {
@@ -40,6 +42,11 @@ export interface BuildState {
   scarfColor: string | null
   hatColor: string | null
   fabrics: Record<string, string | null>
+  /** 1단계에서 고른 하의·신발 판 id (색은 bottomColor/shoesColor) */
+  bottomItem?: string | null
+  shoesItem?: string | null
+  /** 1단계 조합 id (계측·기록용) */
+  templateId?: string | null
 }
 
 // ═══ 자동 슬롯 매핑 ═══
@@ -164,7 +171,7 @@ const initialState = (mode: BuildMode = 'coord'): BuildState => ({
 let uidCounter = 0
 
 export function useBuild(mode: BuildMode = 'coord') {
-  const [step, setStep] = useState<BuildStep>('style')
+  const [step, setStep] = useState<BuildStep>(mode === 'coord' ? 'outfit' : 'style')
   const [state, setState] = useState<BuildState>(initialState(mode))
   const [history, setHistory] = useState<BuildStep[]>([])
   const [vizCollapsed, setVizCollapsed] = useState(false)
@@ -190,7 +197,7 @@ export function useBuild(mode: BuildMode = 'coord') {
 
   const reset = useCallback(() => {
     setState(initialState(mode))
-    setStep('style')
+    setStep(mode === 'coord' ? 'outfit' : 'style')
     setHistory([])
     setEditMode({ type: 'idle' })
   }, [mode])
@@ -219,6 +226,36 @@ export function useBuild(mode: BuildMode = 'coord') {
     setEditMode({ type: 'idle' })
   }, [])
 
+  // ── 1단계(옷 조합) 결과를 한 번에 올린다 ──
+  const applyOutfit = useCallback((o: {
+    layers: { itemId: string; plate: string; colorKey: string }[]
+    bottom?: { plate: string; colorKey: string }
+    shoes?: { plate: string; colorKey: string }
+    style?: string | null
+    templateId?: string | null
+  }) => {
+    setState(prev => {
+      const upper: UpperLayer[] = []
+      for (const l of o.layers) {
+        const item = ITEMS_CATALOG.find(i => i.id === l.itemId)
+        if (!item || upper.some(x => x.itemId === item.id) || upper.length >= 4) continue
+        upper.push({ uid: uidCounter++, itemId: item.id, colorKey: l.colorKey, outerness: item.outerness, plate: l.plate })
+      }
+      return {
+        ...prev,
+        style: o.style ?? null,
+        upper: sortUpper(upper),
+        bottomColor: o.bottom?.colorKey ?? prev.bottomColor,
+        shoesColor: o.shoes?.colorKey ?? prev.shoesColor,
+        bottomItem: o.bottom?.plate ?? null,
+        shoesItem: o.shoes?.plate ?? null,
+        templateId: o.templateId ?? null,
+      }
+    })
+    setEditMode({ type: 'idle' })
+    pushStep('builder')
+  }, [pushStep])
+
   // ── 상체 아이템 수정 ──
   const editUpper = useCallback((index: number, itemId: string, colorKey: string) => {
     setState(prev => {
@@ -226,7 +263,7 @@ export function useBuild(mode: BuildMode = 'coord') {
       if (!item) return prev
       if (prev.upper.some((l, i) => i !== index && l.itemId === itemId)) return prev
       const newUpper = prev.upper.map((l, i) =>
-        i === index ? { ...l, itemId: item.id, colorKey, outerness: item.outerness } : l
+        i === index ? { ...l, itemId: item.id, colorKey, outerness: item.outerness, plate: item.id === l.itemId ? l.plate : undefined } : l
       )
       return { ...prev, upper: sortUpper(newUpper) }
     })
@@ -419,7 +456,7 @@ export function useBuild(mode: BuildMode = 'coord') {
     setVizCollapsed, setEditMode,
     pushStep, goBack, update, reset,
     selectStyle,
-    addUpper, editUpper, removeUpper, setSimpleColor,
+    addUpper, editUpper, removeUpper, setSimpleColor, applyOutfit,
     getColorRecommendations, getScore, getEvalResult, calcScoreDelta,
     predictSlot: (tmpItemId: string, editIdx?: number) => predictSlot(state.upper, tmpItemId, editIdx),
     outfitHex, isComplete,
