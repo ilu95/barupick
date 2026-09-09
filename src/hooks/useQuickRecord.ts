@@ -8,6 +8,7 @@ import { setJSON } from '@/lib/storage'
 import { useCallback } from 'react'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
+import { ENGINE_VERSION } from '@/lib/versions'
 
 const STORAGE_KEY = 'sp_ootd_records'
 
@@ -78,6 +79,7 @@ function saveRecord(outfit: Record<string, string>, dateStr: string): { success:
       colors: cleanOutfit,
       photos: [],
       score: result.total,
+      engine: ENGINE_VERSION,
       weather: '',
       weatherData: null,
       situation: null,

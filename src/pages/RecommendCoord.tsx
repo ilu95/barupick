@@ -11,7 +11,7 @@ import { CATEGORY_NAMES } from '@/lib/categories'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import { trackRecommendComplete, trackSave, trackClick, trackShare } from '@/lib/analytics'
-import { LEGACY_ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
+import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
 import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
 import { useToast } from '@/components/ui/Toast'
 import { useModal } from '@/components/ui/Modal'
@@ -476,7 +476,7 @@ function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
   const handleSave = () => {
     const name = saveName.trim() || combo.name
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now(), engine: LEGACY_ENGINE_VERSION, pal: PALETTE_VERSION })
+    saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION })
     if (saved.length > 100) saved.length = 100
     setJSON('cs_saved', saved)
     setSaveModal(false)

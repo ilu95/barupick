@@ -11,6 +11,7 @@ import { PERSONAL_COLOR_12, FACE_NEAR_ITEMS } from './personalColor'
 import { BODY_GUIDE_DATA } from './bodyType'
 import { profile } from './profile'
 import i18n from '@/i18n'
+import { scoreOutfit } from './engine'
 
 
 export const evaluationSystem = {
@@ -589,7 +590,43 @@ export const evaluationSystem = {
         return Math.round((match / total) * 5);
     },
 
+    /**
+     * 점수 — 엔진 v7.1 (lib/engine.ts) 로 매기고 옛 필드 이름으로 편다.
+     * 추천·기록·옷장·프로필이 이 함수를 그대로 쓰므로 화면 코드는 바꾸지 않는다.
+     * 항목 매핑: 명도 구조→goldilocks(33) · 색 수·면적→ratio(17) · 조화→harmony(17) ·
+     *   상황·계절→season(8) · 시선 정리→balance(8) · 나에게→personal(17). 체형은 아직 없다.
+     * 옛 v6 계산은 evaluateV6 로 남겨 둔다 (비교·회귀 확인용).
+     */
     evaluate(outfit, personalColorType) {
+        let r;
+        try { r = scoreOutfit({ outfit }); } catch (e) { return this.evaluateV6(outfit, personalColorType); }
+        const part = (k) => r.parts.find(x => x.key === k) || null;
+        const scaled = (k, max) => { const p = part(k); return p && p.max ? Math.round(p.value / p.max * max * 100) / 100 : 0; };
+        const hasPersonalColor = !!part('me');
+        const ko = (i18n.language || 'ko').startsWith('ko');
+        const good = r.reasons.filter(x => x.w > 0).slice(0, 2).map(x => x.txt);
+        const bad = r.reasons.filter(x => x.w < 0).slice(0, 1).map(x => x.txt);
+        return {
+            total: r.total,
+            goldilocks: scaled('structure', 33),
+            ratio: scaled('count', 17),
+            harmony: scaled('harmony', 17),
+            season: scaled('situation', 8),
+            balance: scaled('focus', 8),
+            personal: hasPersonalColor ? scaled('me', 17) : 0,
+            bodyFit: 0,
+            hasPersonalColor,
+            hasBodyFit: false,
+            feedback: ko ? [...bad, ...good].join(' · ') : '',
+            theory: [],
+            colorInfo: this.countEffectiveColors(outfit),
+            engine: 'v7.1',
+            reasons: r.reasons,
+            parts: r.parts,
+        };
+    },
+
+    evaluateV6(outfit, personalColorType) {
         const goldilocks = this.calculateGoldilocksScore(outfit);
         const ratio = this.calculate603010Score(outfit);
         const harmony = this.evaluateHarmony(outfit);

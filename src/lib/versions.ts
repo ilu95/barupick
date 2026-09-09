@@ -6,10 +6,8 @@
 // 과거 기록의 점수는 다시 계산하지 않는다.
 // ================================================================
 
-/** 만들기 흐름의 색 점수 엔진. v7.1 = lib/engine.ts (CIELCh · 면적 모델 · 연속 램프). */
+/** 색 점수 엔진. v7.1 = lib/engine.ts (CIELCh · 면적 모델 · 연속 램프). 모든 화면이 쓴다(2026-09-09). */
 export const ENGINE_VERSION = 'v7.1'
-/** 아직 evaluation.ts(v6)로 매기는 화면(추천·기록·옷장)이 저장할 때 쓰는 표기 */
-export const LEGACY_ENGINE_VERSION = 'v6'
 
 /** 팔레트 hex 판. 1 = 웹 기본색 hex. 2 = 의류색 보정 hex(50색). */
 export const PALETTE_VERSION = 2
