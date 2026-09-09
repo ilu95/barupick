@@ -8,6 +8,7 @@ import { useWeather } from '@/hooks/useWeather'
 import { setJSON } from '@/lib/storage'
 import { enqueuePost } from '@/lib/postQueue'
 import { sortRecordsDesc } from '@/lib/records'
+import { ENGINE_VERSION } from '@/lib/versions'
 
 export interface OotdRecord {
   id: string
@@ -17,6 +18,8 @@ export interface OotdRecord {
   itemTypes?: Record<string, string>
   photos: string[]
   score: number
+  /** 점수를 매긴 엔진 (v7.1 부터 기록). 없으면 v6 시절 기록 */
+  engine?: string
   weather: string
   weatherData: any
   situation: string | null
@@ -163,6 +166,7 @@ export function useOotd() {
       itemTypes: Object.keys(itemTypes).length > 0 ? { ...itemTypes } : undefined,
       photos: [...photos],
       score,
+      engine: ENGINE_VERSION,
       weather: weatherStr,
       weatherData: weatherData ? { ...weatherData } : null,
       situation,
