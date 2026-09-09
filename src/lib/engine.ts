@@ -12,6 +12,7 @@ import * as V7 from './engine/v7'
 import { COLORS_60, getColorName } from './colors'
 import { profile } from './profile'
 import { tasteContrast } from './taste'
+import { PLATE_SLOT } from './outfits'
 
 const TO_V7: Record<string, string> = { outer: 'outer', middleware: 'layer', top: 'top', inner: 'inner', bottom: 'bottom', shoes: 'shoes', scarf: 'scarf', hat: 'hat' }
 const FROM_V7: Record<string, string> = Object.fromEntries(Object.entries(TO_V7).map(([a, b]) => [b, a]))
@@ -39,10 +40,16 @@ export function pcSeason(): 'spring' | 'summer' | 'autumn' | 'winter' | null {
   } catch { return null }
 }
 
+const PLATE_V7: Record<string, string> = { inner: 'inner', mid1: 'top', mid2: 'layer', outer: 'outer', bottom: 'bottom', shoe: 'shoes', scarf: 'scarf', hat: 'hat' }
 export function toItems(input: EngineInput) {
   return Object.entries(input.outfit)
     .filter(([, key]) => key && COLORS_60[key])
-    .map(([slot, key]) => ({ slot: TO_V7[slot] || slot, id: input.plates?.[slot] || slot, hex: COLORS_60[key!].hex, color: getColorName(key!), key: key! }))
+    .map(([slot, key]) => {
+      const plate = input.plates?.[slot] || null
+      // 판을 알면 그 판이 실제로 앉는 칸으로 (목폴라를 '상의' 칸에 넣어도 inner 면적으로 센다)
+      const v7slot = (plate && PLATE_SLOT[plate] && PLATE_V7[PLATE_SLOT[plate]]) || TO_V7[slot] || slot
+      return { slot: v7slot, id: plate || slot, hex: COLORS_60[key!].hex, color: getColorName(key!), key: key! }
+    })
 }
 export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason(), contrast: tasteContrast() })
 

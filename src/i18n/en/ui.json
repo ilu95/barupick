@@ -1662,5 +1662,28 @@
     "homeLink": "See your friends' votes",
     "singleSub": "Tap like or not-for-me once",
     "twoSub": "Pick one of the two"
+  },
+  "builder": {
+    "title": "Build",
+    "reset": "Start over",
+    "male": "M",
+    "female": "W",
+    "takeOff": "Take off",
+    "none": "None",
+    "noRec": "Finding colors for this spot…",
+    "pt": "pts",
+    "done": "Done",
+    "slot": {
+      "hair": "Hair",
+      "inner": "Inner",
+      "middleware": "Layer",
+      "acc": "Accessory",
+      "outer": "Outer",
+      "top": "Top",
+      "bottom": "Bottom",
+      "shoes": "Shoes",
+      "scarf": "Scarf",
+      "hat": "Hat"
+    }
   }
 }

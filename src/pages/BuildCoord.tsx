@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import StepOutfit from '@/pages/build/StepOutfit'
-import { charSceneFromBuild } from '@/lib/char/map'
+import StepBuilderV2 from '@/pages/build/StepBuilderV2'
+import { charSceneFromBuild, charSceneFromState } from '@/lib/char/map'
 import { useToast } from '@/components/ui/Toast'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
@@ -51,7 +52,7 @@ export default function BuildCoord() {
       <div className="max-w-[480px] mx-auto px-5 py-4 pb-8">
         {build.step === 'outfit' && <StepOutfit build={build} />}
         {build.step === 'style' && <StepStyle build={build} />}
-        {build.step === 'builder' && <StepBuilder build={build} navigate={navigate} />}
+        {build.step === 'builder' && (build.state.mode === 'coord' ? <StepBuilderV2 build={build} /> : <StepBuilder build={build} navigate={navigate} />)}
         {build.step === 'fabric' && <StepFabric build={build} />}
         {build.step === 'result' && <StepResult build={build} navigate={navigate} />}
         {build.step === 'improve' && <StepImprove build={build} />}
@@ -710,7 +711,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const handleCommunityShare = () => { trackShare('community', 'build', score); setJSON("_pending_post_outfit", outfit); navigate("/community/post") }
 
   // ── 루프 L1: 오늘의 코디 카드 ──
-  const sceneNow = charSceneFromBuild(build.state.upper, build.outfitHex, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem })
+  const sceneNow = charSceneFromState(build.state)
   const colorsNow = filledParts.map(([, key]) => ({ key: key as string, hex: COLORS_60[key as string]?.hex || '#ccc', name: getColorName(key as string) }))
   const stampText = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null].filter(Boolean).join(' ')
   const makeCard = async (ratio: CardRatio) => {
@@ -771,7 +772,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       </button>
       {!build.vizCollapsed && (
         <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
-          <CharacterCanvas {...charSceneFromBuild(build.state.upper, build.outfitHex, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem })} width={180} />
+          <CharacterCanvas {...sceneNow} width={180} />
         </div>
       )}
 

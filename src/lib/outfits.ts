@@ -1349,6 +1349,8 @@ export const PLATE_TO_ITEM: Record<string, string> = {
   '11_knit_crew': 'knit', '12_knit_vneck': 'knit', '13_knit_turtle': 'knit',
   '35_sweat': 'mtm', '16_hoodie': 'hoodie',
   '37_polo': 'tshirt', '07_tee_long': 'tshirt', '06_tee_short': 'tshirt', '36_tank': 'tshirt',
+  '53_halfzip': 'knit_zip', '20_leather': 'jacket', '21_windbreaker': 'hood_zip', '22_sukajan': 'jacket', '32_padding_long': 'padding',
+  '41_jacket_crop': 'jacket', '42_fleece': 'hood_zip', '43_mustang': 'jacket', '44_field': 'jacket', '46_knit_crop': 'knit', '47_blouse': 'shirt',
 }
 /** 조합의 스타일 이름 → STYLE_GUIDE 키 (색 추천이 읽는다). 없는 것은 null. */
 export const STYLE_KEY: Record<string, string | null> = {

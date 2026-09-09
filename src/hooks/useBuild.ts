@@ -16,6 +16,8 @@ import { calculateHarmonyV6 } from '@/lib/recommend'
 import { colorGuide, bestMoves, type Move } from '@/lib/guide'
 import { scoreOutfit, scoreDelta, type EngineInput, type EngineResult } from '@/lib/engine'
 import { platesOf } from '@/lib/char/map'
+import { UI_OUTERNESS, uiSlotOf, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
+import { PLATE_TO_ITEM } from '@/lib/outfits'
 
 export type BuildMode = 'coord' | 'evaluate'
 export type BuildStep = 'outfit' | 'style' | 'builder' | 'fabric' | 'result' | 'improve'
@@ -52,6 +54,11 @@ export interface BuildState {
   templateId?: string | null
   /** 1단계에서 고른 상황 (엔진 v7.1 의 상황 엄격도) */
   situ?: string | null
+  /** 새 만들기 화면: 목도리·모자 판, 헤어 */
+  scarfItem?: string | null
+  hatItem?: string | null
+  hair?: string | null
+  hairColor?: string | null
 }
 
 // ═══ 자동 슬롯 매핑 ═══
@@ -231,6 +238,34 @@ export function useBuild(mode: BuildMode = 'coord') {
     setEditMode({ type: 'idle' })
   }, [])
 
+  // ── 새 만들기 화면: 칸 단위로 옷·색을 바꾼다 (레이어 = outerness 버킷 하나) ──
+  const setSlotGarment = useCallback((slot: UpperSlot, plate: string | null, colorKey?: string) => {
+    setState(prev => {
+      const rest = prev.upper.filter(l => uiSlotOf(l) !== slot)
+      if (!plate) return { ...prev, upper: rest }
+      const old = prev.upper.find(l => uiSlotOf(l) === slot)
+      const itemId = PLATE_TO_ITEM[plate] || (slot === 'outer' ? 'jacket' : slot === 'middleware' ? 'cardigan' : slot === 'inner' ? 'tshirt' : 'knit')
+      const layer: UpperLayer = { uid: uidCounter++, itemId, plate, colorKey: colorKey || old?.colorKey || 'white', outerness: UI_OUTERNESS[slot] }
+      return { ...prev, upper: sortUpper([...rest, layer]) }
+    })
+    setEditMode({ type: 'idle' })
+  }, [])
+  const setSlotColor = useCallback((slot: string, colorKey: string) => {
+    setState(prev => {
+      if (slot === 'bottom') return { ...prev, bottomColor: colorKey }
+      if (slot === 'shoes') return { ...prev, shoesColor: colorKey }
+      if (slot === 'scarf') return { ...prev, scarfColor: colorKey }
+      if (slot === 'hat') return { ...prev, hatColor: colorKey }
+      return { ...prev, upper: prev.upper.map(l => uiSlotOf(l) === slot ? { ...l, colorKey } : l) }
+    })
+  }, [])
+  const setBottomItem = useCallback((plate: string) => setState(prev => ({ ...prev, bottomItem: plate })), [])
+  const setShoesItem = useCallback((plate: string) => setState(prev => ({ ...prev, shoesItem: plate })), [])
+  const setAccItem = useCallback((acc: AccSlot, plate: string | null, colorKey: string | null) => setState(prev => acc === 'scarf'
+    ? { ...prev, scarfItem: plate, scarfColor: plate ? colorKey : null }
+    : { ...prev, hatItem: plate, hatColor: plate ? colorKey : null }), [])
+  const setHair = useCallback((hair: string, hairColor: string) => setState(prev => ({ ...prev, hair, hairColor })), [])
+
   // ── 1단계(옷 조합) 결과를 한 번에 올린다 ──
   const applyOutfit = useCallback((o: {
     layers: { itemId: string; plate: string; colorKey: string }[]
@@ -296,7 +331,19 @@ export function useBuild(mode: BuildMode = 'coord') {
   }, [])
 
   // ── 엔진 v7.1 입력: 자리별 색 + 판 + 상황 ──
-  const engineInput = useCallback((): EngineInput => ({ outfit: getFilledOutfit(state), plates: platesOf(state), situ: state.situ || 'daily' }), [state])
+  // 상체는 outerness 버킷(outer/middleware/top/inner)으로 자리를 정한다 — 새 만들기 화면이 그 버킷으로 칸을 채운다.
+  const engineInput = useCallback((): EngineInput => {
+    const outfit: Record<string, string> = {}
+    const plates: Record<string, string> = platesOf(state)
+    for (const l of state.upper) { const s = uiSlotOf(l); outfit[s] = l.colorKey; if (l.plate) plates[s] = l.plate }
+    if (state.bottomColor) outfit.bottom = state.bottomColor
+    if (state.shoesColor) outfit.shoes = state.shoesColor
+    if (state.scarfColor) outfit.scarf = state.scarfColor
+    if (state.hatColor) outfit.hat = state.hatColor
+    if (state.scarfItem) plates.scarf = state.scarfItem
+    if (state.hatItem) plates.hat = state.hatItem
+    return { outfit, plates, situ: state.situ || 'daily' }
+  }, [state])
 
   // ── 점수 ──
   const getScore = useCallback((): number => {
@@ -476,6 +523,7 @@ export function useBuild(mode: BuildMode = 'coord') {
     pushStep, goBack, update, reset,
     selectStyle,
     addUpper, editUpper, removeUpper, setSimpleColor, applyOutfit,
+    setSlotGarment, setSlotColor, setBottomItem, setShoesItem, setAccItem, setHair,
     getColorRecommendations, getScore, getEvalResult, calcScoreDelta, getGuide, getBestMoves, applyMove,
     predictSlot: (tmpItemId: string, editIdx?: number) => predictSlot(state.upper, tmpItemId, editIdx),
     outfitHex, isComplete,
