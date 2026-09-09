@@ -142,14 +142,15 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
 
   return (
     <div className="animate-screen-fade">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('outfit.title')}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-3">{t('outfit.subtitle')}</p>
-      <button onClick={() => navigate('/home/taste')} className="mb-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 text-[11.5px] font-semibold text-terra-700 dark:text-terra-300 active:scale-95">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight">{t('outfit.title')}</h2>
+        <button onClick={() => navigate('/home/taste')} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-terra-50 dark:bg-terra-900/20 border border-terra-200 dark:border-terra-800 text-[11.5px] font-semibold text-terra-700 dark:text-terra-300 active:scale-95">
         ✦ {taste ? t('outfit.tasteChip', { name: taste.name }) : t('outfit.tasteCta')}
-      </button>
+        </button>
+      </div>
 
       {/* 상황 · 기온 */}
-      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-5 px-5 mb-3 [scrollbar-width:none]">
+      <div className="flex gap-1.5 overflow-x-auto pb-1.5 -mx-5 px-5 mb-2 [scrollbar-width:none]">
         {SITU.map(s => (
           <button key={s.id} onClick={() => setSitu(s.id)} className={`${chip} ${situ === s.id ? chipOn : chipOff}`}>{t('outfit.situ.' + s.id)}</button>
         ))}
@@ -159,11 +160,11 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
       </div>
 
       {/* 1위 한 벌 */}
-      <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-3xl shadow-warm-sm p-4 mb-3">
-        <div className="grid grid-cols-[132px_1fr] gap-3 items-center">
+      <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-3xl shadow-warm-sm p-3 mb-2">
+        <div className="grid grid-cols-[112px_1fr] gap-3 items-center">
           <div className="relative flex justify-center">
             {anchor && <span className="absolute top-0 left-0 text-[10px] font-bold bg-warm-900 text-white px-2 py-0.5 rounded-full">{plateName(anchor)}</span>}
-            <CharacterCanvas {...scene(hero.p, hero.chg)} width={132} />
+            <CharacterCanvas {...scene(hero.p, hero.chg)} width={112} />
           </div>
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-2 mb-1">
@@ -179,20 +180,20 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
             {lastDiff && <div className="text-[11.5px] text-warm-900 dark:text-warm-100 font-semibold mt-1">{lastDiff}</div>}
           </div>
         </div>
-        <button onClick={go} className="mt-3 w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
+        <button onClick={go} className="mt-2.5 w-full py-2.5 bg-terra-500 text-white rounded-xl font-semibold text-[13px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
           {t('outfit.pickColors')} <ArrowRight size={16} />
         </button>
       </div>
 
       {/* 방향 칩 */}
-      <div className="grid grid-cols-2 gap-2 mb-4">
+      <div className="grid grid-cols-2 gap-1.5 mb-3">
         {([['formal', 'formal'], ['relax', 'relax'], ['temp', cool ? 'cool' : 'warm'], ['twist', 'twist']] as [string, DirKind][]).map(([key, kind]) => {
           const v = dirs?.[key as keyof typeof dirs]
           return (
             <button key={key} disabled={!v} onClick={() => onDir(kind, key)}
-              className="text-left px-3 py-2.5 rounded-2xl bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 disabled:opacity-40 active:scale-[0.98] transition-all">
-              <div className="text-[12.5px] font-semibold text-warm-900 dark:text-warm-100">{t('outfit.dirs.' + kind)}</div>
-              {v && <div className="text-[11px] text-warm-500 truncate">→ {v.to ? plateName(v.to) : `${plateName(v.from!)} ${t('outfit.remove')}`}</div>}
+              className="text-left px-2.5 py-1.5 rounded-xl bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 disabled:opacity-40 active:scale-[0.98] transition-all flex items-baseline gap-1.5 min-w-0">
+              <span className="text-[12px] font-semibold text-warm-900 dark:text-warm-100 flex-none">{t('outfit.dirs.' + kind)}</span>
+              {v && <span className="text-[10.5px] text-warm-500 truncate">→ {v.to ? plateName(v.to) : `${plateName(v.from!)} ${t('outfit.remove')}`}</span>}
             </button>
           )
         })}
@@ -203,16 +204,16 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
 
       {/* 대안 3장 */}
       <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-wide mb-2">{t('outfit.altsTitle')}</div>
-      <div className="grid grid-cols-3 gap-2 mb-3">
+      <div className="grid grid-cols-3 gap-1.5 mb-2">
         {alts.map(e => (
           <button key={e.c.id} onClick={() => adopt(e, 'alt')} className="text-left bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-2 active:scale-[0.98] transition-all">
-            <div className="flex justify-center mb-1"><CharacterCanvas {...scene(e.p)} width={78} /></div>
+            <div className="flex justify-center mb-1"><CharacterCanvas {...scene(e.p)} width={64} /></div>
             <div className="text-[11.5px] font-bold text-warm-900 dark:text-warm-100 leading-tight">{e.name}</div>
             <div className="text-[10px] text-warm-500 leading-snug line-clamp-2 mt-0.5">{e.why}</div>
           </button>
         ))}
       </div>
-      <button onClick={() => setMore(m => !m)} className="w-full text-[12px] text-warm-600 dark:text-warm-400 py-2 flex items-center justify-center gap-1 active:opacity-70">
+      <button onClick={() => setMore(m => !m)} className="w-full text-[12px] text-warm-600 dark:text-warm-400 py-1.5 flex items-center justify-center gap-1 active:opacity-70">
         {more ? <><ChevronUp size={13} /> {t('outfit.less')}</> : <><ChevronDown size={13} /> {t('outfit.more')}</>}
       </button>
       {more && (
@@ -228,7 +229,7 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
       )}
 
       {/* 입을 옷이 정해져 있을 때 */}
-      <div className="h-px bg-warm-400 dark:bg-warm-600 my-4" />
+      <div className="h-px bg-warm-400 dark:bg-warm-600 my-3" />
       <button onClick={() => setAnchorOpen(o => !o)} className="w-full flex items-center justify-between py-1 active:opacity-70">
         <div className="text-left">
           <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t('outfit.anchorTitle')}</div>
@@ -248,7 +249,7 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
         </div>
       )}
 
-      <button onClick={() => build.pushStep('style')} className="text-sm text-terra-600 font-medium w-full text-center py-3 mt-2 active:opacity-70">
+      <button onClick={() => build.pushStep('style')} className="text-[13px] text-terra-600 font-medium w-full text-center py-2 mt-1 active:opacity-70">
         {t('outfit.styleFirst')} →
       </button>
     </div>

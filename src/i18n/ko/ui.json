@@ -1662,5 +1662,28 @@
     "homeLink": "친구 투표 결과 보기",
     "singleSub": "좋아요 / 별로 한 번만 눌러 줘",
     "twoSub": "둘 중 하나만 골라 줘"
+  },
+  "builder": {
+    "title": "만들기",
+    "reset": "처음부터",
+    "male": "남",
+    "female": "여",
+    "takeOff": "벗기",
+    "none": "없음",
+    "noRec": "이 자리에 추천할 색을 찾는 중이에요",
+    "pt": "점",
+    "done": "완성",
+    "slot": {
+      "hair": "헤어",
+      "inner": "이너",
+      "middleware": "레이어드",
+      "acc": "악세서리",
+      "outer": "아우터",
+      "top": "상의",
+      "bottom": "하의",
+      "shoes": "신발",
+      "scarf": "목도리",
+      "hat": "모자"
+    }
   }
 }
