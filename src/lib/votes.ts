@@ -7,6 +7,7 @@
 // 테이블: scripts/06_coord_votes.sql
 // ================================================================
 import { supabase } from './supabase'
+import { trackEvent } from './analytics'
 import type { CharScene } from './char/map'
 
 export interface VoteSide { scene: CharScene; colors: { key: string; hex: string; name: string }[]; score: number; label?: string }
@@ -39,13 +40,20 @@ export const votedChoice = (code: string): Choice | null => { try { return (loca
 
 /** 카톡 미리보기 이미지를 Storage 에 올린다. 실패해도 투표는 만든다 (기본 아이콘으로 보임). */
 async function uploadOg(code: string, dataUrl: string): Promise<string | null> {
-  try {
-    const blob = await (await fetch(dataUrl)).blob()
-    const path = `${code}.png`
-    const { error } = await supabase.storage.from('vote-cards').upload(path, blob, { contentType: 'image/png', upsert: false })
-    if (error) return null
-    return supabase.storage.from('vote-cards').getPublicUrl(path).data.publicUrl
-  } catch { return null }
+  const path = `${code}.png`
+  let lastMsg = ''
+  for (let i = 0; i < 2; i++) {   // 한 번은 다시 시도 (모바일 네트워크 흔들림)
+    try {
+      const blob = await (await fetch(dataUrl)).blob()
+      const { error } = await supabase.storage.from('vote-cards').upload(path, blob, { contentType: 'image/png', upsert: true })
+      if (!error) return supabase.storage.from('vote-cards').getPublicUrl(path).data.publicUrl
+      lastMsg = error.message || String(error)
+    } catch (e: any) { lastMsg = e?.message || String(e) }
+  }
+  // 왜 미리보기 카드가 안 붙었는지 남긴다 (analytics_events 에서 vote_og_fail 로 조회)
+  trackEvent('vote_og_fail', { code, msg: lastMsg.slice(0, 200) })
+  if (import.meta.env.DEV) console.warn('[vote] og upload failed:', lastMsg)
+  return null
 }
 
 export async function createVote(input: { a: VoteSide; b: VoteSide | null; question: string; situ?: string | null; temp?: number | null; ownerId?: string | null; ogDataUrl?: string | null }): Promise<Vote> {

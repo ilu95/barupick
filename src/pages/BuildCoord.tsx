@@ -749,7 +749,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       }
       const sub = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null, bSide ? t('vote.twoSub') : t('vote.singleSub')].filter(Boolean).join(' · ')
       let ogDataUrl: string | null = null
-      try { ogDataUrl = await drawVoteOg(a, bSide, t('vote.defaultQ'), sub); if (import.meta.env.DEV) (window as any).__bp_lastOg = ogDataUrl } catch { ogDataUrl = null }
+      try { ogDataUrl = await drawVoteOg(a, bSide, t('vote.defaultQ'), sub); if (import.meta.env.DEV) (window as any).__bp_lastOg = ogDataUrl } catch (e: any) { ogDataUrl = null; trackVote('create', { og_draw_fail: String(e?.message || e).slice(0, 200) }) }
       const v = await createVote({ a, b: bSide, question: t('vote.defaultQ'), situ: build.state.situ || null, temp: weather?.feels ?? null, ownerId: user?.id || null, ogDataUrl })
       trackVote('create', { code: v.code, two: !!bSide, score })
       navigate('/v/' + v.code)
