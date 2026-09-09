@@ -10,7 +10,7 @@ import { supabase } from './supabase'
 import type { CharScene } from './char/map'
 
 export interface VoteSide { scene: CharScene; colors: { key: string; hex: string; name: string }[]; score: number; label?: string }
-export interface Vote { id: string; code: string; owner_id: string | null; question: string; a: VoteSide; b: VoteSide | null; situ: string | null; temp: number | null; created_at: string }
+export interface Vote { id: string; code: string; owner_id: string | null; question: string; a: VoteSide; b: VoteSide | null; situ: string | null; temp: number | null; created_at: string; og_url?: string | null }
 export interface VoteCounts { a: number; b: number; up: number; down: number; total: number }
 export type Choice = 'a' | 'b' | 'up' | 'down'
 
@@ -37,12 +37,24 @@ function rememberMine(code: string, question: string) {
 export const isMine = (code: string) => myVotes().some(v => v.code === code)
 export const votedChoice = (code: string): Choice | null => { try { return (localStorage.getItem('sp_voted_' + code) as Choice) || null } catch { return null } }
 
-export async function createVote(input: { a: VoteSide; b: VoteSide | null; question: string; situ?: string | null; temp?: number | null; ownerId?: string | null }): Promise<Vote> {
+/** 카톡 미리보기 이미지를 Storage 에 올린다. 실패해도 투표는 만든다 (기본 아이콘으로 보임). */
+async function uploadOg(code: string, dataUrl: string): Promise<string | null> {
+  try {
+    const blob = await (await fetch(dataUrl)).blob()
+    const path = `${code}.png`
+    const { error } = await supabase.storage.from('vote-cards').upload(path, blob, { contentType: 'image/png', upsert: false })
+    if (error) return null
+    return supabase.storage.from('vote-cards').getPublicUrl(path).data.publicUrl
+  } catch { return null }
+}
+
+export async function createVote(input: { a: VoteSide; b: VoteSide | null; question: string; situ?: string | null; temp?: number | null; ownerId?: string | null; ogDataUrl?: string | null }): Promise<Vote> {
   let lastErr: any = null
   for (let i = 0; i < 3; i++) {   // 코드 충돌이면 다시
     const code = newCode()
+    const og_url = input.ogDataUrl ? await uploadOg(code, input.ogDataUrl) : null
     const { data, error } = await supabase.from('coord_votes')
-      .insert({ code, owner_id: input.ownerId || null, question: input.question, a: input.a, b: input.b, situ: input.situ || null, temp: input.temp ?? null })
+      .insert({ code, owner_id: input.ownerId || null, question: input.question, a: input.a, b: input.b, situ: input.situ || null, temp: input.temp ?? null, og_url })
       .select('*').single()
     if (!error && data) { rememberMine(code, input.question); return data as Vote }
     lastErr = error

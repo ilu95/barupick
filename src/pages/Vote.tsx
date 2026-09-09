@@ -36,6 +36,7 @@ export default function VotePage() {
     } catch { setState('error') }
   }
   useEffect(() => { load() }, [code])
+  useEffect(() => { const prev = document.title; if (vote) document.title = `${vote.question || t('vote.title')} · 바루픽`; return () => { document.title = prev } }, [vote])
 
   const choose = async (choice: Choice) => {
     if (!vote || busy) return
