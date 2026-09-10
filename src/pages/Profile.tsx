@@ -240,15 +240,7 @@ export default function Profile() {
         </div>
       )}
 
-      {/* 성장 섹션 */}
-      <MenuSection icon={<Trophy size={14} />} title={t('profile.sections.growth')}>
-        <MenuItem icon={<BarChart3 size={18} />} label={t('profile.menu.myLevel')} badge={`Lv.${lv.level} · ${lv.progress}%`} onClick={() => navigate('/profile/level')} />
-        <MenuItem icon={<Award size={18} />} label={t('profile.menu.myBadges')} badge={`${earnedBadges}/${badges.length}`} onClick={() => navigate('/profile/badges')} />
-        <MenuItem icon={<Palette size={18} />} label={t('profile.menu.colorRanking')} onClick={() => navigate('/profile/color-ranking')} />
-        <MenuItem icon={<ScanLine size={18} />} label={t('profile.menu.colorPattern')} badge="DNA" badgeVariant="muted" onClick={() => navigate('/profile/color-pattern')} />
-        <MenuItem icon={<GraduationCap size={18} />} label={t('profile.menu.titleExam')} onClick={() => navigate('/profile/title-exam')} />
-        <MenuItem icon={<Target size={18} />} label={t('profile.menu.challenges')} onClick={() => navigate('/profile/challenges')} last />
-      </MenuSection>
+      {/* 성장(레벨·배지·칭호·챌린지)은 두 타겟 누구의 질문에도 답하지 않아 숨겼다. 경로는 살아 있다 */}
 
       {/* 나의 진단 */}
       <MenuSection icon={<ScanFace size={14} />} title={t('profile.sections.diagnosis')}>

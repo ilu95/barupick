@@ -276,6 +276,8 @@ export function useBuild(mode: BuildMode = 'coord') {
     style?: string | null
     templateId?: string | null
     situ?: string | null
+    /** 초보 앞문: 색 고르기를 건너뛰고 바로 결과로 (뒤로 가면 색 고르기) */
+    goto?: 'builder' | 'result'
   }) => {
     setState(prev => {
       const upper: UpperLayer[] = []
@@ -301,8 +303,9 @@ export function useBuild(mode: BuildMode = 'coord') {
       }
     })
     setEditMode({ type: 'idle' })
-    pushStep('builder')
-  }, [pushStep])
+    if (o.goto === 'result') { setHistory(prev => [...prev, step, 'builder']); setStep('result') }
+    else pushStep('builder')
+  }, [pushStep, step])
 
   // ── 상체 아이템 수정 ──
   const editUpper = useCallback((index: number, itemId: string, colorKey: string) => {

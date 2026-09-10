@@ -127,7 +127,18 @@
     "start": "Get Started",
     "skip": "Skip",
     "langSelectTitle": "Choose Language",
-    "langSelectDesc": "Select your preferred language"
+    "langSelectDesc": "Select your preferred language",
+    "sexTitle": "Pick your character",
+    "sexDesc": "It tries outfits on for you",
+    "modeTitle": "Is choosing clothes hard, or fun?",
+    "modeDesc": "You can change this any time in settings",
+    "easyTitle": "Hard. Pick for me",
+    "easyDesc": "Open the app and one outfit is ready. Take it, or see another",
+    "easyCta": "Start this way",
+    "proTitle": "Fun. I build it myself",
+    "proDesc": "84 garments, 148 colors, full control. Score and reasons only when you want",
+    "proCta": "Start at the workbench",
+    "modeNote": "Character and mode can be changed in settings"
   },
   "home": {
     "greetingMorning": "Good morning",
@@ -179,6 +190,14 @@
         "S",
         "S"
       ]
+    },
+    "easy": {
+      "title": "What to wear today?",
+      "titleTomorrow": "What to wear tomorrow?",
+      "take": "I'll take this",
+      "other": "Show another",
+      "colorsOnly": "Just change colors",
+      "allowLocation": "Allow location to use today's temperature"
     }
   },
   "auth": {
@@ -257,7 +276,9 @@
     "syncErrorState": "Last sync failed — tap Sync now to retry",
     "reminder": "8 PM weather reminder",
     "reminderDesc": "Only on days the weather changes (5°+ or rain): tomorrow's outfit",
-    "reminderDenied": "Notifications are not allowed. Enable them in device settings"
+    "reminderDenied": "Notifications are not allowed. Enable them in device settings",
+    "modeEasy": "Pick-for-me mode",
+    "modeEasyDesc": "On: home is one outfit. Off: the full workbench"
   },
   "feedbackModal": {
     "title": "Send Feedback",
@@ -1787,7 +1808,10 @@
       "shoes": "Shoes",
       "scarf": "Scarf",
       "hat": "Hat"
-    }
+    },
+    "easyTitle": "Pick colors",
+    "moreColors": "More colors",
+    "changeGarment": "Change garment"
   },
   "reminder": {
     "colderTitle": "Tomorrow morning {{temp}}°, {{d}}° colder than today",

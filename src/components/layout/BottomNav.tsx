@@ -7,7 +7,6 @@ const TAB_KEYS = [
   { path: '/closet', labelKey: 'nav.closet', icon: Archive },
   { path: '/record', labelKey: 'nav.record', icon: Plus, center: true },
   { path: '/community', labelKey: 'nav.community', icon: Users },
-  { path: '/shop', labelKey: 'nav.shop', icon: ShoppingBag },
 ]
 
 // 네비 숨김 화면

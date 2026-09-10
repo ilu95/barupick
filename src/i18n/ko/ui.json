@@ -127,7 +127,18 @@
     "start": "시작하기",
     "skip": "건너뛰기",
     "langSelectTitle": "언어 선택",
-    "langSelectDesc": "사용할 언어를 선택해주세요"
+    "langSelectDesc": "사용할 언어를 선택해주세요",
+    "sexTitle": "캐릭터를 골라 주세요",
+    "sexDesc": "이 캐릭터가 대신 입어 봐요",
+    "modeTitle": "옷 고르는 게 어렵나요, 재밌나요?",
+    "modeDesc": "언제든 설정에서 바꿀 수 있어요",
+    "easyTitle": "어려워요. 골라 주세요",
+    "easyDesc": "열면 오늘 입을 한 벌이 놓여 있어요. 마음에 들면 그대로, 아니면 다른 거",
+    "easyCta": "이걸로 시작",
+    "proTitle": "재밌어요. 직접 만들래요",
+    "proDesc": "옷 84종과 색 148개로 자유롭게. 점수와 이유는 확인만",
+    "proCta": "작업대로 시작",
+    "modeNote": "캐릭터 성별과 모드는 설정에서 바꿀 수 있어요"
   },
   "home": {
     "greetingMorning": "좋은 아침이에요",
@@ -179,6 +190,14 @@
         "토",
         "일"
       ]
+    },
+    "easy": {
+      "title": "오늘 뭐 입을까요?",
+      "titleTomorrow": "내일 뭐 입을까요?",
+      "take": "이대로 할게요",
+      "other": "다른 거 볼래요",
+      "colorsOnly": "색만 바꿀래요",
+      "allowLocation": "위치를 허용하면 오늘 기온으로 골라요"
     }
   },
   "auth": {
@@ -257,7 +276,9 @@
     "syncErrorState": "마지막 동기화 실패 — 지금 동기화를 눌러 다시 시도하세요",
     "reminder": "저녁 8시 날씨 알림",
     "reminderDesc": "날씨가 바뀌는 날(기온 5° 이상·비)에만 내일의 한 벌을 알려요",
-    "reminderDenied": "알림 권한이 없어요. 기기 설정에서 허용해 주세요"
+    "reminderDenied": "알림 권한이 없어요. 기기 설정에서 허용해 주세요",
+    "modeEasy": "골라 주는 모드",
+    "modeEasyDesc": "켜면 홈이 곧 한 벌. 끄면 작업대(옷 84종·색 148개)가 열려요"
   },
   "feedbackModal": {
     "title": "피드백 보내기",
@@ -1787,7 +1808,10 @@
       "shoes": "신발",
       "scarf": "목도리",
       "hat": "모자"
-    }
+    },
+    "easyTitle": "색 고르기",
+    "moreColors": "더 많은 색",
+    "changeGarment": "옷 바꾸기"
   },
   "reminder": {
     "colderTitle": "내일 아침 {{temp}}°, 오늘보다 {{d}}° 낮아요",

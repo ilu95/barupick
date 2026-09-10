@@ -1,3 +1,4 @@
+import { isEasy } from '@/lib/mode'
 import { scheduleReminder, initReminderTap } from '@/lib/reminder'
 import { useWeather } from '@/hooks/useWeather'
 import { Suspense, lazy, useEffect } from 'react'
@@ -60,6 +61,7 @@ import Onboarding from '@/pages/Onboarding'
 const TasteQuiz = lazy(() => import('@/pages/TasteQuiz'))
 const VotePage = lazy(() => import('@/pages/Vote'))
 const TasteComparePage = lazy(() => import('@/pages/TasteCompare'))
+const HomeEasy = lazy(() => import('@/pages/HomeEasy'))
 const ClosetCoord = lazy(() => import('@/pages/ClosetCoord'))
 const PurchaseSimulate = lazy(() => import('@/pages/PurchaseSimulate'))
 const WardrobeReport = lazy(() => import('@/pages/WardrobeReport'))
@@ -127,7 +129,7 @@ export default function App() {
               <Suspense fallback={<PageLoading />}>
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" replace />} />
-                  <Route path="/home" element={<Home />} />
+                  <Route path="/home" element={isEasy() ? <HomeEasy /> : <Home />} />
                   <Route path="/home/build" element={<BuildCoord />} />
                   <Route path="/home/taste" element={<TasteQuiz />} />
                   <Route path="/v/:code" element={<VotePage />} />
