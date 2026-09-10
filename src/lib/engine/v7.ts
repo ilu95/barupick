@@ -162,7 +162,8 @@ function evaluate(items, ctx) {
   const fams = [];   // {h, w}
   P.forEach(p => { const w = p.wc * ramp(p.area, .03, .12); if (w < .05) return; const f = fams.find(f => dH(f.h, p.c.h) < 30); if (f) f.w = Math.max(f.w, w); else fams.push({ h: p.c.h, w }); });
   const n = fams.reduce((s, f) => s + f.w, 0);
-  let cScore = n < 1 ? 12 + 4 * n : n <= 2 ? 20 - 2 * (n - 1) : n <= 3 ? 18 - 7 * (n - 2) : Math.max(3, 11 - 7 * (n - 3));
+  // 무채색 일색은 안전한 정석이라 크게 깎지 않는다 (v7.3: 12+4n → 16+4n). 색이 하나 있으면 20, 둘째부터 서서히, 셋째부터 가파르게
+  let cScore = n < 1 ? 16 + 4 * n : n <= 2 ? 20 - 2 * (n - 1) : n <= 3 ? 18 - 7 * (n - 2) : Math.max(3, 11 - 7 * (n - 3));
   if (n >= 2.6) add('too-many', `색이 ${Math.round(n)}가지라 많아요. 하나는 무채색으로 바꿔 보세요`, -2, P.filter(p => p.wc >= .5).map(p => p.slot));
   if (n < .3) add('all-neutral', '전부 무채색이라 안전하지만 심심해요. 작은 포인트 색을 하나 더해 보세요', 0, ['scarf', 'shoes', 'top']);
   const strongArea = P.reduce((s, p) => s + p.area * p.vv, 0);
