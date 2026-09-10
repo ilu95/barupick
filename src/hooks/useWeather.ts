@@ -16,6 +16,8 @@ export interface WeatherData {
   humidity: number
   wind: number
   code: number
+  /** 내일 예보 (저녁 알림·내일의 한 벌). feels = 내일 아침 체감(최저), todayMin = 오늘 아침 체감 */
+  tomorrow?: { feels: number; hi: number; code: number; rain: number; todayMin: number }
 }
 
 export type WeatherStatus = 'idle' | 'loading' | 'ok' | 'denied' | 'unavailable'
@@ -105,10 +107,17 @@ function getPosition(): Promise<GeolocationPosition> {
 }
 
 async function fetchOpenMeteo(lat: number, lon: number): Promise<WeatherData> {
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m`)
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=apparent_temperature_max,apparent_temperature_min,weather_code,precipitation_probability_max&forecast_days=2&timezone=auto`)
   const data = await res.json()
   const c = data.current
-  return { temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature), humidity: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m), code: c.weather_code }
+  const w: WeatherData = { temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature), humidity: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m), code: c.weather_code }
+  try {
+    const d = data.daily
+    if (d && d.apparent_temperature_min && d.apparent_temperature_min.length >= 2) {
+      w.tomorrow = { feels: Math.round(d.apparent_temperature_min[1]), hi: Math.round(d.apparent_temperature_max[1]), code: d.weather_code[1], rain: Math.round(d.precipitation_probability_max?.[1] ?? 0), todayMin: Math.round(d.apparent_temperature_min[0]) }
+    }
+  } catch {}
+  return w
 }
 
 /**

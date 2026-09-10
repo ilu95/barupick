@@ -159,6 +159,26 @@
       "sub": "Pick 10 pictures in 30 seconds, get 30 outfits",
       "done": "My taste: {{name}}",
       "doneSub": "See the 30 outfits again · share"
+    },
+    "pick": {
+      "today": "Today's outfit",
+      "tomorrow": "Tomorrow's outfit",
+      "colder": "{{d}}° colder than today, so an outer layer is in",
+      "warmer": "{{d}}° warmer than today, so one layer less",
+      "rain": "{{p}}% chance of rain tomorrow · darker shoes are easier",
+      "go": "Pick colors with this",
+      "other": "Other",
+      "streak": "This week {{n}}",
+      "lastWeek": "Last week {{n}}",
+      "days": [
+        "M",
+        "T",
+        "W",
+        "T",
+        "F",
+        "S",
+        "S"
+      ]
     }
   },
   "auth": {
@@ -234,7 +254,10 @@
     "deleteAccountSuccess": "Your account has been deleted. Thank you for using BaruPick.",
     "deleteAccountError": "Error deleting account: {{error}}",
     "syncPending": "Changes waiting to upload",
-    "syncErrorState": "Last sync failed — tap Sync now to retry"
+    "syncErrorState": "Last sync failed — tap Sync now to retry",
+    "reminder": "8 PM weather reminder",
+    "reminderDesc": "Only on days the weather changes (5°+ or rain): tomorrow's outfit",
+    "reminderDenied": "Notifications are not allowed. Enable them in device settings"
   },
   "feedbackModal": {
     "title": "Send Feedback",
@@ -1728,5 +1751,13 @@
       "scarf": "Scarf",
       "hat": "Hat"
     }
+  },
+  "reminder": {
+    "colderTitle": "Tomorrow morning {{temp}}°, {{d}}° colder than today",
+    "colderBody": "Pick an outer layer now? Tap and choose colors only",
+    "warmerTitle": "Tomorrow morning {{temp}}°, {{d}}° warmer than today",
+    "warmerBody": "One layer less? Tap and choose colors only",
+    "rainTitle": "{{p}}% chance of rain tomorrow · {{temp}}° in the morning",
+    "rainBody": "Start with the shoes? Tap and choose colors only"
   }
 }

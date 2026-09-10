@@ -1,5 +1,7 @@
+import { scheduleReminder, initReminderTap } from '@/lib/reminder'
+import { useWeather } from '@/hooks/useWeather'
 import { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -101,9 +103,19 @@ function AdminOnly({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+// 저녁 날씨 알림: 날씨가 갱신될 때 오늘 20시 알림을 다시 잡고, 알림을 누르면 만들기로 (루프 L5)
+function ReminderBridge() {
+  const navigate = useNavigate()
+  const { weather } = useWeather({ auto: false })
+  useEffect(() => { initReminderTap(navigate) }, [])
+  useEffect(() => { scheduleReminder(weather) }, [weather?.tomorrow?.feels, weather?.tomorrow?.rain])
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ReminderBridge />
       <AuthProvider>
         <ToastProvider>
           <ModalProvider>

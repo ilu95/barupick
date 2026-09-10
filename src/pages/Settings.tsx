@@ -1,7 +1,9 @@
+import { reminderOn, setReminderOn, requestReminderPermission, scheduleReminder } from '@/lib/reminder'
+import { getWeatherNow } from '@/hooks/useWeather'
 import { setString } from '@/lib/storage'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight } from 'lucide-react'
+import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight, Bell } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useAutoSync, useLastSyncTime, useSyncStatus } from '@/hooks/useAutoSync'
@@ -23,6 +25,13 @@ export default function Settings() {
   const { t, i18n } = useTranslation()
   const [darkMode, setDarkMode] = useState(localStorage.getItem('sp_dark_mode') === '1')
   const [hideCounts, setHideCounts] = useState(localStorage.getItem('sp_hide_counts') === '1')
+  const [reminder, setReminder] = useState(reminderOn())
+  const toggleReminder = async () => {
+    const next = !reminder
+    if (next) { const ok = await requestReminderPermission(); if (!ok) { toast.error(t('settings.reminderDenied')); return } }
+    setReminderOn(next); setReminder(next)
+    scheduleReminder(getWeatherNow())
+  }
   const [syncing, setSyncing] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(searchParams.get('feedback') === '1')
 
@@ -116,6 +125,13 @@ export default function Settings() {
         desc={t('settings.hideCountsDesc')}
         value={hideCounts}
         onChange={toggleHide}
+      />
+      <ToggleItem
+        icon={<Bell size={18} />}
+        label={t('settings.reminder')}
+        desc={t('settings.reminderDesc')}
+        value={reminder}
+        onChange={toggleReminder}
         last
       />
 
