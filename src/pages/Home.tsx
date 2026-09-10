@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, X, Droplets, Wind, Shirt } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import TodayPick from '@/components/home/TodayPick'
 import { COLORS_60 } from '@/lib/colors'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
@@ -61,6 +62,8 @@ export default function Home() {
           {greetingText}
         </h1>
 
+        {/* 오늘의 한 벌 / 내일의 한 벌 + 이번 주 스트릭 (루프 L5) */}
+        <TodayPick />
 
         {/* 날씨 카드 */}
         {weather ? (
