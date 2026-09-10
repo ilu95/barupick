@@ -15,6 +15,7 @@ const TAB_KEYS = [
 // - 작업 집중: 코디 만들기/추천, OOTD 기록, 글쓰기, 옷장 코디
 const HIDDEN_ROUTES = [
   '/v/',           // 웹 투표 (앱 없이 여는 페이지)
+  '/t/',           // 취향 친구 비교 (앱 없이 여는 페이지)
   '/onboarding',
   '/auth',
   '/pc-light',

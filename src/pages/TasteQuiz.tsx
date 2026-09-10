@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, Share, RotateCcw, ChevronDown, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Share, RotateCcw, ChevronDown, X, Users, Link2 } from 'lucide-react'
 import CharacterCanvas, { bootCharacter } from '@/components/mannequin/CharacterCanvas'
 import * as R from '@/lib/char/render3'
 import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { useToast } from '@/components/ui/Toast'
+import { useAuth } from '@/contexts/AuthContext'
+import { createTasteShare, myTasteShare, tasteUrl, profileOf, lookOf } from '@/lib/tasteShare'
+import { drawTasteOg } from '@/lib/tasteCard'
 import { trackTaste } from '@/lib/analytics'
 import { PLATE_TO_ITEM, STYLE_KEY, PARTS, type Parts } from '@/lib/outfits'
 import { QUESTIONS, AXES, zeroVec, applyAnswer, tasteName, axisWords, buildFall, colorNames, saveTaste, loadTaste, clearTaste, type Vec, type Fall, type FallCard } from '@/lib/taste'
@@ -24,6 +27,9 @@ export default function TasteQuiz() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const toast = useToast()
+  const [sp] = useSearchParams()
+  const withCode = sp.get('with')           // 친구 링크(/t/코드)에서 온 사람 — 끝나면 비교로
+  const { user, profile: authProfile } = useAuth() as any
   const sex = charSex()
   const ko = isKo(i18n.language)
 
@@ -36,6 +42,11 @@ export default function TasteQuiz() {
   const [open, setOpen] = useState<{ second: boolean; third: boolean }>({ second: false, third: false })
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
+  // 친구와 비교하기 — 취향 링크 (루프 L2)
+  const [linkOpen, setLinkOpen] = useState(() => sp.get('share') === '1')
+  const [link, setLink] = useState<{ code: string; url: string } | null>(() => { const m = myTasteShare(); const s = loadTaste(); return m && s && m.at >= s.at ? { code: m.code, url: tasteUrl(m.code) } : null })
+  const [linkName, setLinkName] = useState<string>(() => myTasteShare()?.name || '')
+  const [linkBusy, setLinkBusy] = useState(false)
 
   useEffect(() => { if (stage === 'q' && i === 0) trackTaste('start', {}) }, [])
 
@@ -73,7 +84,28 @@ export default function TasteQuiz() {
     trackTaste('fall_view', { name: saved.name })
   }
 
-  const restart = () => { clearTaste(); setSaved(null); setFall(null); setV(zeroVec()); setI(0); setPicked(null); setShareUrl(null); setStage('q'); trackTaste('start', { redo: true }) }
+  const restart = () => { clearTaste(); setSaved(null); setFall(null); setV(zeroVec()); setI(0); setPicked(null); setShareUrl(null); setLink(null); setStage('q'); trackTaste('start', { redo: true }) }
+
+  // 취향 링크 만들기: 미리보기 카드(OG) 그려 올리고 taste_shares 에 넣는다
+  const makeLink = async () => {
+    if (!saved || linkBusy) return
+    setLinkBusy(true)
+    try {
+      const f = fall || buildFall(saved.v, sex)
+      const name = linkName.trim() || authProfile?.nickname || t('taste.cmp.me')
+      const profile = profileOf(saved, sex, lookOf(f.first[0]))
+      let og: string | null = null
+      try { og = await drawTasteOg(profile, name, t('taste.cmp.ogEyebrow', { name }), t('taste.cmp.ogCta')) } catch { og = null }
+      const s = await createTasteShare({ profile, name, ownerId: user?.id || null, ogDataUrl: og })
+      setLink({ code: s.code, url: tasteUrl(s.code) })
+      trackTaste('cmp_share', { code: s.code, name: saved.name })
+    } catch { toast.error(t('taste.cmp.linkFail')) } finally { setLinkBusy(false) }
+  }
+  const sendLink = async () => {
+    if (!link) return
+    try { if (navigator.share) { await navigator.share({ title: t('taste.cmp.shareTitle'), text: t('taste.cmp.shareText'), url: link.url }); return } } catch {}
+    try { await navigator.clipboard.writeText(link.url); toast.success(t('vote.copied')) } catch { toast.error(t('vote.copyFail')) }
+  }
 
   const pick = (x: FallCard, rank: number) => {
     const p = x.p, key = x.key
@@ -178,7 +210,9 @@ export default function TasteQuiz() {
             <div className="text-[13px] text-warm-700 dark:text-warm-300 leading-relaxed mb-4">{saved.tag}</div>
             <div className="flex justify-center gap-2 mb-4">{saved.pal.map(k => <i key={k} title={getColorName(k)} className="w-8 h-8 rounded-full border border-black/10" style={{ background: COLORS_60[k]?.hex }} />)}</div>
             <div className="flex flex-wrap justify-center gap-1.5 mb-5">{words.map(w => <span key={w} className="px-2.5 py-1 rounded-full bg-warm-100 dark:bg-warm-700 text-[11px] font-semibold text-warm-700 dark:text-warm-300">{w}</span>)}</div>
+            {withCode && <button onClick={() => navigate('/t/' + withCode)} className="w-full py-3.5 mb-2 bg-[#FEE500] text-[#1C1917] rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"><Users size={16} /> {t('taste.cmp.seeCompare')} <ArrowRight size={16} /></button>}
             <button onClick={showFall} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] shadow-terra">{t('taste.seeFall')} <ArrowRight size={16} /></button>
+            {!withCode && <button onClick={() => setLinkOpen(true)} className="w-full py-3 mt-2 bg-[#FEE500] text-[#1C1917] rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"><Users size={16} /> {t('taste.cmp.btn')}</button>}
             <button onClick={restart} className="mt-2 text-[12px] text-warm-500 py-2 flex items-center justify-center gap-1 w-full active:opacity-70"><RotateCcw size={12} /> {t('taste.redo')}</button>
           </div>
         )}
@@ -194,12 +228,40 @@ export default function TasteQuiz() {
 
             <div className="sticky bottom-0 -mx-5 px-5 pt-3 pb-4 bg-gradient-to-t from-[#FAF8F5] via-[#FAF8F5] to-transparent dark:from-[#1C1917] dark:via-[#1C1917] flex gap-2">
               <button onClick={makeShare} disabled={sharing} className="flex-1 py-3 bg-terra-500 text-white rounded-2xl font-semibold text-[13px] flex items-center justify-center gap-1.5 active:scale-[0.98] disabled:opacity-60"><Share size={15} /> {sharing ? t('taste.share.making') : t('taste.share.btn')}</button>
+              <button onClick={() => withCode ? navigate('/t/' + withCode) : setLinkOpen(true)} className="px-3 py-3 bg-[#FEE500] text-[#1C1917] rounded-2xl text-[12px] font-semibold flex items-center gap-1 active:scale-[0.98]"><Users size={14} /> {t('taste.cmp.short')}</button>
               <button onClick={restart} className="px-3 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl text-[12px] font-medium text-warm-700 dark:text-warm-300 active:scale-[0.98]">{t('taste.redo')}</button>
               <button onClick={() => navigate('/home/build')} className="px-3 py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl text-[12px] font-semibold active:scale-[0.98]">{t('taste.goBuild')}</button>
             </div>
           </div>
         )}
       </div>
+
+      {/* 친구와 비교하기 — 링크 */}
+      {linkOpen && saved && (
+        <div className="fixed inset-0 z-[300] bg-black/60 flex items-center justify-center px-6" onClick={() => setLinkOpen(false)}>
+          <div className="w-full max-w-[360px] bg-white dark:bg-warm-800 rounded-3xl p-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-sm font-bold text-warm-900 dark:text-warm-100">{t('taste.cmp.btn')}</div>
+              <button onClick={() => setLinkOpen(false)} aria-label={t('common.close')} className="w-8 h-8 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center"><X size={14} /></button>
+            </div>
+            <div className="text-[12px] text-warm-600 dark:text-warm-400 leading-relaxed mb-3">{t('taste.cmp.desc')}</div>
+            {!link ? (
+              <>
+                <div className="text-[11px] font-semibold text-warm-500 mb-1">{t('taste.cmp.nameLabel')}</div>
+                <input value={linkName} onChange={e => setLinkName(e.target.value)} maxLength={12} placeholder={authProfile?.nickname || t('taste.cmp.me')}
+                  className="w-full px-3.5 py-2.5 bg-[#FAF8F5] dark:bg-warm-900/40 border border-warm-300 dark:border-warm-600 rounded-xl text-[14px] font-semibold text-warm-900 dark:text-warm-100 focus:outline-none focus:border-warm-900 mb-3" />
+                <button onClick={makeLink} disabled={linkBusy} className="w-full py-3 bg-[#FEE500] text-[#1C1917] rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60"><Link2 size={15} /> {linkBusy ? t('taste.cmp.making') : t('taste.cmp.make')}</button>
+              </>
+            ) : (
+              <>
+                <div className="px-3 py-2.5 bg-[#FAF8F5] dark:bg-warm-900/40 border border-warm-300 dark:border-warm-600 rounded-xl text-[12.5px] font-semibold text-warm-800 dark:text-warm-200 break-all mb-3">{link.url}</div>
+                <button onClick={sendLink} className="w-full py-3 bg-[#FEE500] text-[#1C1917] rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"><Share size={15} /> {t('taste.cmp.sendLink')}</button>
+                <button onClick={() => navigate('/t/' + link.code)} className="w-full py-2 mt-1 text-[12px] font-semibold text-terra-600">{t('taste.cmp.seeMine')}</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 취향 카드 미리보기 */}
       {shareUrl && (
