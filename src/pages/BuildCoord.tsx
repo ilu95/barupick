@@ -41,6 +41,8 @@ export default function BuildCoord() {
 
   // 계측: 단계 진입 (퍼널 기준선)
   useEffect(() => { trackBuildStep(build.step, { mode: build.state.mode, style: build.state.style }) }, [build.step])
+  // /home 이 곧 만들기인 모드: 1단계 밖에선 하단 탭을 숨긴다 (고정 발 버튼과 겹치지 않게)
+  useEffect(() => { window.dispatchEvent(new CustomEvent('bp:workflow', { detail: build.step !== 'outfit' })); return () => { window.dispatchEvent(new CustomEvent('bp:workflow', { detail: false })) } }, [build.step])
 
   // 취향 폭포(/home/taste)·코디 추천(/home/recommend)에서 고른 코디가 있으면 바로 2단계로
   useEffect(() => {

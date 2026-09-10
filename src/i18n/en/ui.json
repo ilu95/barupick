@@ -1665,7 +1665,16 @@
     "likedToast": "We'll show these pieces more often",
     "dislikedToast": "We'll push this outfit down from now on",
     "tasteChip": "My taste · {{name}}",
-    "tasteCta": "30-second color taste test"
+    "tasteCta": "30-second color taste test",
+    "tools": {
+      "vote": "🗳 Compare picks",
+      "voteN": "🗳 {{n}} picks · vote",
+      "closet": "👕 My closet combos",
+      "record": "📅 Log · this week {{n}}",
+      "styles": "🎨 30 by style",
+      "compare": "✦ Taste compare",
+      "saved": "🔖 Saved"
+    }
   },
   "taste": {
     "title": "My color taste",

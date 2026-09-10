@@ -1665,7 +1665,16 @@
     "likedToast": "이 옷들을 더 자주 보여 드릴게요",
     "dislikedToast": "이 조합은 다음부터 뒤로 보낼게요",
     "tasteChip": "내 취향 · {{name}}",
-    "tasteCta": "내 컬러 취향 30초 테스트"
+    "tasteCta": "내 컬러 취향 30초 테스트",
+    "tools": {
+      "vote": "🗳 후보 비교",
+      "voteN": "🗳 후보 {{n}}벌 · 투표",
+      "closet": "👕 내 옷장 조합",
+      "record": "📅 기록 · 이번 주 {{n}}벌",
+      "styles": "🎨 스타일로 30벌",
+      "compare": "✦ 취향 비교",
+      "saved": "🔖 저장한 코디"
+    }
   },
   "taste": {
     "title": "내 컬러 취향",

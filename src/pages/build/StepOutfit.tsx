@@ -8,6 +8,9 @@ import type { BuildHook } from '@/hooks/useBuild'
 import { useToast } from '@/components/ui/Toast'
 import { trackOutfit } from '@/lib/analytics'
 import { loadTaste } from '@/lib/taste'
+import { isEasy } from '@/lib/mode'
+import { loadBasket } from '@/lib/voteBasket'
+import { myTasteShare } from '@/lib/tasteShare'
 import { useNavigate } from 'react-router-dom'
 import {
   SITU, PARTS, NEU, CHG, PLATE_TO_ITEM, STYLE_KEY,
@@ -134,6 +137,18 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
 
   const isLiked = !!hero && PARTS.some(k => hero.p[k] && prefs.likes[hero.p[k]!] > 0) && !!prefs.likedStyles[hero.c.st]
   const isDisliked = !!hero && prefs.dislikes.includes(hero.c.id)
+  // 직접 만드는 모드의 도구 줄: 후보 비교 · 내 옷장 조합 · 기록 · 스타일로 30벌 · 취향 비교 · 저장한 코디
+  const pro = !isEasy()
+  const basketN = useMemo(() => loadBasket().length, [])
+  const weekN = useMemo(() => { try { const now = new Date(); const dow = (now.getDay() + 6) % 7; const mon = new Date(now); mon.setDate(now.getDate() - dow); mon.setHours(0, 0, 0, 0); const k = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; const set = new Set((JSON.parse(localStorage.getItem('sp_ootd_records') || '[]') as { date?: string }[]).map(r => (r.date || '').slice(0, 10))); let n = 0; for (let i = 0; i < 7; i++) { const d = new Date(mon); d.setDate(mon.getDate() + i); if (set.has(k(d))) n++ } return n } catch { return 0 } }, [])
+  const tools: { key: string; label: string; on?: boolean; go: () => void }[] = [
+    { key: 'vote', label: basketN ? t('outfit.tools.voteN', { n: basketN }) : t('outfit.tools.vote'), on: basketN > 0, go: () => build.pushStep('vote') },
+    { key: 'closet', label: t('outfit.tools.closet'), go: () => navigate('/closet/combos') },
+    { key: 'record', label: t('outfit.tools.record', { n: weekN }), go: () => navigate('/closet/calendar') },
+    { key: 'styles', label: t('outfit.tools.styles'), go: () => navigate('/home/recommend') },
+    { key: 'taste', label: t('outfit.tools.compare'), go: () => { const m = myTasteShare(); navigate(m ? '/t/' + m.code : '/home/taste') } },
+    { key: 'saved', label: t('outfit.tools.saved'), go: () => navigate('/home/saved') },
+  ]
   const chip = 'px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95'
   const chipOn = 'bg-terra-500 text-white'
   const chipOff = 'bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300'
@@ -158,6 +173,13 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
           <Thermometer size={12} /> {temp}°{tempOverride !== null && <span className="text-warm-400">·{t('outfit.manual')}</span>}
         </button>
       </div>
+
+      {/* 도구 줄 (직접 만드는 모드) */}
+      {pro && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1.5 -mx-5 px-5 mb-2 [scrollbar-width:none]">
+          {tools.map(x => <button key={x.key} onClick={x.go} className={`flex-none h-7 px-2.5 rounded-full text-[11px] font-semibold border transition-all active:scale-95 ${x.on ? 'bg-[#FEE500] border-[#E8D34A] text-[#1C1917]' : 'bg-warm-100 dark:bg-warm-800 border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-300'}`}>{x.label}</button>)}
+        </div>
+      )}
 
       {/* 1위 한 벌 */}
       <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-3xl shadow-warm-sm p-3 mb-2">
