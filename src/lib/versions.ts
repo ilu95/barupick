@@ -7,7 +7,7 @@
 // ================================================================
 
 /** 색 점수 엔진. v7.1 = lib/engine.ts (CIELCh · 면적 모델 · 연속 램프). 모든 화면이 쓴다(2026-09-09). */
-export const ENGINE_VERSION = 'v7.2'   // v7.1 + 점수 눈금 보정(calibrate)
+export const ENGINE_VERSION = 'v7.3'   // v7.2 + 무채색 일색 감점 완화
 
 /** 팔레트 hex 판. 1 = 웹 기본색 hex. 2 = 의류색 보정 hex(50색). */
 export const PALETTE_VERSION = 2
