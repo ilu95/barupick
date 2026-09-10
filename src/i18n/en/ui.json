@@ -304,7 +304,8 @@
     "sortByScore": "Sorted by highest score",
     "noRecordsYet": "No records yet",
     "firstOotdRecord": "Record your first OOTD",
-    "scoreSuffix": "pts"
+    "scoreSuffix": "pts",
+    "fromCoord": "from a look"
   },
   "closetAdd": {
     "photoMode": "Add by Photo",
@@ -596,6 +597,11 @@
       "focus": "Focal point",
       "situation": "Occasion & season",
       "me": "For me"
+    },
+    "closetAuto": {
+      "title": "Do you own these?",
+      "hint": "Tap what you don't have. Saving adds the rest to your closet",
+      "added": "{{n}} added to your closet"
     }
   },
   "weatherConditions": {

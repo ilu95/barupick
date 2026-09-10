@@ -304,7 +304,8 @@
     "sortByScore": "높은 점수순으로 정렬했어요",
     "noRecordsYet": "아직 기록이 없어요",
     "firstOotdRecord": "첫 OOTD 기록하기",
-    "scoreSuffix": "점"
+    "scoreSuffix": "점",
+    "fromCoord": "코디에서"
   },
   "closetAdd": {
     "photoMode": "사진으로 등록",
@@ -441,7 +442,7 @@
     "partBottom": "하의",
     "partShoes": "신발",
     "partOuter": "아우터",
-    "partMiddleware": "미들웨어",
+    "partMiddleware": "레이어드",
     "partScarf": "목도리",
     "partHat": "모자",
     "save": "저장",
@@ -596,6 +597,11 @@
       "focus": "시선 정리",
       "situation": "상황·계절",
       "me": "나에게"
+    },
+    "closetAuto": {
+      "title": "이 옷들, 있으세요?",
+      "hint": "없는 옷은 눌러서 빼세요. 저장하면 있는 옷이 옷장에 담겨요",
+      "added": "옷장에 {{n}}벌 담았어요"
     }
   },
   "weatherConditions": {
@@ -1539,7 +1545,7 @@
   },
   "categories": {
     "outer": "아우터",
-    "middleware": "미들웨어",
+    "middleware": "레이어드",
     "top": "상의",
     "bottom": "하의",
     "shoes": "신발",

@@ -123,7 +123,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
           <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 truncate">{displayName}</div>
           <div className="flex items-center gap-1.5 text-xs text-warm-600 dark:text-warm-400 mt-0.5">
             <span className="w-3 h-3 rounded-full border border-warm-400 inline-block flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
-            {colorKey ? getColorName(colorKey) : ''}{date ? ` · ${date}` : ''}
+            {colorKey ? getColorName(colorKey) : ''}{date ? ` · ${date}` : ''}{item.source === 'coord' && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-terra-50 dark:bg-terra-900/30 text-terra-700 dark:text-terra-300 text-[10px] font-semibold">{t('closet.fromCoord')}</span>}
           </div>
         </div>
         <button onClick={() => handleDelete(item.id)} className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg active:bg-warm-200 dark:active:bg-warm-700 transition-colors">
