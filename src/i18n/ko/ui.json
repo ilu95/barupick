@@ -305,7 +305,15 @@
     "noRecordsYet": "아직 기록이 없어요",
     "firstOotdRecord": "첫 OOTD 기록하기",
     "scoreSuffix": "점",
-    "fromCoord": "코디에서"
+    "fromCoord": "코디에서",
+    "wish": {
+      "title": "살 옷",
+      "hint": "코디에서 \"없어요\"로 뺀 옷",
+      "simulate": "사면 어떨까?",
+      "bought": "샀어요",
+      "boughtToast": "옷장에 담았어요",
+      "remove": "빼기"
+    }
   },
   "closetAdd": {
     "photoMode": "사진으로 등록",
