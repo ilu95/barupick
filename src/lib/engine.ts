@@ -54,10 +54,28 @@ export function toItems(input: EngineInput) {
 export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason(), contrast: tasteContrast() })
 
 /** 조합표 그대로 채점: parts = v7 slot → 판 id, keys = slot → 색 키 (취향 폭포·1단계가 쓴다) */
+/**
+ * 점수 보정 (v7.2) — 분포 벌리기.
+ * v7.1 원점수는 무작위 색 조합의 중앙값이 87, 35% 가 92점(완벽) 이상이라 "전부 좋다"가 됐다.
+ * 순서는 그대로 두고 눈금만 편다: 원점수 58→42, 87→75, 100→92. 무작위 조합의 중앙값이 "좋음"(75)에,
+ * 손질한 조합의 중앙값이 82 안팎에 오고, 완벽(92)은 원점수 100 에만 붙는다.
+ * 과거 기록 점수는 그대로 두고(engine 버전이 함께 저장됨) 새 점수만 이 눈금이다.
+ */
+const CAL: [number, number][] = [[0, 0], [58, 42], [87, 75], [100, 92]]
+export function calibrate(raw: number): number {
+  const x = Math.max(0, Math.min(100, raw))
+  for (let i = 1; i < CAL.length; i++) {
+    const [x0, y0] = CAL[i - 1], [x1, y1] = CAL[i]
+    if (x <= x1) return Math.round(y0 + (y1 - y0) * (x - x0) / (x1 - x0))
+  }
+  return 92
+}
+
 export function scoreTemplate(parts: Record<string, string>, keys: Record<string, string>, situ?: string | null) {
   const items = Object.entries(parts).filter(([s]) => keys[s] && COLORS_60[keys[s]]).map(([s, id]) => ({ slot: s, id, hex: COLORS_60[keys[s]].hex, color: getColorName(keys[s]) }))
   if (items.length < 2) return null
-  return V7.evaluate(items, ctxOf({ outfit: {}, situ }))
+  const r = V7.evaluate(items, ctxOf({ outfit: {}, situ }))
+  return { ...r, total: calibrate(r.total), rawTotal: r.total }
 }
 
 /** 148색 팔레트를 v7 guide/bestMoves 가 받는 꼴로 (한 번만) */
@@ -66,9 +84,10 @@ const palette = () => PAL || (PAL = Object.fromEntries(Object.entries(COLORS_60)
 
 export function scoreOutfit(input: EngineInput): EngineResult {
   const r = V7.evaluate(toItems(input), ctxOf(input))
+  const total = calibrate(r.total), k = r.total > 0 ? total / r.total : 1   // 부분 점수도 같은 비율로 (합이 총점이 되게)
   return {
-    total: r.total,
-    parts: Object.entries(r.parts as Record<string, [number, number]>).map(([k, [v, mx]]) => ({ key: PART_KEY[k] || k, label: k, value: v, max: mx })),
+    total,
+    parts: Object.entries(r.parts as Record<string, [number, number]>).map(([key, [v, mx]]) => ({ key: PART_KEY[key] || key, label: key, value: v * k, max: mx })),
     reasons: (r.reasons as EngineReason[]).map(x => ({ ...x, slots: x.slots.map(s => FROM_V7[s] || s) })),
     raw: r,
   }
@@ -76,8 +95,8 @@ export function scoreOutfit(input: EngineInput): EngineResult {
 
 /** slot 을 key 색으로 바꾸면(없으면 더하면) 총점이 얼마나 변하나 */
 export function scoreDelta(input: EngineInput, slot: string, key: string): number {
-  const base = V7.evaluate(toItems(input), ctxOf(input)).total
-  const next = V7.evaluate(toItems({ ...input, outfit: { ...input.outfit, [slot]: key } }), ctxOf(input)).total
+  const base = calibrate(V7.evaluate(toItems(input), ctxOf(input)).total)
+  const next = calibrate(V7.evaluate(toItems({ ...input, outfit: { ...input.outfit, [slot]: key } }), ctxOf(input)).total)
   return next - base
 }
 
@@ -94,5 +113,6 @@ export function guideFor(input: EngineInput, slot: string, recN = 6) {
 /** 옷 하나의 색만 바꿔 얻는 최선의 한 수 k개 (차분한 색 우선) */
 export function bestMovesFor(input: EngineInput, k = 3): EngineMove[] {
   const r = V7.bestMoves(toItems(input), ctxOf(input), palette(), k)
-  return r.moves.map((m: any) => { const slot = FROM_V7[m.slot] || m.slot; return { slot, from: input.outfit[slot] || '', to: m.key, gain: m.d, score: m.total, why: m.why } })
+  const base = calibrate(r.base?.total ?? V7.evaluate(toItems(input), ctxOf(input)).total)
+  return r.moves.map((m: any) => { const slot = FROM_V7[m.slot] || m.slot; const score = calibrate(m.total); return { slot, from: input.outfit[slot] || '', to: m.key, gain: score - base, score, why: m.why } })
 }

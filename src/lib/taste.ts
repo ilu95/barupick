@@ -151,7 +151,7 @@ export function buildFall(v: Vec, sex: 'm' | 'w'): Fall {
       if (p.layer) key.layer = key.outer ? pickN(3) : pickS(1)
       if (!p.top) delete key.top
       const ev = scoreTemplate(p as Record<string, string>, key)
-      if (!ev || ev.total < 65) continue
+      if (!ev || ev.total < 50) continue   // v7.2 눈금 (v7.1 의 65 에 해당)
       const align = tasteAlign(ev, v); const bold = k >= 2
       const why = (ev.reasons.find((r: any) => r.w > 0) || {}).txt || ''
       cands.push({ id: `t${c.id}k${k}`, c, p, key, total: ev.total, align, bold, why, score: .6 * ev.total / 100 + .4 * align + .1 * fw, sig: JSON.stringify(key), tid: c.id })
