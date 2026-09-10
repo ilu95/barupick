@@ -80,3 +80,20 @@ export function commitCloset(garments: Garment[], missing: Set<string>, from: st
   if (added || gone.length) trackEvent('closet_auto', { from, added, missing: gone.length, total: rest.length })
   return added
 }
+
+/* ── 살 옷 목록 (없다고 표시한 옷) ── */
+export interface Wish { plate: string; colorKey: string; slot: string; at: number }
+export function loadWishlist(): Wish[] { try { return JSON.parse(localStorage.getItem(WISH_KEY) || '[]') } catch { return [] } }
+export function removeWish(w: Wish) { setJSON(WISH_KEY, loadWishlist().filter(x => !(x.plate === w.plate && x.colorKey === w.colorKey))) }
+/** 샀어요: 옷장에 담고 목록에서 뺀다 */
+export function boughtWish(w: Wish) {
+  const items = readW()
+  const slot = w.slot === 'inner' ? 'top' : w.slot
+  if (!items.some(it => it.category === slot && (it.color || it.colorKey) === w.colorKey && it.plate === w.plate)) {
+    items.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), category: slot, itemType: PLATE_TO_ITEM[w.plate] || null, plate: w.plate, color: w.colorKey, colorKey: w.colorKey, name: `${getColorName(w.colorKey)} ${nameOf(w.plate)}`, source: 'bought', createdAt: new Date().toISOString() })
+    setJSON(W_KEY, items.slice(0, 200))
+  }
+  removeWish(w)
+  trackEvent('wish_bought', { plate: w.plate, color: w.colorKey })
+}
+export const wishName = (w: Wish) => `${getColorName(w.colorKey)} ${nameOf(w.plate)}`

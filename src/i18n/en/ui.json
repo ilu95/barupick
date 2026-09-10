@@ -305,7 +305,15 @@
     "noRecordsYet": "No records yet",
     "firstOotdRecord": "Record your first OOTD",
     "scoreSuffix": "pts",
-    "fromCoord": "from a look"
+    "fromCoord": "from a look",
+    "wish": {
+      "title": "To buy",
+      "hint": "Marked \"don't have\" in a look",
+      "simulate": "Worth buying?",
+      "bought": "Bought it",
+      "boughtToast": "Added to your closet",
+      "remove": "Remove"
+    }
   },
   "closetAdd": {
     "photoMode": "Add by Photo",

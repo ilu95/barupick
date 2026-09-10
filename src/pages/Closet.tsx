@@ -9,6 +9,7 @@ import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
+import { loadWishlist, removeWish, boughtWish, wishName, type Wish } from '@/lib/closetAuto'
 import { useScrollRestore } from '@/hooks/useScrollRestore'
 
 type ClosetTab = 'wardrobe' | 'records'
@@ -133,18 +134,38 @@ function WardrobeTab({ navigate }: { navigate: any }) {
     )
   }
 
+  // 살 옷 목록: 결과 화면에서 "없어요"로 뺀 옷. 사면 어떨까 → 구매 시뮬, 샀어요 → 옷장
+  const [wishes, setWishes] = useState<Wish[]>(loadWishlist)
+  const wishBlock = wishes.length > 0 && (
+    <div className="bg-white dark:bg-warm-800 border border-amber-300 dark:border-amber-700 rounded-2xl p-3.5 mb-3 shadow-warm-sm">
+      <div className="flex items-baseline gap-2 mb-2"><span className="text-[13px] font-bold text-warm-900 dark:text-warm-100">{t('closet.wish.title')}</span><span className="text-[11px] text-warm-500">{t('closet.wish.hint')}</span></div>
+      <div className="flex flex-col gap-1.5">
+        {wishes.map(w => (
+          <div key={w.plate + w.colorKey} className="flex items-center gap-2">
+            <i className="w-5 h-5 rounded-full border border-black/10 flex-none" style={{ background: COLORS_60[w.colorKey]?.hex }} />
+            <div className="flex-1 min-w-0 text-[12.5px] font-semibold text-warm-900 dark:text-warm-100 truncate">{wishName(w)}</div>
+            <button onClick={() => navigate(`/closet/simulate?category=${w.slot === 'inner' ? 'top' : w.slot}&color=${w.colorKey}`)} className="flex-none h-7 px-2.5 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 text-[11px] font-semibold text-amber-800 dark:text-amber-300 active:scale-95">{t('closet.wish.simulate')}</button>
+            <button onClick={() => { boughtWish(w); setWishes(loadWishlist()); try { setItems(JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')) } catch {} toast.success(t('closet.wish.boughtToast')) }} className="flex-none h-7 px-2.5 rounded-full bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 text-[11px] font-semibold active:scale-95">{t('closet.wish.bought')}</button>
+            <button onClick={() => { removeWish(w); setWishes(loadWishlist()) }} aria-label={t('closet.wish.remove')} className="flex-none w-7 h-7 rounded-full flex items-center justify-center text-warm-400 active:bg-warm-200"><Trash2 size={13} /></button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
   if (items.length === 0) {
     return (
-      <div className="text-center py-16">
+      <div>{wishBlock}<div className="text-center py-16">
         <Shirt size={40} className="text-warm-400 mx-auto mb-3" />
         <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('closet.emptyCloset')}</div>
         <button onClick={() => navigate('/closet/add')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">{t('closet.addFirstItem')}</button>
-      </div>
+      </div></div>
     )
   }
 
   return (
     <div>
+      {wishBlock}
       {/* 내 옷으로 코디하기 CTA */}
       {hasTop && hasBottom ? (
         <button onClick={() => navigate('/closet/coord')} className="w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 mb-2 active:scale-[0.98] transition-all shadow-terra">
