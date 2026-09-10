@@ -14,7 +14,7 @@ async function loadVote(code) {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
   const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
   if (!url || !key) return null
-  const q = `${url}/rest/v1/coord_votes?select=code,question,situ,temp,og_url,a,b,created_at&code=eq.${encodeURIComponent(code)}&limit=1`
+  const q = `${url}/rest/v1/coord_votes?select=code,question,situ,temp,og_url,a,b,sides,created_at&code=eq.${encodeURIComponent(code)}&limit=1`
   const r = await fetch(q, { headers: { apikey: key, Authorization: `Bearer ${key}` } })
   if (!r.ok) return null
   const rows = await r.json()
@@ -35,7 +35,8 @@ export default async function handler(req, res) {
   const SITU = { work: '출근', daily: '일상', date: '데이트·모임', formal: '격식', active: '활동·여행', home: '집 앞' }
   const title = vote ? (vote.question || '이 코디 어때?') : '이 코디 어때?'
   const bits = vote ? [vote.temp != null ? `${vote.temp}°` : null, vote.situ ? SITU[vote.situ] || vote.situ : null].filter(Boolean) : []
-  const desc = (vote && vote.b ? '둘 중 하나만 골라 줘' : '좋아요 / 별로 한 번만 눌러 줘') + (bits.length ? ' · ' + bits.join(' ') : '') + ' · 앱 없이 바로'
+  const n = vote ? (Array.isArray(vote.sides) && vote.sides.length >= 2 ? vote.sides.length : vote.b ? 2 : 1) : 2
+  const desc = (n >= 3 ? `${n}벌 중 하나만 골라 줘` : n === 2 ? '둘 중 하나만 골라 줘' : '좋아요 / 별로 한 번만 눌러 줘') + (bits.length ? ' · ' + bits.join(' ') : '') + ' · 앱 없이 바로'
   const image = (vote && vote.og_url) || `${origin}/icon-512.png`
   const [w, h] = vote && vote.og_url ? [1200, 630] : [512, 512]
 

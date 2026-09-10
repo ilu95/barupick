@@ -20,7 +20,7 @@ import { UI_OUTERNESS, uiSlotOf, type UpperSlot, type AccSlot } from '@/lib/buil
 import { PLATE_TO_ITEM } from '@/lib/outfits'
 
 export type BuildMode = 'coord' | 'evaluate'
-export type BuildStep = 'outfit' | 'style' | 'builder' | 'fabric' | 'result' | 'improve'
+export type BuildStep = 'outfit' | 'style' | 'builder' | 'fabric' | 'result' | 'improve' | 'vote'
 export type SlotKey = 'outer' | 'middleware' | 'top' | 'inner' | 'hidden'
 export type EditMode =
   | { type: 'idle' }
