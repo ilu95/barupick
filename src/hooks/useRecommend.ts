@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, ITEMS_CATALOG, type ItemDef } from '@/lib/styles'
 import { getDynamicCombos } from '@/lib/recommend'
+import { PLATE_TO_ITEM } from '@/lib/outfits'
 import { evaluationSystem } from '@/lib/evaluation'
 import { profile } from '@/lib/profile'
 import i18n from '@/i18n'
@@ -23,7 +24,9 @@ export interface RecState {
   mood: string | null
   style: string | null
   // 아이템 선택 (pick 단계)
-  pickedItems: string[]        // ITEMS_CATALOG item ids
+  pickedItems: string[]        // ITEMS_CATALOG item ids (plates 에서 파생)
+  /** 새 디자인: 자리별 판 id (outer·middleware·top·bottom·shoes·scarf·hat). 캐릭터 렌더 + 2단계 인계 */
+  plates: Record<string, string>
   // 자동 산출
   layerType: string
   outerType: 'coat' | 'jacket' | 'padding'
@@ -41,6 +44,7 @@ const initialState: RecState = {
   mood: null,
   style: null,
   pickedItems: [],
+  plates: {},
   layerType: 'simple',
   outerType: 'coat',
   midType: 'knit',
@@ -203,6 +207,23 @@ export function useRecommend() {
     })
   }, [])
 
+  // ─── 판 고르기 (새 디자인). 아우터·레이어드·목도리·모자 판이 옛 pickedItems 를 정한다 ───
+  const setPlate = useCallback((slot: string, plate: string | null) => {
+    setState(prev => {
+      const plates = { ...prev.plates }
+      if (plate) plates[slot] = plate; else delete plates[slot]
+      const picked: string[] = []
+      if (plates.outer && PLATE_TO_ITEM[plates.outer]) picked.push(PLATE_TO_ITEM[plates.outer])
+      if (plates.middleware && PLATE_TO_ITEM[plates.middleware]) picked.push(PLATE_TO_ITEM[plates.middleware])
+      if (plates.scarf) picked.push('scarf')
+      if (plates.hat) picked.push('hat')
+      const info = itemsToLayerInfo(picked)
+      if (prev.weatherLayerLocked) info.layerType = prev.layerType
+      const newState = { ...prev, plates, pickedItems: picked, ...info }
+      return prev.results.length ? { ...newState, results: generateRecommendations(newState) } : newState
+    })
+  }, [])
+
   // ─── pick에서 추천받기 ───
   const generateFromPick = useCallback(() => {
     const info = itemsToLayerInfo(state.pickedItems)
@@ -301,7 +322,7 @@ export function useRecommend() {
     step, state, history,
     pushStep, goBack, update, reset,
     selectMood, selectStyle,
-    toggleItem, generateFromPick,
+    toggleItem, setPlate, generateFromPick,
     toggleItemInResults,
     togglePin, clearPin, clearAllPins,
     regenerate, openDetail,

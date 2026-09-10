@@ -145,7 +145,9 @@
       "recommend": "Get Recommendations",
       "build": "Build Your Own",
       "weather": "Weather Coord",
-      "saved": "Saved Coords"
+      "saved": "Saved Coords",
+      "recommendSub": "Mood → garments → 30 color combos",
+      "buildSub": "Pick an outfit, then colors one by one"
     },
     "guide": {
       "fabricGuide": "Fabric Guide",
@@ -413,7 +415,28 @@
     "stylePrefix": "Style",
     "fallbackName": "Basic Outfit {{num}}",
     "fallbackTag": "Basic",
-    "fallbackTip": "A basic neutral color combination"
+    "fallbackTip": "A basic neutral color combination",
+    "v2Title": "What mood?",
+    "v2Hint": "Pick a mood to unfold its styles",
+    "v2All": "🎲 Any style",
+    "v2AllHint": "30 combos across all styles",
+    "pickTitle": "Must-wear garments",
+    "pickHint": "Skip to use the basics",
+    "pickNone": "None",
+    "pickCta": "Recommend with these",
+    "pickCtaAll": "Recommend with basics",
+    "weatherLock": "Layers set by weather",
+    "resTitle": "Recommended",
+    "resHint": "Tap a card to dress the character and tweak colors",
+    "shuffle": "Shuffle",
+    "more": "Show {{n}} more",
+    "less": "Show less",
+    "pinBtn": "+ Pin a color",
+    "pinTitle": "Keep this color here",
+    "pinClear": "Unpin",
+    "pinNone": "No pins",
+    "pinDone": "Done",
+    "tryOn": "Try on"
   },
   "build": {
     "stepStyle": "Select Style",
