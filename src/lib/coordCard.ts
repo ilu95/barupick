@@ -183,5 +183,5 @@ export async function drawVoteOg(sides: { scene: CharScene; label?: string }[], 
       pill(g, lab, x + fw / 2 - lw / 2, fy + fh - 34, 36, 'rgba(255,255,255,.92)', '#1C1917', `700 20px ${FONT}`)
     })
   }
-  return cv.toDataURL('image/png')
+  return cv.toDataURL('image/jpeg', .86)   // 미리보기 전용 — PNG 570KB 가 JPEG 100KB 안팎으로, 모바일 업로드가 빨라진다
 }

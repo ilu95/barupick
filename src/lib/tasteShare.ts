@@ -71,8 +71,8 @@ export interface SharedCard { card: FallCard; alignA: number; alignB: number }
 export interface Compare { sim: number; sharedPal: string[]; sentence: string; shared: SharedCard[]; overlap: number; axis: { ax: string; a: string; b: string } | null }
 
 const batchim = (s: string) => { const ch = s.charCodeAt(s.length - 1); return ch >= 0xAC00 && ch <= 0xD7A3 && (ch - 0xAC00) % 28 !== 0 }
-const eun = (s: string) => batchim(s) ? '은' : '는'
-const gwa = (s: string) => batchim(s) ? '과' : '와'
+export const eun = (s: string) => batchim(s) ? '은' : '는'
+export const gwa = (s: string) => batchim(s) ? '과' : '와'
 const AXW: Record<string, [string, string]> = { light: ['어두운 톤', '밝은 톤'], contrast: ['잔잔한 대비', '또렷한 대비'], chroma: ['차분한 색', '색이 있는 옷'], temp: ['쿨한 색', '따뜻한 색'], formal: ['편한 옷', '단정한 옷'], novelty: ['늘 입던 색', '새로운 색'] }
 const AXW_EN: Record<string, [string, string]> = { light: ['darker tones', 'lighter tones'], contrast: ['soft contrast', 'crisp contrast'], chroma: ['calm colors', 'colorful pieces'], temp: ['cool colors', 'warm colors'], formal: ['relaxed pieces', 'polished pieces'], novelty: ['familiar colors', 'new colors'] }
 

@@ -51,7 +51,7 @@ export async function drawTasteOg(profile: TasteProfile, ownerName: string, eyeb
   g.drawImage(f, x, fy, fw, fh)
   g.font = `700 22px ${FONT}`; const lw = g.measureText(ownerName).width + 36
   pill(g, ownerName, x + fw / 2 - lw / 2, fy + fh - 40, 40, 'rgba(255,255,255,.92)', '#1C1917', `700 22px ${FONT}`)
-  return cv.toDataURL('image/png')
+  return cv.toDataURL('image/jpeg', .86)
 }
 
 /** 비교 카드 4:5: 두 캐릭터 · 이름 · 취향 이름 · 팔레트 · 겹치는 옷장 N벌 · 일치 % · 한 줄 · 둘 다 좋아할 코디 3벌 */

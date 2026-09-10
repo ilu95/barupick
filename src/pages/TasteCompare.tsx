@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { charSex } from '@/lib/char/map'
 import { loadTaste, buildFall } from '@/lib/taste'
-import { fetchTasteShare, fetchCompares, recordCompare, compareTastes, sceneFromLook, profileOf, lookOf, isMyShare, myTasteShare, tasteUrl, type TasteShare, type TasteProfile, type TasteCompareRow, type Compare } from '@/lib/tasteShare'
+import { fetchTasteShare, fetchCompares, recordCompare, compareTastes, sceneFromLook, profileOf, lookOf, isMyShare, myTasteShare, tasteUrl, gwa, type TasteShare, type TasteProfile, type TasteCompareRow, type Compare } from '@/lib/tasteShare'
 import { drawCompareCard } from '@/lib/tasteCard'
 import { shareDataUrl } from '@/lib/coordCard'
 import { trackTaste } from '@/lib/analytics'
@@ -78,7 +78,7 @@ export default function TasteComparePage() {
             <div className="text-[13px] text-warm-700 dark:text-warm-300 leading-relaxed mb-3">{share.taste.tag}</div>
             <div className="flex gap-2 mb-4">{share.taste.pal.slice(0, 6).map(k => <i key={k} title={getColorName(k)} className="w-7 h-7 rounded-full border border-black/10" style={{ background: COLORS_60[k]?.hex }} />)}</div>
             <div className="flex justify-center py-2 mb-4 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl"><CharacterCanvas {...sceneFromLook(share.taste.look, share.taste.sex)} width={190} /></div>
-            <div className="text-[13px] font-semibold text-warm-800 dark:text-warm-200 text-center mb-3">{t('taste.cmp.introAsk', { name: share.name || t('taste.cmp.friend') })}</div>
+            <div className="text-[13px] font-semibold text-warm-800 dark:text-warm-200 text-center mb-3">{t('taste.cmp.introAsk', { name: share.name || t('taste.cmp.friend'), p: gwa(share.name || t('taste.cmp.friend')) })}</div>
             <button onClick={() => { trackTaste('cmp_cta', { code }); navigate(`/home/taste?with=${code}`) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] shadow-terra">{t('taste.cmp.introCta')} <ArrowRight size={16} /></button>
             <div className="text-[11px] text-warm-500 text-center mt-2">{t('taste.cmp.introSub')}</div>
           </div>

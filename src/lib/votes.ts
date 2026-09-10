@@ -51,7 +51,7 @@ export async function uploadCard(code: string, dataUrl: string): Promise<string 
   for (let i = 0; i < 2; i++) {   // 한 번은 다시 시도 (모바일 네트워크 흔들림)
     try {
       const blob = await (await fetch(dataUrl)).blob()
-      const { error } = await supabase.storage.from('vote-cards').upload(path, blob, { contentType: 'image/png', upsert: true })
+      const { error } = await supabase.storage.from('vote-cards').upload(path, blob, { contentType: blob.type || 'image/png', upsert: true })   // 이름은 정책상 .png, 내용은 JPEG 여도 미리보기는 content-type 을 본다
       if (!error) return supabase.storage.from('vote-cards').getPublicUrl(path).data.publicUrl
       lastMsg = error.message || String(error)
     } catch (e: any) { lastMsg = e?.message || String(e) }

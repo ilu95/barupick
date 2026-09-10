@@ -120,7 +120,7 @@ const initialLang = localStorage.getItem('sp_language')
 i18n.use(initReactI18next).init({
   resources,
   lng: initialLang || 'ko',
-  fallbackLng: 'ko',
+  fallbackLng: { ko: ['ko'], default: ['en', 'ko'] },   // 일본어·중국어 등은 영어 → 한국어 순으로
   defaultNS: 'ui',
   ns: ['ui', 'colors', 'categories', 'styles', 'bodyType', 'personalColor'],
   interpolation: {

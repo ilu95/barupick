@@ -63,15 +63,15 @@ export const HAIR_COLORS: { hex: string; ko: string; en: string }[] = [
 
 /** 칸별 한 줄 힌트 — 어디에 보이는 색인지 */
 export const HINTS: Record<string, { ko: string; en: string }> = {
-  outer: { ko: '가장 넓은 면 — 차분한 색이 주색으로 편해요', en: 'Largest area — calm colors work as the base' },
-  middleware: { ko: '상의와 밝기를 벌려야 겹이 보여요', en: 'Separate its lightness from the top so the layer shows' },
-  top: { ko: '얼굴 가까이 — 밝은 색이 살아요', en: 'Near the face — light colors flatter' },
-  inner: { ko: '목선에만 보여요 — 포인트로 써요', en: 'Only shows at the neckline — use as an accent' },
-  bottom: { ko: '아래가 어두우면 안정돼요', en: 'Darker below feels grounded' },
-  shoes: { ko: '하의나 무채색을 따라가면 정돈돼요', en: 'Match the bottom or go neutral' },
-  scarf: { ko: '얼굴 옆 — 퍼스널컬러가 제일 드러나요', en: 'Next to the face — personal color shows most' },
-  hat: { ko: '머리 위 한 점 — 신발이나 하의와 이으면 좋아요', en: 'One dot on top — tie it to shoes or bottom' },
-  hair: { ko: '헤어 색은 상의 밝기와 대비가 좋아요', en: 'Hair color reads best against the top' },
+  outer: { ko: '제일 넓게 보여요. 차분한 색이 편해요', en: 'Largest area — calm colors work as the base' },
+  middleware: { ko: '상의와 밝기가 달라야 겹쳐 입은 게 보여요', en: 'Separate its lightness from the top so the layer shows' },
+  top: { ko: '얼굴 바로 아래라 밝은 색이 잘 받아요', en: 'Near the face — light colors flatter' },
+  inner: { ko: '목선에만 살짝 보여요. 포인트 색도 괜찮아요', en: 'Only shows at the neckline — use as an accent' },
+  bottom: { ko: '아래가 어두우면 안정감이 있어요', en: 'Darker below feels grounded' },
+  shoes: { ko: '하의 색이나 무채색으로 맞추면 깔끔해요', en: 'Match the bottom or go neutral' },
+  scarf: { ko: '얼굴 옆이라 퍼스널컬러가 제일 잘 드러나요', en: 'Next to the face — personal color shows most' },
+  hat: { ko: '신발이나 하의와 같은 계열이면 잘 어울려요', en: 'One dot on top — tie it to shoes or bottom' },
+  hair: { ko: '상의보다 어둡거나 밝아야 얼굴이 살아요', en: 'Hair color reads best against the top' },
 }
 
 /** 기본 색 (칸을 처음 채울 때) */
