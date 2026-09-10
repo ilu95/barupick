@@ -115,7 +115,7 @@ export function tastePool(v: Vec) {
 }
 
 /** 이 코디가 취향 벡터와 얼마나 맞나 (0~1). 엔진 결과의 P(면적·LCh)를 읽는다 */
-function tasteAlign(ev: any, v: Vec): number {
+export function tasteAlign(ev: any, v: Vec): number {
   const P: any[] = ev.P || []
   const A = P.reduce((s, p) => s + p.area, 0) || 1
   const L = P.reduce((s, p) => s + p.L * p.area, 0) / A, Cc = P.reduce((s, p) => s + p.C * p.area, 0) / A

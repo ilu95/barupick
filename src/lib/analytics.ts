@@ -213,7 +213,7 @@ export function trackGuide(kind: 'moves_open' | 'move_apply' | 'move_undo', meta
 }
 
 // 취향 온보딩: start · answer · reveal · fall_view · pick(카드 → 만들기) · share
-export function trackTaste(kind: 'start' | 'answer' | 'reveal' | 'fall_view' | 'pick' | 'share', meta: Record<string, any>) {
+export function trackTaste(kind: 'start' | 'answer' | 'reveal' | 'fall_view' | 'pick' | 'share' | 'cmp_share' | 'cmp_view' | 'cmp_done' | 'cmp_cta' | 'cmp_card', meta: Record<string, any>) {
   trackEvent('taste_' + kind, { ...meta, ...VER })
 }
 

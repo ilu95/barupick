@@ -45,7 +45,7 @@ export const isMine = (code: string) => myVotes().some(v => v.code === code)
 export const votedChoice = (code: string): Choice | null => { try { return (localStorage.getItem('sp_voted_' + code) as Choice) || null } catch { return null } }
 
 /** 카톡 미리보기 이미지를 Storage 에 올린다. 실패해도 투표는 만든다 (기본 아이콘으로 보임). */
-async function uploadOg(code: string, dataUrl: string): Promise<string | null> {
+export async function uploadCard(code: string, dataUrl: string): Promise<string | null> {
   const path = `${code}.png`
   let lastMsg = ''
   for (let i = 0; i < 2; i++) {   // 한 번은 다시 시도 (모바일 네트워크 흔들림)
@@ -69,7 +69,7 @@ export async function createVote(input: { sides: VoteSide[]; question: string; s
   let lastErr: any = null
   for (let i = 0; i < 3; i++) {   // 코드 충돌이면 다시
     const code = newCode()
-    const og_url = input.ogDataUrl ? await uploadOg(code, input.ogDataUrl) : null
+    const og_url = input.ogDataUrl ? await uploadCard(code, input.ogDataUrl) : null
     const { data, error } = await supabase.from('coord_votes')
       .insert({ code, owner_id: input.ownerId || null, question: input.question, a: sides[0], b: sides[1] || null, sides: sides.length >= 2 ? sides : null, situ: input.situ || null, temp: input.temp ?? null, og_url })
       .select('*').single()

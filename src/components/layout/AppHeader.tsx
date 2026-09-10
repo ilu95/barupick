@@ -54,7 +54,7 @@ const PREFIX_TITLE_KEYS: [string, string][] = [
 ]
 
 // 헤더 숨김 화면
-const HIDDEN_ROUTES = ['/onboarding', '/pc-light', '/v/']
+const HIDDEN_ROUTES = ['/onboarding', '/pc-light', '/v/', '/t/']
 
 // 뒤로가기 시 홈으로 보낼 최상위 탭 경로
 const ROOT_PATHS = ['/', '/home', '/closet', '/record', '/community', '/shop', '/profile']
