@@ -1412,7 +1412,7 @@ export function reasons(e: Entry, ctx: Ctx): string {
   const ph: { v: number; mid: string; end: string }[] = []
   const inRange = dist(e.s.f, rng) === 0
   ph.push(inRange
-    ? { v: e.s.situ, mid: ko ? `${sn} 자리에 맞고` : `fits ${sn}`, end: ko ? `${sn} 자리에 맞아요` : `it fits ${sn}` }
+    ? { v: e.s.situ, mid: ko ? `${sn}에 어울리고` : `fits ${sn}`, end: ko ? `${sn}에 어울려요` : `it fits ${sn}` }
     : e.s.f > rng[1] ? { v: e.s.situ, mid: ko ? '조금 격식 있는 편이고' : 'a bit dressy', end: ko ? '조금 격식 있는 편이에요' : "it's a bit dressy" }
     : { v: e.s.situ, mid: ko ? '조금 편한 편이고' : 'a bit relaxed', end: ko ? '조금 편한 편이에요' : "it's a bit relaxed" })
   const wOk = dist(e.s.w, iw) <= .3

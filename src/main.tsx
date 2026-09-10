@@ -5,6 +5,7 @@ import App from './App'
 import './index.css'
 import { installStorageWatcher } from './lib/storage'
 import { installAppLifecycle } from './lib/appLifecycle'
+import { bootCharacter } from './components/mannequin/CharacterCanvas'
 
 installStorageWatcher()
 installAppLifecycle()
@@ -84,3 +85,7 @@ if ('serviceWorker' in navigator) {
     })
   })
 }
+
+// 캐릭터 카탈로그·기본 판을 한가할 때 미리 읽어 둔다 — 첫 캐릭터가 늦게 뜨지 않게
+const idle = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 800))
+idle(() => { bootCharacter().catch(() => {}) })

@@ -1673,7 +1673,7 @@
     "cmp": {
       "btn": "Compare with a friend",
       "short": "Compare",
-      "desc": "Send the link. Your friend takes the 30-second test and you both see the overlapping closet and taste match. You see who compared on your link page.",
+      "desc": "When your friend finishes the 30-second test, you both see the shared closet and taste match",
       "nameLabel": "Your name shown to friends",
       "me": "Me",
       "friend": "Friend",
@@ -1689,7 +1689,7 @@
       "loadFail": "Couldn't load this link",
       "introEyebrow": "{{name}}'s color taste is",
       "introAsk": "How much do you overlap with {{name}}?",
-      "introCta": "What's your taste? 30 seconds",
+      "introCta": "Find my taste in 30 seconds",
       "introSub": "Just pick the one you like more, 10 times",
       "overlapLabel": "Shared closet",
       "unit": "looks",
@@ -1705,7 +1705,7 @@
       "rowSub": "Shared closet {{n}} · match {{sim}}%",
       "backTaste": "Back to my taste",
       "ogEyebrow": "{{name}}'s color taste is",
-      "ogCta": "What's yours? 30 seconds · no app"
+      "ogCta": "Mine in 30 seconds · no app"
     }
   },
   "card": {
@@ -1731,7 +1731,7 @@
     "myPick": "my pick",
     "up": "Like it",
     "down": "Not for me",
-    "cta": "Decide your own outfit for tomorrow",
+    "cta": "Decide my own outfit for tomorrow",
     "shareLink": "Send the link",
     "shareText": "What should I wear tomorrow? Pick one",
     "copied": "Link copied",
@@ -1773,7 +1773,7 @@
     "female": "W",
     "takeOff": "Take off",
     "none": "None",
-    "noRec": "Finding colors for this spot…",
+    "noRec": "No color makes this much better right now",
     "pt": "pts",
     "done": "Done",
     "slot": {

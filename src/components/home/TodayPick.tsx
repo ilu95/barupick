@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
 import { useWeather, weatherEmoji } from '@/hooks/useWeather'
-import { PARTS, NEU, PLATE_TO_ITEM, STYLE_KEY, ranked, reasons, nameOf, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Part } from '@/lib/outfits'
+import { PARTS, NEU, PLATE_TO_ITEM, STYLE_KEY, ranked, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Part } from '@/lib/outfits'
 import { trackEvent } from '@/lib/analytics'
 
 // ═══════════════════════════════════════════════════════
@@ -81,7 +81,7 @@ export default function TodayPick() {
           <CharacterCanvas {...scene} width={96} />
         </div>
         <div className="min-w-0 flex flex-col">
-          <div className="text-[10.5px] font-bold text-warm-500 truncate">{evening ? t('home.pick.tomorrow') : t('home.pick.today')} · {t('outfit.situ.' + situ)} · {weather ? `${weatherEmoji(evening ? tm!.code : weather.code)} ` : ''}{temp}° · {nameOf(hero)}</div>
+          <div className="text-[10.5px] font-bold text-warm-500 truncate">{evening ? t('home.pick.tomorrow') : t('home.pick.today')} · {t('outfit.situ.' + situ)} · {weather ? `${weatherEmoji(evening ? tm!.code : weather.code)} ` : ''}{temp}°</div>
           <div className="text-[15px] font-extrabold text-warm-900 dark:text-warm-100 leading-tight mt-0.5 truncate">{garments}</div>
           <div className="text-[11.5px] text-warm-600 dark:text-warm-400 leading-snug mt-1 line-clamp-2">{why}</div>
           <div className="flex gap-1.5 mt-auto pt-2">

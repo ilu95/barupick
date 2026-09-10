@@ -19,6 +19,8 @@ import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildSte
 import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
+import { plateName } from '@/lib/outfits'
+import { HAT_NAMES } from '@/lib/builderSlots'
 import { trackVote } from '@/lib/analytics'
 import { useAuth } from '@/contexts/AuthContext'
 import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
@@ -661,11 +663,17 @@ function StepFabric({ build }: { build: BH }) {
 }
 
 // ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 (BuildCoord용) ───
-function getBuildPartLabel(partKey: string, upper: any[]): string {
+function getBuildPartLabel(partKey: string, upper: any[], state?: any): string {
+  // 새 만들기 화면에서 고른 판이 있으면 그 이름(트렌치코트), 없으면 종류(코트)
+  if (state) {
+    const plateOf: Record<string, string | null | undefined> = { bottom: state.bottomItem, shoes: state.shoesItem, scarf: state.scarfItem, hat: state.hatItem }
+    if (plateOf[partKey]) return HAT_NAMES[plateOf[partKey]!] ? HAT_NAMES[plateOf[partKey]!][i18n.language.startsWith('ko') ? 'ko' : 'en'] : plateName(plateOf[partKey]!)
+  }
   const sorted = sortUpper(upper)
   for (let i = 0; i < sorted.length; i++) {
     const slot = getSlotKey(i, sorted.length, sorted[i])
     if (slot === partKey) {
+      if (sorted[i].plate) return plateName(sorted[i].plate)
       const item = ITEMS_CATALOG.find(x => x.id === sorted[i].itemId)
       if (item) return i18n.t('categories:itemsCatalog.' + item.id)
     }
@@ -825,7 +833,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
               <div key={cat} className="flex flex-col items-center gap-1">
                 <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold border border-warm-400/30"
                   style={{ background: c.hex, color: c.hcl[2] > 60 ? '#1C1917' : '#fff' }}>{getColorName(colorKey)}</div>
-                <div className="text-[10px] text-warm-700 dark:text-warm-300">{getBuildPartLabel(cat, build.state.upper)}</div>
+                <div className="text-[10px] text-warm-700 dark:text-warm-300">{getBuildPartLabel(cat, build.state.upper, build.state)}</div>
               </div>
             )
           })}
