@@ -1,717 +1,325 @@
-// @ts-nocheck
-import { setJSON } from '@/lib/storage'
-import { useEffect, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, RefreshCw, Pin, Bookmark, Share, Users, ChevronRight, Palette, X, ChevronDown } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import ColorPicker from '@/components/ui/ColorPicker'
-import { COLORS_60, getColorName } from '@/lib/colors'
-import { MOOD_GROUPS, LAYER_LEVELS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styles'
-import { CATEGORY_NAMES } from '@/lib/categories'
-import { evaluationSystem } from '@/lib/evaluation'
-import { profile } from '@/lib/profile'
-import { trackRecommendComplete, trackSave, trackClick, trackShare } from '@/lib/analytics'
-import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
-import { useRecommend, itemsToLayerInfo, type RecStep } from '@/hooks/useRecommend'
-import { useToast } from '@/components/ui/Toast'
-import { useModal } from '@/components/ui/Modal'
 import { useTranslation } from 'react-i18next'
+import { ArrowLeft, ArrowRight, RotateCcw, X, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
+import { MOOD_GROUPS, STYLE_ICONS } from '@/lib/styles'
+import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT, type CharScene } from '@/lib/char/map'
+import { typesFor, HAT_NAMES } from '@/lib/builderSlots'
+import { PLATE_TO_ITEM, plateName as plateNameOf } from '@/lib/outfits'
+import { useRecommend, type ComboResult } from '@/hooks/useRecommend'
+import { trackEvent } from '@/lib/analytics'
 
-// ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 ───
-function getPickedPartLabel(partKey: string, pickedItems: string[], t?: any): string {
-  for (const id of pickedItems) {
-    const item = ITEMS_CATALOG.find(i => i.id === id)
-    if (!item) continue
-    if (partKey === 'outer' && item.outerType) return t ? t('categories:itemsCatalog.' + item.id) : item.label
-    if (partKey === 'middleware' && item.midType) return t ? t('categories:itemsCatalog.' + item.id) : item.label
-    if (partKey === 'scarf' && item.slot === 'scarf') return t ? t('categories:itemsCatalog.' + item.id) : item.label
-    if (partKey === 'hat' && item.slot === 'hat') return t ? t('categories:itemsCatalog.' + item.id) : item.label
-    if (partKey === 'top' && !item.outerType && !item.midType && !item.slot) return t ? t('categories:itemsCatalog.' + item.id) : item.label
-  }
-  const fallbackKeys: Record<string, string> = { top: 'recommend.partTop', bottom: 'recommend.partBottom', shoes: 'recommend.partShoes', outer: 'recommend.partOuter', middleware: 'recommend.partMiddleware', scarf: 'recommend.partScarf', hat: 'recommend.partHat' }
-  if (t && fallbackKeys[partKey]) return t(fallbackKeys[partKey])
-  return partKey
-}
+// ═══════════════════════════════════════════════════════
+// 코디 추천받기 — 새 디자인 (만들기 2단계와 같은 언어: 캐릭터 · 칩 · 이름 달린 색)
+// 1) 느낌·스타일 한 화면  2) 꼭 입을 옷(판)  3) 색 조합 카드 30벌
+// 카드를 누르면 만들기 2단계(캐릭터 + 레일)로 그대로 입혀 보낸다 — 색 바꾸기·카드·투표는 거기서.
+// 추천 엔진(getDynamicCombos)과 세션 캐시는 그대로, 판(plate) 상태만 얹었다.
+// ═══════════════════════════════════════════════════════
 
-// ─── 스텝 진행 표시기 ───
-const STEP_ORDER: RecStep[] = ['mood', 'style', 'pick', 'results']
-function StepIndicator({ current }: { current: RecStep }) {
-  const { t } = useTranslation()
-  const labels = [t('recommend.moodTitle'), t('recommend.styleTitle'), t('recommend.mustWear'), t('recommend.resultTitle')]
-  const currentIdx = STEP_ORDER.indexOf(current)
-  if (currentIdx < 0) return null // detail에서는 숨김
+type Slot = 'outer' | 'middleware' | 'top' | 'bottom' | 'shoes' | 'scarf' | 'hat'
+const SLOTS: { id: Slot; optional: boolean }[] = [
+  { id: 'outer', optional: true }, { id: 'middleware', optional: true }, { id: 'top', optional: false },
+  { id: 'bottom', optional: false }, { id: 'shoes', optional: false }, { id: 'scarf', optional: true }, { id: 'hat', optional: true },
+]
+const DEFAULT_TOP = '11_knit_crew'
+const OUTER_BY_TYPE: Record<string, string> = { coat: '17_coat_long', jacket: '18_jacket_short', padding: '29_puffer' }
+const MID_BY_TYPE: Record<string, string> = { cardigan: '15_cardigan', vest: '14_knit_vest', knit: '14_knit_vest' }
+/** 1단계처럼 색 없는 중립색 — 옷 고르기 화면의 캐릭터 */
+const NEU: Record<Slot, string> = { outer: '#9A948C', middleware: '#C4BDB3', top: '#ECE7DF', bottom: '#4B4844', shoes: '#2A2825', scarf: '#B8AFA4', hat: '#6E6862' }
 
-  return (
-    <div className="flex items-center gap-1 mb-4">
-      {STEP_ORDER.map((s, i) => (
-        <div key={s} className="flex items-center gap-1 flex-1">
-          <div className="flex flex-col items-center flex-1">
-            <div className={`w-full h-1 rounded-full transition-all ${
-              i <= currentIdx ? 'bg-terra-500' : 'bg-warm-300 dark:bg-warm-600'
-            }`} />
-            <span className={`text-[9px] mt-1 font-medium whitespace-nowrap ${
-              i === currentIdx ? 'text-terra-600 dark:text-terra-400' : i < currentIdx ? 'text-warm-500 dark:text-warm-400' : 'text-warm-400 dark:text-warm-500'
-            }`}>{labels[i]}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
+const plateName = (id: string) => HAT_NAMES[id] ? HAT_NAMES[id][(navigator.language || 'ko').startsWith('ko') ? 'ko' : 'en'] : plateNameOf(id)
+
+/** 판 + 자리별 색 → 장면 */
+function sceneOf(plates: Record<string, string>, hex: Partial<Record<Slot, string>>, types: { outerType: string; midType: string }, sex: 'm' | 'w'): CharScene {
+  const items: CharScene['items'] = []
+  if (hex.outer) items.push({ id: plates.outer || OUTER_BY_TYPE[types.outerType] || '17_coat_long', color: hex.outer })
+  if (hex.middleware) items.push({ id: plates.middleware || MID_BY_TYPE[types.midType] || '15_cardigan', color: hex.middleware })
+  if (hex.top) items.push({ id: plates.top || DEFAULT_TOP, color: hex.top })
+  items.push({ id: plates.bottom || DEFAULT_BOTTOM, color: hex.bottom || NEU.bottom })
+  items.push({ id: plates.shoes || DEFAULT_SHOE, color: hex.shoes || NEU.shoes })
+  if (hex.scarf) items.push({ id: plates.scarf || DEFAULT_SCARF, color: hex.scarf })
+  const body: CharScene['body'] = { sex, hair: DEFAULT_HAIR[sex], hairColor: DEFAULT_HAIR_COLOR }
+  if (hex.hat) { body.hat = plates.hat || DEFAULT_HAT; body.hatColor = hex.hat }
+  return { items, body }
 }
 
 export default function RecommendCoord() {
-  const navigate = useNavigate()
   const rec = useRecommend()
-
+  const step = rec.step === 'detail' ? 'results' : rec.step
   return (
-    <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <StepIndicator current={rec.step} />
-      {rec.step === 'mood' && <StepMood rec={rec} />}
-      {rec.step === 'style' && <StepStyle rec={rec} />}
-      {rec.step === 'pick' && <StepPick rec={rec} />}
-      {rec.step === 'results' && <StepResults rec={rec} navigate={navigate} />}
-      {rec.step === 'detail' && <StepDetail rec={rec} navigate={navigate} />}
+    <div className="animate-screen-fade">
+      {(step === 'mood' || step === 'style') && <StepMood rec={rec} />}
+      {step === 'pick' && <StepPick rec={rec} />}
+      {step === 'results' && <StepResults rec={rec} />}
     </div>
   )
 }
 
 type RecHook = ReturnType<typeof useRecommend>
 
+const Head = ({ title, onBack, right }: { title: string; onBack?: () => void; right?: ReactNode }) => {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center gap-2 px-3 pt-2 pb-1">
+      {onBack && <button onClick={onBack} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>}
+      <div className="flex-1 font-display text-[17px] font-bold text-warm-900 dark:text-warm-100 truncate">{title}</div>
+      {right}
+    </div>
+  )
+}
+const chipCls = (on: boolean) => `h-8 px-3 rounded-full text-[12.5px] font-semibold whitespace-nowrap border transition-all active:scale-95 ${on ? 'bg-warm-900 text-white border-warm-900 dark:bg-warm-100 dark:text-warm-900 dark:border-warm-100' : 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'}`
+
 // ═══════════════════════════════════════
-// Step 1: 무드 선택
+// 1. 느낌 → 스타일 (한 화면)
 // ═══════════════════════════════════════
 function StepMood({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const mood = rec.state.mood
+  const group = mood ? MOOD_GROUPS[mood] : null
   return (
-    <div className="animate-screen-fade">
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{t('recommend.moodTitle')}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('recommend.moodDesc')}</p>
+    <div className="pb-8">
+      <Head title={t('recommend.v2Title')} onBack={() => navigate('/home')} />
+      <div className="px-4 text-[11.5px] text-warm-500 dark:text-warm-400">{t('recommend.v2Hint')}</div>
 
-      <div className="grid grid-cols-2 gap-2.5 mb-5">
-        {Object.entries(MOOD_GROUPS).map(([key, group]) => (
-          <button key={key} onClick={() => rec.selectMood(key)}
-            className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 text-center shadow-warm-sm active:scale-[0.97] transition-all">
-            <div className="text-2xl mb-2">{group.icon}</div>
-            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t('styles:moodGroups.' + key + '.name')}</div>
-            <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-1 leading-snug">{t('styles:moodGroups.' + key + '.description')}</div>
-          </button>
-        ))}
-      </div>
-      <button onClick={() => rec.selectMood(null)}
-        className="w-full py-3 bg-warm-100 dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
-        🎲 {t('recommend.allStyles')}
-      </button>
-    </div>
-  )
-}
-
-// ═══════════════════════════════════════
-// Step 2: 스타일 선택
-// ═══════════════════════════════════════
-function StepStyle({ rec }: { rec: RecHook }) {
-  const { t } = useTranslation()
-  const group = rec.state.mood ? MOOD_GROUPS[rec.state.mood] : null
-  if (!group) return null
-  return (
-    <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> {t('common.back')}
-      </button>
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{group.icon} {t('styles:moodGroups.' + rec.state.mood + '.name')}</h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('recommend.styleTitle')}</p>
-      <div className="flex flex-col gap-2.5 mb-5">
-        {group.styles.map((s: string) => {
-          const sd = STYLE_GUIDE[s]
-          const icon = (STYLE_ICONS as any)?.[s] || '🎨'
+      <div className="px-4 mt-3 grid grid-cols-3 gap-2">
+        {Object.entries(MOOD_GROUPS).map(([key, g]) => {
+          const on = mood === key
           return (
-            <button key={s} onClick={() => rec.selectStyle(s)}
-              className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 text-left shadow-warm-sm active:scale-[0.98] transition-all">
-              <span className="text-xl flex-shrink-0">{icon}</span>
-              <div className="flex-1 min-w-0">
-                <div className="text-[15px] font-semibold text-warm-900 dark:text-warm-100">{t('styles:guide.' + s + '.name')}</div>
-                <div className="text-xs text-warm-600 dark:text-warm-400 mt-0.5">{t('styles:guide.' + s + '.subtitle')}</div>
-              </div>
-              <ChevronRight size={16} className="text-warm-500 flex-shrink-0" />
+            <button key={key} onClick={() => { rec.update({ mood: key, style: null }); trackEvent('rec_mood', { mood: key }) }}
+              className={`rounded-2xl border px-2 py-3 flex flex-col items-center gap-1 transition-all active:scale-[0.97] ${on ? 'bg-white dark:bg-warm-800 border-warm-900 dark:border-warm-100 shadow-warm' : 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600'}`}>
+              <span className="text-[22px] leading-none">{g.icon}</span>
+              <span className={`text-[12px] font-bold ${on ? 'text-warm-900 dark:text-warm-100' : 'text-warm-700 dark:text-warm-300'}`}>{t('styles:moodGroups.' + key + '.name')}</span>
             </button>
           )
         })}
       </div>
-      <button onClick={() => rec.selectStyle(null)}
-        className="w-full py-3 bg-warm-100 dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
-        🎲 {t('recommend.allRecommend')}
-      </button>
+
+      {group && (
+        <div className="px-4 mt-4 animate-screen-fade">
+          <div className="text-[11px] font-bold text-warm-500 dark:text-warm-400 mb-1.5">{group.icon} {t('styles:moodGroups.' + mood + '.name')} · {t('recommend.styleTitle')}</div>
+          <div className="flex flex-col gap-1.5">
+            {group.styles.map((s: string) => (
+              <button key={s} onClick={() => { rec.selectStyle(s); trackEvent('rec_style', { style: s }) }}
+                className="w-full flex items-center gap-2.5 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.98] transition-all">
+                <span className="text-[18px]">{(STYLE_ICONS as any)?.[s] || '🎨'}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13.5px] font-bold text-warm-900 dark:text-warm-100">{t('styles:guide.' + s + '.name')}</div>
+                  <div className="text-[11px] text-warm-500 truncate">{t('styles:guide.' + s + '.subtitle')}</div>
+                </div>
+                <ArrowRight size={15} className="text-warm-400" />
+              </button>
+            ))}
+            <button onClick={() => rec.selectStyle(null)} className="w-full py-2.5 rounded-2xl border border-dashed border-warm-400 text-[12.5px] font-semibold text-warm-600 dark:text-warm-300 active:scale-[0.98]">{t('recommend.allRecommend')}</button>
+          </div>
+        </div>
+      )}
+
+      <div className="px-4 mt-4">
+        <button onClick={() => { rec.selectMood(null); trackEvent('rec_mood', { mood: null }) }} className="w-full rounded-2xl bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 px-4 py-3 flex items-center justify-between active:scale-[0.98]">
+          <span className="text-[13px] font-bold text-warm-800 dark:text-warm-200">{t('recommend.v2All')}</span>
+          <span className="text-[11px] text-warm-500">{t('recommend.v2AllHint')}</span>
+        </button>
+      </div>
     </div>
   )
 }
 
 // ═══════════════════════════════════════
-// Step 3: 아이템 선택 (꼭 입고 싶은 옷)
+// 2. 꼭 입을 옷 (판 고르기)
 // ═══════════════════════════════════════
 function StepPick({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
-  const picked = rec.state.pickedItems
-  const info = itemsToLayerInfo(picked)
-
-  // 마네킹 미리보기
-  const sampleOutfit: Record<string, string> = { top: '#E7E5E4', bottom: '#44403C', shoes: '#78716C' }
-  if (info.hasOuter) sampleOutfit.outer = '#57534E'
-  if (info.hasMid) sampleOutfit.middleware = '#A8A29E'
-  if (info.hasScarf) sampleOutfit.scarf = '#D6D3D1'
-  if (info.hasHat) sampleOutfit.hat = '#78716C'
-
-  return (
-    <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> {t('common.back')}
-      </button>
-
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">
-        {t('recommend.mustWear')}
-      </h2>
-      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">
-        {t('recommend.mustWearDesc')}
-      </p>
-
-      {/* 마네킹 미리보기 */}
-      <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
-        <MannequinSVG outfit={sampleOutfit} options={{ outerType: info.outerType, midType: info.midType }} size={120} />
-      </div>
-
-      {/* 기본 포함 안내 */}
-      <div className="flex items-center gap-2 mb-3 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-50 dark:bg-warm-800 rounded-xl px-3 py-2">
-        <span>{t('recommend.alwaysIncluded')}</span>
-      </div>
-
-      {/* 아이템 그리드 — 의류 */}
-      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('recommend.clothing')}</div>
-      <div className="grid grid-cols-3 gap-2.5 mb-4">
-        {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
-          const selected = picked.includes(item.id)
-          return (
-            <button key={item.id} onClick={() => rec.toggleItem(item.id)}
-              className={`flex flex-col items-center gap-1.5 py-4 px-2 rounded-xl text-center transition-all active:scale-93 ${
-                selected
-                  ? 'bg-terra-50 dark:bg-terra-900/30 border-[1.5px] border-terra-400 shadow-warm'
-                  : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
-              }`}>
-              <span className="text-2xl">{item.emoji}</span>
-              <span className={`text-xs font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* 아이템 그리드 — 악세서리 */}
-      <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('recommend.accessory')}</div>
-      <div className="grid grid-cols-3 gap-2.5 mb-6">
-        {ITEMS_CATALOG.filter(i => i.slot).map(item => {
-          const selected = picked.includes(item.id)
-          return (
-            <button key={item.id} onClick={() => rec.toggleItem(item.id)}
-              className={`flex flex-col items-center gap-1.5 py-4 px-2 rounded-xl text-center transition-all active:scale-93 ${
-                selected
-                  ? 'bg-terra-50 dark:bg-terra-900/30 border-[1.5px] border-terra-400 shadow-warm'
-                  : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600'
-              }`}>
-              <span className="text-2xl">{item.emoji}</span>
-              <span className={`text-xs font-semibold ${selected ? 'text-terra-700 dark:text-terra-400' : 'text-warm-700 dark:text-warm-300'}`}>{t('categories:itemsCatalog.' + item.id)}</span>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* 선택된 구성 요약 */}
-      {picked.length > 0 && (
-        <div className="mb-4 text-center text-xs text-warm-600 dark:text-warm-400">
-          {picked.map(id => t('categories:itemsCatalog.' + id)).filter(Boolean).join(' + ')} {t('recommend.plusBasics')}
-        </div>
-      )}
-
-      {/* CTA */}
-      <button onClick={rec.generateFromPick}
-        className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
-        {picked.length === 0 ? t('recommend.getAll') : t('recommend.getWithPicked')} <ArrowRight size={18} />
-      </button>
-    </div>
-  )
-}
-
-// ═══════════════════════════════════════
-// Step 4: 결과 리스트
-// ═══════════════════════════════════════
-function StepResults({ rec, navigate }: { rec: RecHook; navigate: any }) {
-  const { t } = useTranslation()
-  const toast = useToast()
-  const [showItemPicker, setShowItemPicker] = useState(false)
-  const [pinPart, setPinPart] = useState<string | null>(null)
-
-  const results = rec.state.results
-  const layerData = LAYER_LEVELS[rec.state.layerType]
-  const partKeys = layerData?.partKeys || ['top', 'bottom', 'shoes']
-  const picked = rec.state.pickedItems
-  const pinned = rec.state.pinned || {}
+  const sex = charSex()
+  const plates = rec.state.plates
+  const shown = (slot: Slot) => plates[slot] || (slot === 'top' ? DEFAULT_TOP : slot === 'bottom' ? DEFAULT_BOTTOM : slot === 'shoes' ? DEFAULT_SHOE : null)
+  const scene = useMemo(() => {
+    const hex: Partial<Record<Slot, string>> = { top: NEU.top, bottom: NEU.bottom, shoes: NEU.shoes }
+    if (plates.outer) hex.outer = NEU.outer
+    if (plates.middleware) hex.middleware = NEU.middleware
+    if (plates.scarf) hex.scarf = NEU.scarf
+    if (plates.hat) hex.hat = NEU.hat
+    return sceneOf(plates, hex, rec.state, sex)
+  }, [plates, sex])
+  const picked = SLOTS.filter(s => plates[s.id]).length
 
   return (
-    <div className="animate-screen-enter">
-      <button onClick={rec.goBack} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70">
-        <ArrowLeft size={16} /> {t('common.back')}
-      </button>
-
-      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">
-        {t('recommend.resultTitle')} {results.length}
-      </h2>
-
-      {/* ─── 현재 조건 칩 ─── */}
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        {/* 선택된 아이템 칩 */}
-        {picked.map(id => {
-          const item = ITEMS_CATALOG.find(i => i.id === id)
-          if (!item) return null
-          return (
-            <button key={id} onClick={() => rec.toggleItemInResults(id)}
-              className="flex items-center gap-1 bg-terra-50 dark:bg-terra-900/30 border border-terra-300 dark:border-terra-700 rounded-full px-2.5 py-1 text-[11px] font-semibold text-terra-700 dark:text-terra-400 active:scale-95">
-              {item.emoji} {t('categories:itemsCatalog.' + item.id)} <X size={10} />
-            </button>
-          )
-        })}
-
-        {/* 고정된 컬러 칩 */}
-        {Object.entries(pinned).map(([part, colorKey]) => {
-          const c = COLORS_60[colorKey]
-          if (!c) return null
-          const partName = t('categories:names.' + part)
-          return (
-            <button key={part} onClick={() => rec.clearPin(part)}
-              className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-semibold text-warm-700 dark:text-warm-300 active:scale-95">
-              <span className="w-3 h-3 rounded-full border border-warm-300" style={{ background: c.hex }} />
-              {t('recommend.pinned', { part: partName })} <X size={10} />
-            </button>
-          )
-        })}
-
-        {/* 옷 추가 버튼 */}
-        <button onClick={() => setShowItemPicker(!showItemPicker)}
-          className="flex items-center gap-1 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-medium text-warm-600 dark:text-warm-400 active:scale-95">
-          {t('recommend.changeClothes')}
-        </button>
-
-        {/* 컬러 고정 버튼 */}
-        <button onClick={() => setPinPart(pinPart ? null : partKeys[0])}
-          className="flex items-center gap-1 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-full px-2.5 py-1 text-[11px] font-medium text-warm-600 dark:text-warm-400 active:scale-95">
-          <Pin size={10} /> {t('recommend.pinColor')}
-        </button>
+    <div className="pb-24">
+      <Head title={t('recommend.pickTitle')} onBack={rec.goBack} right={rec.state.style ? <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200">{(STYLE_ICONS as any)?.[rec.state.style] || ''} {t('styles:guide.' + rec.state.style + '.name')}</span> : null} />
+      <div className="px-4 text-[11.5px] text-warm-500 dark:text-warm-400 flex items-center gap-2">
+        {t('recommend.pickHint')}
+        {rec.state.weatherLayerLocked && <span className="text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">{t('recommend.weatherLock')}</span>}
       </div>
 
-      {/* ─── 인라인 아이템 피커 ─── */}
-      {showItemPicker && (
-        <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
-          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">{t('recommend.addRemoveClothes')}</div>
-          <div className="grid grid-cols-4 gap-1.5">
-            {ITEMS_CATALOG.map(item => {
-              const sel = picked.includes(item.id)
-              return (
-                <button key={item.id} onClick={() => rec.toggleItemInResults(item.id)}
-                  className={`flex flex-col items-center gap-0.5 py-2 rounded-xl text-center transition-all active:scale-93 ${
-                    sel ? 'bg-terra-100 dark:bg-terra-900/30 border-terra-400 border-[1.5px]' : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
-                  }`}>
-                  <span className="text-base">{item.emoji}</span>
-                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
-                </button>
-              )
-            })}
-          </div>
-          <button onClick={() => setShowItemPicker(false)} className="w-full mt-2 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">{t('common.close')}</button>
-        </div>
-      )}
-
-      {/* ─── 인라인 컬러 고정 ─── */}
-      {pinPart && (
-        <div className="mb-4 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
-          <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">{t('recommend.selectPartToPin')}</div>
-          <div className="flex gap-1.5 mb-3">
-            {partKeys.map((pk: string) => {
-              // 유저가 선택한 아이템명으로 표시 (코트, 니트 등)
-              const pickedLabel = (() => {
-                for (const id of picked) {
-                  const item = ITEMS_CATALOG.find(i => i.id === id)
-                  if (!item) continue
-                  if (pk === 'outer' && item.outerType) return t('categories:itemsCatalog.' + item.id)
-                  if (pk === 'middleware' && item.midType) return t('categories:itemsCatalog.' + item.id)
-                  if (pk === 'scarf' && item.slot === 'scarf') return t('categories:itemsCatalog.' + item.id)
-                  if (pk === 'hat' && item.slot === 'hat') return t('categories:itemsCatalog.' + item.id)
-                  if (pk === 'top' && !item.outerType && !item.midType && !item.slot) return t('categories:itemsCatalog.' + item.id)
-                }
-                const fallbackKeys: Record<string, string> = { top: 'recommend.partTop', bottom: 'recommend.partBottom', shoes: 'recommend.partShoes', outer: 'recommend.partOuter', middleware: 'recommend.partMiddleware', scarf: 'recommend.partScarf', hat: 'recommend.partHat' }
-                return fallbackKeys[pk] ? t(fallbackKeys[pk]) : pk
-              })()
-              return (
-              <button key={pk} onClick={() => setPinPart(pk)}
-                className={`flex-1 py-2 rounded-xl text-[11px] font-semibold text-center transition-all ${
-                  pinPart === pk ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-                }`}>
-                {pickedLabel}
-                {pinned[pk] && <span className="ml-1">📌</span>}
-              </button>
-              )
-            })}
-          </div>
-          <ColorPicker
-            inline
-            selected={pinned[pinPart]}
-            onSelect={(k) => rec.togglePin(pinPart, k)}
-            onClear={() => rec.clearPin(pinPart)}
-            ctx="recommend_pin"
-            slot={pinPart}
-          />
-          <div className="flex gap-2 mt-2">
-            <button onClick={() => setPinPart(null)} className="flex-1 text-center text-[11px] text-warm-500 dark:text-warm-400 py-1">{t('common.close')}</button>
-            {Object.keys(pinned).length > 0 && (
-              <button onClick={() => { rec.clearAllPins(); setPinPart(null) }} className="text-[11px] text-red-500 py-1">{t('recommend.clearAll')}</button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ─── 셔플 ─── */}
-      <div className="flex justify-end mb-3">
-        <button onClick={rec.regenerate} className="flex items-center gap-1 text-xs text-terra-600 dark:text-terra-400 font-medium active:opacity-70">
-          <RefreshCw size={13} /> {t('recommend.reshuffle')}
-        </button>
+      {/* 무대 (높이 고정) */}
+      <div className="relative flex items-end justify-center overflow-hidden" style={{ height: 220 }}>
+        <div className="absolute left-1/2 bottom-2 -translate-x-1/2 w-24 h-3 rounded-full" style={{ background: 'radial-gradient(ellipse at center, rgba(28,25,23,.16), rgba(28,25,23,0) 70%)' }} />
+        <CharacterCanvas {...scene} width={150} />
       </div>
 
-      {/* ─── 결과 카드 ─── */}
-      <div className="flex flex-col gap-3">
-        {results.map((combo, idx) => {
-          const outfitHex = outfitToHex(combo.outfit)
-          const parts = Object.keys(combo.outfit).filter(k => combo.outfit[k])
+      {/* 자리별 옷 종류 */}
+      <div className="bg-white dark:bg-warm-800 border-t border-warm-300 dark:border-warm-700 pt-2">
+        {SLOTS.map(s => {
+          const cur = shown(s.id)
+          const types = typesFor(s.id, sex)
           return (
-            <button key={idx} onClick={() => rec.openDetail(idx)}
-              className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm active:scale-[0.98] transition-all text-left">
-              <MannequinSVG outfit={outfitHex} options={{ outerType: rec.state.outerType, midType: rec.state.midType }} size={70} />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`font-display text-lg font-bold ${
-                    combo.score >= 85 ? 'text-green-600 dark:text-green-400' : combo.score >= 70 ? 'text-warm-800 dark:text-warm-200' : 'text-warm-500'
-                  }`}>{t('common.score', { score: combo.score })}</span>
-                  {combo.tags?.[0] && <span className="text-[9px] bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 px-1.5 py-0.5 rounded-full">{combo.tags[0]}</span>}
-                </div>
-                <div className="flex gap-1">
-                  {parts.slice(0, 5).map(k => {
-                    const c = COLORS_60[combo.outfit[k]]
-                    return c ? <div key={k} className="w-5 h-5 rounded border border-warm-300 dark:border-warm-500" style={{ background: c.hex }} /> : null
-                  })}
-                </div>
+            <div key={s.id} className="py-1.5">
+              <div className="px-4 flex items-baseline gap-1.5">
+                <span className="text-[12px] font-bold text-warm-900 dark:text-warm-100">{t('builder.slot.' + s.id)}</span>
+                <span className="text-[10.5px] text-warm-500 truncate">{cur ? plateName(cur) : t('recommend.pickNone')}</span>
               </div>
-              <ChevronRight size={16} className="text-warm-400 flex-shrink-0" />
-            </button>
+              <div className="mt-1 px-4 flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
+                {s.optional && <button onClick={() => rec.setPlate(s.id, null)} className={`flex-none ${chipCls(!plates[s.id])} border-dashed`}>{t('recommend.pickNone')}</button>}
+                {types.map(id => <button key={id} onClick={() => { rec.setPlate(s.id, id); trackEvent('rec_plate', { slot: s.id, plate: id }) }} className={`flex-none ${chipCls(cur === id)}`}>{plateName(id)}</button>)}
+              </div>
+            </div>
           )
         })}
       </div>
 
-      {results.length === 0 && (
-        <div className="text-center py-16">
-          <div className="text-3xl mb-3">🤔</div>
-          <div className="text-sm text-warm-600 dark:text-warm-400">{t('recommend.noResults')}</div>
-        </div>
-      )}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white/95 dark:bg-[#1C1917]/95 backdrop-blur-xl border-t border-warm-300 dark:border-warm-700 px-4 py-2.5 z-50" style={{ paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))' }}>
+        <button onClick={() => { trackEvent('rec_generate', { n_plates: picked, style: rec.state.style, layer: rec.state.layerType }); rec.generateFromPick() }} className="w-full h-11 rounded-full bg-terra-500 text-white font-bold text-[14px] flex items-center justify-center gap-1.5 active:scale-[0.98] shadow-terra">
+          {picked ? t('recommend.pickCta') : t('recommend.pickCtaAll')} <ArrowRight size={16} />
+        </button>
+      </div>
     </div>
   )
 }
 
 // ═══════════════════════════════════════
-// Step 5: 상세 보기
+// 3. 색 조합 카드
 // ═══════════════════════════════════════
-function StepDetail({ rec, navigate }: { rec: RecHook; navigate: any }) {
+function StepResults({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
-  const toast = useToast()
-  const modal = useModal()
-  const combo = rec.state.results[rec.state.detailIdx]
-  const [saveModal, setSaveModal] = useState(false)
-  const [saveName, setSaveName] = useState('')
-  const [vizCollapsed, setVizCollapsed] = useState(false)
-  const [editingPart, setEditingPart] = useState<string | null>(null)
-  const [editedOutfit, setEditedOutfit] = useState<Record<string, string> | null>(null)
+  const navigate = useNavigate()
+  const sex = charSex()
+  const s = rec.state
+  const results = s.results
+  const [all, setAll] = useState(false)
+  const [pinSlot, setPinSlot] = useState<string | null>(null)
+  const [tab, setTab] = useState<string>(COLOR_TABS[0].id)
+  const partKeys: string[] = useMemo(() => {
+    const keys = Object.keys(results[0]?.outfit || { top: 1, bottom: 1, shoes: 1 })
+    return (['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat'] as string[]).filter(k => keys.includes(k))
+  }, [results])
+  const pinned = s.pinned || {}
+  const garmentChips = SLOTS.filter(x => s.plates[x.id]).map(x => plateName(s.plates[x.id]))
 
-  const handleBack = () => {
-    if (editedOutfit) {
-      modal.confirm({
-        title: t('recommend.colorImprove'),
-        message: t('recommend.unsavedColorWarning'),
-        confirmLabel: t('common.back'),
-        variant: 'danger',
-        onConfirm: () => { setEditedOutfit(null); rec.goBack() },
-      })
-    } else {
-      rec.goBack()
+  const hexOf = (o: Record<string, string>): Partial<Record<Slot, string>> => {
+    const h: Partial<Record<Slot, string>> = {}
+    for (const k of Object.keys(o)) { const c = COLORS_60[o[k]]; if (c) (h as any)[k] = c.hex }
+    return h
+  }
+
+  // 카드 → 만들기 2단계로 입혀 보내기
+  const tryOn = (combo: ComboResult, idx: number) => {
+    const o = combo.outfit
+    const plate = (slot: Slot, fallback: string) => s.plates[slot] || fallback
+    const layers: { itemId: string; plate: string; colorKey: string }[] = []
+    if (o.outer) { const p = plate('outer', OUTER_BY_TYPE[s.outerType] || '17_coat_long'); layers.push({ itemId: PLATE_TO_ITEM[p] || 'coat', plate: p, colorKey: o.outer }) }
+    if (o.middleware) { const p = plate('middleware', MID_BY_TYPE[s.midType] || '15_cardigan'); layers.push({ itemId: PLATE_TO_ITEM[p] || 'cardigan', plate: p, colorKey: o.middleware }) }
+    if (o.top) { const p = plate('top', DEFAULT_TOP); layers.push({ itemId: PLATE_TO_ITEM[p] || 'knit', plate: p, colorKey: o.top }) }
+    const pick = {
+      layers,
+      bottom: { plate: plate('bottom', DEFAULT_BOTTOM), colorKey: o.bottom || 'charcoal' },
+      shoes: { plate: plate('shoes', DEFAULT_SHOE), colorKey: o.shoes || 'black' },
+      scarf: o.scarf ? { plate: plate('scarf', DEFAULT_SCARF), colorKey: o.scarf } : null,
+      hat: o.hat ? { plate: plate('hat', DEFAULT_HAT), colorKey: o.hat } : null,
+      style: s.style || combo.style || null,
     }
+    try { sessionStorage.setItem('sp_rec_pick', JSON.stringify(pick)) } catch {}
+    trackEvent('rec_tryon', { idx, score: combo.score, style: s.style, layer: s.layerType })
+    navigate('/home/build')
   }
 
-  if (!combo) return <div className="text-center py-16 text-warm-500 dark:text-warm-400">{t('recommend.noResults')}</div>
-
-  const currentOutfit = editedOutfit || combo.outfit
-  const outfitHex = outfitToHex(currentOutfit)
-  const parts = Object.keys(currentOutfit).filter(k => currentOutfit[k])
-
-  let evalResult: any = null
-  let finalScore = combo.score
-  try {
-    const pc = profile.getPersonalColor()
-    evalResult = evaluationSystem.evaluate(currentOutfit, pc)
-    finalScore = evalResult?.total || combo.score
-  } catch {}
-
-  const circumference = 2 * Math.PI * 52
-  const offset = circumference * (1 - finalScore / 100)
-
-  const scoreItems = evalResult ? [
-    { label: t('build.scoreItems.colorPlacement'), value: evalResult.goldilocks, max: 33, desc: '' },
-    { label: t('build.scoreItems.colorRatio'), value: evalResult.ratio, max: 17, desc: '' },
-    { label: t('build.scoreItems.colorHarmony'), value: evalResult.harmony, max: 17, desc: '' },
-    { label: t('build.scoreItems.seasonal'), value: evalResult.season, max: 8, desc: '' },
-    { label: t('build.scoreItems.balance'), value: evalResult.balance, max: 8, desc: '' },
-    ...(evalResult.hasPersonalColor ? [{ label: t('build.scoreItems.personalColor'), value: evalResult.personal, max: 17, desc: '' }] : []),
-    ...(evalResult.hasBodyFit ? [{ label: t('build.scoreItems.bodyFit'), value: evalResult.bodyFit, max: 8, desc: '' }] : []),
-  ] : []
-
-  const handleSave = () => {
-    const name = saveName.trim() || combo.name
-    const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit: currentOutfit, score: finalScore, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION })
-    if (saved.length > 100) saved.length = 100
-    setJSON('cs_saved', saved)
-    setSaveModal(false)
-    setSaveName('')
-    trackSave('recommend', finalScore)
-    toast.success(t('recommend.saveSuccess'))
-  }
+  const list = all ? results : results.slice(0, 10)
+  const tabKeys = COLOR_TABS.find(x => x.id === tab)?.keys || []
 
   return (
-    <div className="animate-screen-enter">
-      <button onClick={() => setVizCollapsed(!vizCollapsed)} className="w-full text-center text-xs text-warm-600 dark:text-warm-400 py-2 mb-2 active:opacity-70">
-        {vizCollapsed ? t('recommend.showMannequin') : t('recommend.hideMannequin')}
-      </button>
+    <div className="pb-10">
+      <Head title={`${t('recommend.resTitle')} ${results.length}`} onBack={rec.goBack}
+        right={<button onClick={() => { rec.regenerate(); trackEvent('rec_shuffle', {}) }} className="h-8 px-3 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-semibold text-warm-700 dark:text-warm-300 flex items-center gap-1 active:scale-95"><RotateCcw size={13} /> {t('recommend.shuffle')}</button>} />
+      <div className="px-4 text-[11.5px] text-warm-500 dark:text-warm-400">{t('recommend.resHint')}</div>
 
-      {!vizCollapsed && (
-        <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
-          <MannequinSVG outfit={outfitHex} options={{ outerType: rec.state.outerType, midType: rec.state.midType }} size={200} />
-        </div>
-      )}
-
-      {/* 태그 */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-terra-100 dark:bg-terra-900/30 text-terra-700 dark:text-terra-400">{combo.name}</span>
-        {combo.tags?.[0] && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{combo.tags[0]}</span>}
-        {evalResult?.hasPersonalColor && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400">{t('recommend.pcCheck')}</span>}
+      {/* 조건 칩 */}
+      <div className="px-4 mt-2.5 flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
+        {s.style && <span className="flex-none h-7 px-2.5 rounded-full bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900 text-[11px] font-bold flex items-center gap-1">{(STYLE_ICONS as any)?.[s.style] || ''} {t('styles:guide.' + s.style + '.name')}</span>}
+        {garmentChips.map(g => <span key={g} className="flex-none h-7 px-2.5 rounded-full bg-warm-200 dark:bg-warm-700 text-warm-800 dark:text-warm-200 text-[11px] font-semibold flex items-center">{g}</span>)}
+        {Object.entries(pinned).map(([part, key]) => COLORS_60[key] ? (
+          <button key={part} onClick={() => rec.clearPin(part)} className="flex-none h-7 pl-1.5 pr-2 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[11px] font-semibold text-warm-800 dark:text-warm-200 flex items-center gap-1">
+            <i className="w-4 h-4 rounded-full border border-black/10" style={{ background: COLORS_60[key].hex }} />{t('builder.slot.' + part)} {getColorName(key)} <X size={10} />
+          </button>) : null)}
+        <button onClick={() => setPinSlot(pinSlot ? null : partKeys[0])} className={`flex-none h-7 px-2.5 rounded-full border border-dashed text-[11px] font-semibold ${pinSlot ? 'bg-warm-900 text-white border-warm-900' : 'border-warm-400 text-warm-600 dark:text-warm-300'}`}>{t('recommend.pinBtn')}</button>
       </div>
 
-      {/* 점수 원형 + 부위 컬러 */}
-      <div className="flex items-center gap-5 mb-5">
-        <div className="relative w-[120px] h-[120px] flex-shrink-0">
-          <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-            <circle cx={60} cy={60} r={52} fill="none" stroke="#E7E5E4" strokeWidth={8} />
-            <circle cx={60} cy={60} r={52} fill="none" stroke="#C2785C" strokeWidth={8}
-              strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="transition-all duration-700" />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-display text-3xl font-bold text-warm-900 dark:text-warm-100">{finalScore}</span>
-            <span className="text-[10px] text-warm-600 dark:text-warm-400">/ 100</span>
+      {/* 색 고정 서랍 */}
+      {pinSlot && (
+        <div className="mx-4 mt-2 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-2.5 animate-screen-fade">
+          <div className="px-3 flex items-center gap-2">
+            <span className="text-[12px] font-bold text-warm-900 dark:text-warm-100">{t('recommend.pinTitle')}</span>
+            <button onClick={() => setPinSlot(null)} className="ml-auto text-[11px] font-semibold text-warm-500 px-2 py-0.5">{t('recommend.pinDone')}</button>
           </div>
-        </div>
-        <div className="flex-1 flex flex-col gap-1.5">
-          {parts.map((k: string) => {
-            const colorKey = currentOutfit[k]; const c = COLORS_60[colorKey]
-            return (
-              <div key={k} className="flex items-center gap-2 text-xs">
-                <span className="w-4 h-4 rounded flex-shrink-0 border border-warm-400 dark:border-warm-500" style={{ background: c?.hex || '#ccc' }} />
-                <span className="text-warm-500 dark:text-warm-400 whitespace-nowrap">{getPickedPartLabel(k, rec.state.pickedItems, t)}</span>
-                <span className="text-warm-800 dark:text-warm-200 font-medium">{colorKey ? getColorName(colorKey) : ''}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* 배색 이론 태그 */}
-      {evalResult?.theory && evalResult.theory.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-          {evalResult.theory.map((tag: string, i: number) => (
-            <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-warm-300 dark:bg-warm-700 text-warm-700 dark:text-warm-300">{t(tag)}</span>
-          ))}
-        </div>
-      )}
-
-      {/* 피드백 */}
-      {evalResult?.feedback && (
-        <div className="bg-warm-200 dark:bg-warm-700 rounded-2xl p-4 text-sm text-warm-800 dark:text-warm-200 leading-relaxed mb-5">{evalResult.feedback}</div>
-      )}
-
-      {/* 점수 분해도 */}
-      {scoreItems.length > 0 && (
-        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
-          {scoreItems.map((item, idx) => (
-            <div key={idx} className="mb-2.5 last:mb-0">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-warm-700 dark:text-warm-300 font-medium">{item.label}</span>
-                <span className="text-warm-500 dark:text-warm-400">{Math.round(item.value)} / {item.max}</span>
-              </div>
-              <div className="h-1.5 bg-warm-300 dark:bg-warm-600 rounded-full overflow-hidden">
-                <div className="h-full bg-terra-500 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 액션 */}
-      <div className="flex flex-col gap-2.5 mb-5">
-        <button onClick={() => { setSaveName(combo.name); setSaveModal(true) }}
-          className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
-          <Bookmark size={18} /> {t('recommend.save')}
-        </button>
-        <button onClick={() => { trackShare('native', 'recommend', finalScore); navigator.share?.({ title: t('ootdDetail.shareTitle'), text: combo?.name + ' ' + t('common.score', { score: finalScore }), url: 'https://barupick.vercel.app' }).catch(() => {}) }}
-          className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
-          <Share size={16} /> {t('recommend.share')}
-        </button>
-        <button onClick={() => { trackShare('community', 'recommend', finalScore); setJSON('_pending_post_outfit', combo.outfit); window.location.href = '/community/post' }}
-          className="w-full py-3 bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 rounded-2xl font-medium text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
-          <Users size={16} /> {t('recommend.communityShare')}
-        </button>
-      </div>
-
-      {/* 저장 모달 */}
-      {saveModal && (
-        <div className="fixed inset-0 z-[300] bg-black/50 flex items-center justify-center px-8" onClick={() => setSaveModal(false)}>
-          <div className="bg-white dark:bg-warm-800 rounded-2xl p-5 w-full max-w-sm shadow-warm-lg" onClick={e => e.stopPropagation()}>
-            <div className="text-lg font-bold text-warm-900 dark:text-warm-100 mb-3">{t('recommend.save')}</div>
-            <input type="text" value={saveName} onChange={e => setSaveName(e.target.value)} maxLength={30} autoFocus
-              placeholder={t('recommend.coordNamePlaceholder')}
-              className="w-full px-4 py-3 bg-warm-100 dark:bg-warm-700 border border-warm-400 dark:border-warm-600 rounded-xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 focus:outline-none focus:border-terra-400 mb-4" />
-            <div className="flex gap-2">
-              <button onClick={() => setSaveModal(false)} className="flex-1 py-2.5 bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-300 rounded-xl text-sm font-medium active:scale-[0.98]">{t('common.cancel')}</button>
-              <button onClick={handleSave} className="flex-1 py-2.5 bg-terra-500 text-white rounded-xl text-sm font-semibold active:scale-[0.98] shadow-terra">{t('common.save')}</button>
+          <div className="mt-1.5 px-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
+            {partKeys.map(k => <button key={k} onClick={() => setPinSlot(k)} className={`flex-none h-7 px-2.5 rounded-full text-[11px] font-semibold flex items-center gap-1 ${pinSlot === k ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300'}`}>{pinned[k] && <i className="w-2 h-2 rounded-full border border-white/60" style={{ background: COLORS_60[pinned[k]]?.hex }} />}{t('builder.slot.' + k)}</button>)}
+          </div>
+          <div className="mt-2.5 px-3 flex gap-3.5 overflow-x-auto [scrollbar-width:none]">
+            {COLOR_TABS.map(x => <button key={x.id} onClick={() => setTab(x.id)} className={`flex-none text-[12px] font-semibold pb-0.5 border-b-2 whitespace-nowrap ${tab === x.id ? 'text-warm-900 dark:text-warm-100 border-warm-900 dark:border-warm-100' : 'text-warm-500 border-transparent'}`}>{x.label}</button>)}
+          </div>
+          <div className="mt-2 px-2 overflow-x-auto [scrollbar-width:none]">
+            <div className="grid grid-flow-col gap-1.5" style={{ gridTemplateRows: 'repeat(2, 56px)', gridAutoColumns: '54px' }}>
+              {tabKeys.map(k => {
+                const c = COLORS_60[k]; if (!c) return null
+                const on = pinned[pinSlot] === k
+                return (
+                  <button key={k} onClick={() => { rec.togglePin(pinSlot, k); trackEvent('rec_pin', { slot: pinSlot, color: k, on: !on }) }} className="w-[54px] flex flex-col items-center gap-1 active:scale-95 transition-transform">
+                    <span className="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center" style={{ background: c.hex, boxShadow: on ? '0 0 0 2px #1C1917' : '0 0 0 1px rgba(28,25,23,.15)' }}>{on && <Check size={14} className={c.hcl[2] > 60 ? 'text-warm-900' : 'text-white'} />}</span>
+                    <span className={`text-[10px] leading-none max-w-[54px] truncate ${on ? 'font-semibold text-warm-900 dark:text-warm-100' : 'text-warm-500'}`}>{getColorName(k)}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
+          {pinned[pinSlot] && <div className="px-3 mt-1"><button onClick={() => rec.clearPin(pinSlot)} className="text-[11px] font-semibold text-warm-500">{t('recommend.pinClear')}</button></div>}
         </div>
       )}
 
-      {/* 색상 개선 */}
-      <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
-        <div className="flex items-center gap-1.5 text-sm font-bold text-warm-900 dark:text-warm-100 mb-1">
-          <Palette size={16} className="text-terra-500" /> {t('recommend.colorImprove')}
-        </div>
-        <div className="text-xs text-warm-600 dark:text-warm-400 mb-3">{t('recommend.tapToChangeColor')}</div>
-        <div className="flex gap-2 flex-wrap justify-center py-1 pb-2">
-          {Object.entries(currentOutfit).filter(([_, v]) => v).map(([cat, colorKey]) => {
-            const c = COLORS_60[colorKey as string]
-            if (!c) return null
-            const isEditing = editingPart === cat
-            return (
-              <button key={cat} onClick={() => setEditingPart(isEditing ? null : cat)}
-                className="flex flex-col items-center gap-1 flex-shrink-0">
-                <div className={`w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold active:scale-90 transition-transform border ${isEditing ? 'border-terra-500 border-2 ring-2 ring-terra-300' : 'border-warm-400/30'}`}
-                  style={{ background: c.hex }}>
-                  <span style={{ color: c.hcl[2] > 60 ? '#1C1917' : '#ffffff' }}>{getColorName(colorKey as string)}</span>
-                </div>
-                <div className={`text-[10px] whitespace-nowrap ${isEditing ? 'text-terra-600 dark:text-terra-400 font-semibold' : 'text-warm-700 dark:text-warm-300'}`}>
-                  {getPickedPartLabel(cat, rec.state.pickedItems, t)}
-                </div>
-              </button>
-            )
-          })}
-        </div>
-        {editingPart && (() => {
-          const scoredColors = Object.keys(COLORS_60)
-            .filter(k => k !== currentOutfit[editingPart])
-            .map(k => {
-              try {
-                const testOutfit = { ...currentOutfit, [editingPart]: k }
-                const pc = profile.getPersonalColor()
-                const newScore = evaluationSystem.evaluate(testOutfit, pc).total
-                return { key: k, delta: Math.round(newScore - finalScore) }
-              } catch { return { key: k, delta: 0 } }
-            })
-            .sort((a, b) => b.delta - a.delta)
-          const topColors = scoredColors.slice(0, 10)
-
+      {/* 카드 */}
+      <div className="px-4 mt-3 flex flex-col gap-2">
+        {list.map((combo, idx) => {
+          const o = combo.outfit
+          const keys = partKeys.filter(k => o[k] && COLORS_60[o[k]])
           return (
-          <div className="mt-2 animate-screen-fade">
-            <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 mb-2">
-              {t('recommend.colorChange', { part: getPickedPartLabel(editingPart, rec.state.pickedItems, t) })}
-            </div>
-
-            {/* 추천 색상 */}
-            {topColors.length > 0 && (
-              <>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500">{t('recommend.recommendedColors')}</div>
+            <button key={(combo as any).id || idx} onClick={() => tryOn(combo, idx)} className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-2.5 text-left active:scale-[0.98] transition-all">
+              <div className="flex-none w-[64px] flex justify-center"><CharacterCanvas {...sceneOf(s.plates, hexOf(o), s, sex)} width={60} /></div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[20px] font-extrabold text-warm-900 dark:text-warm-100 tabular-nums leading-none">{combo.score}</span><span className="text-[11px] text-warm-500">{t('builder.pt')}</span>
+                  {combo.tags?.[0] && <span className="ml-1 text-[10.5px] font-semibold text-warm-600 dark:text-warm-300 truncate">{combo.tags[0]}</span>}
                 </div>
-                <div className="grid grid-cols-5 gap-1.5 mb-3">
-                  {topColors.map(rec => {
-                    const c = COLORS_60[rec.key]
-                    if (!c) return null
-                    const light = c.hcl[2] > 55
-                    return (
-                      <button key={rec.key} onClick={() => {
-                          setEditedOutfit(prev => ({ ...(prev || combo.outfit), [editingPart]: rec.key }))
-                        }}
-                        className={`h-11 rounded-lg flex items-center justify-center text-[9px] font-semibold relative transition-all active:scale-90 ${
-                          currentOutfit[editingPart] === rec.key ? 'ring-2 ring-terra-500 ring-offset-1 scale-105' : ''
-                        }`}
-                        style={{ background: c.hex, color: light ? '#1C1917' : '#fff' }}>
-                        {getColorName(rec.key)}
-                        {rec.delta > 0 && <span className="absolute -top-1 -right-1 bg-green-100 text-green-600 text-[7px] font-bold px-1 rounded">+{rec.delta}</span>}
-                        {rec.delta < -1 && <span className="absolute -top-1 -right-1 bg-red-100 text-red-500 text-[7px] font-bold px-1 rounded">{rec.delta}</span>}
-                      </button>
-                    )
-                  })}
+                <div className="mt-1.5 flex gap-1.5 overflow-hidden">
+                  {keys.slice(0, 5).map(k => (
+                    <span key={k} className="flex flex-col items-center gap-0.5 w-[44px]">
+                      <i className="w-6 h-6 rounded-full border border-black/10" style={{ background: COLORS_60[o[k]].hex }} />
+                      <span className="text-[9.5px] text-warm-500 leading-none max-w-[44px] truncate">{getColorName(o[k])}</span>
+                    </span>
+                  ))}
                 </div>
-              </>
-            )}
-
-            <div className="text-[10px] font-semibold text-warm-400 dark:text-warm-500 mb-2">{topColors.length > 0 ? t('recommend.allColors') : t('recommend.colors')}</div>
-            <ColorPicker
-              inline
-              selected={currentOutfit[editingPart]}
-              onSelect={(k) => {
-                setEditedOutfit(prev => ({ ...(prev || combo.outfit), [editingPart]: k }))
-              }}
-              onClear={() => setEditingPart(null)}
-              ctx="recommend_edit"
-              slot={editingPart}
-              scoreDeltaFn={(k) => {
-                try {
-                  const testOutfit = { ...currentOutfit, [editingPart]: k }
-                  const pc = profile.getPersonalColor()
-                  const newScore = evaluationSystem.evaluate(testOutfit, pc).total
-                  return Math.round(newScore - finalScore)
-                } catch { return 0 }
-              }}
-            />
-            {editedOutfit && (
-              <div className="flex gap-2 mt-2">
-                <button onClick={() => { setEditedOutfit(null); setEditingPart(null) }}
-                  className="flex-1 py-2 text-[11px] text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-700 rounded-xl active:scale-[0.98]">{t('recommend.revert')}</button>
-                <button onClick={() => setEditingPart(null)}
-                  className="flex-1 py-2 text-[11px] text-white bg-terra-500 rounded-xl font-semibold active:scale-[0.98]">{t('recommend.apply')}</button>
               </div>
-            )}
-          </div>
+              <span className="flex-none text-[11px] font-bold text-terra-600 flex items-center gap-0.5">{t('recommend.tryOn')} <ArrowRight size={12} /></span>
+            </button>
           )
-        })()}
+        })}
+        {results.length === 0 && (
+          <div className="text-center py-16"><div className="text-3xl mb-3">🤔</div><div className="text-sm text-warm-600 dark:text-warm-400">{t('recommend.noResults')}</div></div>
+        )}
+        {results.length > 10 && (
+          <button onClick={() => setAll(!all)} className="w-full py-2.5 text-[12.5px] font-semibold text-warm-600 dark:text-warm-300 flex items-center justify-center gap-1">
+            {all ? <><ChevronUp size={14} /> {t('recommend.less')}</> : <><ChevronDown size={14} /> {t('recommend.more', { n: results.length - 10 })}</>}
+          </button>
+        )}
       </div>
-
-      {/* 뒤로 */}
-      <button onClick={handleBack}
-        className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm flex items-center justify-center gap-1.5 mb-12 active:scale-[0.98] transition-all">
-        <ArrowLeft size={16} /> {t('recommend.backToList')}
-      </button>
     </div>
   )
-}
-
-// ─── 헬퍼: outfit colorKey → hex 변환 ───
-function outfitToHex(outfit: Record<string, string>): Record<string, string> {
-  const hex: Record<string, string> = {}
-  Object.entries(outfit).forEach(([k, v]) => { if (v) hex[k] = COLORS_60[v]?.hex || v })
-  return hex
 }

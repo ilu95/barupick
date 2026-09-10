@@ -39,13 +39,16 @@ export default function BuildCoord() {
   // 계측: 단계 진입 (퍼널 기준선)
   useEffect(() => { trackBuildStep(build.step, { mode: build.state.mode, style: build.state.style }) }, [build.step])
 
-  // 취향 폭포(/home/taste)에서 고른 카드가 있으면 바로 2단계로
+  // 취향 폭포(/home/taste)·코디 추천(/home/recommend)에서 고른 코디가 있으면 바로 2단계로
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('sp_taste_pick'); if (!raw) return
-      sessionStorage.removeItem('sp_taste_pick')
-      build.applyOutfit(JSON.parse(raw))
-    } catch {}
+    for (const key of ['sp_taste_pick', 'sp_rec_pick']) {
+      try {
+        const raw = sessionStorage.getItem(key); if (!raw) continue
+        sessionStorage.removeItem(key)
+        build.applyOutfit(JSON.parse(raw))
+        return
+      } catch {}
+    }
   }, [])
 
   return (

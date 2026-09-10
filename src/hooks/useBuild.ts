@@ -271,6 +271,8 @@ export function useBuild(mode: BuildMode = 'coord') {
     layers: { itemId: string; plate: string; colorKey: string }[]
     bottom?: { plate: string; colorKey: string }
     shoes?: { plate: string; colorKey: string }
+    scarf?: { plate: string; colorKey: string } | null
+    hat?: { plate: string; colorKey: string } | null
     style?: string | null
     templateId?: string | null
     situ?: string | null
@@ -290,6 +292,10 @@ export function useBuild(mode: BuildMode = 'coord') {
         shoesColor: o.shoes?.colorKey ?? prev.shoesColor,
         bottomItem: o.bottom?.plate ?? null,
         shoesItem: o.shoes?.plate ?? null,
+        scarfColor: o.scarf ? o.scarf.colorKey : prev.scarfColor,
+        scarfItem: o.scarf ? o.scarf.plate : prev.scarfItem,
+        hatColor: o.hat ? o.hat.colorKey : prev.hatColor,
+        hatItem: o.hat ? o.hat.plate : prev.hatItem,
         templateId: o.templateId ?? null,
         situ: o.situ ?? prev.situ ?? null,
       }

@@ -179,7 +179,7 @@ export default function Home() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-display text-lg font-bold text-terra-700 tracking-tight">{t('home.mainCta.recommend')}</div>
-            <div className="text-sm text-warm-600 mt-0.5">{t('recommend.resultSubtitle')}</div>
+            <div className="text-sm text-warm-600 mt-0.5">{t('home.mainCta.recommendSub')}</div>
           </div>
           <ChevronRight size={18} className="text-terra-600 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
         </button>
@@ -191,7 +191,7 @@ export default function Home() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[15px] font-semibold text-warm-900 tracking-tight">{t('home.mainCta.build')}</div>
-            <div className="text-xs text-warm-600 mt-0.5">{t('recommend.resultSubtitle')}</div>
+            <div className="text-xs text-warm-600 mt-0.5">{t('home.mainCta.buildSub')}</div>
           </div>
           <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
         </button>
