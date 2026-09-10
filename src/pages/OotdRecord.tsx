@@ -1,555 +1,223 @@
 // @ts-nocheck
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, Camera, Lock, Users, Globe, X, Pencil, Plus } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import ColorPicker from '@/components/ui/ColorPicker'
+import { useTranslation } from 'react-i18next'
+import { Check, Camera, Lock, Users, Globe, Pencil, ArrowLeft } from 'lucide-react'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import StepBuilderV2 from '@/pages/build/StepBuilderV2'
 import ImageEditor from '@/components/ui/ImageEditor'
 import CropOverlay from '@/components/ui/CropOverlay'
-import { COLORS_60, getColorName } from '@/lib/colors'
-import { ITEMS_CATALOG } from '@/lib/styles'
+import { useBuild } from '@/hooks/useBuild'
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
+import { charSceneFromState, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT } from '@/lib/char/map'
+import { garmentsOf, commitCloset } from '@/lib/closetAuto'
+import { isEasy } from '@/lib/mode'
 import { trackOotdRecord } from '@/lib/analytics'
-import { useTranslation } from 'react-i18next'
+import { COLORS_60, getColorName } from '@/lib/colors'
 
-function itemToSlot(itemId: string): string | null {
-  const item = ITEMS_CATALOG.find(i => i.id === itemId)
-  if (!item) return null
-  if (item.outerType) return 'outer'
-  if (item.midType) return 'middleware'
-  if (item.slot === 'scarf') return 'scarf'
-  if (item.slot === 'hat') return 'hat'
-  return 'top'
-}
-
-function slotToDefaultItem(slot: string): string | null {
-  if (slot === 'outer') return 'jacket'
-  if (slot === 'middleware') return 'knit'
-  if (slot === 'scarf') return 'scarf'
-  if (slot === 'hat') return 'hat'
-  if (slot === 'top') return 'tshirt'
-  return null
-}
+// ═══════════════════════════════════════════════════════
+// 기록 — 새 디자인. 옷 입히기는 만들기 2단계(캐릭터 + 레일)를 그대로 쓰고,
+// "기록하기"를 누르면 마무리(사진·상황·기분·공개)만 한 장 더. 오늘 저장한 코디가 있으면
+// 한 번 탭으로 그대로 불러온다. 기록한 옷은 옷장에 담긴다(입었으니 가진 옷).
+// ═══════════════════════════════════════════════════════
 
 const SITUATION_KEYS = ['commute', 'date', 'casual', 'interview', 'travel', 'exercise'] as const
-const MOOD_KEYS = [
-  { emoji: '😊', key: 'satisfied' },
-  { emoji: '😐', key: 'okay' },
-  { emoji: '😕', key: 'regret' },
-] as const
-
-// 어떤 패널이 열려있는지
-type OpenPanel = null | 'clothes' | 'accessory' | 'bottom' | 'shoes'
+const MOOD_KEYS = [{ emoji: '😊', key: 'satisfied' }, { emoji: '😐', key: 'okay' }, { emoji: '😕', key: 'regret' }] as const
+const DEF_ITEM: Record<string, string> = { outer: 'jacket', middleware: 'knit', top: 'tshirt', inner: 'tshirt' }
 
 export default function OotdRecord() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { profile } = useAuth()
   const ootd = useOotd()
-
-  // 편집 모드 로드
-  useEffect(() => {
-    const editData = localStorage.getItem("_ootd_edit")
-    if (editData) {
-      try {
-        const rec = JSON.parse(editData)
-        ootd.startEdit(rec)
-        localStorage.removeItem("_ootd_edit")
-        const restored: string[] = []
-        Object.entries(rec.colors || {}).forEach(([slot, v]) => {
-          if (v && slot !== 'bottom' && slot !== 'shoes') {
-            const defItem = slotToDefaultItem(slot)
-            if (defItem) restored.push(defItem)
-          }
-        })
-        if (restored.length > 0) setPickedItems(restored)
-      } catch {}
-    }
-  }, [])
-
-  const [saved, setSaved] = useState(false)
+  const build = useBuild('coord')
+  const easy = isEasy()
+  const [stage, setStage] = useState<'dress' | 'finish' | 'saved'>('dress')
   const [saveError, setSaveError] = useState('')
   const [customSit, setCustomSit] = useState(false)
   const [editingPhotoIdx, setEditingPhotoIdx] = useState<number | null>(null)
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // 아이템 상태
-  const [pickedItems, setPickedItems] = useState<string[]>([])
-  const [openPanel, setOpenPanel] = useState<OpenPanel>(null)
-  const [pendingItem, setPendingItem] = useState<string | null>(null) // 아이템 선택 후 컬러 대기
+  // 오늘 저장한 코디 (결과 화면 "코디 저장"). 한 번 탭으로 그대로
+  const quick = useMemo(() => {
+    try {
+      const today = new Date().toDateString()
+      return (JSON.parse(localStorage.getItem('cs_saved') || '[]') as any[]).filter(x => x && x.pick && x.scene && new Date(x.createdAt).toDateString() === today).slice(0, 3)
+    } catch { return [] }
+  }, [])
 
-  // 슬롯 계산
-  const usedSlots = new Map<string, string>()
-  pickedItems.forEach(id => {
-    const slot = itemToSlot(id)
-    if (slot) usedSlots.set(slot, id)
-  })
-
-  // 마네킹 hex
-  const outfitHex: Record<string, string> = {}
-  const allSlots = [...Array.from(usedSlots.keys()), 'bottom', 'shoes']
-  allSlots.forEach(s => {
-    const ck = ootd.colors[s]
-    if (ck) { const c = COLORS_60[ck]; if (c) outfitHex[s] = c.hex }
-  })
-
-  // 옷 추가 → 아이템 선택
-  const handleItemSelect = (itemId: string) => {
-    const slot = itemToSlot(itemId)
-    if (!slot) return
-    // 같은 슬롯 기존 아이템 교체
-    setPickedItems(prev => {
-      const without = prev.filter(id => itemToSlot(id) !== slot)
-      return [...without, itemId]
-    })
-    // slot→itemId 매핑 저장
-    ootd.setItemTypes((prev: Record<string, string>) => ({ ...prev, [slot]: itemId }))
-    setPendingItem(itemId)
-  }
-
-  // 컬러 선택 완료 → 패널 닫기
-  const handleColorDone = (slot: string, colorKey: string) => {
-    ootd.selectColor(slot, colorKey)
-    setOpenPanel(null)
-    setPendingItem(null)
-  }
-
-  // 칩 제거
-  const removeItem = (itemId: string) => {
-    const slot = itemToSlot(itemId)
-    if (slot) {
-      ootd.clearColor(slot)
-      ootd.setItemTypes((prev: Record<string, string>) => {
-        const next = { ...prev }
-        delete next[slot]
-        return next
+  // 편집 모드: 기록의 색·옷 종류를 캐릭터에 올린다
+  useEffect(() => {
+    const editData = localStorage.getItem('_ootd_edit')
+    if (!editData) return
+    try {
+      const rec = JSON.parse(editData)
+      ootd.startEdit(rec)
+      localStorage.removeItem('_ootd_edit')
+      const c = rec.colors || {}, it = rec.itemTypes || {}
+      const layers = ['outer', 'middleware', 'top'].filter(s => c[s]).map(s => ({ itemId: it[s] || DEF_ITEM[s], plate: it[s] && it[s].includes('_') ? it[s] : undefined, colorKey: c[s] }))
+      build.applyOutfit({
+        layers,
+        bottom: c.bottom ? { plate: it.bottom && it.bottom.includes('_') ? it.bottom : DEFAULT_BOTTOM, colorKey: c.bottom } : undefined,
+        shoes: c.shoes ? { plate: it.shoes && it.shoes.includes('_') ? it.shoes : DEFAULT_SHOE, colorKey: c.shoes } : undefined,
+        scarf: c.scarf ? { plate: DEFAULT_SCARF, colorKey: c.scarf } : null,
+        hat: c.hat ? { plate: DEFAULT_HAT, colorKey: c.hat } : null,
       })
-    }
-    setPickedItems(prev => prev.filter(id => id !== itemId))
-  }
-  const removeFixed = (slot: string) => {
-    ootd.clearColor(slot)
-  }
+    } catch {}
+  }, [])
 
-  // 칩 탭 → 컬러 변경
-  const editChipColor = (slot: string, panel: OpenPanel) => {
-    setOpenPanel(panel)
-    setPendingItem(null) // 이미 아이템은 있으니 바로 컬러 피커
-  }
+  const garments = useMemo(() => garmentsOf(build.state), [build.state])
+  const scene = useMemo(() => charSceneFromState(build.state), [build.state])
+  const score = build.getScore()
+  const canSave = build.isComplete
 
   const handleSave = () => {
-    if (!ootd.canSave) {
-      setSaveError(t('ootdRecord.selectAllRequired'))
-      setTimeout(() => setSaveError(''), 2000)
-      return
-    }
-    if (ootd.needsPhoto) {
-      setSaveError(t('ootdRecord.photoRequiredPublic'))
-      setTimeout(() => setSaveError(''), 2000)
-      return
-    }
+    if (!canSave) { setSaveError(t('ootdRecord.selectAllRequired')); setTimeout(() => setSaveError(''), 2000); return }
+    if (ootd.needsPhoto) { setSaveError(t('ootdRecord.photoRequiredPublic')); setTimeout(() => setSaveError(''), 2000); return }
+    const colors: Record<string, string | null> = { top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null }
+    const itemTypes: Record<string, string> = {}
+    for (const g of garments) { const slot = g.slot === 'inner' ? 'top' : g.slot; if (!colors[slot]) { colors[slot] = g.colorKey; itemTypes[slot] = g.plate } }
     try {
-      const ok = ootd.saveRecord()
+      const ok = ootd.saveRecord({ colors, itemTypes, score })
       if (ok) {
+        commitCloset(garments, new Set(), 'record')   // 입었으니 가진 옷
         trackOotdRecord(ootd.photos.length > 0, ootd.visibility)
-        setSaved(true)
-        setTimeout(() => {
-          setSaved(false)
-          ootd.resetForm()
-          setPickedItems([])
-          setOpenPanel(null)
-          setPendingItem(null)
-          navigate('/closet')
-        }, 1500)
-      } else {
-        setSaveError(t('ootdRecord.saveFailed'))
-        setTimeout(() => setSaveError(''), 2000)
-      }
+        setStage('saved')
+        setTimeout(() => { ootd.resetForm(); navigate('/closet') }, 1500)
+      } else { setSaveError(t('ootdRecord.saveFailed')); setTimeout(() => setSaveError(''), 2000) }
     } catch (e: any) {
-      setSaveError(e?.name === 'StorageQuotaError' ? t('ootdRecord.storageFull') : t('ootdRecord.saveError'))
-      setTimeout(() => setSaveError(''), 3500)
+      setSaveError(e?.name === 'StorageQuotaError' ? t('ootdRecord.storageFull') : t('ootdRecord.saveError')); setTimeout(() => setSaveError(''), 3500)
     }
   }
-
   const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => { if (typeof reader.result === 'string') setCropSrc(reader.result) }
-    reader.readAsDataURL(file)
-    e.target.value = ''
+    const file = e.target.files?.[0]; if (!file) return
+    const reader = new FileReader(); reader.onload = () => { if (typeof reader.result === 'string') setCropSrc(reader.result) }; reader.readAsDataURL(file); e.target.value = ''
   }
 
-  // 저장 완료
-  if (saved) {
+  if (stage === 'saved') {
     let streakMsg = ''
-    try {
-      const records = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-      if (records.length >= 3) streakMsg = t('ootdRecord.streakMessage', { count: records.length })
-    } catch {}
+    try { const records = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]'); if (records.length >= 3) streakMsg = t('ootdRecord.streakMessage', { count: records.length }) } catch {}
     return (
       <div className="animate-screen-fade flex items-center justify-center py-28">
-        <div className="text-center relative">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden -top-8">
-            {['✨', '🎉', '⭐', '💫'].map((emoji, i) => (
-              <span key={i} className="absolute text-xl animate-confetti"
-                style={{ left: `${10 + i * 22}%`, animationDelay: `${i * 0.2}s`, animationDuration: `${1.3 + i * 0.15}s` }}>{emoji}</span>
-            ))}
-          </div>
-          <div className="w-20 h-20 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-4 animate-score-count">
-            <Check size={36} className="text-sage" />
-          </div>
-          <div className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 mb-1">{t('ootdRecord.saveComplete')}</div>
-          <div className="text-sm text-warm-600 dark:text-warm-400">{t('ootdRecord.savedMessage')}</div>
-          {streakMsg && (
-            <div className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-terra-50 border border-terra-200 rounded-full text-[13px] font-semibold text-terra-600 animate-pop-in">{streakMsg}</div>
-          )}
+        <div className="text-center">
+          <div className="flex justify-center mb-3"><CharacterCanvas {...scene} width={140} /></div>
+          <div className="w-14 h-14 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-3"><Check size={26} className="text-sage" /></div>
+          <div className="font-display text-xl font-bold text-warm-900 dark:text-warm-100">{t('ootdRecord.saveComplete')}</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400 mt-1">{streakMsg || t('ootdRecord.savedMessage')}</div>
         </div>
       </div>
     )
   }
 
-  const isReady = ootd.canSave
+  if (stage === 'dress') {
+    return (
+      <div className="px-5 py-4">
+        {quick.length > 0 && build.state.upper.length === 0 && (
+          <div className="-mx-5 px-4 pt-2 pb-1">
+            <div className="text-[11px] font-bold text-warm-500 mb-1.5">{t('ootdRecord.quickToday')}</div>
+            <div className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
+              {quick.map((x: any) => (
+                <button key={x.id} onClick={() => { build.applyOutfit({ ...x.pick, goto: 'builder' }) }} className="flex-none w-[96px] bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-1.5 active:scale-[0.97]">
+                  <div className="flex justify-center"><CharacterCanvas {...x.scene} width={72} /></div>
+                  <div className="text-[10.5px] font-bold text-warm-900 dark:text-warm-100 truncate">{x.name}</div>
+                  <div className="text-[10px] text-warm-500">{x.score}{t('builder.pt')}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <StepBuilderV2 build={build} easy={easy} onBack={() => navigate('/closet')} onDone={() => setStage('finish')} doneLabel={t('ootdRecord.next')} title={t('ootdRecord.whatDidYouWear')} />
+      </div>
+    )
+  }
 
+  const chip = (on: boolean) => `px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${on ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'}`
   return (
-    <div className="animate-screen-fade px-5 pt-2 pb-10">
-
-      {/* 마네킹 */}
-      {ootd.filledCount > 0 && (
-        <div className="flex justify-center mb-3">
-          <MannequinSVG outfit={outfitHex} size={90} />
-        </div>
-      )}
-
-      {/* 날씨 */}
-      {ootd.weatherData && (
-        <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl text-sm">
-          <span>{ootd.weatherData.code === 0 ? '☀️' : ootd.weatherData.code <= 3 ? '⛅' : ootd.weatherData.code <= 67 ? '🌧️' : '❄️'}</span>
-          <span className="text-warm-800 dark:text-warm-200">{ootd.weatherData.temp}°C</span>
-          <span className="text-warm-500 text-xs">{t('weather.feelsLike', { temp: ootd.weatherData.feels })}</span>
-        </div>
-      )}
-
-      {/* ═══ 1) 4버튼 1줄 ═══ */}
-      <div className="text-[11px] font-semibold text-warm-600 dark:text-warm-400 tracking-wider uppercase mb-2">{t('ootdRecord.whatDidYouWear')}</div>
-      <div className="grid grid-cols-4 gap-2 mb-3">
-        <button onClick={() => { setOpenPanel(openPanel === 'clothes' ? null : 'clothes'); setPendingItem(null) }}
-          className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[10px] font-semibold transition-all active:scale-95 ${
-            openPanel === 'clothes' ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'
-          }`}>
-          <Plus size={14} />{t('ootdRecord.addClothes')}
-        </button>
-        <button onClick={() => { setOpenPanel(openPanel === 'accessory' ? null : 'accessory'); setPendingItem(null) }}
-          className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[10px] font-semibold transition-all active:scale-95 ${
-            openPanel === 'accessory' ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'
-          }`}>
-          {t('ootdRecord.accessoryBtn')}
-        </button>
-        <button onClick={() => { setOpenPanel(openPanel === 'bottom' ? null : 'bottom'); setPendingItem(null) }}
-          className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[10px] font-semibold transition-all active:scale-95 ${
-            openPanel === 'bottom' ? 'bg-terra-500 text-white' : ootd.colors.bottom
-              ? 'bg-terra-50 dark:bg-terra-900/20 border border-terra-300 text-terra-700 dark:text-terra-400'
-              : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'
-          }`}>
-          {t('ootdRecord.bottomBtn')}
-        </button>
-        <button onClick={() => { setOpenPanel(openPanel === 'shoes' ? null : 'shoes'); setPendingItem(null) }}
-          className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[10px] font-semibold transition-all active:scale-95 ${
-            openPanel === 'shoes' ? 'bg-terra-500 text-white' : ootd.colors.shoes
-              ? 'bg-terra-50 dark:bg-terra-900/20 border border-terra-300 text-terra-700 dark:text-terra-400'
-              : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'
-          }`}>
-          {t('ootdRecord.shoesBtn')}
-        </button>
+    <div className="animate-screen-fade px-5 py-4 pb-10">
+      <div className="flex items-center gap-2 mb-3">
+        <button onClick={() => setStage('dress')} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>
+        <div className="font-display text-[17px] font-bold text-warm-900 dark:text-warm-100">{t('ootdRecord.finishTitle')}</div>
       </div>
 
-      {/* ═══ 패널: 옷 추가 (아이템→컬러) ═══ */}
-      {openPanel === 'clothes' && !pendingItem && (
-        <div className="mb-3 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
-          <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('ootdRecord.whatClothes')}</div>
-          <div className="grid grid-cols-4 gap-1.5">
-            {ITEMS_CATALOG.filter(i => !i.slot).map(item => {
-              const selected = pickedItems.includes(item.id)
-              const slot = itemToSlot(item.id)
-              const slotTaken = slot && usedSlots.has(slot) && !selected
-              return (
-                <button key={item.id} onClick={() => handleItemSelect(item.id)}
-                  className={`flex flex-col items-center gap-0.5 py-2 rounded-xl text-center transition-all active:scale-93 ${
-                    selected ? 'bg-terra-100 dark:bg-terra-900/30 border-[1.5px] border-terra-400'
-                    : slotTaken ? 'bg-warm-100 dark:bg-warm-700 border border-warm-200 opacity-40'
-                    : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
-                  }`}>
-                  <span className="text-lg">{item.emoji}</span>
-                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
-                </button>
-              )
-            })}
-          </div>
+      {/* 오늘의 코디 요약 */}
+      <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl p-3 mb-3 grid grid-cols-[88px_1fr] gap-3 items-center">
+        <div className="flex justify-center"><CharacterCanvas {...scene} width={84} /></div>
+        <div className="min-w-0">
+          <div className="text-[13px] font-extrabold text-warm-900 dark:text-warm-100 leading-tight truncate">{garments.map(g => g.name).join(' · ')}</div>
+          <div className="flex flex-wrap gap-1 mt-1.5">{garments.map(g => <span key={g.slot} className="flex items-center gap-1 text-[10.5px] text-warm-600 dark:text-warm-300"><i className="w-3 h-3 rounded-full border border-black/10" style={{ background: COLORS_60[g.colorKey]?.hex }} />{getColorName(g.colorKey)}</span>)}</div>
+          <div className="text-[12px] font-bold text-warm-800 dark:text-warm-200 mt-1.5">{score}{t('builder.pt')}{ootd.weatherData ? ` · ${ootd.weatherData.temp}°` : ''}</div>
         </div>
-      )}
-
-      {/* 패널: 옷 추가 (컬러 선택 단계) */}
-      {openPanel === 'clothes' && pendingItem && (
-        <div className="mb-3 animate-screen-fade">
-          <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">
-            {t('ootdRecord.selectColorFor', { item: t('categories:itemsCatalog.' + pendingItem) })}
-          </div>
-          <ColorPicker
-            inline
-            selected={null}
-            onSelect={(k) => { const slot = itemToSlot(pendingItem); if (slot) handleColorDone(slot, k) }}
-          />
-        </div>
-      )}
-
-      {/* 패널: 악세서리 (아이템→컬러) */}
-      {openPanel === 'accessory' && !pendingItem && (
-        <div className="mb-3 bg-warm-50 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 animate-screen-fade">
-          <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('ootdRecord.accessoryLabel')}</div>
-          <div className="grid grid-cols-4 gap-1.5">
-            {ITEMS_CATALOG.filter(i => i.slot).map(item => {
-              const selected = pickedItems.includes(item.id)
-              return (
-                <button key={item.id} onClick={() => handleItemSelect(item.id)}
-                  className={`flex flex-col items-center gap-0.5 py-2 rounded-xl text-center transition-all active:scale-93 ${
-                    selected ? 'bg-terra-100 dark:bg-terra-900/30 border-[1.5px] border-terra-400'
-                    : 'bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600'
-                  }`}>
-                  <span className="text-lg">{item.emoji}</span>
-                  <span className="text-[9px] font-semibold text-warm-700 dark:text-warm-300">{t('categories:itemsCatalog.' + item.id)}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 패널: 악세서리 컬러 */}
-      {openPanel === 'accessory' && pendingItem && (
-        <div className="mb-3 animate-screen-fade">
-          <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">
-            {t('ootdRecord.colorOf', { item: t('categories:itemsCatalog.' + pendingItem) })}
-          </div>
-          <ColorPicker inline selected={null}
-            onSelect={(k) => { const slot = itemToSlot(pendingItem); if (slot) handleColorDone(slot, k) }} />
-        </div>
-      )}
-
-      {/* 패널: 하의 컬러 */}
-      {openPanel === 'bottom' && (
-        <div className="mb-3 animate-screen-fade">
-          <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('ootdRecord.bottomColor')}</div>
-          <ColorPicker inline selected={ootd.colors.bottom}
-            onSelect={(k) => handleColorDone('bottom', k)} />
-        </div>
-      )}
-
-      {/* 패널: 신발 컬러 */}
-      {openPanel === 'shoes' && (
-        <div className="mb-3 animate-screen-fade">
-          <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 mb-2">{t('ootdRecord.shoesColor')}</div>
-          <ColorPicker inline selected={ootd.colors.shoes}
-            onSelect={(k) => handleColorDone('shoes', k)} />
-        </div>
-      )}
-
-      {/* ═══ 추가된 아이템 칩 ═══ */}
-      {(pickedItems.length > 0 || ootd.colors.bottom || ootd.colors.shoes) && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {/* 의류/악세서리 칩 */}
-          {pickedItems.map(id => {
-            const item = ITEMS_CATALOG.find(i => i.id === id)
-            const slot = itemToSlot(id)
-            const colorKey = slot ? ootd.colors[slot] : null
-            const color = colorKey ? COLORS_60[colorKey] : null
-            if (!item) return null
-            return (
-              <div key={id} className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
-                {color && <span className="w-4 h-4 rounded border border-warm-200" style={{ background: color.hex }} />}
-                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">
-                  {t('categories:itemsCatalog.' + id)}{colorKey ? ` ${getColorName(colorKey)}` : ''}
-                </span>
-                {!color && <button onClick={() => { setOpenPanel('clothes'); setPendingItem(id) }}
-                  className="text-[9px] text-terra-500 font-bold">{t('ootdRecord.color')}</button>}
-                <button onClick={() => removeItem(id)} className="ml-0.5 text-warm-400 dark:text-warm-500"><X size={10} /></button>
-              </div>
-            )
-          })}
-
-          {/* 하의 칩 */}
-          {ootd.colors.bottom && (() => {
-            const c = COLORS_60[ootd.colors.bottom]
-            return c ? (
-              <div className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
-                <span className="w-4 h-4 rounded border border-warm-200" style={{ background: c.hex }} />
-                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('ootdRecord.bottom')} {getColorName(ootd.colors.bottom)}</span>
-                <button onClick={() => removeFixed('bottom')} className="ml-0.5 text-warm-400"><X size={10} /></button>
-              </div>
-            ) : null
-          })()}
-
-          {/* 신발 칩 */}
-          {ootd.colors.shoes && (() => {
-            const c = COLORS_60[ootd.colors.shoes]
-            return c ? (
-              <div className="flex items-center gap-1 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-lg px-2 py-1.5">
-                <span className="w-4 h-4 rounded border border-warm-200" style={{ background: c.hex }} />
-                <span className="text-[10px] font-semibold text-warm-700 dark:text-warm-300">{t('ootdRecord.shoes')} {getColorName(ootd.colors.shoes)}</span>
-                <button onClick={() => removeFixed('shoes')} className="ml-0.5 text-warm-400"><X size={10} /></button>
-              </div>
-            ) : null
-          })()}
-        </div>
-      )}
-
-      {/* 안내 */}
-      {!isReady && (
-        <div className="mb-4 text-center text-[12px] text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-800 rounded-xl py-3">
-          {ootd.filledCount === 0
-            ? t('ootdRecord.guideSelectClothesAndColor')
-            : !ootd.colors.bottom && !ootd.colors.shoes
-              ? t('ootdRecord.guideSelectBottomAndShoes')
-              : !ootd.colors.bottom
-                ? t('ootdRecord.guideSelectBottom')
-                : !ootd.colors.shoes
-                  ? t('ootdRecord.guideSelectShoes')
-                  : t('ootdRecord.guideAddClothes')}
-        </div>
-      )}
-
-      {/* ═══ 2) 항상 열린 옵션들 — 압축 레이아웃 ═══ */}
+      </div>
 
       {/* 사진 */}
       <div className="mb-3">
-        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">
-          📷 {t('common.photo')} {ootd.visibility === 'public' && <span className="text-red-500 normal-case tracking-normal">{t('ootdRecord.photoPublicRequired')}</span>}
-          {ootd.photos.length > 0 && <span className="ml-auto text-warm-400 normal-case tracking-normal">{ootd.photos.length}/4</span>}
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-warm-500 mb-1.5">
+          📷 {t('common.photo')} {ootd.visibility === 'public' && <span className="text-red-500 font-medium">{t('ootdRecord.photoPublicRequired')}</span>}
+          {ootd.photos.length > 0 && <span className="ml-auto text-warm-400 font-medium">{ootd.photos.length}/4</span>}
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
           {ootd.photos.map((photo, idx) => (
-            <div key={idx} className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 relative">
+            <div key={idx} className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 relative">
               <img src={photo} className="w-full h-full object-cover" alt="" />
-              <button onClick={() => setEditingPhotoIdx(idx)}
-                className="absolute bottom-0.5 left-0.5 w-4 h-4 rounded-full bg-black/50 text-white flex items-center justify-center">
-                <Pencil size={7} />
-              </button>
-              <button onClick={() => ootd.removePhoto(idx)}
-                className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 text-white text-[8px] flex items-center justify-center">✕</button>
+              <button onClick={() => setEditingPhotoIdx(idx)} className="absolute bottom-0.5 left-0.5 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center"><Pencil size={8} /></button>
+              <button onClick={() => ootd.removePhoto(idx)} className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/50 text-white text-[9px] flex items-center justify-center">✕</button>
             </div>
           ))}
           {ootd.photos.length < 4 && (
-            <label className="w-14 h-14 rounded-xl border-2 border-dashed border-warm-400 dark:border-warm-600 flex flex-col items-center justify-center cursor-pointer flex-shrink-0 active:scale-95 bg-warm-100 dark:bg-warm-800">
-              <Camera size={16} className="text-warm-500" />
+            <label className="w-16 h-16 rounded-xl border-2 border-dashed border-warm-400 dark:border-warm-600 flex flex-col items-center justify-center cursor-pointer flex-shrink-0 active:scale-95 bg-warm-100 dark:bg-warm-800">
+              <Camera size={18} className="text-warm-500" />
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoAdd} />
             </label>
           )}
         </div>
       </div>
 
-      {/* 메모 */}
+      {/* 상황 */}
       <div className="mb-3">
-        <input type="text" placeholder={`💬 ${t('ootdRecord.memoPlaceholder')}`} maxLength={100}
-          value={ootd.memo} onChange={e => ootd.setMemo(e.target.value)}
-          className="w-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl px-3 py-2.5 text-xs text-warm-900 dark:text-warm-100 placeholder-warm-400 outline-none focus:border-terra-400 transition-all" />
+        <div className="text-[11px] font-bold text-warm-500 mb-1.5">{t('ootdRecord.situationLabel')}</div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-5 px-5 [scrollbar-width:none]">
+          {SITUATION_KEYS.map(key => <button key={key} onClick={() => { setCustomSit(false); ootd.setSituation(ootd.situation === key ? null : key) }} className={chip(ootd.situation === key)}>{t(`ootdRecord.situations.${key}`)}</button>)}
+          <button onClick={() => { setCustomSit(true); ootd.setSituation('') }} className={chip(customSit)}>{t('ootdRecord.customInput')}</button>
+        </div>
+        {customSit && <input type="text" placeholder={t('ootdRecord.customPlaceholder')} maxLength={20} value={ootd.situation || ''} onChange={e => ootd.setSituation(e.target.value)} className="mt-2 w-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl px-3 py-2.5 text-[13px] text-warm-900 dark:text-warm-100 outline-none focus:border-terra-400" />}
       </div>
 
-      {/* 상황 — 가로 스크롤 1줄 */}
-      <div className="mb-3">
-        <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">{t('ootdRecord.situationLabel')}</div>
-        <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1">
-          {SITUATION_KEYS.map(key => {
-            const label = t(`ootdRecord.situations.${key}`)
-            return (
-            <button key={key} onClick={() => { setCustomSit(false); ootd.setSituation(ootd.situation === key ? null : key) }}
-              className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                ootd.situation === key ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-              }`}>{label}</button>
-            )
-          })}
-          <button onClick={() => { setCustomSit(!customSit); ootd.setSituation(null) }}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-              customSit ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-            }`}>{t('ootdRecord.customInput')}</button>
+      {/* 기분 · 공개 */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <div className="text-[11px] font-bold text-warm-500 mb-1.5">{t('ootdRecord.moodLabel')}</div>
+          <div className="flex gap-1.5">{MOOD_KEYS.map(m => <button key={m.key} onClick={() => ootd.setMood(ootd.mood === m.key ? null : m.key)} className={chip(ootd.mood === m.key)}>{m.emoji}</button>)}</div>
         </div>
-        {customSit && (
-          <input autoFocus type="text" placeholder={t('ootdRecord.customPlaceholder')} maxLength={20}
-            className="w-full mt-1.5 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl px-3 py-2 text-xs text-warm-900 dark:text-warm-100 placeholder-warm-400 outline-none focus:border-terra-400"
-            onChange={e => ootd.setSituation(e.target.value || null)} />
-        )}
-      </div>
-
-      {/* 기분 — 1줄 */}
-      <div className="mb-3">
-        <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">{t('ootdRecord.moodLabel')}</div>
-        <div className="flex gap-1.5">
-          {MOOD_KEYS.map(m => {
-            const text = t(`ootdRecord.moods.${m.key}`)
-            const displayVal = m.emoji + ' ' + text
-            return (
-              <button key={m.key} onClick={() => ootd.setMood(ootd.mood === m.key ? null : m.key)}
-                className={`flex-1 py-2 rounded-xl text-[11px] font-medium text-center transition-all ${
-                  ootd.mood === m.key ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-                }`}>{displayVal}</button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* 공개 범위 — 1줄 */}
-      <div className="mb-4">
-        <div className="text-[10px] font-semibold text-warm-500 dark:text-warm-400 tracking-wider uppercase mb-1.5">{t('ootdRecord.visibilityLabel')}</div>
-        <div className="flex gap-1.5">
-          {[
-            { key: 'private', icon: <Lock size={11} />, label: t('ootdRecord.visibility.private') },
-            { key: 'friends', icon: <Users size={11} />, label: t('ootdRecord.visibility.friends') },
-            { key: 'public', icon: <Globe size={11} />, label: t('ootdRecord.visibility.public') },
-          ].map(v => (
-            <button key={v.key} onClick={() => ootd.setVisibility(v.key as any)}
-              className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all ${
-                ootd.visibility === v.key ? 'bg-terra-500 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
-              }`}>{v.icon} {v.label}</button>
-          ))}
-        </div>
-        {ootd.visibility === 'public' && (
-          <div className="mt-1.5 text-[10px] text-green-600 dark:text-green-400">{t('ootdRecord.publicNotice')}</div>
-        )}
-        {(ootd.visibility === 'public' || ootd.visibility === 'friends') && profile?.instagram_id && (
-          <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-xl px-3 py-2 mt-1.5">
-            <div className="text-[11px] font-medium text-warm-800 dark:text-warm-200">📸 @{profile.instagram_id}</div>
-            <button onClick={() => ootd.setShowInstagram(!ootd.showInstagram)}
-              className={`w-10 h-5 rounded-full transition-all ${ootd.showInstagram ? 'bg-terra-500' : 'bg-warm-400'}`}>
-              <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${ootd.showInstagram ? 'translate-x-5' : 'translate-x-0.5'}`} />
-            </button>
+        <div>
+          <div className="text-[11px] font-bold text-warm-500 mb-1.5">{t('ootdRecord.visibilityLabel')}</div>
+          <div className="flex gap-1.5">
+            {[{ key: 'private', icon: <Lock size={11} /> }, { key: 'friends', icon: <Users size={11} /> }, { key: 'public', icon: <Globe size={11} /> }].map(v => (
+              <button key={v.key} onClick={() => ootd.setVisibility(v.key as any)} className={chip(ootd.visibility === v.key) + ' flex items-center gap-1'}>{v.icon}{t('ootdRecord.visibility.' + v.key)}</button>
+            ))}
           </div>
-        )}
+        </div>
       </div>
-
-      {/* 이미지 편집기 */}
-      {editingPhotoIdx !== null && ootd.photos[editingPhotoIdx] && (
-        <ImageEditor src={ootd.photos[editingPhotoIdx]}
-          onSave={(dataUrl) => { ootd.replacePhoto(editingPhotoIdx, dataUrl); setEditingPhotoIdx(null) }}
-          onCancel={() => setEditingPhotoIdx(null)} />
-      )}
-      {cropSrc && <CropOverlay src={cropSrc} ratio={4/5} onDone={(url) => { ootd.addPhoto(url); setCropSrc(null) }} onCancel={() => setCropSrc(null)} />}
-
-      {/* 에러 */}
-      {saveError && (
-        <div className="mb-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-3.5 py-2.5 animate-screen-fade">
-          <div className="text-xs font-semibold text-red-700 dark:text-red-400">{saveError}</div>
+      {ootd.visibility === 'public' && <div className="-mt-1 mb-3 text-[11px] text-green-700 dark:text-green-400">{t('ootdRecord.publicNotice')}</div>}
+      {(ootd.visibility === 'public' || ootd.visibility === 'friends') && profile?.instagram_id && (
+        <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-xl px-3 py-2 mb-3">
+          <div className="text-[11px] font-medium text-warm-800 dark:text-warm-200">📸 @{profile.instagram_id}</div>
+          <button onClick={() => ootd.setShowInstagram(!ootd.showInstagram)} className={`w-10 h-5 rounded-full transition-all ${ootd.showInstagram ? 'bg-terra-500' : 'bg-warm-400'}`}><div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${ootd.showInstagram ? 'translate-x-5' : 'translate-x-0.5'}`} /></button>
         </div>
       )}
 
-      {/* CTA */}
-      <button onClick={handleSave}
-        className={`w-full py-3.5 ${isReady && !ootd.needsPhoto ? 'bg-terra-500 shadow-terra active:scale-[0.98]' : 'bg-warm-400 dark:bg-warm-600 opacity-60 cursor-not-allowed'} text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all mb-2`}>
-        <Check size={16} /> {ootd.editId ? t('common.done') : t('common.save')}
-      </button>
+      {/* 메모 */}
+      <input type="text" placeholder={`💬 ${t('ootdRecord.memoPlaceholder')}`} maxLength={100} value={ootd.memo} onChange={e => ootd.setMemo(e.target.value)}
+        className="w-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl px-3 py-2.5 text-[13px] text-warm-900 dark:text-warm-100 placeholder-warm-400 outline-none focus:border-terra-400 mb-3" />
 
-      <button onClick={() => navigate('/closet')}
-        className="w-full py-2.5 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all">
-        {t('ootdRecord.viewCalendar')}
+      {editingPhotoIdx !== null && ootd.photos[editingPhotoIdx] && <ImageEditor src={ootd.photos[editingPhotoIdx]} onSave={(dataUrl) => { ootd.replacePhoto(editingPhotoIdx, dataUrl); setEditingPhotoIdx(null) }} onCancel={() => setEditingPhotoIdx(null)} />}
+      {cropSrc && <CropOverlay src={cropSrc} ratio={4 / 5} onDone={(url) => { ootd.addPhoto(url); setCropSrc(null) }} onCancel={() => setCropSrc(null)} />}
+
+      {saveError && <div className="mb-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-red-700 dark:text-red-400">{saveError}</div>}
+
+      <button onClick={handleSave} className={`w-full py-3.5 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 transition-all ${canSave && !ootd.needsPhoto ? 'bg-terra-500 text-white shadow-terra active:scale-[0.98]' : 'bg-warm-300 dark:bg-warm-600 text-white opacity-70'}`}>
+        <Check size={16} /> {ootd.editId ? t('common.done') : t('ootdRecord.saveBtn')}
       </button>
     </div>
   )

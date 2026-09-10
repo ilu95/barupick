@@ -670,7 +670,11 @@
     "visibilityLabel": "Visibility",
     "publicNotice": "🌐 Shared to community immediately · Photo required",
     "viewCalendar": "View coord calendar",
-    "storageFull": "Storage is full. Remove photos from older records to continue"
+    "storageFull": "Storage is full. Remove photos from older records to continue",
+    "quickToday": "Today's saved looks",
+    "next": "Log it",
+    "finishTitle": "Finish the log",
+    "saveBtn": "Save log"
   },
   "ootdCalendar": {
     "weekDays": [

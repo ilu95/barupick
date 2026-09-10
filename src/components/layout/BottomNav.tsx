@@ -20,6 +20,7 @@ const HIDDEN_ROUTES = [
   '/auth',
   '/pc-light',
   '/home/build',
+  '/record',        // 기록 (만들기 화면과 고정 발 버튼을 같이 씀)
   '/home/recommend',
   '/community/post',
   '/closet/coord',

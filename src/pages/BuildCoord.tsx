@@ -667,6 +667,17 @@ function StepFabric({ build }: { build: BH }) {
 }
 
 // ─── 헬퍼: partKey → 유저가 선택한 아이템 라벨 (BuildCoord용) ───
+/** 만들기 상태 → applyOutfit 입력 (저장한 코디를 기록·후보에서 한 번 탭으로 다시 올릴 때) */
+function pickOf(s: any) {
+  return {
+    layers: sortUpper(s.upper).map((l: any) => ({ itemId: l.itemId, plate: l.plate, colorKey: l.colorKey })),
+    bottom: s.bottomColor ? { plate: s.bottomItem || '03_slacks_straight', colorKey: s.bottomColor } : undefined,
+    shoes: s.shoesColor ? { plate: s.shoesItem || '71_sneaker_canvas', colorKey: s.shoesColor } : undefined,
+    scarf: s.scarfColor ? { plate: s.scarfItem || '54_scarf', colorKey: s.scarfColor } : null,
+    hat: s.hatColor ? { plate: s.hatItem || 'c1_cap', colorKey: s.hatColor } : null,
+    style: s.style || null, templateId: s.templateId || null, situ: s.situ || null,
+  }
+}
 function getBuildPartLabel(partKey: string, upper: any[], state?: any): string {
   // 새 만들기 화면에서 고른 판이 있으면 그 이름(트렌치코트), 없으면 종류(코트)
   if (state) {
@@ -723,9 +734,9 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
 
   const handleSave = () => {
     commitOwned('save')
-    const name = build.state.style || t('common.coord')
+    const name = build.state.style ? t('styles:guide.' + build.state.style + '.name', { defaultValue: build.state.style }) : t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null, scene: charSceneFromState(build.state) })
+    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null, scene: charSceneFromState(build.state), pick: pickOf(build.state) })
     if (saved.length > 100) saved.length = 100
     setJSON('cs_saved', saved)
     trackSave('build', score)

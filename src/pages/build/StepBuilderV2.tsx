@@ -19,7 +19,7 @@ import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent } from '@/
 const UPPER: UpperSlot[] = ['outer', 'middleware', 'top', 'inner']
 const isUpper = (s: RailSlot): s is UpperSlot => (UPPER as string[]).includes(s)
 
-export default function StepBuilderV2({ build, easy = false }: { build: BuildHook; easy?: boolean }) {
+export default function StepBuilderV2({ build, easy = false, onBack, onDone, doneLabel, title }: { build: BuildHook; easy?: boolean; onBack?: () => void; onDone?: () => void; doneLabel?: string; title?: string }) {
   const { t, i18n } = useTranslation()
   const ko = (i18n.language || 'ko').startsWith('ko')
   const [sex, setSex] = useState<'m' | 'w'>(charSex)
@@ -124,8 +124,8 @@ export default function StepBuilderV2({ build, easy = false }: { build: BuildHoo
     <div className="-mx-5 -my-4 flex flex-col" style={{ minHeight: 'calc(100dvh - 60px)' }}>
       {/* 머리: 뒤로 · 제목 · 리셋 · 남/여 */}
       <div className="flex items-center gap-2 px-3 pt-2 pb-1">
-        <button onClick={() => build.goBack()} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>
-        <div className="flex-1 font-display text-[17px] font-bold text-warm-900 dark:text-warm-100">{easy ? t('builder.easyTitle') : t('builder.title')}</div>
+        <button onClick={() => onBack ? onBack() : build.goBack()} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>
+        <div className="flex-1 font-display text-[17px] font-bold text-warm-900 dark:text-warm-100">{title || (easy ? t('builder.easyTitle') : t('builder.title'))}</div>
         <button onClick={() => build.reset()} aria-label={t('builder.reset')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><RotateCcw size={15} /></button>
         <div className="flex bg-warm-200 dark:bg-warm-700 rounded-full p-0.5">
           {(['m', 'w'] as const).map(x => <button key={x} onClick={() => changeSex(x)} className={`px-3 py-1.5 rounded-full text-[12px] font-bold ${sex === x ? 'bg-warm-900 text-white' : 'text-warm-600'}`}>{x === 'm' ? t('builder.male') : t('builder.female')}</button>)}
@@ -238,7 +238,7 @@ export default function StepBuilderV2({ build, easy = false }: { build: BuildHoo
           </div>
           {reason && <div className="text-[11px] text-warm-500 truncate">{reason}</div>}
         </div>
-        <button onClick={() => build.pushStep(s.fabricMode ? 'fabric' : 'result')} disabled={!complete} className="flex-none h-11 px-5 rounded-full bg-terra-500 text-white font-bold text-[14px] disabled:opacity-40 active:scale-[0.98] shadow-terra">{t('builder.done')} →</button>
+        <button onClick={() => onDone ? onDone() : build.pushStep(s.fabricMode ? 'fabric' : 'result')} disabled={!complete} className="flex-none h-11 px-5 rounded-full bg-terra-500 text-white font-bold text-[14px] disabled:opacity-40 active:scale-[0.98] shadow-terra">{doneLabel || t('builder.done')} →</button>
       </div>
 
       {/* 접근성: 닫기 없는 X 아이콘 사용 안 함 */}
