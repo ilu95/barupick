@@ -1,129 +1,57 @@
 import { setString } from '@/lib/storage'
-import { useState, useRef, useCallback } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Palette, Users, Calendar, Sparkles, ChevronRight } from 'lucide-react'
-
-const SLIDES = [
-  {
-    emoji: '👕',
-    icon: <Palette size={32} className="text-terra-500" />,
-    titleKey: 'onboarding.slide1Title',
-    descKey: 'onboarding.slide1Desc',
-    bg: 'from-terra-50 to-warm-100',
-  },
-  {
-    emoji: '📊',
-    icon: <Sparkles size={32} className="text-terra-500" />,
-    titleKey: 'onboarding.slide2Title',
-    descKey: 'onboarding.slide2Desc',
-    bg: 'from-amber-50 to-terra-50',
-  },
-  {
-    emoji: '📝',
-    icon: <Calendar size={32} className="text-terra-500" />,
-    titleKey: 'onboarding.slide3Title',
-    descKey: 'onboarding.slide3Desc',
-    bg: 'from-sky-50 to-warm-50',
-  },
-  {
-    emoji: '👥',
-    icon: <Users size={32} className="text-terra-500" />,
-    titleKey: 'onboarding.slide4Title',
-    descKey: 'onboarding.slide4Desc',
-    bg: 'from-green-50 to-warm-50',
-  },
-]
-
+import { ArrowRight } from 'lucide-react'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { COLORS_60 } from '@/lib/colors'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, setCharSex, type CharScene } from '@/lib/char/map'
+import { setMode, type AppMode } from '@/lib/mode'
+import { trackEvent } from '@/lib/analytics'
 import { SUPPORTED_LANGUAGES } from '@/i18n'
 
-const SWIPE_THRESHOLD = 50
+// ═══════════════════════════════════════════════════════
+// 온보딩 — 기능 설명 슬라이드 대신 질문 둘.
+// 1) 캐릭터 성별  2) "옷 고르는 게 어렵나요, 재밌나요?" → 앱 모드(골라 주는 / 직접 만드는)
+// 답하면 바로 홈(한 벌). 언어는 한국어 브라우저면 건너뛴다.
+// ═══════════════════════════════════════════════════════
+
+const SAMPLE: Record<'m' | 'w', CharScene['items']> = {
+  m: [{ id: '28_coat_short', color: COLORS_60.camel.hex }, { id: '11_knit_crew', color: COLORS_60.ivory.hex }, { id: '03_slacks_straight', color: COLORS_60.charcoal.hex }, { id: '74_loafer', color: COLORS_60.brown.hex }],
+  w: [{ id: '28_coat_short', color: COLORS_60.camel.hex }, { id: '11_knit_crew', color: COLORS_60.ivory.hex }, { id: '24_skirt_pleat', color: COLORS_60.charcoal.hex }, { id: '74_loafer', color: COLORS_60.brown.hex }],
+}
 
 export default function Onboarding() {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
-  // Language is auto-detected in i18n/index.ts (Korean browsers skip selection)
   const hasLang = !!localStorage.getItem('sp_language')
-  const [step, setStep] = useState(hasLang ? 0 : -1)
-  const [direction, setDirection] = useState<'left' | 'right' | null>(null)
+  const [step, setStep] = useState<'lang' | 'sex' | 'mode'>(hasLang ? 'sex' : 'lang')
+  const [sex, setSex] = useState<'m' | 'w' | null>(null)
+  const scenes = useMemo(() => ({ m: { items: SAMPLE.m, body: { sex: 'm' as const, hair: DEFAULT_HAIR.m, hairColor: DEFAULT_HAIR_COLOR } }, w: { items: SAMPLE.w, body: { sex: 'w' as const, hair: DEFAULT_HAIR.w, hairColor: DEFAULT_HAIR_COLOR } } }), [])
 
-  const touchRef = useRef({ startX: 0, startY: 0, swiping: false })
-
-  const goTo = useCallback((next: number, dir: 'left' | 'right') => {
-    if (next < -1 || next >= SLIDES.length) return
-    setDirection(dir)
-    setTimeout(() => {
-      setStep(next)
-      setDirection(null)
-    }, 150)
-  }, [])
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchRef.current = {
-      startX: e.touches[0].clientX,
-      startY: e.touches[0].clientY,
-      swiping: true,
-    }
-  }, [])
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!touchRef.current.swiping) return
-    const dx = e.changedTouches[0].clientX - touchRef.current.startX
-    const dy = e.changedTouches[0].clientY - touchRef.current.startY
-    touchRef.current.swiping = false
-
-    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dy) > Math.abs(dx)) return
-
-    if (dx < 0 && step < SLIDES.length - 1) {
-      goTo(step + 1, 'left')
-    } else if (dx > 0 && step > 0) {
-      goTo(step - 1, 'right')
-    }
-  }, [step, goTo])
-
-  const selectLanguage = (code: string) => {
-    i18n.changeLanguage(code)
-    setString('sp_language', code)
-    goTo(0, 'left')
-  }
-
-  const finish = () => {
+  const selectLanguage = (code: string) => { i18n.changeLanguage(code); setString('sp_language', code); setStep('sex') }
+  const pickSex = (s: 'm' | 'w') => { setSex(s); setCharSex(s); setStep('mode') }
+  const finish = (mode: AppMode) => {
+    setMode(mode)
     setString('sp_onboarded', '1')
+    trackEvent('onboard_done', { sex, mode })
     navigate('/home', { replace: true })
   }
 
-  // Language selection screen
-  if (step === -1) {
+  if (step === 'lang') {
     return (
       <div className="fixed inset-0 bg-[#F7F5F2] z-[500] flex flex-col">
         <div className="flex-1 flex flex-col items-center px-6 pt-14 pb-6 max-w-[480px] mx-auto w-full">
           <div className="text-5xl mb-4">🌍</div>
-          <h2 className="font-display text-[22px] font-bold text-warm-900 tracking-tight mb-2">
-            {t('onboarding.langSelectTitle')}
-          </h2>
+          <h2 className="font-display text-[22px] font-bold text-warm-900 tracking-tight mb-2">{t('onboarding.langSelectTitle')}</h2>
           <p className="text-sm text-warm-500 mb-6">{t('onboarding.langSelectDesc')}</p>
-
           <div className="w-full flex-1 overflow-y-auto -mx-1 px-1">
             <div className="flex flex-col gap-2">
               {SUPPORTED_LANGUAGES.map(lang => (
-                <button
-                  key={lang.code}
-                  onClick={() => selectLanguage(lang.code)}
-                  className={`w-full flex items-center gap-3.5 px-5 py-3.5 rounded-2xl border-2 transition-all active:scale-[0.98] ${
-                    i18n.language === lang.code
-                      ? 'border-terra-500 bg-terra-50'
-                      : 'border-warm-300 bg-white hover:border-warm-400'
-                  }`}
-                >
+                <button key={lang.code} onClick={() => selectLanguage(lang.code)}
+                  className={`w-full flex items-center gap-3.5 px-5 py-3.5 rounded-2xl border-2 transition-all active:scale-[0.98] ${i18n.language === lang.code ? 'border-terra-500 bg-terra-50' : 'border-warm-300 bg-white hover:border-warm-400'}`}>
                   <span className="text-2xl">{lang.flag}</span>
-                  <div className="text-left flex-1">
-                    <div className="text-[15px] font-bold text-warm-900">{lang.nativeName}</div>
-                  </div>
-                  {i18n.language === lang.code && (
-                    <div className="ml-auto w-5 h-5 rounded-full bg-terra-500 flex items-center justify-center flex-shrink-0">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                  )}
+                  <div className="text-left flex-1"><div className="text-[15px] font-bold text-warm-900">{lang.nativeName}</div></div>
                 </button>
               ))}
             </div>
@@ -133,77 +61,41 @@ export default function Onboarding() {
     )
   }
 
-  const slide = SLIDES[step]
-  const isLast = step === SLIDES.length - 1
-
-  const slideAnim = direction === 'left'
-    ? 'opacity-0 -translate-x-8'
-    : direction === 'right'
-    ? 'opacity-0 translate-x-8'
-    : 'opacity-100 translate-x-0'
-
   return (
-    <div
-      className="fixed inset-0 bg-[#F7F5F2] z-[500] flex flex-col"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      <div className="flex-1 flex flex-col items-center justify-center px-8 max-w-[480px] mx-auto w-full">
+    <div className="fixed inset-0 bg-[#F7F5F2] z-[500] flex flex-col">
+      <div className="flex-1 flex flex-col px-6 pt-12 pb-8 max-w-[480px] mx-auto w-full">
+        <div className="text-[11px] font-extrabold tracking-[.2em] text-warm-500 mb-6">BARUPICK</div>
 
-        <div
-          className={`w-full bg-gradient-to-b ${slide.bg} rounded-3xl p-8 mb-8 text-center transition-all duration-200 ease-out ${slideAnim}`}
-          aria-live="polite"
-        >
-          <div className="text-6xl mb-5">{slide.emoji}</div>
-          <div className="w-14 h-14 rounded-2xl bg-white/80 flex items-center justify-center mx-auto mb-5 shadow-warm-sm">
-            {slide.icon}
+        {step === 'sex' && (
+          <div className="animate-screen-fade flex-1 flex flex-col">
+            <h2 className="font-display text-[24px] font-bold text-warm-900 tracking-tight leading-snug mb-1">{t('onboarding.sexTitle')}</h2>
+            <p className="text-sm text-warm-500 mb-5">{t('onboarding.sexDesc')}</p>
+            <div className="grid grid-cols-2 gap-3">
+              {(['m', 'w'] as const).map(s => (
+                <button key={s} onClick={() => pickSex(s)} className="bg-white border-2 border-warm-300 rounded-3xl p-3 flex flex-col items-center gap-2 active:scale-[0.97] active:border-terra-500 transition-all">
+                  <CharacterCanvas {...scenes[s]} width={130} />
+                  <span className="text-[15px] font-bold text-warm-900">{s === 'm' ? t('builder.male') : t('builder.female')}</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <h2 className="font-display text-[22px] font-bold text-warm-900 tracking-tight leading-snug whitespace-pre-line mb-3">
-            {t(slide.titleKey)}
-          </h2>
-          <p className="text-sm text-warm-600 leading-relaxed whitespace-pre-line">
-            {t(slide.descKey)}
-          </p>
-        </div>
+        )}
 
-        <div className="flex gap-2 mb-8" role="tablist" aria-label={t('onboarding.start')}>
-          {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              role="tab"
-              aria-selected={i === step}
-              aria-label={`${i + 1}`}
-              onClick={() => goTo(i, i > step ? 'left' : 'right')}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === step ? 'w-6 bg-terra-500' : 'w-2 bg-warm-400'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="px-6 pb-10 max-w-[480px] mx-auto w-full">
-        {isLast ? (
-          <button
-            onClick={finish}
-            className="w-full py-4 bg-terra-500 text-white rounded-2xl font-bold text-[16px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
-          >
-            {t('onboarding.start')} <Sparkles size={18} />
-          </button>
-        ) : (
-          <div className="flex gap-3">
-            <button
-              onClick={finish}
-              className="px-6 py-4 bg-white border border-warm-400 text-warm-600 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all"
-            >
-              {t('onboarding.skip')}
+        {step === 'mode' && (
+          <div className="animate-screen-fade flex-1 flex flex-col">
+            <h2 className="font-display text-[24px] font-bold text-warm-900 tracking-tight leading-snug mb-1">{t('onboarding.modeTitle')}</h2>
+            <p className="text-sm text-warm-500 mb-5">{t('onboarding.modeDesc')}</p>
+            <button onClick={() => finish('easy')} className="w-full bg-terra-500 text-white rounded-3xl p-5 text-left active:scale-[0.98] transition-all shadow-terra mb-3">
+              <div className="text-[18px] font-extrabold leading-tight">{t('onboarding.easyTitle')}</div>
+              <div className="text-[13px] opacity-90 mt-1 leading-snug">{t('onboarding.easyDesc')}</div>
+              <div className="text-[12px] font-bold mt-3 flex items-center gap-1">{t('onboarding.easyCta')} <ArrowRight size={14} /></div>
             </button>
-            <button
-              onClick={() => goTo(step + 1, 'left')}
-              className="flex-1 py-4 bg-terra-500 text-white rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"
-            >
-              {t('common.next')} <ChevronRight size={18} />
+            <button onClick={() => finish('pro')} className="w-full bg-white border-2 border-warm-300 rounded-3xl p-5 text-left active:scale-[0.98] transition-all">
+              <div className="text-[18px] font-extrabold text-warm-900 leading-tight">{t('onboarding.proTitle')}</div>
+              <div className="text-[13px] text-warm-600 mt-1 leading-snug">{t('onboarding.proDesc')}</div>
+              <div className="text-[12px] font-bold text-warm-800 mt-3 flex items-center gap-1">{t('onboarding.proCta')} <ArrowRight size={14} /></div>
             </button>
+            <div className="text-[11.5px] text-warm-500 text-center mt-4">{t('onboarding.modeNote')}</div>
           </div>
         )}
       </div>

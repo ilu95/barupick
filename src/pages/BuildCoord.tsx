@@ -19,6 +19,7 @@ import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildSte
 import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
+import { isEasy } from '@/lib/mode'
 import { plateName } from '@/lib/outfits'
 import { HAT_NAMES } from '@/lib/builderSlots'
 import { trackVote } from '@/lib/analytics'
@@ -58,7 +59,7 @@ export default function BuildCoord() {
       <div className="max-w-[480px] mx-auto px-5 py-4 pb-8">
         {build.step === 'outfit' && <StepOutfit build={build} />}
         {build.step === 'style' && <StepStyle build={build} />}
-        {build.step === 'builder' && (build.state.mode === 'coord' ? <StepBuilderV2 build={build} /> : <StepBuilder build={build} navigate={navigate} />)}
+        {build.step === 'builder' && (build.state.mode === 'coord' ? <StepBuilderV2 build={build} easy={isEasy()} /> : <StepBuilder build={build} navigate={navigate} />)}
         {build.step === 'fabric' && <StepFabric build={build} />}
         {build.step === 'result' && <StepResult build={build} navigate={navigate} />}
         {build.step === 'improve' && <StepImprove build={build} />}
@@ -690,6 +691,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const toast = useToast()
   const { user, profile: authProfile } = useAuth() as any
   const { weather } = useWeather()
+  const easy = isEasy()   // 초보 앞문: 저장 · 물어보기만 크게, 분석표 없음
   const [card, setCard] = useState<{ url: string; ratio: CardRatio } | null>(null)
   const [cardBusy, setCardBusy] = useState(false)
   const score = build.getScore()
@@ -763,9 +765,11 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
 
   return (
     <div className="animate-screen-enter">
+      {!easy && (
       <button onClick={() => build.setVizCollapsed(!build.vizCollapsed)} className="w-full text-center text-xs text-warm-600 py-2 mb-2 active:opacity-70">
         {build.vizCollapsed ? t('build.showMannequin') : t('build.hideMannequin')}
       </button>
+      )}
       {!build.vizCollapsed && (
         <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
           <CharacterCanvas {...sceneNow} width={180} />
@@ -796,8 +800,17 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
       </div>
 
+      {/* 초보 앞문: 분석표 없이 이유만 */}
+      {easy && reasonLines.length > 0 && (
+        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm flex flex-col gap-1.5">
+          {reasonLines.map((r, i) => (
+            <div key={i} className={`text-[12.5px] font-medium leading-snug ${r.w < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-terra-600'}`}>{r.w < 0 ? '△' : '●'} {r.txt}</div>
+          ))}
+        </div>
+      )}
+
       {/* 점수 분해도 */}
-      {scoreItems.length > 0 && (
+      {!easy && scoreItems.length > 0 && (
         <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm">
           <div className="text-xs font-semibold text-warm-500 uppercase tracking-widest mb-3">{t('build.scoreAnalysis')}</div>
           <div className="flex flex-col gap-2">
@@ -840,6 +853,22 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
       </div>
 
+      {easy ? (
+        <>
+          <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-2">
+            <Bookmark size={18} /> {t('build.saveCoord')}
+          </button>
+          <button onClick={ask} className="w-full py-3.5 bg-[#FEE500] text-[#1C1917] rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 active:scale-98 mb-3">
+            <Users size={18} /> {t('vote.ask')}
+          </button>
+          <div className="flex items-center justify-center gap-4 text-[12.5px] text-warm-600 mb-6">
+            <button onClick={() => build.goBack()} className="underline underline-offset-2">{t('build.editColors')}</button>
+            <button onClick={() => makeCard('story')} disabled={cardBusy} className="underline underline-offset-2">{t('card.btn')}</button>
+            <button onClick={() => navigate('/home')} className="underline underline-offset-2">{t('build.goHome')}</button>
+          </div>
+        </>
+      ) : (
+        <>
       <button onClick={() => build.goBack()} className="w-full py-3 border border-terra-400 dark:border-terra-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-2">
         <Edit3 size={16} /> {t('build.editColors')}
       </button>
@@ -866,6 +895,8 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </button>
       </div>
       <button onClick={() => navigate('/home')} className="w-full py-2 text-sm text-warm-600 text-center active:opacity-70 mb-6">{t('build.goHome')}</button>
+        </>
+      )}
 
       {/* 오늘의 코디 카드 미리보기 */}
       {card && (

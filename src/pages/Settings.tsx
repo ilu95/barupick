@@ -1,9 +1,10 @@
+import { isEasy, setMode } from '@/lib/mode'
 import { reminderOn, setReminderOn, requestReminderPermission, scheduleReminder } from '@/lib/reminder'
 import { getWeatherNow } from '@/hooks/useWeather'
 import { setString } from '@/lib/storage'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight, Bell } from 'lucide-react'
+import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight, Bell, Wand2 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useAutoSync, useLastSyncTime, useSyncStatus } from '@/hooks/useAutoSync'
@@ -26,6 +27,8 @@ export default function Settings() {
   const [darkMode, setDarkMode] = useState(localStorage.getItem('sp_dark_mode') === '1')
   const [hideCounts, setHideCounts] = useState(localStorage.getItem('sp_hide_counts') === '1')
   const [reminder, setReminder] = useState(reminderOn())
+  const [easy, setEasy] = useState(isEasy())
+  const toggleMode = () => { const next = !easy; setMode(next ? 'easy' : 'pro'); setEasy(next) }
   const toggleReminder = async () => {
     const next = !reminder
     if (next) { const ok = await requestReminderPermission(); if (!ok) { toast.error(t('settings.reminderDenied')); return } }
@@ -125,6 +128,13 @@ export default function Settings() {
         desc={t('settings.hideCountsDesc')}
         value={hideCounts}
         onChange={toggleHide}
+      />
+      <ToggleItem
+        icon={<Wand2 size={18} />}
+        label={t('settings.modeEasy')}
+        desc={t('settings.modeEasyDesc')}
+        value={easy}
+        onChange={toggleMode}
       />
       <ToggleItem
         icon={<Bell size={18} />}
