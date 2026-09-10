@@ -138,9 +138,11 @@ export function useOotd() {
     }
   }
 
-  const saveRecord = useCallback(() => {
+  const saveRecord = useCallback((override?: { colors: Record<string, string | null>; itemTypes?: Record<string, string>; score?: number }) => {
+    const useColors = override?.colors || colors
+    const useItemTypes = override?.itemTypes || itemTypes
     const outfit: Record<string, string> = {}
-    Object.entries(colors).forEach(([k, v]) => { if (v) outfit[k] = v })
+    Object.entries(useColors).forEach(([k, v]) => { if (v) outfit[k] = v })
     if (Object.keys(outfit).length < 2) return false
 
     const now = new Date()
@@ -152,7 +154,7 @@ export function useOotd() {
       dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
     }
 
-    const score = calcScore(outfit)
+    const score = override?.score ?? calcScore(outfit)
 
     let weatherStr = ''
     if (weatherData) {
@@ -162,8 +164,8 @@ export function useOotd() {
     const record: OotdRecord = {
       id: editId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
       date: dateStr,
-      colors: { ...colors },
-      itemTypes: Object.keys(itemTypes).length > 0 ? { ...itemTypes } : undefined,
+      colors: { ...useColors },
+      itemTypes: Object.keys(useItemTypes).length > 0 ? { ...useItemTypes } : undefined,
       photos: [...photos],
       score,
       engine: ENGINE_VERSION,
