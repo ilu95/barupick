@@ -6,6 +6,7 @@ import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, Chevr
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import StepOutfit from '@/pages/build/StepOutfit'
 import StepBuilderV2 from '@/pages/build/StepBuilderV2'
+import StepVote from '@/pages/build/StepVote'
 import { charSceneFromBuild, charSceneFromState } from '@/lib/char/map'
 import { useToast } from '@/components/ui/Toast'
 import ColorPicker from '@/components/ui/ColorPicker'
@@ -16,8 +17,8 @@ import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit,
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide } from '@/lib/analytics'
 import type { Move } from '@/lib/guide'
-import { drawCoordCard, drawVoteOg, shareDataUrl, type CardRatio } from '@/lib/coordCard'
-import { createVote, type VoteSide } from '@/lib/votes'
+import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
+import { addToBasket } from '@/lib/voteBasket'
 import { trackVote } from '@/lib/analytics'
 import { useAuth } from '@/contexts/AuthContext'
 import { ENGINE_VERSION, PALETTE_VERSION } from '@/lib/versions'
@@ -56,6 +57,7 @@ export default function BuildCoord() {
         {build.step === 'fabric' && <StepFabric build={build} />}
         {build.step === 'result' && <StepResult build={build} navigate={navigate} />}
         {build.step === 'improve' && <StepImprove build={build} />}
+        {build.step === 'vote' && <StepVote build={build} />}
       </div>
     </div>
   )
@@ -679,7 +681,6 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const { weather } = useWeather()
   const [card, setCard] = useState<{ url: string; ratio: CardRatio } | null>(null)
   const [cardBusy, setCardBusy] = useState(false)
-  const [askBusy, setAskBusy] = useState(false)
   const score = build.getScore()
   const evalResult = build.getEvalResult()
   const circumference = 2 * Math.PI * 52
@@ -701,7 +702,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const handleSave = () => {
     const name = build.state.style || t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
-    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null })
+    saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null, scene: charSceneFromState(build.state) })
     if (saved.length > 100) saved.length = 100
     setJSON('cs_saved', saved)
     trackSave('build', score)
@@ -731,30 +732,14 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   }
   const shareCard = async () => { if (!card) return; const r = await shareDataUrl(card.url, `barupick-${Date.now()}.png`, t('card.title')); if (r === 'downloaded') toast.success(t('card.saved')) }
 
-  // ── 루프 L3: 친구에게 물어보기 (A = 지금, B = 한 수 바꾼 버전) ──
-  const ask = async () => {
-    if (askBusy) return
-    setAskBusy(true)
-    try {
-      const a: VoteSide = { scene: sceneNow, colors: colorsNow, score, label: t('vote.labelA') }
-      let bSide: VoteSide | null = null
-      const m = build.getBestMoves(1)[0]
-      if (m) {
-        const hexB = { ...build.outfitHex, [m.slot]: COLORS_60[m.to]?.hex }
-        const outfitB = { ...outfit, [m.slot]: m.to }
-        bSide = {
-          scene: charSceneFromBuild(build.state.upper, hexB, { bottomItem: build.state.bottomItem, shoesItem: build.state.shoesItem }),
-          colors: Object.entries(outfitB).filter(([, v]) => v).map(([, key]) => ({ key: key as string, hex: COLORS_60[key as string]?.hex || '#ccc', name: getColorName(key as string) })),
-          score: m.score, label: t('vote.labelB'),
-        }
-      }
-      const sub = [weather?.feels != null ? `${weather.feels}°` : null, build.state.situ ? t('outfit.situ.' + build.state.situ) : null, bSide ? t('vote.twoSub') : t('vote.singleSub')].filter(Boolean).join(' · ')
-      let ogDataUrl: string | null = null
-      try { ogDataUrl = await drawVoteOg(a, bSide, t('vote.defaultQ'), sub); if (import.meta.env.DEV) (window as any).__bp_lastOg = ogDataUrl } catch (e: any) { ogDataUrl = null; trackVote('create', { og_draw_fail: String(e?.message || e).slice(0, 200) }) }
-      const v = await createVote({ a, b: bSide, question: t('vote.defaultQ'), situ: build.state.situ || null, temp: weather?.feels ?? null, ownerId: user?.id || null, ogDataUrl })
-      trackVote('create', { code: v.code, two: !!bSide, score })
-      navigate('/v/' + v.code)
-    } catch { toast.error(t('vote.failCreate')) } finally { setAskBusy(false) }
+  // ── 루프 L3: 친구에게 물어보기 — 후보 화면에서 2~4벌을 직접 고른다 ──
+  const ask = () => { trackVote('create', { stage: 'open', score }); build.pushStep('vote') }
+  // 후보에 담기: 지금 코디를 바구니에 두고, 다른 코디를 만든 뒤 함께 고른다
+  const basketAdd = () => {
+    const garments = [...build.state.upper.map(l => l.plate).filter(Boolean), build.state.bottomItem, build.state.shoesItem].filter(Boolean) as string[]
+    const n = addToBasket({ scene: sceneNow, colors: colorsNow, score, label: colorsNow.slice(0, 2).map(c => c.name).join(' + ') }, garments)
+    trackVote('create', { stage: 'basket', n })
+    toast.success(t('vote.basketAdded', { n }))
   }
 
   // 등급 기준은 v7.1 분포로 올렸다: 완벽 92 · 훌륭 84 · 좋음 72 · 괜찮 60 (연구 11장)
@@ -850,9 +835,14 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
       <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-2">
         <Bookmark size={18} /> {t('build.saveCoord')}
       </button>
-      <button onClick={ask} disabled={askBusy} className="w-full py-3.5 bg-[#FEE500] text-[#1C1917] rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-3 disabled:opacity-60">
-        <Users size={18} /> {askBusy ? t('vote.asking') : t('vote.ask')}
-      </button>
+      <div className="flex gap-2 mb-3">
+        <button onClick={ask} className="flex-1 py-3.5 bg-[#FEE500] text-[#1C1917] rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98">
+          <Users size={18} /> {t('vote.ask')}
+        </button>
+        <button onClick={basketAdd} className="px-4 py-3.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-800 dark:text-warm-200 rounded-2xl font-semibold text-[12.5px] flex items-center justify-center gap-1 active:scale-98 whitespace-nowrap">
+          <Plus size={15} /> {t('vote.basketAdd')}
+        </button>
+      </div>
       <div className="grid grid-cols-3 gap-2 mb-4">
         <button onClick={() => makeCard('story')} disabled={cardBusy} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm disabled:opacity-60">
           <Share size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{cardBusy ? t('card.making') : t('card.btn')}</span>

@@ -122,33 +122,66 @@ export async function shareDataUrl(url: string, filename: string, title: string)
   return 'downloaded'
 }
 
-/** 투표 링크 미리보기용 OG 카드 1200×630 — 카톡 미리보기에서 그대로 보인다 */
-export async function drawVoteOg(a: { scene: CharScene; label?: string }, b: { scene: CharScene; label?: string } | null, question: string, sub: string): Promise<string> {
+/** 투표 링크 미리보기용 OG 카드 1200×630 — 카톡 미리보기에서 그대로 보인다. 후보 1~4벌 */
+export async function drawVoteOg(sides: { scene: CharScene; label?: string }[], question: string, sub: string): Promise<string> {
   await bootCharacter()
-  const figs = await Promise.all([a, b].filter(Boolean).map(async s => { const cv = document.createElement('canvas'); await R.render(cv, s!.scene.items, s!.scene.body); return cv }))
+  const figs = await Promise.all(sides.map(async s => { const cv = document.createElement('canvas'); await R.render(cv, s.scene.items, s.scene.body); return cv }))
   const W = 1200, H = 630
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H
   const g = cv.getContext('2d')!
   const grad = g.createLinearGradient(0, 0, W, H); grad.addColorStop(0, '#F3EEE6'); grad.addColorStop(1, '#FAF8F5')
   g.fillStyle = grad; g.fillRect(0, 0, W, H)
   g.textBaseline = 'top'
-  // 왼쪽 글
-  g.fillStyle = '#6E6862'; g.font = `800 24px ${FONT}`; g.fillText('BARUPICK', 64, 56)
-  g.fillStyle = '#1C1917'; g.font = `800 60px ${FONT}`
-  const words = question.split(' '); let line = ''; let y = 120
-  for (const w of words) { const test = line ? line + ' ' + w : w; if (g.measureText(test).width > 470 && line) { g.fillText(line, 64, y); line = w; y += 72 } else line = test }
-  if (line) { g.fillText(line, 64, y); y += 72 }
-  g.fillStyle = '#57534E'; g.font = `500 28px ${FONT}`; g.fillText(sub, 64, y + 12)
-  pill(g, '앱 없이 · 한 번만 누르면 돼요', 64, H - 130, 56, '#1C1917', '#FFFFFF', `700 24px ${FONT}`)
-  // 오른쪽 캐릭터 1~2
-  const fh = 560, fw = Math.round(fh * 896 / 1200)
-  const xs = figs.length === 2 ? [W - 64 - fw * 2 - 24, W - 64 - fw] : [W - 64 - fw]
-  figs.forEach((f, i) => {
-    const x = xs[i], fy = 40
-    g.save(); g.beginPath(); g.ellipse(x + fw / 2, fy + fh - 6, fw * .38, 14, 0, 0, Math.PI * 2); g.fillStyle = 'rgba(28,25,23,.10)'; g.filter = 'blur(6px)'; g.fill(); g.restore()
-    g.drawImage(f, x, fy, fw, fh)
-    const lab = (i === 0 ? a.label : b?.label) || (i === 0 ? 'A' : 'B')
-    pill(g, lab, x + fw / 2 - 40, fy + fh - 40, 40, 'rgba(255,255,255,.92)', '#1C1917', `700 22px ${FONT}`)
-  })
+  const LET = 'ABCD'
+  const badge = (letter: string, x: number, y: number, r = 26) => {
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = '#1C1917'; g.fill()
+    g.fillStyle = '#FFFFFF'; g.font = `800 ${Math.round(r * 1.05)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(letter, x, y + 1); g.textAlign = 'left'; g.textBaseline = 'top'
+  }
+  const shadow = (x: number, y: number, fw: number, fh: number) => {
+    g.save(); g.beginPath(); g.ellipse(x + fw / 2, y + fh - 6, fw * .38, 14, 0, 0, Math.PI * 2); g.fillStyle = 'rgba(28,25,23,.10)'; g.filter = 'blur(6px)'; g.fill(); g.restore()
+  }
+  const PILL = '앱 없이 · 한 번만 누르면 돼요'
+  const n = figs.length
+  if (n <= 2) {
+    // 왼쪽 글 · 오른쪽 캐릭터 1~2
+    g.fillStyle = '#6E6862'; g.font = `800 24px ${FONT}`; g.fillText('BARUPICK', 64, 56)
+    g.fillStyle = '#1C1917'; g.font = `800 60px ${FONT}`
+    const words = question.split(' '); let line = ''; let y = 120
+    for (const w of words) { const test = line ? line + ' ' + w : w; if (g.measureText(test).width > 470 && line) { g.fillText(line, 64, y); line = w; y += 72 } else line = test }
+    if (line) { g.fillText(line, 64, y); y += 72 }
+    g.fillStyle = '#57534E'; g.font = `500 28px ${FONT}`; g.fillText(sub, 64, y + 12)
+    pill(g, PILL, 64, H - 130, 56, '#1C1917', '#FFFFFF', `700 24px ${FONT}`)
+    const fh = 560, fw = Math.round(fh * 896 / 1200)
+    const xs = n === 2 ? [W - 64 - fw * 2 - 24, W - 64 - fw] : [W - 64 - fw]
+    figs.forEach((f, i) => {
+      const x = xs[i], fy = 40
+      shadow(x, fy, fw, fh)
+      g.drawImage(f, x, fy, fw, fh)
+      if (n === 2) badge(LET[i], x + 56, fy + 60)
+      const lab = sides[i].label || LET[i]
+      g.font = `700 22px ${FONT}`; const lw = g.measureText(lab).width + 36
+      pill(g, lab, x + fw / 2 - lw / 2, fy + fh - 40, 40, 'rgba(255,255,255,.92)', '#1C1917', `700 22px ${FONT}`)
+    })
+  } else {
+    // 위에 글 한 줄 · 아래에 캐릭터 3~4벌 나란히 (A·B·C·D 뱃지)
+    g.fillStyle = '#6E6862'; g.font = `800 24px ${FONT}`; g.fillText('BARUPICK', 64, 48)
+    g.font = `700 22px ${FONT}`; const pw = g.measureText(PILL).width + 44
+    pill(g, PILL, W - 64 - pw, 44, 50, '#1C1917', '#FFFFFF', `700 22px ${FONT}`)
+    g.fillStyle = '#1C1917'; g.font = `800 52px ${FONT}`
+    let q = question; while (q.length > 2 && g.measureText(q).width > W - 128 - pw - 24) q = q.slice(0, -2) + '…'
+    g.fillText(q, 64, 84)
+    g.fillStyle = '#57534E'; g.font = `500 26px ${FONT}`; g.fillText(sub, 64, 150)
+    const fh = 400, fw = Math.round(fh * 896 / 1200), gap = 20
+    const total = n * fw + (n - 1) * gap, x0 = Math.round((W - total) / 2), fy = H - fh - 24
+    figs.forEach((f, i) => {
+      const x = x0 + i * (fw + gap)
+      shadow(x, fy, fw, fh)
+      g.drawImage(f, x, fy, fw, fh)
+      badge(LET[i], x + 44, fy + 44, 24)
+      const lab = sides[i].label || LET[i]
+      g.font = `700 20px ${FONT}`; const lw = Math.min(fw - 8, g.measureText(lab).width + 34)
+      pill(g, lab, x + fw / 2 - lw / 2, fy + fh - 34, 36, 'rgba(255,255,255,.92)', '#1C1917', `700 20px ${FONT}`)
+    })
+  }
   return cv.toDataURL('image/png')
 }
