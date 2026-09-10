@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, X, Send } from 'lucide-react'
@@ -58,7 +58,8 @@ export default function StepVote({ build }: { build: BuildHook }) {
   const s = build.state
   const sex = charSex()
   const score = build.getScore()
-  const [sel, setSel] = useState<string[]>(['now'])
+  const hasNow = s.upper.length > 0   // 1단계 도구 줄에서 바로 오면 지금 코디가 없다
+  const [sel, setSel] = useState<string[]>(hasNow ? ['now'] : [])
   const [q, setQ] = useState<string>(t('vote.defaultQ'))
   const [busy, setBusy] = useState(false)
   const [basketTick, setBasketTick] = useState(0)
@@ -129,7 +130,8 @@ export default function StepVote({ build }: { build: BuildHook }) {
     } catch { return [] }
   }, [])
 
-  const all = useMemo(() => [now, ...moves, ...garments, ...basket, ...saved], [now, moves, garments, basket, saved])
+  const all = useMemo(() => [...(hasNow ? [now] : []), ...moves, ...garments, ...basket, ...saved], [now, moves, garments, basket, saved, hasNow])
+  useEffect(() => { if (!hasNow && sel.length === 0 && basket.length) setSel(basket.slice(0, 2).map(c => c.key)) }, [basket.length])
   const chosen = sel.map(k => all.find(c => c.key === k)).filter(Boolean) as Cand[]
 
   const toggle = (key: string) => {
@@ -206,7 +208,7 @@ export default function StepVote({ build }: { build: BuildHook }) {
         </div>
       </div>
 
-      {sec(t('vote.secNow'), [now])}
+      {hasNow && sec(t('vote.secNow'), [now])}
       {sec(t('vote.secMove'), moves)}
       {sec(t('vote.secGarment'), garments)}
       {sec(t('vote.secBasket'), basket, t('vote.basketEmpty'))}

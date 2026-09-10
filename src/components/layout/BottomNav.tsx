@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Shirt, Archive, Plus, Users, ShoppingBag } from 'lucide-react'
@@ -29,8 +30,12 @@ export default function BottomNav() {
   const navigate = useNavigate()
   const { t } = useTranslation()
 
+  // 작업 중 숨김: 직접 만드는 모드는 /home 이 곧 만들기라, 1단계 밖(색 고르기·결과·후보)에선 만들기 화면이 알려 준다
+  const [busy, setBusy] = useState(false)
+  useEffect(() => { const h = (e: Event) => setBusy(!!(e as CustomEvent).detail); window.addEventListener('bp:workflow', h); return () => window.removeEventListener('bp:workflow', h) }, [])
+  useEffect(() => { setBusy(false) }, [location.pathname])
   // 숨김 판별
-  const shouldHide = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r))
+  const shouldHide = busy || HIDDEN_ROUTES.some(r => location.pathname.startsWith(r))
   if (shouldHide) return null
 
   // 활성 탭 판별
