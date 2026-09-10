@@ -20,6 +20,7 @@ import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
 import { isEasy } from '@/lib/mode'
+import { garmentsOf, garmentKey, commitCloset, inCloset, type Garment } from '@/lib/closetAuto'
 import { plateName } from '@/lib/outfits'
 import { HAT_NAMES } from '@/lib/builderSlots'
 import { trackVote } from '@/lib/analytics'
@@ -694,6 +695,12 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const { user, profile: authProfile } = useAuth() as any
   const { weather } = useWeather()
   const easy = isEasy()   // 초보 앞문: 저장 · 물어보기만 크게, 분석표 없음
+  // 옷장은 쌓이는 곳: 이 코디의 옷들. 없는 옷은 칩으로 뺀다 (저장·물어보기 때 담긴다)
+  const garments: Garment[] = useMemo(() => garmentsOf(build.state), [build.state])
+  const [missing, setMissing] = useState<Set<string>>(() => new Set())
+  const [closetMsg, setClosetMsg] = useState<string | null>(null)
+  const toggleMissing = (g: Garment) => setMissing(prev => { const n = new Set(prev); const k = garmentKey(g); if (n.has(k)) n.delete(k); else n.add(k); return n })
+  const commitOwned = (from: string) => { const n = commitCloset(garments, missing, from); if (n > 0) setClosetMsg(t('build.closetAuto.added', { n })) }
   const [card, setCard] = useState<{ url: string; ratio: CardRatio } | null>(null)
   const [cardBusy, setCardBusy] = useState(false)
   const score = build.getScore()
@@ -715,6 +722,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     : []
 
   const handleSave = () => {
+    commitOwned('save')
     const name = build.state.style || t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null, scene: charSceneFromState(build.state) })
@@ -748,7 +756,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const shareCard = async () => { if (!card) return; const r = await shareDataUrl(card.url, `barupick-${Date.now()}.png`, t('card.title')); if (r === 'downloaded') toast.success(t('card.saved')) }
 
   // ── 루프 L3: 친구에게 물어보기 — 후보 화면에서 2~4벌을 직접 고른다 ──
-  const ask = () => { trackVote('create', { stage: 'open', score }); build.pushStep('vote') }
+  const ask = () => { commitOwned('ask'); trackVote('create', { stage: 'open', score }); build.pushStep('vote') }
   // 후보에 담기: 지금 코디를 바구니에 두고, 다른 코디를 만든 뒤 함께 고른다
   const basketAdd = () => {
     const garments = [...build.state.upper.map(l => l.plate).filter(Boolean), build.state.bottomItem, build.state.shoesItem].filter(Boolean) as string[]
@@ -854,6 +862,22 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
           })}
         </div>
       </div>
+
+      {/* 옷장에 담기: 없는 옷은 칩 한 번으로 뺀다 */}
+      {garments.length > 0 && (
+        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3.5 mb-5 shadow-warm-sm">
+          <div className="flex items-baseline gap-2 mb-2">
+            <span className="text-[13px] font-bold text-warm-900 dark:text-warm-100">{t('build.closetAuto.title')}</span>
+            <span className="text-[11px] text-warm-500">{closetMsg || t('build.closetAuto.hint')}</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {garments.map(g => { const off = missing.has(garmentKey(g)); const had = inCloset(g); return (
+              <button key={garmentKey(g)} onClick={() => toggleMissing(g)} className={`h-8 pl-1.5 pr-2.5 rounded-full text-[12px] font-semibold border flex items-center gap-1.5 transition-all active:scale-95 ${off ? 'bg-warm-100 dark:bg-warm-900/40 border-dashed border-warm-400 text-warm-400 line-through' : 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 text-warm-800 dark:text-warm-200'}`}>
+                <i className="w-4 h-4 rounded-full border border-black/10" style={{ background: COLORS_60[g.colorKey]?.hex, opacity: off ? .4 : 1 }} />{g.name}{had && !off && <span className="text-[10px] text-terra-600 font-bold">✓</span>}
+              </button>) })}
+          </div>
+        </div>
+      )}
 
       {easy ? (
         <>
