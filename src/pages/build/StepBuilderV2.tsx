@@ -4,8 +4,8 @@ import { ArrowLeft, RotateCcw, X, Check } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { charSceneFromState, charSex, setCharSex, canWearTie } from '@/lib/char/map'
-import { PLATE_NAMES } from '@/lib/outfits'
-import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
+import { PLATE_NAMES, PLATE_TO_ITEM } from '@/lib/outfits'
+import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, UI_OUTERNESS, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import { getFilledOutfit, type BuildHook } from '@/hooks/useBuild'
 import type { ComboCard } from '@/lib/engine'
 import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuide } from '@/lib/analytics'
@@ -251,7 +251,13 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   }, [guided, guide])
   const previewScene = (key: string) => {
     if (focus === 'acc') return charSceneFromState({ ...s, scarfColor: acc === 'scarf' ? key : s.scarfColor, hatColor: acc === 'hat' ? key : s.hatColor, tieColor: acc === 'tie' ? key : s.tieColor }, sex)
-    if (isUpper(focus)) return charSceneFromState({ ...s, upper: s.upper.map(l => uiSlotOf(l) === focus ? { ...l, colorKey: key } : l) }, sex)
+    if (isUpper(focus)) {
+      // 아직 안 입은 자리(하나씩 골라보기 첫 단계의 상의)는 기본 판으로 가상 레이어를 덧대어 색이 보이게
+      const worn = layerOf(s.upper, focus as UpperSlot)
+      const upper = worn ? s.upper.map(l => uiSlotOf(l) === focus ? { ...l, colorKey: key } : l)
+        : [...s.upper, { uid: -1, itemId: PLATE_TO_ITEM[types[0]] || types[0], colorKey: key, outerness: UI_OUTERNESS[focus as UpperSlot], plate: types[0] }]
+      return charSceneFromState({ ...s, upper }, sex)
+    }
     return charSceneFromState({ ...s, bottomColor: focus === 'bottom' ? key : s.bottomColor, shoesColor: focus === 'shoes' ? key : s.shoesColor }, sex)
   }
   const pickPreview = (c: { key: string; kind: string }, idx: number) => {
