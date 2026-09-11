@@ -1,7 +1,7 @@
 // 1단계 후보(Entry) → 만들기(useBuild.applyOutfit) 입력. 홈·조합 목록에서 같이 쓴다.
 import { PARTS, PLATE_TO_ITEM, STYLE_KEY, type Entry, type Part, type Situ } from './outfits'
 
-export const FALLBACK_PAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black' }
+export const FALLBACK_PAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black', tie: 'navy' }
 export const colorKeyOf = (e: Entry, k: Part) => e.c.pal[k] || FALLBACK_PAL[k]
 export const colorKeysOf = (e: Entry) => PARTS.filter(k => e.p[k]).map(k => colorKeyOf(e, k))
 
@@ -18,6 +18,7 @@ export function pickPayload(e: Entry, situ: Situ, goto: 'builder' | 'result') {
     layers,
     bottom: p.bottom ? { plate: p.bottom, colorKey: colorKeyOf(e, 'bottom') } : undefined,
     shoes: p.shoes ? { plate: p.shoes, colorKey: colorKeyOf(e, 'shoes') } : undefined,
+    tie: p.tie ? { plate: p.tie, colorKey: colorKeyOf(e, 'tie') } : undefined,
     style: STYLE_KEY[e.c.st] ?? null, templateId: e.c.id, situ, goto,
   }
 }

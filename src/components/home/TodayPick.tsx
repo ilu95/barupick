@@ -15,7 +15,7 @@ import { trackEvent } from '@/lib/analytics'
 // 17시 이후엔 내일 아침 체감으로 고른다.
 // ═══════════════════════════════════════════════════════
 
-const FALLBACK_PAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black' }
+const FALLBACK_PAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black', tie: 'navy' }
 
 function weekDots(): { on: boolean[]; n: number; last: number } {
   let dates: string[] = []

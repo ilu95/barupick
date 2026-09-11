@@ -26,7 +26,7 @@ import {
 // 색은 여기서 고르지 않는다 — 카드의 색은 전부 중립색이다.
 // ═══════════════════════════════════════════════════════
 
-const FALLBACK_PAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black' }
+const FALLBACK_PAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black', tie: 'navy' }
 const TEMP_STEPS = [15, 21, 26]
 
 export default function StepOutfit({ build }: { build: BuildHook }) {

@@ -129,6 +129,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" replace />} />
                   <Route path="/home" element={<Home />} />
+                  <Route path="/home/picks/style/:style" element={<PickList />} />
                   <Route path="/home/picks/:kind" element={<PickList />} />
                   <Route path="/home/build" element={<BuildCoord />} />
                   <Route path="/home/taste" element={<TasteQuiz />} />
