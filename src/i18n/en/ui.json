@@ -336,7 +336,7 @@
     "coordRecord": "Coord Records",
     "emptyCloset": "Your closet is empty",
     "addFirstItem": "Add your first item",
-    "itemCount": "{{count}} items",
+    "itemCount": "Add {{count}} more",
     "deleteItem": "Delete this item?",
     "deleteSuccess": "Deleted",
     "bestCoordTitle": "Best Coords",
@@ -345,6 +345,23 @@
     "firstOotdRecord": "Record your first OOTD",
     "scoreSuffix": "pts",
     "fromCoord": "from a look",
+    "fromBought": "Bought",
+    "summary": {
+      "add": "Add"
+    },
+    "needs": {
+      "title": "What you can do",
+      "combos": { "title": "Coord with my clothes", "sub": "Every combo you can make from what you own" },
+      "simulate": { "title": "Items worth adding", "sub": "See what a new item would change" },
+      "report": { "title": "Wardrobe report", "sub": "Top items and color balance" },
+      "add": { "title": "Add manually", "sub": "Register an item right away" },
+      "needTopBottom": "Needs a top and bottom"
+    },
+    "empty": {
+      "hint": "Tap \"Add to closet\" on a coord result and it lands here",
+      "addManual": "Add manually",
+      "goHome": "Build today's coord"
+    },
     "wish": {
       "title": "To buy",
       "hint": "Items you marked to buy",
@@ -360,6 +377,8 @@
     "step1": "Select category",
     "step2": "Select color",
     "step3": "Enter details",
+    "slot": "Slot",
+    "type": "Type",
     "brand": "Brand",
     "brandPlaceholder": "Brand name (optional)",
     "name": "Name",

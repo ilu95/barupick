@@ -1,12 +1,17 @@
 // @ts-nocheck
 import { setJSON } from '@/lib/storage'
 import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, Edit3, ArrowLeft, X } from 'lucide-react'
 import ColorPicker from '@/components/ui/ColorPicker'
-import { COLORS_60, getColorName } from '@/lib/colors'
+import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { ITEMS_CATALOG } from '@/lib/styles'
+import { typesFor, HAT_NAMES } from '@/lib/builderSlots'
+import { plateName, PLATE_TO_ITEM } from '@/lib/outfits'
+import { charSex } from '@/lib/char/map'
+
+const SLOT_ORDER = ['outer', 'middleware', 'top', 'inner', 'bottom', 'shoes', 'scarf', 'hat']
 
 // ITEMS_CATALOG + bottom/shoes combined list
 const ALL_ITEMS = [
@@ -83,9 +88,12 @@ function generateThumbnail(img) {
 
 export default function ClosetAdd() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
-  const [mode, setMode] = useState('select')
-  const [selectedItem, setSelectedItem] = useState(null) // ALL_ITEMS 중 하나
+  const { t, i18n } = useTranslation()
+  const ko = (i18n.language || 'ko').startsWith('ko')
+  const [searchParams] = useSearchParams()
+  const initialSlot = SLOT_ORDER.includes(searchParams.get('category')) ? searchParams.get('category') : null
+  const [mode, setMode] = useState(initialSlot ? 'manual' : 'select')
+  const [selectedItem, setSelectedItem] = useState(null) // ALL_ITEMS 중 하나 (사진 모드)
   const [color, setColor] = useState(null)
   const [brand, setBrand] = useState('')
   const [itemName, setItemName] = useState('')
@@ -96,9 +104,39 @@ export default function ClosetAdd() {
   const [extracting, setExtracting] = useState(false)
   const fileRef = useRef(null)
 
+  // 직접 등록(새 디자인): 자리 → 옷 종류 → 색
+  const [mSlot, setMSlot] = useState(initialSlot)
+  const [mPlate, setMPlate] = useState(null)
+  const [mColor, setMColor] = useState(null)
+  const [mColorTab, setMColorTab] = useState(COLOR_TABS[0].id)
+  const plateLabel = (id) => HAT_NAMES[id] ? HAT_NAMES[id][ko ? 'ko' : 'en'] : plateName(id)
+
   const resetForm = () => {
     setSelectedItem(null); setColor(null); setBrand(''); setItemName('')
     setPhotoData(null); setPhotoThumb(null); setCandidates([])
+  }
+  const resetManual = () => { setMSlot(null); setMPlate(null); setMColor(null); setMColorTab(COLOR_TABS[0].id) }
+
+  const handleSaveManual = () => {
+    if (!mSlot || !mPlate || !mColor) return
+    try {
+      const items = JSON.parse(localStorage.getItem('sp_wardrobe') || '[]')
+      const category = mSlot === 'inner' ? 'top' : mSlot
+      items.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        category,
+        itemType: PLATE_TO_ITEM[mPlate] ?? null,
+        plate: mPlate,
+        color: mColor, colorKey: mColor,
+        name: `${getColorName(mColor)} ${plateLabel(mPlate)}`,
+        source: 'manual',
+        createdAt: new Date().toISOString(),
+      })
+      if (items.length > 200) items.length = 200
+      setJSON('sp_wardrobe', items)
+      setSaved(true)
+      setTimeout(() => { setSaved(false); resetManual(); setMode('select') }, 1200)
+    } catch {}
   }
 
   const handleSave = () => {
@@ -255,26 +293,64 @@ export default function ClosetAdd() {
     )
   }
 
+  // ─── 직접 등록: 자리 칩 → 옷 종류 칩 → 색 칩 (만들기와 같은 방식) ───
+  const mTypes = mSlot ? typesFor(mSlot, charSex()) : []
   return (
     <div className="animate-screen-enter px-5 pt-2 pb-10">
-      <button onClick={() => { resetForm(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
+      <button onClick={() => { resetManual(); setMode('select') }} className="flex items-center gap-1 text-sm text-warm-600 dark:text-warm-400 mb-4 active:opacity-70"><ArrowLeft size={16} /> {t('common.back')}</button>
       <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('closetAdd.manualMode')}</h2>
 
-      {itemSelector}
+      <div className="mb-5">
+        <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. {t('closetAdd.slot')}</div>
+        <div className="flex flex-wrap gap-2">
+          {SLOT_ORDER.map(slot => (
+            <button key={slot} onClick={() => { setMSlot(slot); setMPlate(null) }} className={`h-8 px-3 rounded-full text-[12px] font-semibold transition-all ${mSlot === slot ? 'bg-warm-900 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
+              {t('builder.slot.' + slot)}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {selectedItem && (
+      {mSlot && (
         <div className="mb-5">
-          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">
-            2. {t('closetAdd.step2')} {color && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {getColorName(color)}</span>}
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. {t('closetAdd.type')}</div>
+          <div className="flex flex-wrap gap-2">
+            {mTypes.map(id => (
+              <button key={id} onClick={() => setMPlate(id)} className={`h-8 px-3 rounded-full text-[12px] font-semibold transition-all ${mPlate === id ? 'bg-warm-900 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
+                {plateLabel(id)}
+              </button>
+            ))}
           </div>
-          <ColorPicker inline selected={color} onSelect={setColor} onClear={() => setColor(null)} />
         </div>
       )}
 
-      {selectedItem && color && itemInfo(3)}
+      {mSlot && mPlate && (
+        <div className="mb-5">
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">
+            3. {t('closetAdd.step2')} {mColor && <span className="text-terra-600 dark:text-terra-400 normal-case tracking-normal">— {getColorName(mColor)}</span>}
+          </div>
+          <div className="flex gap-3.5 overflow-x-auto [scrollbar-width:none] mb-2">
+            {COLOR_TABS.map(tab => (
+              <button key={tab.id} onClick={() => setMColorTab(tab.id)} className={`flex-none text-[12px] font-semibold pb-0.5 border-b-2 whitespace-nowrap ${mColorTab === tab.id ? 'text-warm-900 dark:text-warm-100 border-warm-900 dark:border-warm-100' : 'text-warm-500 border-transparent'}`}>{tab.label}</button>
+            ))}
+          </div>
+          <div className="grid grid-flow-col gap-1.5 overflow-x-auto [scrollbar-width:none] pb-1" style={{ gridTemplateRows: 'repeat(2, 56px)', gridAutoColumns: '54px' }}>
+            {(COLOR_TABS.find(x => x.id === mColorTab)?.keys || []).map(k => {
+              const c = COLORS_60[k]; if (!c) return null
+              const on = mColor === k
+              return (
+                <button key={k} onClick={() => setMColor(k)} className="w-[54px] flex flex-col items-center gap-1 active:scale-95 transition-transform">
+                  <span className="w-9 h-9 rounded-full border-2 border-white" style={{ background: c.hex, boxShadow: on ? '0 0 0 2px #1C1917' : '0 0 0 1px rgba(28,25,23,.15)' }} />
+                  <span className={`text-[10px] leading-none max-w-[54px] truncate ${on ? 'font-semibold text-warm-900 dark:text-warm-100' : 'text-warm-500'}`}>{getColorName(k)}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
-      {selectedItem && color && (
-        <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('common.done')}</button>
+      {mSlot && mPlate && mColor && (
+        <button onClick={handleSaveManual} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-terra">{t('build.closetAuto.button')}</button>
       )}
     </div>
   )

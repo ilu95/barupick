@@ -336,7 +336,7 @@
     "coordRecord": "코디 기록",
     "emptyCloset": "옷장이 비어있어요",
     "addFirstItem": "첫 아이템을 등록해보세요",
-    "itemCount": "{{count}}개",
+    "itemCount": "{{count}}벌 더 있으면 돼요",
     "deleteItem": "삭제하시겠어요?",
     "deleteSuccess": "삭제되었어요",
     "bestCoordTitle": "베스트 코디",
@@ -345,6 +345,23 @@
     "firstOotdRecord": "첫 OOTD 기록하기",
     "scoreSuffix": "점",
     "fromCoord": "코디에서",
+    "fromBought": "샀어요",
+    "summary": {
+      "add": "담기"
+    },
+    "needs": {
+      "title": "할 수 있는 일",
+      "combos": { "title": "내 옷으로 코디 짜기", "sub": "가진 옷으로 만드는 모든 조합" },
+      "simulate": { "title": "추가하면 좋을 아이템", "sub": "새 아이템을 더하면 뭐가 달라질지" },
+      "report": { "title": "옷장 리포트", "sub": "활약 아이템과 컬러 밸런스" },
+      "add": { "title": "직접 담기", "sub": "원하는 옷을 바로 등록해요" },
+      "needTopBottom": "상의·하의가 있어야 해요"
+    },
+    "empty": {
+      "hint": "코디 결과에서 \"옷장에 담기\"를 누르면 여기 쌓여요",
+      "addManual": "직접 담기",
+      "goHome": "오늘 코디 만들러 가기"
+    },
     "wish": {
       "title": "살 옷",
       "hint": "담아 둔 살 옷",
@@ -360,6 +377,8 @@
     "step1": "카테고리 선택",
     "step2": "색상 선택",
     "step3": "정보 입력",
+    "slot": "자리",
+    "type": "옷 종류",
     "brand": "브랜드",
     "brandPlaceholder": "브랜드명 (선택)",
     "name": "이름",
