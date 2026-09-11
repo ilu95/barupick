@@ -161,7 +161,8 @@ export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: n
     cards.push({ outfit: key, total: r.total, why, kind, mine })
   }
   const tasteCard = cards.find(c => c.kind === 'taste')
-  const rest = cards.filter(c => c.kind !== 'taste').sort((a, b) => b.total - a.total)
+  // 보기 좋은 조합만 — 60점(괜찮음) 미만은 카드로 내지 않는다
+  const rest = cards.filter(c => c.kind !== 'taste' && c.total >= 60).sort((a, b) => b.total - a.total)
   return [...rest.slice(0, opts.n || 6), ...(tasteCard ? [tasteCard] : [])]
 }
 
