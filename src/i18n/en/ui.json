@@ -1926,6 +1926,9 @@
         "two": "Two-tone",
         "taste": "Your taste"
       }
+    },
+    "preview": {
+      "title": "Try for this spot"
     }
   },
   "reminder": {

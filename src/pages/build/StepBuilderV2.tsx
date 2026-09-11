@@ -219,7 +219,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const wardrobeBySlot = useMemo(() => Object.fromEntries(
     (['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat'] as const).map(cat => [cat, Array.from(new Set(wardrobe.getItems(cat).map(i => i.color)))])
   ), [wardrobe.items])
-  const combos = useMemo(() => build.getCombos({ fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) }), [s, touched, wardrobeBySlot])
+  const combos = useMemo(() => guided ? [] : build.getCombos({ fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) }), [guided, s, touched, wardrobeBySlot])
   useEffect(() => { if (combos.length) trackEvent('combo_view', { n: combos.length }) }, [combos.length])
   const filled = getFilledOutfit(s)
   const comboActive = (c: ComboCard) => Object.entries(c.outfit).every(([slot, key]) => filled[slot] === key)
@@ -236,6 +236,28 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const applyCombo = (c: ComboCard) => {
     build.applyColors(c.outfit)
     trackEvent('combo_pick', { idx: combos.indexOf(c), kind: c.kind, total: c.total, mine: c.mine })
+  }
+
+  // 하나씩 골라보기: 조합 줄 대신 이 자리 후보 3장(무난·어울려요·포인트 1위) — 누르면 그 색 적용 + 다음 자리로
+  const previewCards = useMemo(() => {
+    if (!guided || !guide) return []
+    const cands: { key: string; kind: 'safe' | 'match' | 'point' }[] = []
+    if (guide.groups.safe[0]) cands.push({ key: guide.groups.safe[0], kind: 'safe' })
+    if (guide.groups.match[0]) cands.push({ key: guide.groups.match[0], kind: 'match' })
+    const pointKey = guide.groups.point[0] || guide.groups.match[1]
+    if (pointKey) cands.push({ key: pointKey, kind: 'point' })
+    const seen = new Set<string>()
+    return cands.filter(c => !seen.has(c.key) && seen.add(c.key))
+  }, [guided, guide])
+  const previewScene = (key: string) => {
+    if (focus === 'acc') return charSceneFromState({ ...s, scarfColor: acc === 'scarf' ? key : s.scarfColor, hatColor: acc === 'hat' ? key : s.hatColor, tieColor: acc === 'tie' ? key : s.tieColor }, sex)
+    if (isUpper(focus)) return charSceneFromState({ ...s, upper: s.upper.map(l => uiSlotOf(l) === focus ? { ...l, colorKey: key } : l) }, sex)
+    return charSceneFromState({ ...s, bottomColor: focus === 'bottom' ? key : s.bottomColor, shoesColor: focus === 'shoes' ? key : s.shoesColor }, sex)
+  }
+  const pickPreview = (c: { key: string; kind: string }, idx: number) => {
+    pickColor(c.key, 'rec', idx, c.kind)
+    trackEvent('guided_preview_pick', { slot: colorSlot, idx })
+    nextGuide()
   }
 
   return (
@@ -273,7 +295,25 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
 
       {/* 서랍 */}
       <div className="flex-1 bg-white dark:bg-warm-800 border-t border-warm-300 dark:border-warm-700 pt-2 pb-24">
-        {combos.length > 0 && (
+        {guided ? previewCards.length > 0 && (
+          <div className="px-4 pb-2 mb-2 border-b border-warm-200 dark:border-warm-700">
+            <div className="text-[10.5px] font-bold text-warm-500 mb-1.5">{t('builder.preview.title')}</div>
+            <div className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
+              {previewCards.map((c, i) => {
+                const on = cur === c.key
+                return (
+                  <button key={c.key} onClick={() => pickPreview(c, i)} className="flex-none w-[72px] flex flex-col items-center gap-0.5 active:scale-95 transition-transform">
+                    <span className={`rounded-xl overflow-hidden border-2 ${on ? 'border-warm-900 dark:border-warm-100' : 'border-transparent'}`}>
+                      <CharacterCanvas {...previewScene(c.key)} width={72} style={{ contentVisibility: 'auto' } as React.CSSProperties} />
+                    </span>
+                    <span className="text-[11px] font-bold text-warm-900 dark:text-warm-100 truncate max-w-full">{getColorName(c.key)}</span>
+                    <span className="text-[9.5px] text-warm-500 truncate max-w-full">{t('builder.group.' + c.kind)}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ) : combos.length > 0 && (
           <div className="px-4 pb-2 mb-2 border-b border-warm-200 dark:border-warm-700">
             <div className="text-[10.5px] font-bold text-warm-500 mb-1.5">
               {t('builder.combos.title')}
