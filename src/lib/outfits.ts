@@ -10,7 +10,7 @@
 import i18n from '@/i18n'
 
 export type Situ = 'work' | 'daily' | 'date' | 'formal' | 'active' | 'home'
-export type Part = 'outer' | 'layer' | 'top' | 'bottom' | 'shoes'
+export type Part = 'outer' | 'layer' | 'top' | 'bottom' | 'shoes' | 'tie'
 export type Parts = Partial<Record<Part, string>>
 export interface Template { id: string; tag: Situ; st: string; p: Parts; w: Parts | null; pal: Record<string, string> }
 export interface Score { situ: number; weather: number; taste: number; recent: number; dis: number; total: number; f: number; w: number; ov: number }
@@ -18,15 +18,15 @@ export interface Entry { c: Template; p: Parts; s: Score; chg?: Part; from?: str
 export interface Prefs { likes: Record<string, number>; likedStyles: Record<string, number>; dislikes: string[] }
 export interface Ctx { sex: 'm' | 'w'; situ: Situ; temp: number; prefs: Prefs; recent: { id: string; ago: number }[]; anchor?: string | null }
 
-export const PARTS: Part[] = ['outer', 'layer', 'top', 'bottom', 'shoes']
+export const PARTS: Part[] = ['outer', 'layer', 'top', 'bottom', 'shoes', 'tie']
 export const SITU: { id: Situ; range: [number, number] }[] = [
   { id: 'work', range: [3, 4.6] }, { id: 'daily', range: [1.5, 3.5] }, { id: 'date', range: [2.5, 4] },
   { id: 'formal', range: [3.8, 5] }, { id: 'active', range: [1, 2.6] }, { id: 'home', range: [1, 2.6] },
 ]
 /** 조합 카드의 중립색 — 옷 모양이 주인공이라 색은 죽인다. 바뀐 옷만 CHG 로 살짝 띄운다. */
-export const NEU: Record<Part, string> = { outer: '#9A948C', layer: '#C4BDB3', top: '#ECE7DF', bottom: '#4B4844', shoes: '#2A2825' }
+export const NEU: Record<Part, string> = { outer: '#9A948C', layer: '#C4BDB3', top: '#ECE7DF', bottom: '#4B4844', shoes: '#2A2825', tie: '#7A6A5A' }
 export const CHG = '#7A6A5A'
-const DEFPAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black' }
+const DEFPAL: Record<Part, string> = { outer: 'camel', layer: 'beige', top: 'white', bottom: 'charcoal', shoes: 'black', tie: 'navy' }
 
 /** 판 id → 이름 (catalog3.json ko · 컬러랩 en.json) */
 export const PLATE_NAMES: Record<string, { ko: string; en: string }> = {
@@ -1336,6 +1336,638 @@ export const TEMPLATES: Template[] = [
       "bottom": "gray",
       "shoes": "white"
     }
+  },
+  {
+    "id": "f8",
+    "tag": "formal",
+    "st": "프레피",
+    "p": {
+      "layer": "14_knit_vest",
+      "top": "08_shirt_closed",
+      "tie": "59_tie",
+      "bottom": "03_slacks_straight",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "layer": "camel",
+      "top": "white",
+      "tie": "burgundy",
+      "bottom": "charcoal",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "d10",
+    "tag": "daily",
+    "st": "아이비",
+    "p": {
+      "outer": "19_blazer",
+      "top": "08_shirt_closed",
+      "bottom": "63_chino",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "outer": "navy",
+      "top": "white",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "d11",
+    "tag": "daily",
+    "st": "올드머니",
+    "p": {
+      "layer": "15_cardigan",
+      "top": "13_knit_turtle",
+      "bottom": "64_corduroy",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "layer": "camel",
+      "top": "cream",
+      "bottom": "brown",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "t10",
+    "tag": "date",
+    "st": "랄프룩",
+    "p": {
+      "outer": "30_trench",
+      "top": "37_polo",
+      "bottom": "63_chino",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "outer": "camel",
+      "top": "white",
+      "bottom": "navy",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "w10",
+    "tag": "work",
+    "st": "랄프룩",
+    "p": {
+      "outer": "19_blazer",
+      "top": "37_polo",
+      "bottom": "63_chino",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "outer": "navy",
+      "top": "white",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "d12",
+    "tag": "daily",
+    "st": "랄프룩",
+    "p": {
+      "layer": "15_cardigan",
+      "top": "37_polo",
+      "bottom": "63_chino",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "layer": "burgundy",
+      "top": "white",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "f9",
+    "tag": "formal",
+    "st": "랄프룩",
+    "p": {
+      "outer": "19_blazer",
+      "layer": "14_knit_vest",
+      "top": "08_shirt_closed",
+      "bottom": "03_slacks_straight",
+      "shoes": "74_loafer"
+    },
+    "w": null,
+    "pal": {
+      "outer": "navy",
+      "layer": "burgundy",
+      "top": "white",
+      "bottom": "navy",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "t11",
+    "tag": "date",
+    "st": "놈코어",
+    "p": {
+      "top": "12_knit_vneck",
+      "bottom": "01_denim_straight",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "white",
+      "bottom": "denim",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "a8",
+    "tag": "active",
+    "st": "애슬레저",
+    "p": {
+      "outer": "21_windbreaker",
+      "top": "35_sweat",
+      "bottom": "40_track",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "gray",
+      "bottom": "charcoal",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "h8",
+    "tag": "home",
+    "st": "애슬레저",
+    "p": {
+      "top": "16_hoodie",
+      "bottom": "40_track",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "charcoal",
+      "bottom": "gray",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "w11",
+    "tag": "work",
+    "st": "아메카지",
+    "p": {
+      "outer": "31_trucker",
+      "top": "07_tee_long",
+      "bottom": "63_chino",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "denim",
+      "top": "white",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "h9",
+    "tag": "home",
+    "st": "아메카지",
+    "p": {
+      "top": "35_sweat",
+      "bottom": "01_denim_straight",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "top": "cream",
+      "bottom": "denim",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "w12",
+    "tag": "work",
+    "st": "워크웨어",
+    "p": {
+      "outer": "44_field",
+      "top": "07_tee_long",
+      "bottom": "39_cargo",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "olive",
+      "top": "gray",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "d13",
+    "tag": "daily",
+    "st": "워크웨어",
+    "p": {
+      "outer": "31_trucker",
+      "top": "07_tee_long",
+      "bottom": "39_cargo",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "denim",
+      "top": "white",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "a9",
+    "tag": "active",
+    "st": "워크웨어",
+    "p": {
+      "top": "16_hoodie",
+      "bottom": "39_cargo",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "top": "charcoal",
+      "bottom": "olive",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "h10",
+    "tag": "home",
+    "st": "워크웨어",
+    "p": {
+      "outer": "44_field",
+      "top": "06_tee_short",
+      "bottom": "63_chino",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "khaki",
+      "top": "white",
+      "bottom": "olive",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "d14",
+    "tag": "daily",
+    "st": "밀리터리",
+    "p": {
+      "outer": "44_field",
+      "top": "07_tee_long",
+      "bottom": "39_cargo",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "olive",
+      "top": "khaki",
+      "bottom": "olive",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "a10",
+    "tag": "active",
+    "st": "밀리터리",
+    "p": {
+      "outer": "29_puffer",
+      "top": "16_hoodie",
+      "bottom": "39_cargo",
+      "shoes": "73_sneaker_chunky"
+    },
+    "w": null,
+    "pal": {
+      "outer": "olive",
+      "top": "black",
+      "bottom": "khaki",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "w13",
+    "tag": "work",
+    "st": "밀리터리",
+    "p": {
+      "outer": "31_trucker",
+      "top": "08_shirt_closed",
+      "bottom": "39_cargo",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "olive",
+      "top": "khaki",
+      "bottom": "olive",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "h11",
+    "tag": "home",
+    "st": "밀리터리",
+    "p": {
+      "top": "07_tee_long",
+      "bottom": "39_cargo",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "olive",
+      "bottom": "khaki",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "f10",
+    "tag": "formal",
+    "st": "브리티시",
+    "p": {
+      "outer": "30_trench",
+      "top": "13_knit_turtle",
+      "bottom": "03_slacks_straight",
+      "shoes": "75_boots_chelsea"
+    },
+    "w": null,
+    "pal": {
+      "outer": "olive",
+      "top": "charcoal",
+      "bottom": "charcoal",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "h12",
+    "tag": "home",
+    "st": "브리티시",
+    "p": {
+      "outer": "28_coat_short",
+      "top": "11_knit_crew",
+      "bottom": "64_corduroy",
+      "shoes": "75_boots_chelsea"
+    },
+    "w": null,
+    "pal": {
+      "outer": "camel",
+      "top": "cream",
+      "bottom": "brown",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "a11",
+    "tag": "active",
+    "st": "고프코어",
+    "p": {
+      "outer": "42_fleece",
+      "top": "07_tee_long",
+      "bottom": "40_track",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "outer": "olive",
+      "top": "gray",
+      "bottom": "khaki",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "h13",
+    "tag": "home",
+    "st": "스트릿",
+    "p": {
+      "top": "16_hoodie",
+      "bottom": "61_pants_balloon",
+      "shoes": "73_sneaker_chunky"
+    },
+    "w": null,
+    "pal": {
+      "top": "olive",
+      "bottom": "black",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "d15",
+    "tag": "daily",
+    "st": "그런지",
+    "p": {
+      "layer": "10_shirt_open",
+      "top": "06_tee_short",
+      "bottom": "38_denim_slim",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "layer": "charcoal",
+      "top": "black",
+      "bottom": "denim",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "t12",
+    "tag": "date",
+    "st": "그런지",
+    "p": {
+      "layer": "10_shirt_open",
+      "top": "36_tank",
+      "bottom": "38_denim_slim",
+      "shoes": "75_boots_chelsea"
+    },
+    "w": null,
+    "pal": {
+      "layer": "black",
+      "top": "white",
+      "bottom": "denim",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "h14",
+    "tag": "home",
+    "st": "그런지",
+    "p": {
+      "top": "16_hoodie",
+      "bottom": "38_denim_slim",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "black",
+      "bottom": "denim",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "a12",
+    "tag": "active",
+    "st": "그런지",
+    "p": {
+      "outer": "20_leather",
+      "top": "06_tee_short",
+      "bottom": "38_denim_slim",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "charcoal",
+      "bottom": "denim",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "d16",
+    "tag": "daily",
+    "st": "컨템포러리",
+    "p": {
+      "top": "13_knit_turtle",
+      "bottom": "04_slacks_wide",
+      "shoes": "77_derby"
+    },
+    "w": null,
+    "pal": {
+      "top": "black",
+      "bottom": "gray",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "a13",
+    "tag": "active",
+    "st": "테크웨어",
+    "p": {
+      "outer": "21_windbreaker",
+      "top": "07_tee_long",
+      "bottom": "39_cargo",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "gray",
+      "bottom": "black",
+      "shoes": "gray"
+    }
+  },
+  {
+    "id": "d17",
+    "tag": "daily",
+    "st": "테크웨어",
+    "p": {
+      "outer": "21_windbreaker",
+      "top": "16_hoodie",
+      "bottom": "39_cargo",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "outer": "charcoal",
+      "top": "black",
+      "bottom": "charcoal",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "h15",
+    "tag": "home",
+    "st": "테크웨어",
+    "p": {
+      "outer": "42_fleece",
+      "top": "36_tank",
+      "bottom": "40_track",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "gray",
+      "bottom": "black",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "w14",
+    "tag": "work",
+    "st": "테크웨어",
+    "p": {
+      "outer": "21_windbreaker",
+      "top": "08_shirt_closed",
+      "bottom": "39_cargo",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "gray",
+      "bottom": "charcoal",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "d18",
+    "tag": "daily",
+    "st": "젠더리스",
+    "p": {
+      "top": "08_shirt_closed",
+      "bottom": "04_slacks_wide",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "white",
+      "bottom": "black",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "w15",
+    "tag": "work",
+    "st": "젠더리스",
+    "p": {
+      "outer": "19_blazer",
+      "top": "36_tank",
+      "bottom": "04_slacks_wide",
+      "shoes": "77_derby"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "white",
+      "bottom": "black",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "h16",
+    "tag": "home",
+    "st": "젠더리스",
+    "p": {
+      "top": "16_hoodie",
+      "bottom": "04_slacks_wide",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "ivory",
+      "bottom": "black",
+      "shoes": "white"
+    }
   }
 ]
 
@@ -1357,6 +1989,7 @@ export const STYLE_KEY: Record<string, string | null> = {
   '아이비': 'ivy', '댄디': 'dandy', '미니멀': 'minimal', '올드머니': 'oldmoney', '프레피': 'preppy', '시티보이': 'cityboy',
   '컨템포러리': 'contemporary', '놈코어': 'normcore', '브리티시': 'british', '캐주얼': 'casual', '아메카지': 'amekaji',
   '스트릿': 'street', '고프코어': 'gorpcore', '젠더리스': 'genderless', '애슬레저': 'athleisure', '클래식': 'ivy', '세미포멀': 'dandy',
+  '랄프룩': 'ralphlook', '워크웨어': 'workwear', '밀리터리': 'military', '그런지': 'grunge', '테크웨어': 'techwear',
 }
 
 const isKo = () => (i18n.language || 'ko').startsWith('ko')

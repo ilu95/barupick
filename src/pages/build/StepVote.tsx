@@ -101,7 +101,7 @@ export default function StepVote({ build }: { build: BuildHook }) {
       if (!cur) return []
       const keyOf: Record<Part, string> = {
         outer: layerOf(s.upper, 'outer')?.colorKey || 'camel', layer: layerOf(s.upper, 'middleware')?.colorKey || 'beige',
-        top: layerOf(s.upper, 'top')?.colorKey || layerOf(s.upper, 'inner')?.colorKey || 'white', bottom: s.bottomColor || 'charcoal', shoes: s.shoesColor || 'black',
+        top: layerOf(s.upper, 'top')?.colorKey || layerOf(s.upper, 'inner')?.colorKey || 'white', bottom: s.bottomColor || 'charcoal', shoes: s.shoesColor || 'black', tie: s.tieColor || 'navy',
       }
       const body = charSceneFromState(s, sex).body
       return alternatives(cur, ctx).slice(0, 3).map(e => {

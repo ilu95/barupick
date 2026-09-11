@@ -227,8 +227,8 @@
         "basket": "{{n}} picks saved"
       },
       "styles": {
-        "title": "30 outfits by style",
-        "sub": "Mood → garments → colors"
+        "title": "Outfit combos by style",
+        "sub": "Preppy, minimal, gorpcore… garments that fit each style"
       }
     },
     "links": {
@@ -472,6 +472,7 @@
     "moodDesc": "Choose a mood and we'll recommend outfits in that style.",
     "allStyles": "Recommend from all styles →",
     "styleTitle": "Select Style",
+    "templateCount": "{{count}} combos",
     "allRecommend": "Recommend from all →",
     "mustWear": "I must wear this!",
     "mustWearDesc": "Pick items you want to include. Skip if none.",
@@ -1923,6 +1924,29 @@
       "title": "Outer combos",
       "sub": "Only outfits with an outer layer. Tap one to pick its colors"
     },
-    "empty": "No matching combos for this temperature and occasion. Tap the temperature above to change it"
+    "empty": "No matching combos for this temperature and occasion. Tap the temperature above to change it",
+    "styleNeighbor": "From nearby styles",
+    "styleWhy": {
+      "preppy": "Knit vest and tie for a tidy Ivy League finish",
+      "ivy": "Blazer, oxford shirt and loafers — classic campus style",
+      "dandy": "Wool coat, turtleneck and Chelsea boots for a mature edge",
+      "oldmoney": "Cashmere and corduroy — quiet, understated luxury",
+      "ralphlook": "Polo shirt and cable knit — American traditional style",
+      "minimal": "Plain tee and wide pants, refined with no extras",
+      "casual": "Sweatshirt, jeans and sneakers — easy everyday wear",
+      "cityboy": "Oversized shirt and wide pants in natural pastel tones",
+      "normcore": "Plain tee and straight jeans, deliberately unremarkable",
+      "athleisure": "Jogger pants and a hooded zip-up, gym-comfortable",
+      "amekaji": "Denim jacket and work boots with checked shirt vintage feel",
+      "workwear": "Coverall, work pants and boots for a practical laborer mood",
+      "military": "Cargo pants and combat boots with a military jacket silhouette",
+      "british": "Barbour jacket, tweed and Chelsea boots — English countryside",
+      "gorpcore": "Fleece, trekking shoes and cargo pants bringing the outdoors to the city",
+      "street": "Hoodie, cargo pants and high-tops for a free street mood",
+      "grunge": "Checked flannel, ripped jeans and boots — a rebellious mix",
+      "contemporary": "Structured jacket in monotone for a modern silhouette",
+      "techwear": "Gore-Tex, cargo pants and tech runners for a functional city look",
+      "genderless": "Oversized shirt and wide pants, free of gender lines"
+    }
   }
 }

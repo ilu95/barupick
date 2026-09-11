@@ -7,7 +7,7 @@ import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { MOOD_GROUPS, STYLE_ICONS } from '@/lib/styles'
 import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT, type CharScene } from '@/lib/char/map'
 import { typesFor, HAT_NAMES } from '@/lib/builderSlots'
-import { PLATE_TO_ITEM, plateName as plateNameOf } from '@/lib/outfits'
+import { PLATE_TO_ITEM, plateName as plateNameOf, TEMPLATES, STYLE_KEY, PARTS } from '@/lib/outfits'
 import { useRecommend, type ComboResult } from '@/hooks/useRecommend'
 import { trackEvent } from '@/lib/analytics'
 
@@ -30,6 +30,10 @@ const MID_BY_TYPE: Record<string, string> = { cardigan: '15_cardigan', vest: '14
 const NEU: Record<Slot, string> = { outer: '#9A948C', middleware: '#C4BDB3', top: '#ECE7DF', bottom: '#4B4844', shoes: '#2A2825', scarf: '#B8AFA4', hat: '#6E6862' }
 
 const plateName = (id: string) => HAT_NAMES[id] ? HAT_NAMES[id][(navigator.language || 'ko').startsWith('ko') ? 'ko' : 'en'] : plateNameOf(id)
+
+/** 스타일 키 → 그 스타일의 템플릿들 (스타일 목록의 코디 개수 · 미리보기 카드용) */
+const TEMPLATES_BY_STYLE: Record<string, typeof TEMPLATES> = {}
+for (const tpl of TEMPLATES) { const key = STYLE_KEY[tpl.st]; if (key) (TEMPLATES_BY_STYLE[key] ||= []).push(tpl) }
 
 /** 판 + 자리별 색 → 장면 */
 function sceneOf(plates: Record<string, string>, hex: Partial<Record<Slot, string>>, types: { outerType: string; midType: string }, sex: 'm' | 'w'): CharScene {
@@ -77,6 +81,7 @@ const chipCls = (on: boolean) => `h-8 px-3 rounded-full text-[12.5px] font-semib
 function StepMood({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const sex = charSex()
   const mood = rec.state.mood
   const group = mood ? MOOD_GROUPS[mood] : null
   return (
@@ -101,17 +106,24 @@ function StepMood({ rec }: { rec: RecHook }) {
         <div className="px-4 mt-4 animate-screen-fade">
           <div className="text-[11px] font-bold text-warm-500 dark:text-warm-400 mb-1.5">{group.icon} {t('styles:moodGroups.' + mood + '.name')} · {t('recommend.styleTitle')}</div>
           <div className="flex flex-col gap-1.5">
-            {group.styles.map((s: string) => (
-              <button key={s} onClick={() => { rec.selectStyle(s); trackEvent('rec_style', { style: s }) }}
-                className="w-full flex items-center gap-2.5 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.98] transition-all">
-                <span className="text-[18px]">{(STYLE_ICONS as any)?.[s] || '🎨'}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13.5px] font-bold text-warm-900 dark:text-warm-100">{t('styles:guide.' + s + '.name')}</div>
-                  <div className="text-[11px] text-warm-500 truncate">{t('styles:guide.' + s + '.subtitle')}</div>
-                </div>
-                <ArrowRight size={15} className="text-warm-400" />
-              </button>
-            ))}
+            {group.styles.map((s: string) => {
+              const tpls = TEMPLATES_BY_STYLE[s] || []
+              const first = tpls[0]
+              return (
+                <button key={s} onClick={() => { navigate('/home/picks/style/' + s); trackEvent('rec_style', { style: s }) }}
+                  className="w-full flex items-center gap-2.5 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.98] transition-all">
+                  {first ? (
+                    <CharacterCanvas items={PARTS.filter(k => first.p[k]).map(k => ({ id: first.p[k]!, color: COLORS_60[first.pal[k] as string]?.hex || '#ccc' }))}
+                      body={{ sex, hair: DEFAULT_HAIR[sex], hairColor: DEFAULT_HAIR_COLOR }} width={44} />
+                  ) : <span className="text-[18px]">{(STYLE_ICONS as any)?.[s] || '🎨'}</span>}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13.5px] font-bold text-warm-900 dark:text-warm-100">{t('styles:guide.' + s + '.name')}</div>
+                    <div className="text-[11px] text-warm-500 truncate">{t('styles:guide.' + s + '.subtitle')} · {t('recommend.templateCount', { count: tpls.length })}</div>
+                  </div>
+                  <ArrowRight size={15} className="text-warm-400" />
+                </button>
+              )
+            })}
             <button onClick={() => rec.selectStyle(null)} className="w-full py-2.5 rounded-2xl border border-dashed border-warm-400 text-[12.5px] font-semibold text-warm-600 dark:text-warm-300 active:scale-[0.98]">{t('recommend.allRecommend')}</button>
           </div>
         </div>
