@@ -1,0 +1,3201 @@
+{
+ "note": "기준 세트 v2 (2026-09-11) — 실무 출처(스타일리스트 가이드·브랜드 팔레트·국내 커뮤니티 정석·에디토리얼)에서 옮겨 적은 좋은 100·나쁜 50. cat: A 클래식 스마트 / B 한국 데일리 / C 여성·에디토리얼 / D 브랜드 룩북 / E 톤온톤·모노톤 / F 톤인톤·포인트 ; G 원색 과다 / H 톤 불일치 / I 온도 충돌 / J 명도 뭉개짐 / K 어두운 셋·블랙×브라운 / L 연상·보색 / M 근접 불일치. 스타일리스트 검수 전.",
+ "good": [
+  {
+   "name": "네이비 블레이저·화이트 셔츠·베이지 치노·브라운 로퍼",
+   "cat": "A",
+   "src": "VOU/ffashionmouse",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "beige"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "네이비 블레이저·스카이블루 셔츠·그레이 슬랙스·블랙 더비",
+   "cat": "A",
+   "src": "VOU",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "sky_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "77_derby",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "차콜 수트·화이트 셔츠·버건디 타이·블랙 더비",
+   "cat": "A",
+   "src": "VOU",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "charcoal"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "tie": [
+     "tie",
+     "burgundy"
+    ],
+    "shoes": [
+     "77_derby",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 수트·화이트 셔츠·버건디 타이·블랙 더비",
+   "cat": "A",
+   "src": "VOU",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "tie": [
+     "tie",
+     "burgundy"
+    ],
+    "shoes": [
+     "77_derby",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 수트·파우더블루 셔츠·브라운 더비",
+   "cat": "A",
+   "src": "ffashionmouse",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "powder_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "77_derby",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "그레이 수트·화이트 셔츠·네이비 타이·블랙 더비",
+   "cat": "A",
+   "src": "VOU",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "gray"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "tie": [
+     "tie",
+     "navy"
+    ],
+    "shoes": [
+     "77_derby",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·네이비 니트·그레이 슬랙스·브라운 부츠",
+   "cat": "A",
+   "src": "gentlemanwithin",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·화이트 셔츠·네이비 슬랙스·브라운 로퍼",
+   "cat": "A",
+   "src": "StudioSuits",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "네이비 코트·그레이 니트·차콜 슬랙스·블랙 부츠",
+   "cat": "A",
+   "src": "gentlemanwithin",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "navy"
+    ],
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "차콜 코트·버건디 니트·그레이 슬랙스·블랙 첼시",
+   "cat": "A",
+   "src": "VOU",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "charcoal"
+    ],
+    "top": [
+     "11_knit_crew",
+     "burgundy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 블레이저·화이트 티·화이트 치노·브라운 로퍼",
+   "cat": "A",
+   "src": "apetogentleman",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "white"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "올리브 필드재킷·화이트 티·데님·브라운 워커",
+   "cat": "A",
+   "src": "gentlemanwithin",
+   "items": {
+    "outer": [
+     "44_field",
+     "olive"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "denim"
+    ],
+    "shoes": [
+     "76_boots_walker",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "브라운 블루종·아이보리 니트·네이비 데님·브라운 로퍼",
+   "cat": "A",
+   "src": "StudioSuits",
+   "items": {
+    "outer": [
+     "18_jacket_short",
+     "brown"
+    ],
+    "top": [
+     "11_knit_crew",
+     "ivory"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "그레이 블레이저·화이트 셔츠·네이비 슬랙스·블랙 로퍼",
+   "cat": "A",
+   "src": "ffashionmouse",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "gray"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 니트·화이트 셔츠 이너·베이지 치노·브라운 로퍼",
+   "cat": "A",
+   "src": "VOU",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "inner": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "beige"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "버건디 니트·차콜 슬랙스·블랙 첼시",
+   "cat": "A",
+   "src": "VOU charcoal+burgundy",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "burgundy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "포레스트 니트·베이지 치노·브라운 로퍼",
+   "cat": "A",
+   "src": "whowhatwear forest+ivory",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "forest"
+    ],
+    "bottom": [
+     "63_chino",
+     "beige"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "카멜 니트·네이비 슬랙스·브라운 로퍼",
+   "cat": "A",
+   "src": "whowhatwear camel+navy",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "camel"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "베이지 트렌치·네이비 니트·그레이 슬랙스·브라운 더비",
+   "cat": "A",
+   "src": "apetogentleman",
+   "items": {
+    "outer": [
+     "30_trench",
+     "beige"
+    ],
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "77_derby",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "네이비 피코트·아이보리 목폴라·차콜 슬랙스·블랙 부츠",
+   "cat": "A",
+   "src": "gentlemanwithin",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "navy"
+    ],
+    "top": [
+     "13_knit_turtle",
+     "ivory"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "화이트 티·블랙 슬랙스·블랙 스니커",
+   "cat": "B",
+   "src": "ffashionmouse B",
+   "items": {
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "화이트 셔츠·중청 데님·화이트 스니커",
+   "cat": "B",
+   "src": "catallena",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "denim"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "베이지 재킷·화이트 티·블랙 슬랙스·블랙 로퍼",
+   "cat": "B",
+   "src": "ffashionmouse C",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "beige"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "베이지 재킷·블랙 티·블랙 슬랙스·블랙 로퍼",
+   "cat": "B",
+   "src": "ffashionmouse C",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "beige"
+    ],
+    "top": [
+     "07_tee_long",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "아이보리 니트·그레이 슬랙스·브라운 스웨이드 로퍼",
+   "cat": "B",
+   "src": "ffashionmouse D",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "ivory"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "베이지 니트·그레이 팬츠·브라운 처카",
+   "cat": "B",
+   "src": "ffashionmouse D",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "beige"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "76_boots_walker",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "네이비 니트·라이트그레이 슬랙스·화이트 스니커",
+   "cat": "B",
+   "src": "catallena 네이비+그레이",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "lightgray"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "그레이 맨투맨·블랙 슬랙스·화이트 스니커",
+   "cat": "B",
+   "src": "스냅 정석",
+   "items": {
+    "top": [
+     "35_sweat",
+     "gray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "블랙 후드·그레이 스웻·블랙 청키",
+   "cat": "B",
+   "src": "스냅 스트릿",
+   "items": {
+    "top": [
+     "16_hoodie",
+     "black"
+    ],
+    "bottom": [
+     "40_track",
+     "gray"
+    ],
+    "shoes": [
+     "73_sneaker_chunky",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 셋업·화이트 티·화이트 스니커",
+   "cat": "B",
+   "src": "무신사 네이비 톤온톤 셋업",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "데님 트러커·화이트 티·블랙 슬랙스·화이트 스니커",
+   "cat": "B",
+   "src": "스냅 정석",
+   "items": {
+    "outer": [
+     "31_trucker",
+     "denim"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "데님 셔츠·화이트 티·베이지 치노·화이트 스니커",
+   "cat": "B",
+   "src": "무신사 블루&화이트",
+   "items": {
+    "layer": [
+     "10_shirt_open",
+     "denim"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "beige"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "카키 야상·화이트 티·블랙 슬랙스·블랙 워커",
+   "cat": "B",
+   "src": "스냅 정석",
+   "items": {
+    "outer": [
+     "44_field",
+     "khaki"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "76_boots_walker",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "차콜 후드·블랙 카고·화이트 청키",
+   "cat": "B",
+   "src": "스냅 스트릿",
+   "items": {
+    "top": [
+     "16_hoodie",
+     "charcoal"
+    ],
+    "bottom": [
+     "39_cargo",
+     "black"
+    ],
+    "shoes": [
+     "73_sneaker_chunky",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "블랙 레더·화이트 티·블랙 데님·블랙 부츠",
+   "cat": "B",
+   "src": "무신사 시크 올블랙+화이트",
+   "items": {
+    "outer": [
+     "20_leather",
+     "black"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "38_denim_slim",
+     "black"
+    ],
+    "shoes": [
+     "76_boots_walker",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "브라운 블루종·아이보리 티·데님·화이트 스니커",
+   "cat": "B",
+   "src": "스냅 정석",
+   "items": {
+    "outer": [
+     "18_jacket_short",
+     "brown"
+    ],
+    "top": [
+     "07_tee_long",
+     "ivory"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "denim"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "화이트 셔츠·베이지 와이드·브라운 로퍼",
+   "cat": "B",
+   "src": "catallena",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "beige"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "스카이블루 셔츠·화이트 슬랙스·화이트 스니커",
+   "cat": "B",
+   "src": "무신사 2026 스카이블루",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "sky_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "스카이블루 셔츠·네이비 슬랙스·브라운 로퍼",
+   "cat": "B",
+   "src": "무신사 2026 스카이블루",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "sky_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "올블랙·화이트 양말 5% 포인트",
+   "cat": "B",
+   "src": "theguide 올블랙 교정",
+   "items": {
+    "top": [
+     "07_tee_long",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ],
+    "socks": [
+     "socks",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·버건디 니트·크림 슬랙스·브라운 부츠",
+   "cat": "C",
+   "src": "whowhatwear burgundy+camel+cream",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "burgundy"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "cream"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·네이비 니트·크림 슬랙스·브라운 로퍼",
+   "cat": "C",
+   "src": "whowhatwear camel+navy",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "cream"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "초콜릿 코트·크림 니트·크림 와이드·브라운 부츠",
+   "cat": "C",
+   "src": "whowhatwear chocolate+cream",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "chocolate"
+    ],
+    "top": [
+     "11_knit_crew",
+     "cream"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "cream"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "올리브 재킷·아이보리 티·초콜릿 슬랙스·브라운 로퍼",
+   "cat": "C",
+   "src": "grazia olive+chocolate",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "olive"
+    ],
+    "top": [
+     "07_tee_long",
+     "ivory"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "chocolate"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "모스 니트·샌드 치노·화이트 스니커",
+   "cat": "C",
+   "src": "grazia moss+sand",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "moss"
+    ],
+    "bottom": [
+     "63_chino",
+     "sand"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "체스넛 카디건·베이비블루 셔츠·크림 슬랙스·브라운 로퍼",
+   "cat": "C",
+   "src": "grazia chestnut+baby blue",
+   "items": {
+    "layer": [
+     "15_cardigan",
+     "chestnut"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "baby_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "cream"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "파우더블루 셔츠·화이트 와이드·화이트 스니커",
+   "cat": "C",
+   "src": "jenknowsbest powder blue+white",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "powder_blue"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "버터 니트·화이트 와이드·화이트 스니커",
+   "cat": "C",
+   "src": "jenknowsbest butter+white",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "butter"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "포레스트 니트·아이보리 와이드·블랙 부츠",
+   "cat": "C",
+   "src": "jenknowsbest forest+ivory",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "forest"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "ivory"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "파스텔핑크 니트·차콜 슬랙스·블랙 플랫",
+   "cat": "C",
+   "src": "jenknowsbest blush+charcoal",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "pastel_pink"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "shoes": [
+     "78_flats_ballet",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·블랙 목폴라·블랙 슬랙스·블랙 부츠",
+   "cat": "C",
+   "src": "jenknowsbest camel+black",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "13_knit_turtle",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 코트·라이트그레이 니트·네이비 슬랙스·블랙 부츠",
+   "cat": "C",
+   "src": "jenknowsbest navy+silver",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "navy"
+    ],
+    "top": [
+     "11_knit_crew",
+     "lightgray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "파스텔핑크 니트·버건디 스커트·블랙 플랫",
+   "cat": "C",
+   "src": "grazia blush+merlot",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "pastel_pink"
+    ],
+    "bottom": [
+     "49_skirt_long",
+     "burgundy"
+    ],
+    "shoes": [
+     "78_flats_ballet",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "더스티블루 셔츠·크림 치노·브라운 로퍼",
+   "cat": "C",
+   "src": "jenknowsbest dusty blue+cream",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "dusty_blue"
+    ],
+    "bottom": [
+     "63_chino",
+     "cream"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "올리브 니트·탄 치노·브라운 부츠",
+   "cat": "C",
+   "src": "jenknowsbest olive+tan",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "olive"
+    ],
+    "bottom": [
+     "63_chino",
+     "tan"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "초콜릿 니트·베이지 와이드·브라운 로퍼",
+   "cat": "C",
+   "src": "jenknowsbest chocolate+beige",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "chocolate"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "beige"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "와인 니트·카멜 스커트·브라운 부츠",
+   "cat": "C",
+   "src": "jenknowsbest burgundy+tan",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "wine"
+    ],
+    "bottom": [
+     "49_skirt_long",
+     "camel"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "베이지 니트·카멜 팬츠·브라운 로퍼",
+   "cat": "C",
+   "src": "mzjjin 톤온톤",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "beige"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "camel"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "아이보리 블라우스·네이비 롱스커트·블랙 플랫",
+   "cat": "C",
+   "src": "여성 정석",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "ivory"
+    ],
+    "bottom": [
+     "49_skirt_long",
+     "navy"
+    ],
+    "shoes": [
+     "78_flats_ballet",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "화이트 셔츠·블랙 와이드·블랙 로퍼",
+   "cat": "C",
+   "src": "흑백 정석",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "유니클로: 네이비 카디건·화이트 티·베이지 치노·화이트 스니커",
+   "cat": "D",
+   "src": "Uniqlo",
+   "items": {
+    "layer": [
+     "15_cardigan",
+     "navy"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "beige"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "유니클로: 그레이 후디·네이비 데님·화이트 스니커",
+   "cat": "D",
+   "src": "Uniqlo",
+   "items": {
+    "top": [
+     "16_hoodie",
+     "gray"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "navy"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "유니클로: 올리브 파카·화이트 티·데님·블랙 스니커",
+   "cat": "D",
+   "src": "Uniqlo",
+   "items": {
+    "outer": [
+     "44_field",
+     "olive"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "denim"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "유니클로: 레드 니트·화이트 셔츠 이너·네이비 슬랙스·블랙 로퍼",
+   "cat": "D",
+   "src": "Uniqlo/Ralph 레드 니트",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "red"
+    ],
+    "inner": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "무지: 오트밀 니트·네이비 와이드·화이트 스니커",
+   "cat": "D",
+   "src": "Muji",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "oatmeal"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "navy"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "무지: 베이지 리넨 셔츠·화이트 티·라이트그레이 와이드·화이트",
+   "cat": "D",
+   "src": "Muji",
+   "items": {
+    "layer": [
+     "10_shirt_open",
+     "beige"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "lightgray"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "무지: 네이비 셔츠·에크루 치노·네이비 스니커",
+   "cat": "D",
+   "src": "Muji",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "navy"
+    ],
+    "bottom": [
+     "63_chino",
+     "ecru"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "navy"
+    ]
+   }
+  },
+  {
+   "name": "COS: 블랙 코트·크림 니트·그레이 와이드·블랙 부츠",
+   "cat": "D",
+   "src": "COS",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "black"
+    ],
+    "top": [
+     "11_knit_crew",
+     "cream"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "gray"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "COS: 화이트 셔츠·차콜 와이드·블랙 로퍼",
+   "cat": "D",
+   "src": "COS",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "charcoal"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "COS: 그레이 니트·블랙 와이드·블랙 첼시",
+   "cat": "D",
+   "src": "COS/theguide",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "black"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "랄프: 네이비 블레이저·크림 케이블니트·카멜 치노·브라운 로퍼",
+   "cat": "D",
+   "src": "Ralph Lauren",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "11_knit_crew",
+     "cream"
+    ],
+    "bottom": [
+     "63_chino",
+     "camel"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "랄프: 헌터그린 니트·화이트 셔츠 이너·카멜 치노·브라운 부츠",
+   "cat": "D",
+   "src": "Ralph Lauren",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "hunter_green"
+    ],
+    "inner": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "camel"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "랄프: 버건디 니트·화이트 셔츠 이너·네이비 치노·브라운 로퍼",
+   "cat": "D",
+   "src": "Ralph Lauren",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "burgundy"
+    ],
+    "inner": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "63_chino",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "아르켓: 카멜 코트·그레이 니트·네이비 데님·화이트 스니커",
+   "cat": "D",
+   "src": "Arket",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "navy"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "유니클로 2026: 스카이블루 니트·화이트 티 이너·라이트그레이 슬랙스·화이트",
+   "cat": "D",
+   "src": "Uniqlo/무신사",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "sky_blue"
+    ],
+    "inner": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "lightgray"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "라이트그레이 코트·그레이 니트·차콜 슬랙스·블랙 부츠",
+   "cat": "E",
+   "src": "theguide 그레이 3단",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "lightgray"
+    ],
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "블랙 코트·화이트 티·블랙 슬랙스·블랙 부츠",
+   "cat": "E",
+   "src": "theguide 올블랙+화이트",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "black"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "브라운 코트·베이지 니트·크림 팬츠·브라운 로퍼",
+   "cat": "E",
+   "src": "catallena 톤온톤 예",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "brown"
+    ],
+    "top": [
+     "11_knit_crew",
+     "beige"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "cream"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "네이비 코트·더스티블루 니트·네이비 슬랙스·블랙 부츠",
+   "cat": "E",
+   "src": "블루 톤온톤",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "navy"
+    ],
+    "top": [
+     "11_knit_crew",
+     "dusty_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 셋업·스카이블루 셔츠·브라운 로퍼",
+   "cat": "E",
+   "src": "무신사 네이비 톤온톤",
+   "items": {
+    "outer": [
+     "19_blazer",
+     "navy"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "sky_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "세이지 카디건·아이보리 티·올리브 치노·브라운 로퍼",
+   "cat": "E",
+   "src": "그린 톤온톤 명도 계단",
+   "items": {
+    "layer": [
+     "15_cardigan",
+     "sage"
+    ],
+    "top": [
+     "07_tee_long",
+     "ivory"
+    ],
+    "bottom": [
+     "63_chino",
+     "olive"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·아이보리 니트·코냑 슬랙스·브라운 부츠",
+   "cat": "E",
+   "src": "브라운 톤온톤",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "ivory"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "cognac"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "그레이 후드·라이트그레이 스웻·화이트 스니커",
+   "cat": "E",
+   "src": "그레이 톤온톤 캐주얼",
+   "items": {
+    "top": [
+     "16_hoodie",
+     "gray"
+    ],
+    "bottom": [
+     "40_track",
+     "lightgray"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "차콜 니트·블랙 슬랙스·블랙 부츠",
+   "cat": "E",
+   "src": "theguide 블랙 윤곽",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "charcoal"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "아이보리 니트·오트밀 와이드·화이트 스니커",
+   "cat": "E",
+   "src": "mzjjin 아이보리+베이지",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "ivory"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "oatmeal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "화이트 셔츠·아이보리 와이드·화이트 스니커",
+   "cat": "E",
+   "src": "올화이트",
+   "items": {
+    "top": [
+     "08_shirt_closed",
+     "white"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "ivory"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "버건디 코트·파스텔핑크 니트·차콜 슬랙스·블랙 부츠",
+   "cat": "E",
+   "src": "tonelala burgundy+pink",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "burgundy"
+    ],
+    "top": [
+     "11_knit_crew",
+     "pastel_pink"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "charcoal"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 니트·데님·화이트 스니커",
+   "cat": "E",
+   "src": "블루 톤온톤",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "denim"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "블랙 니트·차콜 와이드·화이트 스니커",
+   "cat": "E",
+   "src": "모노톤",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "black"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "charcoal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "브라운 니트·토프 슬랙스·브라운 로퍼",
+   "cat": "E",
+   "src": "mzjjin 토프+브라운",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "brown"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "taupe"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "파스텔핑크 니트·파스텔블루 와이드·화이트 스니커",
+   "cat": "F",
+   "src": "ajd/catallena 톤인톤",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "pastel_pink"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "pastel_blue"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "파스텔라벤더 니트·파스텔민트 치노·화이트",
+   "cat": "F",
+   "src": "톤인톤 파스텔",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "pastel_lavender"
+    ],
+    "bottom": [
+     "63_chino",
+     "pastel_mint"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "올블랙·레드 머플러 포인트",
+   "cat": "F",
+   "src": "catallena 포인트 컬러",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ],
+    "scarf": [
+     "54_scarf",
+     "red"
+    ]
+   }
+  },
+  {
+   "name": "그레이 니트·블랙 슬랙스·블랙 부츠·코발트 머플러",
+   "cat": "F",
+   "src": "mzjjin 포인트 코발트",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ],
+    "scarf": [
+     "54_scarf",
+     "cobalt"
+    ]
+   }
+  },
+  {
+   "name": "네이비 니트·베이지 치노·버건디 로퍼",
+   "cat": "F",
+   "src": "VOU 액센트 버건디",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "63_chino",
+     "beige"
+    ],
+    "shoes": [
+     "74_loafer",
+     "burgundy"
+    ]
+   }
+  },
+  {
+   "name": "코랄 티·화이트 와이드·베이지 스니커",
+   "cat": "F",
+   "src": "포인트 1+무채",
+   "items": {
+    "top": [
+     "07_tee_long",
+     "coral"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "beige"
+    ]
+   }
+  },
+  {
+   "name": "머스타드 니트·네이비 슬랙스·브라운 부츠",
+   "cat": "F",
+   "src": "가을 머스타드×네이비",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "mustard"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·화이트 티·네이비 데님·화이트 스니커",
+   "cat": "F",
+   "src": "카멜×데님",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "07_tee_long",
+     "white"
+    ],
+    "bottom": [
+     "01_denim_straight",
+     "navy"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "아이스블루 니트·버터 스커트·화이트 플랫",
+   "cat": "F",
+   "src": "grazia icy blue+butter",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "ice_blue"
+    ],
+    "bottom": [
+     "24_skirt_pleat",
+     "butter"
+    ],
+    "shoes": [
+     "78_flats_ballet",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "초콜릿 코트·베이비블루 셔츠·크림 슬랙스·브라운 로퍼",
+   "cat": "F",
+   "src": "grazia chocolate+baby blue",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "chocolate"
+    ],
+    "top": [
+     "08_shirt_closed",
+     "baby_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "cream"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  }
+ ],
+ "bad": [
+  {
+   "name": "레드 코트·그린 니트·옐로 슬랙스·블루 스니커",
+   "cat": "G",
+   "src": "3색 초과 원색",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "red"
+    ],
+    "top": [
+     "11_knit_crew",
+     "green"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "yellow"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "blue"
+    ]
+   }
+  },
+  {
+   "name": "오렌지 코트·핫핑크 니트·라임 슬랙스·퍼플 스니커",
+   "cat": "G",
+   "src": "3색 초과 원색",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "orange"
+    ],
+    "top": [
+     "11_knit_crew",
+     "hot_pink"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "lime"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "purple"
+    ]
+   }
+  },
+  {
+   "name": "퓨시아 티·라임 슬랙스·시안 스니커",
+   "cat": "G",
+   "src": "VOU 네온",
+   "items": {
+    "top": [
+     "07_tee_long",
+     "fuchsia"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "lime"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "cyan"
+    ]
+   }
+  },
+  {
+   "name": "레드 티·블루 슬랙스·화이트 스니커",
+   "cat": "G",
+   "src": "catallena 원색 직접",
+   "items": {
+    "top": [
+     "07_tee_long",
+     "red"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "blue"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "옐로 코트·옐로 니트·옐로 슬랙스·옐로 스니커",
+   "cat": "G",
+   "src": "쨍한 원톤",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "yellow"
+    ],
+    "top": [
+     "11_knit_crew",
+     "yellow"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "yellow"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "yellow"
+    ]
+   }
+  },
+  {
+   "name": "라임 코트·옐로 니트·화이트 슬랙스·화이트 스니커",
+   "cat": "G",
+   "src": "colorbux green+yellow bright",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "lime"
+    ],
+    "top": [
+     "11_knit_crew",
+     "yellow"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "켈리그린 니트·오렌지 슬랙스·화이트 스니커",
+   "cat": "G",
+   "src": "colorbux green+orange",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "kelly_green"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "orange"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "레드 코트·레드 니트·블랙 슬랙스·레드 스니커",
+   "cat": "G",
+   "src": "강한 색 과다+포인트 둘",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "red"
+    ],
+    "top": [
+     "11_knit_crew",
+     "red"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "red"
+    ]
+   }
+  },
+  {
+   "name": "오트밀 코트·스칼렛 니트·다크틸 슬랙스·화이트 스니커 (대표님 사례)",
+   "cat": "H",
+   "src": "뮤트+비비드+딥 온도 불일치",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "oatmeal"
+    ],
+    "top": [
+     "11_knit_crew",
+     "scarlet"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "dark_teal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "스칼렛 니트·다크틸 슬랙스·화이트 스니커 (대표님 사례, 아우터 없음)",
+   "cat": "H",
+   "src": "비비드 웜+딥 쿨",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "scarlet"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "dark_teal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "오트밀 코트·코발트 니트·머쉬룸 슬랙스·브라운 로퍼",
+   "cat": "H",
+   "src": "뮤트 바탕+비비드 이너",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "oatmeal"
+    ],
+    "top": [
+     "11_knit_crew",
+     "cobalt"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "mushroom"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "세이지 코트·핫핑크 니트·그레이지 슬랙스·화이트 스니커",
+   "cat": "H",
+   "src": "뮤트+네온",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "sage"
+    ],
+    "top": [
+     "11_knit_crew",
+     "hot_pink"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "greige"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·라임 니트·브라운 슬랙스·브라운 로퍼",
+   "cat": "H",
+   "src": "어스+네온",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "lime"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "brown"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "더스티로즈 니트·로얄블루 슬랙스·화이트 스니커",
+   "cat": "H",
+   "src": "뮤트 vs 비비드",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "dusty_rose"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "royal_blue"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "파스텔핑크 코트·스칼렛 니트·블랙 슬랙스·블랙 로퍼",
+   "cat": "H",
+   "src": "bestlife pink+red 비비드",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "pastel_pink"
+    ],
+    "top": [
+     "11_knit_crew",
+     "scarlet"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "올리브 코트·퓨시아 니트·카키 슬랙스·브라운 로퍼",
+   "cat": "H",
+   "src": "어스+네온",
+   "items": {
+    "outer": [
+     "44_field",
+     "olive"
+    ],
+    "top": [
+     "11_knit_crew",
+     "fuchsia"
+    ],
+    "bottom": [
+     "63_chino",
+     "khaki"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "베이지 코트·아쥬르 니트·오트밀 와이드·화이트 스니커",
+   "cat": "H",
+   "src": "뮤트 바탕+비비드 이너",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "beige"
+    ],
+    "top": [
+     "11_knit_crew",
+     "azure"
+    ],
+    "bottom": [
+     "04_slacks_wide",
+     "oatmeal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "머쉬룸 코트·켈리그린 니트·토프 슬랙스·브라운 부츠",
+   "cat": "H",
+   "src": "뮤트+비비드",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "mushroom"
+    ],
+    "top": [
+     "11_knit_crew",
+     "kelly_green"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "taupe"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "그레이지 니트·탠저린 슬랙스·화이트 스니커",
+   "cat": "H",
+   "src": "뮤트 위+비비드 아래",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "greige"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "tangerine"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "스톤 코트·마젠타 니트·다크올리브 슬랙스·브라운 로퍼",
+   "cat": "H",
+   "src": "대표님 사례 유형: 뮤트 겉+비비드 안+딥 아래",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "stone"
+    ],
+    "top": [
+     "11_knit_crew",
+     "magenta"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "dark_olive"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "코랄 니트·틸 슬랙스·화이트 스니커",
+   "cat": "I",
+   "src": "웜 비비드+쿨 딥",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "coral"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "teal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "탠저린 코트·터콰이즈 니트·화이트 슬랙스·화이트 스니커",
+   "cat": "I",
+   "src": "웜 비비드+쿨 비비드",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "tangerine"
+    ],
+    "top": [
+     "11_knit_crew",
+     "turquoise"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "러스트 니트·코발트 슬랙스·블랙 로퍼",
+   "cat": "I",
+   "src": "웜 어스+쿨 비비드",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "rust"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "cobalt"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "머스타드 코트·라벤더 니트·퍼플 슬랙스·블랙 로퍼",
+   "cat": "I",
+   "src": "bestlife purple+yellow",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "mustard"
+    ],
+    "top": [
+     "11_knit_crew",
+     "lavender"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "purple"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "피치 니트·시안 슬랙스·화이트 스니커",
+   "cat": "I",
+   "src": "웜 파스텔+쿨 비비드",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "peach"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "cyan"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "카라멜 코트·아이스블루 니트·터콰이즈 슬랙스·화이트",
+   "cat": "I",
+   "src": "웜 중간+쿨 파스텔+쿨 비비드",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "caramel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "ice_blue"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "turquoise"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "사프란 니트·페리윙클 슬랙스·화이트 스니커",
+   "cat": "I",
+   "src": "옐로+퍼플 계열",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "saffron"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "periwinkle"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "라이트그레이 니트·실버 슬랙스·화이트 스니커",
+   "cat": "J",
+   "src": "밝은 무채 뭉개짐",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "lightgray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "silver"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "네이비 니트·미드나잇 슬랙스·블랙 로퍼",
+   "cat": "J",
+   "src": "어두운 뭉개짐",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "midnight"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "그레이 코트·그레이 니트·그레이 슬랙스·그레이 스니커",
+   "cat": "J",
+   "src": "theguide 올그레이 흐림",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "gray"
+    ],
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "gray"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "gray"
+    ]
+   }
+  },
+  {
+   "name": "카멜 코트·카멜 니트·카멜 슬랙스·카멜 로퍼",
+   "cat": "J",
+   "src": "가를 곳 없는 원톤",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "camel"
+    ],
+    "top": [
+     "11_knit_crew",
+     "camel"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "camel"
+    ],
+    "shoes": [
+     "74_loafer",
+     "camel"
+    ]
+   }
+  },
+  {
+   "name": "화이트 니트·실버 슬랙스·화이트 스니커",
+   "cat": "J",
+   "src": "colorbux white+silver",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "white"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "silver"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "그레이 니트·브라운 슬랙스·브라운 로퍼",
+   "cat": "J",
+   "src": "colorbux/bestlife brown+gray",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "gray"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "brown"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "머쉬룸 니트·그레이지 슬랙스·스톤 스니커",
+   "cat": "J",
+   "src": "뮤트 일색 흐림",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "mushroom"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "greige"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "stone"
+    ]
+   }
+  },
+  {
+   "name": "올리브 니트·카키 슬랙스·브라운 로퍼",
+   "cat": "J",
+   "src": "apetogentleman olive+khaki 어정쩡",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "olive"
+    ],
+    "bottom": [
+     "63_chino",
+     "khaki"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "브라운 코트·블랙 니트·네이비 슬랙스·화이트 스니커",
+   "cat": "K",
+   "src": "어두운 셋",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "brown"
+    ],
+    "top": [
+     "11_knit_crew",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "navy"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "블랙 코트·네이비 니트·블랙 슬랙스·브라운 로퍼",
+   "cat": "K",
+   "src": "블랙×네이비+브라운 구두",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "black"
+    ],
+    "top": [
+     "11_knit_crew",
+     "navy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "블랙 니트·브라운 슬랙스·블랙 로퍼",
+   "cat": "K",
+   "src": "bestlife brown+black 제3색 없음",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "brown"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "네이비 코트·블랙 니트·블랙 슬랙스·네이비 스니커",
+   "cat": "K",
+   "src": "블랙×네이비 두 겹",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "navy"
+    ],
+    "top": [
+     "11_knit_crew",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "navy"
+    ]
+   }
+  },
+  {
+   "name": "에스프레소 코트·블랙 목폴라·초콜릿 슬랙스·블랙 부츠",
+   "cat": "K",
+   "src": "다크브라운×블랙 뭉침",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "espresso"
+    ],
+    "top": [
+     "13_knit_turtle",
+     "black"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "chocolate"
+    ],
+    "shoes": [
+     "75_boots_chelsea",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "레드 니트·그린 슬랙스·블랙 로퍼",
+   "cat": "L",
+   "src": "크리스마스",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "red"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "green"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "켈리그린 코트·레드 니트·화이트 슬랙스·화이트 스니커",
+   "cat": "L",
+   "src": "크리스마스",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "kelly_green"
+    ],
+    "top": [
+     "11_knit_crew",
+     "red"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "퍼플 후드·옐로 카고·블랙 청키",
+   "cat": "L",
+   "src": "purple+yellow",
+   "items": {
+    "top": [
+     "16_hoodie",
+     "purple"
+    ],
+    "bottom": [
+     "39_cargo",
+     "yellow"
+    ],
+    "shoes": [
+     "73_sneaker_chunky",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "옐로 니트·레드 슬랙스·화이트 스니커",
+   "cat": "L",
+   "src": "red+yellow",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "yellow"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "red"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "로얄블루 코트·오렌지 니트·화이트 슬랙스·화이트 스니커",
+   "cat": "L",
+   "src": "보색 큰 면 인접",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "royal_blue"
+    ],
+    "top": [
+     "11_knit_crew",
+     "orange"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "white"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "그린 니트·오렌지 슬랙스·브라운 로퍼",
+   "cat": "L",
+   "src": "green+orange",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "green"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "orange"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "레드 코트·마젠타 니트·블랙 슬랙스·블랙 로퍼",
+   "cat": "M",
+   "src": "magenta+red",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "red"
+    ],
+    "top": [
+     "11_knit_crew",
+     "magenta"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "black"
+    ],
+    "shoes": [
+     "74_loafer",
+     "black"
+    ]
+   }
+  },
+  {
+   "name": "브라운 코트·버건디 니트·브라운 슬랙스·브라운 로퍼",
+   "cat": "M",
+   "src": "brown+burgundy",
+   "items": {
+    "outer": [
+     "17_coat_long",
+     "brown"
+    ],
+    "top": [
+     "11_knit_crew",
+     "burgundy"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "brown"
+    ],
+    "shoes": [
+     "74_loafer",
+     "brown"
+    ]
+   }
+  },
+  {
+   "name": "위트 니트·옐로 슬랙스·화이트 스니커",
+   "cat": "M",
+   "src": "nude+yellow",
+   "items": {
+    "top": [
+     "11_knit_crew",
+     "wheat"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "yellow"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "white"
+    ]
+   }
+  },
+  {
+   "name": "에메랄드 코트·터콰이즈 니트·틸 슬랙스·시안 스니커",
+   "cat": "M",
+   "src": "청록 4종 근접",
+   "items": {
+    "outer": [
+     "28_coat_short",
+     "emerald"
+    ],
+    "top": [
+     "11_knit_crew",
+     "turquoise"
+    ],
+    "bottom": [
+     "03_slacks_straight",
+     "teal"
+    ],
+    "shoes": [
+     "71_sneaker_canvas",
+     "cyan"
+    ]
+   }
+  }
+ ]
+}
