@@ -128,34 +128,34 @@ export default function Profile() {
       <div className="flex items-center gap-4 pb-3">
         <div className="relative flex-shrink-0 overflow-hidden" onClick={user ? handleAvatarChange : undefined}>
           {avatarUrl ? (
-            <img src={avatarUrl} className="w-16 h-16 rounded-full object-cover border-[2.5px] border-terra-200" alt="" />
+            <img src={avatarUrl} className="w-16 h-16 rounded-full object-cover border-[2.5px] border-terra-200 dark:border-terra-800" alt="" />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-terra-100 border-[2.5px] border-terra-200 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-terra-100 dark:bg-terra-900/40 border-[2.5px] border-terra-200 dark:border-terra-800 flex items-center justify-center">
               <User size={26} className="text-terra-600" />
             </div>
           )}
           {user && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-white border border-warm-400 rounded-full flex items-center justify-center shadow-sm">
-              <Camera size={11} className="text-warm-600" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full flex items-center justify-center shadow-sm">
+              <Camera size={11} className="text-warm-600 dark:text-warm-300" />
             </div>
           )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <div className="text-lg font-bold text-warm-900 tracking-tight">{nickname}</div>
+            <div className="text-lg font-bold text-warm-900 dark:text-warm-100 tracking-tight">{nickname}</div>
             {user && (
-              <button onClick={() => handleEditField('nickname')} className="text-warm-500 active:scale-90 transition-all">
+              <button onClick={() => handleEditField('nickname')} className="text-warm-500 dark:text-warm-400 active:scale-90 transition-all">
                 <Pencil size={13} />
               </button>
             )}
           </div>
-          <div className="text-sm text-warm-600 mt-0.5">Lv.{lv.level} · {lv.name}</div>
-          <div className="h-1.5 bg-warm-300 rounded-full overflow-hidden mt-1.5 max-w-[140px]">
+          <div className="text-sm text-warm-600 dark:text-warm-400 mt-0.5">Lv.{lv.level} · {lv.name}</div>
+          <div className="h-1.5 bg-warm-300 dark:bg-warm-600 rounded-full overflow-hidden mt-1.5 max-w-[140px]">
             <div className="h-full bg-terra-400 rounded-full transition-all" style={{ width: `${lv.progress}%` }} />
           </div>
         </div>
         {user ? (
-          <button onClick={logout} className="px-4 py-2 rounded-full border border-warm-400 bg-white text-xs font-medium text-warm-700 active:scale-95 transition-all">
+          <button onClick={logout} className="px-4 py-2 rounded-full border border-warm-400 dark:border-warm-600 bg-white dark:bg-warm-800 text-xs font-medium text-warm-700 dark:text-warm-200 active:scale-95 transition-all">
             {t('settings.logout')}
           </button>
         ) : (
@@ -169,9 +169,9 @@ export default function Profile() {
       {user && (
         <div className="mb-6 cursor-pointer" onClick={() => handleEditField('bio')}>
           {bio ? (
-            <div className="text-sm text-warm-700 leading-relaxed">{bio}</div>
+            <div className="text-sm text-warm-700 dark:text-warm-300 leading-relaxed">{bio}</div>
           ) : (
-            <div className="text-sm text-warm-500 italic">{t('profile.edit.bioPlaceholder')}</div>
+            <div className="text-sm text-warm-500 dark:text-warm-400 italic">{t('profile.edit.bioPlaceholder')}</div>
           )}
         </div>
       )}
@@ -179,7 +179,7 @@ export default function Profile() {
       {/* 인스타그램 */}
       {user && (
         <div
-          className="flex items-center gap-2.5 mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl px-4 py-3 cursor-pointer active:scale-[0.99] transition-all"
+          className="flex items-center gap-2.5 mb-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-800 rounded-2xl px-4 py-3 cursor-pointer active:scale-[0.99] transition-all"
           onClick={() => handleEditField('instagram_id')}
         >
           <span className="text-lg">📸</span>
@@ -187,13 +187,13 @@ export default function Profile() {
             {authProfile?.instagram_id ? (
               <>
                 <div className="text-sm font-medium text-warm-900 dark:text-white">@{authProfile.instagram_id}</div>
-                <div className="text-[10px] text-warm-500">{t('common.edit')}</div>
+                <div className="text-[10px] text-warm-500 dark:text-warm-400">{t('common.edit')}</div>
               </>
             ) : (
-              <div className="text-sm text-warm-500">{t('profile.edit.instagram')}</div>
+              <div className="text-sm text-warm-500 dark:text-warm-400">{t('profile.edit.instagram')}</div>
             )}
           </div>
-          <ChevronRight size={16} className="text-warm-500" />
+          <ChevronRight size={16} className="text-warm-500 dark:text-warm-400" />
         </div>
       )}
 
@@ -201,40 +201,40 @@ export default function Profile() {
       {user ? (
         <>
           <div className="grid grid-cols-3 gap-2.5 mb-4">
-            <div onClick={() => navigate('/profile/posts')} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
-              <div className="font-display text-xl font-bold text-terra-500">{totalRecords}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{t('profile.stats.coords')}</div>
+            <div onClick={() => navigate('/profile/posts')} className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
+              <div className="font-display text-xl font-bold text-terra-500 dark:text-terra-400">{totalRecords}</div>
+              <div className="text-[10px] text-warm-600 dark:text-warm-400 font-medium mt-0.5">{t('profile.stats.coords')}</div>
             </div>
-            <div onClick={() => navigate(`/user/${user.id}/followers`)} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
-              <div className="font-display text-xl font-bold text-terra-500">{followerCount}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{t('profile.stats.followers')}</div>
+            <div onClick={() => navigate(`/user/${user.id}/followers`)} className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
+              <div className="font-display text-xl font-bold text-terra-500 dark:text-terra-400">{followerCount}</div>
+              <div className="text-[10px] text-warm-600 dark:text-warm-400 font-medium mt-0.5">{t('profile.stats.followers')}</div>
             </div>
-            <div onClick={() => navigate(`/user/${user.id}/following`)} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
-              <div className="font-display text-xl font-bold text-terra-500">{followingCount}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{t('profile.stats.following')}</div>
+            <div onClick={() => navigate(`/user/${user.id}/following`)} className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3.5 text-center shadow-warm-sm cursor-pointer active:scale-[0.97] transition-all">
+              <div className="font-display text-xl font-bold text-terra-500 dark:text-terra-400">{followingCount}</div>
+              <div className="text-[10px] text-warm-600 dark:text-warm-400 font-medium mt-0.5">{t('profile.stats.following')}</div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2.5 mb-6">
-            <div className="bg-warm-100 border border-warm-300 rounded-xl py-2.5 text-center">
-              <div className="font-display text-sm font-bold text-warm-700">{streak}</div>
-              <div className="text-[9px] text-warm-500 mt-0.5">🔥 {t('profile.stats.streak')}</div>
+            <div className="bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
+              <div className="font-display text-sm font-bold text-warm-700 dark:text-warm-200">{streak}</div>
+              <div className="text-[9px] text-warm-500 dark:text-warm-400 mt-0.5">🔥 {t('profile.stats.streak')}</div>
             </div>
-            <div onClick={() => navigate('/profile/badges')} className="bg-warm-100 border border-warm-300 rounded-xl py-2.5 text-center cursor-pointer">
-              <div className="font-display text-sm font-bold text-warm-700">{earnedBadges}</div>
-              <div className="text-[9px] text-warm-500 mt-0.5">🏅 {t('profile.stats.badges')}</div>
+            <div onClick={() => navigate('/profile/badges')} className="bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center cursor-pointer">
+              <div className="font-display text-sm font-bold text-warm-700 dark:text-warm-200">{earnedBadges}</div>
+              <div className="text-[9px] text-warm-500 dark:text-warm-400 mt-0.5">🏅 {t('profile.stats.badges')}</div>
             </div>
-            <div className="bg-warm-100 border border-warm-300 rounded-xl py-2.5 text-center">
-              <div className="font-display text-sm font-bold text-warm-700">{savedCount}</div>
-              <div className="text-[9px] text-warm-500 mt-0.5">💾 {t('profile.stats.saved')}</div>
+            <div className="bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
+              <div className="font-display text-sm font-bold text-warm-700 dark:text-warm-200">{savedCount}</div>
+              <div className="text-[9px] text-warm-500 dark:text-warm-400 mt-0.5">💾 {t('profile.stats.saved')}</div>
             </div>
           </div>
         </>
       ) : (
         <div className="grid grid-cols-4 gap-2 mb-6">
           {[[t('profile.stats.coords'), totalRecords], [t('profile.stats.streak'), streak], [t('profile.stats.badges'), earnedBadges], [t('profile.stats.saved'), savedCount]].map(([label, val]) => (
-            <div key={label as string} className="bg-white border border-warm-400 rounded-2xl py-3.5 text-center shadow-warm-sm">
-              <div className="font-display text-xl font-bold text-terra-500">{val}</div>
-              <div className="text-[10px] text-warm-600 font-medium mt-0.5">{label}</div>
+            <div key={label as string} className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3.5 text-center shadow-warm-sm">
+              <div className="font-display text-xl font-bold text-terra-500 dark:text-terra-400">{val}</div>
+              <div className="text-[10px] text-warm-600 dark:text-warm-400 font-medium mt-0.5">{label}</div>
             </div>
           ))}
         </div>
@@ -292,7 +292,7 @@ export default function Profile() {
 function MenuSection({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) {
   return (
     <div className="mb-6">
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3 pb-2 border-b border-warm-400">
+      <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3 pb-2 border-b border-warm-400 dark:border-warm-600">
         {icon} {title}
       </div>
       {children}
@@ -306,18 +306,18 @@ function MenuItem({ icon, label, badge, badgeVariant, onClick, last }: {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 py-3.5 text-left active:bg-warm-200/50 rounded-lg transition-colors ${last ? '' : 'border-b border-warm-300'}`}
+      className={`w-full flex items-center gap-3 py-3.5 text-left active:bg-warm-200/50 dark:active:bg-warm-700/50 rounded-lg transition-colors ${last ? '' : 'border-b border-warm-300 dark:border-warm-600'}`}
     >
-      <span className="text-warm-600">{icon}</span>
-      <span className="text-[15px] text-warm-900 flex-1">{label}</span>
+      <span className="text-warm-600 dark:text-warm-300">{icon}</span>
+      <span className="text-[15px] text-warm-900 dark:text-warm-100 flex-1">{label}</span>
       {badge && (
         <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-          badgeVariant === 'muted' ? 'text-warm-600 bg-warm-200' : 'text-terra-600 bg-terra-100'
+          badgeVariant === 'muted' ? 'text-warm-600 dark:text-warm-300 bg-warm-200 dark:bg-warm-700' : 'text-terra-600 dark:text-terra-300 bg-terra-100 dark:bg-terra-900/50'
         }`}>
           {badge}
         </span>
       )}
-      <ChevronRight size={16} className="text-warm-500" />
+      <ChevronRight size={16} className="text-warm-500 dark:text-warm-400" />
     </button>
   )
 }

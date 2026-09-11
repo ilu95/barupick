@@ -50,22 +50,22 @@ export default function BlockList() {
   if (!user) {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
-        <div className="text-sm text-warm-600">{t('common.loginRequired')}</div>
+        <div className="text-sm text-warm-600 dark:text-warm-400">{t('common.loginRequired')}</div>
       </div>
     )
   }
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('blockList.title')}</h2>
-      <p className="text-sm text-warm-600 mb-5">{t('blockList.subtitle')}</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{t('blockList.title')}</h2>
+      <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('blockList.subtitle')}</p>
 
       {loading ? (
-        <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>
+        <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('common.loading')}</div>
       ) : blocked.length === 0 ? (
         <div className="text-center py-16">
-          <ShieldOff size={40} className="text-warm-400 mx-auto mb-3" />
-          <div className="text-sm text-warm-600">{t('blockList.empty')}</div>
+          <ShieldOff size={40} className="text-warm-400 dark:text-warm-500 mx-auto mb-3" />
+          <div className="text-sm text-warm-600 dark:text-warm-400">{t('blockList.empty')}</div>
         </div>
       ) : (
         <div className="flex flex-col">
@@ -75,23 +75,23 @@ export default function BlockList() {
             const avatar = prof?.avatar_url
 
             return (
-              <div key={b.id} className="flex items-center gap-3 py-3 border-b border-warm-300">
+              <div key={b.id} className="flex items-center gap-3 py-3 border-b border-warm-300 dark:border-warm-600">
                 <div className="flex-shrink-0">
                   {avatar ? (
-                    <img src={avatar} className="w-11 h-11 rounded-full object-cover border border-warm-300" alt="" />
+                    <img src={avatar} className="w-11 h-11 rounded-full object-cover border border-warm-300 dark:border-warm-600" alt="" />
                   ) : (
-                    <div className="w-11 h-11 rounded-full bg-warm-200 flex items-center justify-center border border-warm-300">
+                    <div className="w-11 h-11 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center border border-warm-300 dark:border-warm-600">
                       <User size={18} className="text-warm-500" />
                     </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-warm-900 truncate">@{nick}</div>
-                  <div className="text-[11px] text-warm-500">{t('common.blocked')}</div>
+                  <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 truncate">@{nick}</div>
+                  <div className="text-[11px] text-warm-500 dark:text-warm-400">{t('common.blocked')}</div>
                 </div>
                 <button
                   onClick={() => handleUnblock(b.id, nick)}
-                  className="px-3.5 py-1.5 rounded-full text-[11px] font-semibold bg-white text-red-600 border border-red-200 active:scale-95 transition-all flex-shrink-0"
+                  className="px-3.5 py-1.5 rounded-full text-[11px] font-semibold bg-white dark:bg-warm-800 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 active:scale-95 transition-all flex-shrink-0"
                 >
                   {t('common.unblock')}
                 </button>

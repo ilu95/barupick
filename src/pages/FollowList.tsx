@@ -59,8 +59,8 @@ export default function FollowList() {
           <button
             key={key}
             onClick={() => setTab(key)}
-            className={`flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
-              tab === key ? 'bg-warm-900 text-white shadow-md' : 'bg-white border border-warm-400 text-warm-700 active:scale-95'
+            className={`flex-1 h-9 rounded-full text-[13px] font-semibold transition-all ${
+              tab === key ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900 shadow-md' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'
             }`}
           >
             {label}
@@ -70,11 +70,11 @@ export default function FollowList() {
 
       {/* 리스트 */}
       {loading ? (
-        <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>
+        <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('common.loading')}</div>
       ) : users.length === 0 ? (
         <div className="text-center py-10">
           <div className="text-4xl mb-3">{tab === 'followers' ? '👤' : '👥'}</div>
-          <div className="text-sm text-warm-600">{tab === 'followers' ? t('followList.noFollowers') : t('followList.noFollowing')}</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400">{tab === 'followers' ? t('followList.noFollowers') : t('followList.noFollowing')}</div>
         </div>
       ) : (
         <div className="flex flex-col">
@@ -84,26 +84,26 @@ export default function FollowList() {
             const mutual = isFriend(u.id)
 
             return (
-              <div key={u.id} className="flex items-center gap-3 py-3 border-b border-warm-300">
+              <div key={u.id} className="flex items-center gap-3 py-3 border-b border-warm-300 dark:border-warm-600">
                 <div onClick={() => navigate(`/user/${u.id}`)} className="flex-shrink-0 cursor-pointer">
                   {u.avatar_url ? (
-                    <img src={u.avatar_url} className="w-11 h-11 rounded-full object-cover border border-warm-300" alt="" />
+                    <img src={u.avatar_url} className="w-11 h-11 rounded-full object-cover border border-warm-300 dark:border-warm-600" alt="" />
                   ) : (
-                    <div className="w-11 h-11 rounded-full bg-terra-100 flex items-center justify-center border border-warm-300">
+                    <div className="w-11 h-11 rounded-full bg-terra-100 dark:bg-terra-900/40 flex items-center justify-center border border-warm-300 dark:border-warm-600">
                       <User size={18} className="text-terra-600" />
                     </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0 cursor-pointer" onClick={() => navigate(`/user/${u.id}`)}>
-                  <div className="text-sm font-semibold text-warm-900 truncate">@{u.nickname || t('common.user')}</div>
-                  {mutual && <div className="text-[10px] text-green-600 font-medium">{t('common.mutualFriend')}</div>}
+                  <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 truncate">@{u.nickname || t('common.user')}</div>
+                  {mutual && <div className="text-[10px] text-green-600 dark:text-green-400 font-medium">{t('common.mutualFriend')}</div>}
                 </div>
                 {!isMe && (
                   <button
                     onClick={() => toggleFollow(u.id)}
                     className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0 ${
-                      mutual ? 'bg-green-100 text-green-700 border border-green-300'
-                      : following ? 'bg-warm-200 text-warm-700 border border-warm-400'
+                      mutual ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800'
+                      : following ? 'bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200 border border-warm-400 dark:border-warm-600'
                       : 'bg-terra-500 text-white shadow-terra'
                     }`}
                   >

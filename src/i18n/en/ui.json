@@ -939,7 +939,11 @@
       }
     },
     "insights": {
-      "title": "Insights"
+      "title": "Insights",
+      "byPost": "By post",
+      "sortViews": "Most viewed",
+      "sortLikes": "Most liked",
+      "empty": "No posts yet"
     },
     "savedCoords": {
       "title": "Saved Coords"
