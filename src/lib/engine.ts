@@ -100,14 +100,14 @@ export function scoreDelta(input: EngineInput, slot: string, key: string): numbe
   return next - base
 }
 
-/** 자리 하나의 ● 추천 / △ 주의 (v7 guide: 안전 3 + 유채 3, 감점 규칙 없는 것만, 계열 겹침 2까지) */
-export function guideFor(input: EngineInput, slot: string, recN = 6) {
+/** 자리 하나의 ● 추천 / △ 주의 (v7 guide: 무난 4 + 어울려요 5 + 포인트(작은 자리) 3, 감점 규칙 없는 것만, 계열 겹침 3까지) */
+export function guideFor(input: EngineInput, slot: string, recN = 12) {
   const g = V7.guide(toItems(input), ctxOf(input), TO_V7[slot] || slot, palette(), { idFor: input.plates?.[slot] || slot, recN })
   const marks: Record<string, 'rec' | 'warn'> = {}
   for (const [k, m] of Object.entries(g.marks as Record<string, string>)) if (m === 'rec' || m === 'warn') marks[k] = m
   const delta: Record<string, number> = {}; const why: Record<string, string> = {}
   for (const x of g.list) { delta[x.key] = x.d; why[x.key] = x.why }
-  return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why }
+  return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[] } }
 }
 
 /** 옷 하나의 색만 바꿔 얻는 최선의 한 수 k개 (차분한 색 우선) */

@@ -1905,7 +1905,18 @@
     "guided": {
       "next": "Next: {{slot}}",
       "skip": "Skip to {{slot}}"
-    }
+    },
+    "group": {
+      "safe": "Safe",
+      "match": "Matches",
+      "point": "Accent",
+      "mine": "My clothes"
+    },
+    "sortRec": "Best match",
+    "sortBright": "By brightness",
+    "legend": "● recommended · △ caution",
+    "mineTab": "My closet",
+    "moveChip": "{{slot}} → {{color}} · {{score}}pt"
   },
   "reminder": {
     "colderTitle": "Tomorrow morning {{temp}}°, {{d}}° colder than today",

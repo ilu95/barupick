@@ -259,6 +259,7 @@ function delta(items, ctx, slot, hex, name) {
   const r = evaluate(items.map(i => i.slot === slot ? { ...i, hex, color: name || i.color } : i), ctx);
   return { d: r.total - base.total, total: r.total, warn: r.reasons.filter(x => x.w < 0 && x.slots.includes(slot)), reasons: r.reasons };
 }
+const SMALL_SLOTS = ['shoes', 'scarf', 'hat', 'inner', 'tie', 'socks'];
 function guide(items, ctx, slot, palette, opts) {
   opts = opts || {};
   const base = evaluate(items, ctx);
@@ -275,15 +276,19 @@ function guide(items, ctx, slot, palette, opts) {
   list.forEach(x => { const c = lch(x.hex); x.adj = x.total - 2 * x.vv - 1.5 * ramp(c.C, NEUTRAL_C, SOFT_C); });   /* 동점이면 차분한 색 먼저 */
   list.sort((a, b) => b.total - a.total || a.vv - b.vv || a.key.localeCompare(b.key));
   const top = list[0] ? list[0].total : 0;
-  /* 추천 = 안전한 색(무채·연유채) 최대 3 + 색 있는 것 최대 3. 감점 규칙 없는 것만, 계열 겹침 2개까지 */
+  /* 추천 세 묶음: 무난(무채·연유채) 최대 4 + 어울려요(유채 상위) 최대 5 + 포인트(작은 자리에서만 쨍한 색) 최대 3. 감점 규칙 없는 것만, 계열 겹침 3개까지 */
   const byAdj = [...list].sort((a, b) => b.adj - a.adj || a.key.localeCompare(b.key));
-  const pickN = (pred, nMax, tol) => { const out = [], hues = []; for (const x of byAdj) { if (out.length >= nMax) break; if (!pred(x) || x.warn.some(w => w.w <= -1) || x.total < top - tol) continue; const c = lch(x.hex); const fam = c.C <= NEUTRAL_C ? 'n' + (c.L > 60 ? 'L' : 'D') : 'h' + Math.round(c.h / 30); if (hues.filter(h => h === fam).length >= 2) continue; hues.push(fam); out.push(x); } return out; };
-  const half = Math.ceil((opts.recN || 6) / 2);
-  const safe = pickN(x => lch(x.hex).C <= 18, half, 6), colored = pickN(x => lch(x.hex).C > 18, (opts.recN || 6) - half, 3);
-  const rec = [...safe, ...colored].sort((a, b) => b.total - a.total || a.vv - b.vv);
-  const recSet = new Set(rec.map(x => x.key));
-  const marks = {}; list.forEach(x => { marks[x.key] = recSet.has(x.key) ? 'rec' : (x.warn.length && x.d <= -4) ? 'warn' : ''; });
-  return { base, list, rec, marks };
+  const famOf = hex => { const c = lch(hex); return c.C <= NEUTRAL_C ? 'n' + (c.L > 60 ? 'L' : 'D') : 'h' + Math.round(c.h / 30); };
+  const pickN = (pred, nMax, tol) => { const out = [], hues = []; for (const x of byAdj) { if (out.length >= nMax) break; if (!pred(x) || x.warn.some(w => w.w <= -1) || x.total < top - tol) continue; const fam = famOf(x.hex); if (hues.filter(h => h === fam).length >= 3) continue; hues.push(fam); out.push(x); } return out; };
+  const safe = pickN(x => lch(x.hex).C <= 18, 4, 10), match = pickN(x => lch(x.hex).C > 18, 5, 8);
+  const point = SMALL_SLOTS.includes(slot)
+    ? list.filter(x => x.vv >= .4 && !x.warn.some(w => w.w <= -1)).sort((a, b) => b.total - a.total || a.key.localeCompare(b.key)).slice(0, 3)
+    : [];
+  const groups = { safe: safe.map(x => x.key), match: match.map(x => x.key), point: point.map(x => x.key) };
+  const seen = new Set(); const rec = [];
+  for (const x of [...safe, ...match, ...point]) if (!seen.has(x.key)) { seen.add(x.key); rec.push(x); }
+  const marks = {}; list.forEach(x => { marks[x.key] = seen.has(x.key) ? 'rec' : (x.warn.length && x.d <= -4) ? 'warn' : ''; });
+  return { base, list, rec, groups, marks };
 }
 function bestMoves(items, ctx, palette, k) {
   const base = evaluate(items, ctx); const out = [];

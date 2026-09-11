@@ -8,12 +8,12 @@
 import { guideFor, bestMovesFor, type EngineInput, type EngineMove } from './engine'
 
 export type Mark = 'rec' | 'warn'
-export interface Guide { rec: string[]; warn: string[]; marks: Record<string, Mark>; delta: Record<string, number>; why: Record<string, string> }
+export interface Guide { rec: string[]; warn: string[]; marks: Record<string, Mark>; delta: Record<string, number>; why: Record<string, string>; groups: { safe: string[]; match: string[]; point: string[] } }
 export type Move = EngineMove
 
-export function colorGuide(input: EngineInput, slot: string, recN = 6): Guide {
+export function colorGuide(input: EngineInput, slot: string, recN = 12): Guide {
   const g = guideFor(input, slot, recN)
-  return { rec: g.rec, warn: Object.keys(g.marks).filter(k => g.marks[k] === 'warn'), marks: g.marks, delta: g.delta, why: g.why }
+  return { rec: g.rec, warn: Object.keys(g.marks).filter(k => g.marks[k] === 'warn'), marks: g.marks, delta: g.delta, why: g.why, groups: g.groups }
 }
 
 export function bestMoves(input: EngineInput, k = 3): Move[] {

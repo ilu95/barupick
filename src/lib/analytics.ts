@@ -163,8 +163,8 @@ export function trackColorTab(ctx: string, tab: string, n: number) {
   trackEvent('color_tab', { ctx, tab, n })
 }
 
-// 색 탭(터치). src: grid=팔레트 격자, recent=최근 사용, rec=추천 칩
-export function trackColorPick(ctx: string, meta: { slot?: string | null; color: string; src: 'grid' | 'recent' | 'rec'; tab?: string; pos?: number; delta?: number }) {
+// 색 탭(터치). src: grid=팔레트 격자, recent=최근 사용, rec=추천 칩, mine=내 옷
+export function trackColorPick(ctx: string, meta: { slot?: string | null; color: string; src: 'grid' | 'recent' | 'rec' | 'mine'; tab?: string; pos?: number; delta?: number; group?: string }) {
   if (ctx === 'build') funnel('build').picks++
   trackEvent('color_pick', { ctx, ...meta, ...VER })
 }
