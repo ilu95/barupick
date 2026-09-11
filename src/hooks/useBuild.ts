@@ -418,10 +418,9 @@ export function useBuild(mode: BuildMode = 'coord') {
     const prev = state
     setState(p => {
       if (['bottom', 'shoes', 'scarf', 'hat', 'tie'].includes(move.slot)) return { ...p, [move.slot + 'Color']: move.to }
-      const sorted = sortUpper(p.upper)
-      const idx = sorted.findIndex((l, i) => getSlotKey(i, sorted.length, l) === move.slot)
+      const idx = p.upper.findIndex(l => uiSlotOf(l) === move.slot)
       if (idx < 0) return p
-      return { ...p, upper: sorted.map((l, i) => i === idx ? { ...l, colorKey: move.to } : l) }
+      return { ...p, upper: p.upper.map((l, i) => i === idx ? { ...l, colorKey: move.to } : l) }
     })
     return () => setState(prev)
   }, [state])
