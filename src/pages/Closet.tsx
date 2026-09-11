@@ -8,10 +8,8 @@ import MannequinSVG from '@/components/mannequin/MannequinSVG'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { COLORS_60, getColorName } from '@/lib/colors'
-import { plateName } from '@/lib/outfits'
-import { HAT_NAMES } from '@/lib/builderSlots'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
-import { loadWishlist, removeWish, boughtWish, wishName, type Wish } from '@/lib/closetAuto'
+import { loadWishlist, removeWish, boughtWish, wishName, nameOf, type Wish } from '@/lib/closetAuto'
 import { useScrollRestore } from '@/hooks/useScrollRestore'
 
 type ClosetTab = 'wardrobe' | 'records'
@@ -55,8 +53,7 @@ export default function Closet() {
 // 내 옷장 탭
 // ═══════════════════════════════════════
 function WardrobeTab({ navigate }: { navigate: any }) {
-  const { t, i18n } = useTranslation()
-  const ko = (i18n.language || 'ko').startsWith('ko')
+  const { t } = useTranslation()
   const modal = useModal()
   const toast = useToast()
   const [items, setItems] = useState(() => {
@@ -67,7 +64,6 @@ function WardrobeTab({ navigate }: { navigate: any }) {
 
   const getColor = (item: any) => item.color || item.colorKey || null
   const catOrder = ['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat']
-  const plateLabelOf = (plate: string) => HAT_NAMES[plate] ? HAT_NAMES[plate][ko ? 'ko' : 'en'] : plateName(plate)
 
   // localStorage 저장 헬퍼
   const persist = useCallback((nextItems: any[]) => {
@@ -112,9 +108,9 @@ function WardrobeTab({ navigate }: { navigate: any }) {
   const renderItem = (item: any) => {
     const colorKey = getColor(item)
     const c = colorKey ? COLORS_60[colorKey] : null
-    const fallbackName = [colorKey ? getColorName(colorKey) : '', item.plate ? plateLabelOf(item.plate) : ''].filter(Boolean).join(' ')
+    const fallbackName = [colorKey ? getColorName(colorKey) : '', item.plate ? nameOf(item.plate) : ''].filter(Boolean).join(' ')
     const displayName = item.name || fallbackName || colorKey || ''
-    const meta = [t('builder.slot.' + item.category), item.plate ? plateLabelOf(item.plate) : ''].filter(Boolean).join(' · ')
+    const meta = [t('builder.slot.' + item.category), item.plate ? nameOf(item.plate) : ''].filter(Boolean).join(' · ')
     const badge = item.source === 'coord' ? t('closet.fromCoord') : item.source === 'bought' ? t('closet.fromBought') : null
 
     return (

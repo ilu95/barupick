@@ -19,7 +19,7 @@ export interface Garment { slot: string; plate: string; itemType: string | null;
 
 const W_KEY = 'sp_wardrobe', WISH_KEY = 'sp_wishlist'
 const ko = () => (i18n.language || 'ko').startsWith('ko')
-const nameOf = (plate: string) => HAT_NAMES[plate] ? HAT_NAMES[plate][ko() ? 'ko' : 'en'] : plateName(plate)
+export const nameOf = (plate: string) => HAT_NAMES[plate] ? HAT_NAMES[plate][ko() ? 'ko' : 'en'] : plateName(plate)
 
 /** 만들기 상태 → 입은 옷 목록 (자리·판·색) */
 export function garmentsOf(s: BuildState): Garment[] {
