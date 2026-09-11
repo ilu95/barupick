@@ -10,7 +10,7 @@ import CropOverlay from '@/components/ui/CropOverlay'
 import { useBuild } from '@/hooks/useBuild'
 import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
-import { charSceneFromState, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT } from '@/lib/char/map'
+import { charSceneFromState, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT, DEFAULT_TIE } from '@/lib/char/map'
 import { garmentsOf, commitCloset } from '@/lib/closetAuto'
 import { trackOotdRecord } from '@/lib/analytics'
 import { COLORS_60, getColorName } from '@/lib/colors'
@@ -62,6 +62,7 @@ export default function OotdRecord() {
         shoes: c.shoes ? { plate: it.shoes && it.shoes.includes('_') ? it.shoes : DEFAULT_SHOE, colorKey: c.shoes } : undefined,
         scarf: c.scarf ? { plate: DEFAULT_SCARF, colorKey: c.scarf } : null,
         hat: c.hat ? { plate: DEFAULT_HAT, colorKey: c.hat } : null,
+        tie: c.tie ? { plate: it.tie && it.tie.includes('_') ? it.tie : DEFAULT_TIE, colorKey: c.tie } : null,
       })
     } catch {}
   }, [])
@@ -74,7 +75,7 @@ export default function OotdRecord() {
   const handleSave = () => {
     if (!canSave) { setSaveError(t('ootdRecord.selectAllRequired')); setTimeout(() => setSaveError(''), 2000); return }
     if (ootd.needsPhoto) { setSaveError(t('ootdRecord.photoRequiredPublic')); setTimeout(() => setSaveError(''), 2000); return }
-    const colors: Record<string, string | null> = { top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null }
+    const colors: Record<string, string | null> = { top: null, middleware: null, bottom: null, outer: null, shoes: null, scarf: null, hat: null, tie: null }
     const itemTypes: Record<string, string> = {}
     for (const g of garments) { const slot = g.slot === 'inner' ? 'top' : g.slot; if (!colors[slot]) { colors[slot] = g.colorKey; itemTypes[slot] = g.plate } }
     try {

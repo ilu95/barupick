@@ -14,7 +14,7 @@ import { profile } from './profile'
 import { tasteContrast } from './taste'
 import { PLATE_SLOT } from './outfits'
 
-const TO_V7: Record<string, string> = { outer: 'outer', middleware: 'layer', top: 'top', inner: 'inner', bottom: 'bottom', shoes: 'shoes', scarf: 'scarf', hat: 'hat' }
+const TO_V7: Record<string, string> = { outer: 'outer', middleware: 'layer', top: 'top', inner: 'inner', bottom: 'bottom', shoes: 'shoes', scarf: 'scarf', hat: 'hat', tie: 'tie' }
 const FROM_V7: Record<string, string> = Object.fromEntries(Object.entries(TO_V7).map(([a, b]) => [b, a]))
 const PART_KEY: Record<string, string> = { '명도 구조': 'structure', '색 수·면적': 'count', '조화': 'harmony', '시선 정리': 'focus', '상황·계절': 'situation', '나에게': 'me' }
 
@@ -40,7 +40,7 @@ export function pcSeason(): 'spring' | 'summer' | 'autumn' | 'winter' | null {
   } catch { return null }
 }
 
-const PLATE_V7: Record<string, string> = { inner: 'inner', mid1: 'top', mid2: 'layer', outer: 'outer', bottom: 'bottom', shoe: 'shoes', scarf: 'scarf', hat: 'hat' }
+const PLATE_V7: Record<string, string> = { inner: 'inner', mid1: 'top', mid2: 'layer', outer: 'outer', bottom: 'bottom', shoe: 'shoes', scarf: 'scarf', hat: 'hat', tie: 'tie' }
 export function toItems(input: EngineInput) {
   return Object.entries(input.outfit)
     .filter(([, key]) => key && COLORS_60[key])

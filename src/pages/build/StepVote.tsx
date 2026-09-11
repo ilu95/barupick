@@ -35,7 +35,7 @@ function colorsOf(s: BuildState): VoteSide['colors'] {
   const out: VoteSide['colors'] = []
   const push = (k?: string | null) => { if (k && COLORS_60[k]) out.push({ key: k, hex: COLORS_60[k].hex, name: getColorName(k) }) }
   for (const slot of UPPER) push(layerOf(s.upper, slot)?.colorKey)
-  push(s.bottomColor); push(s.shoesColor); push(s.scarfColor); push(s.hatColor)
+  push(s.bottomColor); push(s.shoesColor); push(s.scarfColor); push(s.hatColor); push(s.tieColor)
   return out
 }
 function withColor(s: BuildState, slot: string, key: string): BuildState {
@@ -44,6 +44,7 @@ function withColor(s: BuildState, slot: string, key: string): BuildState {
   if (slot === 'shoes') return { ...s, shoesColor: key }
   if (slot === 'scarf') return { ...s, scarfColor: key }
   if (slot === 'hat') return { ...s, hatColor: key }
+  if (slot === 'tie') return { ...s, tieColor: key }
   return s
 }
 const colorLabel = (c: VoteSide['colors']) => c.slice(0, 2).map(x => x.name).join(' + ')

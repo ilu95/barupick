@@ -10,7 +10,7 @@ import type { UpperLayer } from '@/hooks/useBuild'
 
 export type UpperSlot = 'outer' | 'middleware' | 'top' | 'inner'
 export type RailSlot = 'hair' | 'inner' | 'middleware' | 'acc' | 'outer' | 'top' | 'bottom' | 'shoes'
-export type AccSlot = 'scarf' | 'hat'
+export type AccSlot = 'scarf' | 'hat' | 'tie'
 
 /** 레일 순서 = 화면 순서 (2열 × 4행) */
 export const RAIL: { id: RailSlot; icon: string; optional: boolean }[] = [
@@ -31,7 +31,7 @@ export const uiSlotOf = (l: { outerness: number }): UpperSlot => l.outerness >= 
 export const layerOf = (upper: UpperLayer[], slot: UpperSlot) => upper.find(l => uiSlotOf(l) === slot) || null
 
 /** 칸별 판 목록 (남 기준). 여성은 TYPES_W 로 덧붙인다 */
-export const TYPES: Record<'inner' | 'top' | 'middleware' | 'outer' | 'bottom' | 'shoes' | 'scarf' | 'hat', string[]> = {
+export const TYPES: Record<'inner' | 'top' | 'middleware' | 'outer' | 'bottom' | 'shoes' | 'scarf' | 'hat' | 'tie', string[]> = {
   inner: ['07_tee_long', '06_tee_short', '13_knit_turtle', '36_tank'],
   top: ['11_knit_crew', '35_sweat', '08_shirt_closed', '16_hoodie', '37_polo', '12_knit_vneck', '09_shirt_short', '53_halfzip'],
   middleware: ['15_cardigan', '14_knit_vest', '10_shirt_open', '45_vest_padding'],
@@ -40,6 +40,7 @@ export const TYPES: Record<'inner' | 'top' | 'middleware' | 'outer' | 'bottom' |
   shoes: ['74_loafer', '71_sneaker_canvas', '75_boots_chelsea', '76_boots_walker', '73_sneaker_chunky', '77_derby', '72_sneaker_runner', '80_sandal_slide', '81_boots_ugg'],
   scarf: ['54_scarf', '55_snood', '56_scarf_silk', '57_scarf_cable', '58_scarf_blanket'],
   hat: ['c1_cap', 'c2_beanie', 'c3_bucket', 'c4_beret'],
+  tie: ['59_tie'],
 }
 export const TYPES_W: Partial<Record<keyof typeof TYPES, string[]>> = {
   top: [...TYPES.top, '46_knit_crop', '47_blouse'],
@@ -72,7 +73,8 @@ export const HINTS: Record<string, { ko: string; en: string }> = {
   scarf: { ko: '얼굴 옆이라 퍼스널컬러가 제일 잘 드러나요', en: 'Next to the face — personal color shows most' },
   hat: { ko: '신발이나 하의와 같은 계열이면 잘 어울려요', en: 'One dot on top — tie it to shoes or bottom' },
   hair: { ko: '상의보다 어둡거나 밝아야 얼굴이 살아요', en: 'Hair color reads best against the top' },
+  tie: { ko: '셔츠 위에만 보여요. 상의·하의 중 한 색과 이으면 정돈돼요', en: 'Only shows over a shirt — echo the top or bottom color to tie it together' },
 }
 
 /** 기본 색 (칸을 처음 채울 때) */
-export const DEFAULT_COLOR: Record<string, string> = { outer: 'charcoal', middleware: 'beige', top: 'white', inner: 'white', bottom: 'charcoal', shoes: 'black', scarf: 'burgundy', hat: 'black' }
+export const DEFAULT_COLOR: Record<string, string> = { outer: 'charcoal', middleware: 'beige', top: 'white', inner: 'white', bottom: 'charcoal', shoes: 'black', scarf: 'burgundy', hat: 'black', tie: 'navy' }

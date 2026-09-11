@@ -64,7 +64,7 @@ function WardrobeTab({ navigate }: { navigate: any }) {
   const undoRef = useRef<{ id: string; item: any; timer: ReturnType<typeof setTimeout> } | null>(null)
 
   const getColor = (item: any) => item.color || item.colorKey || null
-  const catOrder = ['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat']
+  const catOrder = ['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat', 'tie']
 
   // localStorage 저장 헬퍼
   const persist = useCallback((nextItems: any[]) => {

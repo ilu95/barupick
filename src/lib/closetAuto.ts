@@ -9,7 +9,7 @@
 import { COLORS_60, getColorName } from './colors'
 import { PLATE_TO_ITEM, plateName, loadPrefs, savePrefs } from './outfits'
 import { HAT_NAMES, uiSlotOf, type UpperSlot } from './builderSlots'
-import { defaultPlateFor, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT } from './char/map'
+import { defaultPlateFor, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT, DEFAULT_TIE, canWearTie } from './char/map'
 import { setJSON } from './storage'
 import { trackEvent } from './analytics'
 import type { BuildState } from '@/hooks/useBuild'
@@ -34,6 +34,7 @@ export function garmentsOf(s: BuildState): Garment[] {
   if (s.shoesColor && COLORS_60[s.shoesColor]) { const p = s.shoesItem || DEFAULT_SHOE; out.push({ slot: 'shoes', plate: p, itemType: null, colorKey: s.shoesColor, name: nameOf(p) }) }
   if (s.scarfColor && COLORS_60[s.scarfColor]) { const p = s.scarfItem || DEFAULT_SCARF; out.push({ slot: 'scarf', plate: p, itemType: 'scarf', colorKey: s.scarfColor, name: nameOf(p) }) }
   if (s.hatColor && COLORS_60[s.hatColor]) { const p = s.hatItem || DEFAULT_HAT; out.push({ slot: 'hat', plate: p, itemType: 'hat', colorKey: s.hatColor, name: nameOf(p) }) }
+  if (s.tieColor && COLORS_60[s.tieColor] && canWearTie(s)) { const p = s.tieItem || DEFAULT_TIE; out.push({ slot: 'tie', plate: p, itemType: 'tie', colorKey: s.tieColor, name: nameOf(p) }) }
   return out
 }
 

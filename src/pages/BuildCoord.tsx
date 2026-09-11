@@ -681,13 +681,14 @@ function pickOf(s: any) {
     shoes: s.shoesColor ? { plate: s.shoesItem || '71_sneaker_canvas', colorKey: s.shoesColor } : undefined,
     scarf: s.scarfColor ? { plate: s.scarfItem || '54_scarf', colorKey: s.scarfColor } : null,
     hat: s.hatColor ? { plate: s.hatItem || 'c1_cap', colorKey: s.hatColor } : null,
+    tie: s.tieColor ? { plate: s.tieItem || '59_tie', colorKey: s.tieColor } : null,
     style: s.style || null, templateId: s.templateId || null, situ: s.situ || null,
   }
 }
 function getBuildPartLabel(partKey: string, upper: any[], state?: any): string {
   // 새 만들기 화면에서 고른 판이 있으면 그 이름(트렌치코트), 없으면 종류(코트)
   if (state) {
-    const plateOf: Record<string, string | null | undefined> = { bottom: state.bottomItem, shoes: state.shoesItem, scarf: state.scarfItem, hat: state.hatItem }
+    const plateOf: Record<string, string | null | undefined> = { bottom: state.bottomItem, shoes: state.shoesItem, scarf: state.scarfItem, hat: state.hatItem, tie: state.tieItem }
     if (plateOf[partKey]) return HAT_NAMES[plateOf[partKey]!] ? HAT_NAMES[plateOf[partKey]!][i18n.language.startsWith('ko') ? 'ko' : 'en'] : plateName(plateOf[partKey]!)
   }
   const sorted = sortUpper(upper)
@@ -699,7 +700,7 @@ function getBuildPartLabel(partKey: string, upper: any[], state?: any): string {
       if (item) return i18n.t('categories:itemsCatalog.' + item.id)
     }
   }
-  const fallbacks: Record<string, string> = { top: i18n.t('categories.top'), bottom: i18n.t('categories.bottom'), shoes: i18n.t('categories.shoes'), outer: i18n.t('categories.outer'), middleware: i18n.t('categories.middleware'), scarf: i18n.t('categories.scarf'), hat: i18n.t('categories.hat') }
+  const fallbacks: Record<string, string> = { top: i18n.t('categories.top'), bottom: i18n.t('categories.bottom'), shoes: i18n.t('categories.shoes'), outer: i18n.t('categories.outer'), middleware: i18n.t('categories.middleware'), scarf: i18n.t('categories.scarf'), hat: i18n.t('categories.hat'), tie: i18n.t('categories.tie') }
   return fallbacks[partKey] || partKey
 }
 

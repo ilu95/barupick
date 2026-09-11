@@ -15,7 +15,7 @@ import { evaluationSystem } from '@/lib/evaluation'
 import { calculateHarmonyV6 } from '@/lib/recommend'
 import { colorGuide, bestMoves, type Move } from '@/lib/guide'
 import { scoreOutfit, scoreDelta, type EngineInput, type EngineResult } from '@/lib/engine'
-import { platesOf } from '@/lib/char/map'
+import { platesOf, canWearTie } from '@/lib/char/map'
 import { UI_OUTERNESS, uiSlotOf, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import { PLATE_TO_ITEM } from '@/lib/outfits'
 
@@ -46,6 +46,7 @@ export interface BuildState {
   shoesColor: string | null
   scarfColor: string | null
   hatColor: string | null
+  tieColor: string | null
   fabrics: Record<string, string | null>
   /** 1단계에서 고른 하의·신발 판 id (색은 bottomColor/shoesColor) */
   bottomItem?: string | null
@@ -57,6 +58,7 @@ export interface BuildState {
   /** 새 만들기 화면: 목도리·모자 판, 헤어 */
   scarfItem?: string | null
   hatItem?: string | null
+  tieItem?: string | null
   hair?: string | null
   hairColor?: string | null
 }
@@ -105,7 +107,7 @@ export function upperToOutfit(state: BuildState): Record<string, string | null> 
   const outfit: Record<string, string | null> = {
     outer: null, middleware: null, top: null, inner: null,
     bottom: state.bottomColor, shoes: state.shoesColor,
-    scarf: state.scarfColor, hat: state.hatColor,
+    scarf: state.scarfColor, hat: state.hatColor, tie: state.tieColor,
   }
   const sorted = sortUpper(state.upper)
   sorted.forEach((layer, idx) => {
@@ -177,6 +179,7 @@ const initialState = (mode: BuildMode = 'coord'): BuildState => ({
   shoesColor: null,
   scarfColor: null,
   hatColor: null,
+  tieColor: null,
   fabrics: {},
 })
 
@@ -263,7 +266,9 @@ export function useBuild(mode: BuildMode = 'coord') {
   const setShoesItem = useCallback((plate: string) => setState(prev => ({ ...prev, shoesItem: plate })), [])
   const setAccItem = useCallback((acc: AccSlot, plate: string | null, colorKey: string | null) => setState(prev => acc === 'scarf'
     ? { ...prev, scarfItem: plate, scarfColor: plate ? colorKey : null }
-    : { ...prev, hatItem: plate, hatColor: plate ? colorKey : null }), [])
+    : acc === 'hat'
+    ? { ...prev, hatItem: plate, hatColor: plate ? colorKey : null }
+    : { ...prev, tieItem: plate, tieColor: plate ? colorKey : null }), [])
   const setHair = useCallback((hair: string, hairColor: string) => setState(prev => ({ ...prev, hair, hairColor })), [])
 
   // ── 1단계(옷 조합) 결과를 한 번에 올린다 ──
@@ -273,6 +278,7 @@ export function useBuild(mode: BuildMode = 'coord') {
     shoes?: { plate: string; colorKey: string }
     scarf?: { plate: string; colorKey: string } | null
     hat?: { plate: string; colorKey: string } | null
+    tie?: { plate: string; colorKey: string } | null
     style?: string | null
     templateId?: string | null
     situ?: string | null
@@ -298,6 +304,8 @@ export function useBuild(mode: BuildMode = 'coord') {
         scarfItem: o.scarf ? o.scarf.plate : prev.scarfItem,
         hatColor: o.hat ? o.hat.colorKey : prev.hatColor,
         hatItem: o.hat ? o.hat.plate : prev.hatItem,
+        tieColor: o.tie ? o.tie.colorKey : prev.tieColor,
+        tieItem: o.tie ? o.tie.plate : prev.tieItem,
         templateId: o.templateId ?? null,
         situ: o.situ ?? prev.situ ?? null,
       }
@@ -349,8 +357,10 @@ export function useBuild(mode: BuildMode = 'coord') {
     if (state.shoesColor) outfit.shoes = state.shoesColor
     if (state.scarfColor) outfit.scarf = state.scarfColor
     if (state.hatColor) outfit.hat = state.hatColor
+    if (state.tieColor && canWearTie(state)) outfit.tie = state.tieColor
     if (state.scarfItem) plates.scarf = state.scarfItem
     if (state.hatItem) plates.hat = state.hatItem
+    if (state.tieItem) plates.tie = state.tieItem
     return { outfit, plates, situ: state.situ || 'daily' }
   }, [state])
 
@@ -388,7 +398,7 @@ export function useBuild(mode: BuildMode = 'coord') {
   const applyMove = useCallback((move: { slot: string; to: string }): (() => void) => {
     const prev = state
     setState(p => {
-      if (['bottom', 'shoes', 'scarf', 'hat'].includes(move.slot)) return { ...p, [move.slot + 'Color']: move.to }
+      if (['bottom', 'shoes', 'scarf', 'hat', 'tie'].includes(move.slot)) return { ...p, [move.slot + 'Color']: move.to }
       const sorted = sortUpper(p.upper)
       const idx = sorted.findIndex((l, i) => getSlotKey(i, sorted.length, l) === move.slot)
       if (idx < 0) return p

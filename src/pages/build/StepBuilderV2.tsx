@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, RotateCcw, X, Check } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
-import { charSceneFromState, charSex, setCharSex } from '@/lib/char/map'
+import { charSceneFromState, charSex, setCharSex, canWearTie } from '@/lib/char/map'
 import { PLATE_NAMES } from '@/lib/outfits'
-import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, layerOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
+import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import type { BuildHook } from '@/hooks/useBuild'
 import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent } from '@/lib/analytics'
 
@@ -41,32 +41,34 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const scene = useMemo(() => charSceneFromState(s, sex), [s, sex])
   const score = build.getScore()
   const ev = build.getEvalResult()
+  const tieAllowed = canWearTie(s)
+  useEffect(() => { if (acc === 'tie' && !tieAllowed) setAcc('scarf') }, [tieAllowed])
 
-  // 지금 칸의 "옷 자리" 이름: 색·판이 붙는 자리 (acc 는 scarf/hat 로 푼다)
+  // 지금 칸의 "옷 자리" 이름: 색·판이 붙는 자리 (acc 는 scarf/hat/tie 로 푼다)
   const colorSlot: string = focus === 'acc' ? acc : focus
   const worn = (slot: RailSlot): boolean => {
     if (slot === 'hair') return true
-    if (slot === 'acc') return !!(s.scarfColor || s.hatColor)
+    if (slot === 'acc') return !!(s.scarfColor || s.hatColor || s.tieColor)
     if (isUpper(slot)) return !!layerOf(s.upper, slot)
     if (slot === 'bottom') return !!s.bottomColor
     return !!s.shoesColor
   }
   const colorOf = (slot: RailSlot): string | null => {
     if (slot === 'hair') return s.hairColor || HAIR_COLORS[0].hex
-    if (slot === 'acc') return s.scarfColor ? COLORS_60[s.scarfColor]?.hex : s.hatColor ? COLORS_60[s.hatColor]?.hex : null
+    if (slot === 'acc') return s.scarfColor ? COLORS_60[s.scarfColor]?.hex : s.hatColor ? COLORS_60[s.hatColor]?.hex : s.tieColor ? COLORS_60[s.tieColor]?.hex : null
     if (isUpper(slot)) { const l = layerOf(s.upper, slot); return l ? COLORS_60[l.colorKey]?.hex || null : null }
     const k = slot === 'bottom' ? s.bottomColor : s.shoesColor
     return k ? COLORS_60[k]?.hex || null : null
   }
   const currentKey = (): string | null => {
     if (focus === 'hair') return null
-    if (focus === 'acc') return acc === 'scarf' ? s.scarfColor : s.hatColor
+    if (focus === 'acc') return acc === 'scarf' ? s.scarfColor : acc === 'hat' ? s.hatColor : s.tieColor
     if (isUpper(focus)) return layerOf(s.upper, focus)?.colorKey || null
     return focus === 'bottom' ? s.bottomColor : s.shoesColor
   }
   const currentPlate = (): string | null => {
     if (focus === 'hair') return s.hair || null
-    if (focus === 'acc') return acc === 'scarf' ? (s.scarfColor ? s.scarfItem || TYPES.scarf[0] : null) : (s.hatColor ? s.hatItem || TYPES.hat[0] : null)
+    if (focus === 'acc') return acc === 'scarf' ? (s.scarfColor ? s.scarfItem || TYPES.scarf[0] : null) : acc === 'hat' ? (s.hatColor ? s.hatItem || TYPES.hat[0] : null) : (s.tieColor ? s.tieItem || TYPES.tie[0] : null)
     if (isUpper(focus)) return layerOf(s.upper, focus)?.plate || null
     return focus === 'bottom' ? (s.bottomItem || TYPES.bottom[0]) : (s.shoesItem || TYPES.shoes[0])
   }
@@ -78,7 +80,9 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const types: string[] = focus === 'hair' ? HAIR[sex].map(h => h.id)
     : focus === 'acc' ? typesFor(acc, sex)
     : typesFor(focus as keyof typeof TYPES, sex)
-  const optional = focus === 'acc' || (isUpper(focus) && focus !== 'top')
+  // 상의는 다른 상체 레이어(아우터·레이어드·이너) 중 하나라도 입고 있어야 벗을 수 있다
+  const canTakeOff = (slot: RailSlot): boolean => slot === 'acc' || (isUpper(slot) && (slot !== 'top' || s.upper.some(l => uiSlotOf(l) !== 'top')))
+  const showNone = (slot: RailSlot): boolean => slot === 'acc' || isUpper(slot)
 
   const pickType = (plate: string) => {
     trackEvent('garment_pick', { slot: colorSlot, plate })
@@ -168,25 +172,32 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
             {currentPlate() && <span className="ml-1.5 font-medium text-warm-500">{plateName(currentPlate()!)}{cur ? ' · ' + getColorName(cur) : ''}</span>}
           </div>
           <div className="ml-auto text-[10.5px] text-warm-500 truncate max-w-[46%]">{HINTS[colorSlot]?.[ko ? 'ko' : 'en']}</div>
-          {optional && worn(focus) && <button onClick={takeOff} className="flex-none text-[11px] font-semibold px-2.5 py-1 rounded-full border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300">{t('builder.takeOff')}</button>}
+          {canTakeOff(focus) && worn(focus) && <button onClick={takeOff} className="flex-none text-[11px] font-semibold px-2.5 py-1 rounded-full border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300">{t('builder.takeOff')}</button>}
         </div>
 
         {focus === 'acc' && (
-          <div className="flex gap-1.5 px-4 mt-1.5">
-            {(['scarf', 'hat'] as AccSlot[]).map(a => { const w = a === 'scarf' ? !!s.scarfColor : !!s.hatColor; return (
-              <button key={a} onClick={() => setAcc(a)} className={`h-6 px-2.5 rounded-full text-[11px] font-semibold flex items-center gap-1.5 ${acc === a ? 'bg-warm-900 text-white' : 'bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300'}`}>
-                <i className={`w-1.5 h-1.5 rounded-full ${w ? 'bg-terra-500' : 'bg-current opacity-30'}`} />{t('builder.slot.' + a)}
-              </button>) })}
+          <div className="flex items-center gap-1.5 px-4 mt-1.5">
+            {(['scarf', 'hat', 'tie'] as AccSlot[]).map(a => {
+              const w = a === 'scarf' ? !!s.scarfColor : a === 'hat' ? !!s.hatColor : !!s.tieColor
+              const disabled = a === 'tie' && !tieAllowed
+              return (
+                <button key={a} onClick={() => !disabled && setAcc(a)} disabled={disabled} className={`h-6 px-2.5 rounded-full text-[11px] font-semibold flex items-center gap-1.5 ${disabled ? 'bg-warm-100 dark:bg-warm-800 text-warm-400 dark:text-warm-600' : acc === a ? 'bg-warm-900 text-white' : 'bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300'}`}>
+                  <i className={`w-1.5 h-1.5 rounded-full ${w ? 'bg-terra-500' : 'bg-current opacity-30'}`} />{t('builder.slot.' + a)}
+                </button>
+              )
+            })}
+            {!tieAllowed && <span className="text-[10.5px] text-warm-400">{t('builder.tieNeedsShirt')}</span>}
           </div>
         )}
 
         {/* 옷 종류 */}
         <div className="mt-2 px-4 overflow-x-auto [scrollbar-width:none]">
           <div className="grid grid-flow-col gap-1.5" style={{ gridTemplateRows: types.length > 5 ? 'repeat(2, 32px)' : '32px', gridAutoColumns: 'max-content' }}>
-            {optional && <button onClick={takeOff} disabled={!worn(focus)} className={`h-8 px-3 rounded-full text-[12.5px] font-semibold border border-dashed whitespace-nowrap ${!worn(focus) ? 'bg-warm-900 text-white border-warm-900' : 'border-warm-400 text-warm-600 dark:text-warm-300'}`}>{t('builder.none')}</button>}
+            {showNone(focus) && <button onClick={takeOff} disabled={!worn(focus) || !canTakeOff(focus)} className={`h-8 px-3 rounded-full text-[12.5px] font-semibold border border-dashed whitespace-nowrap ${!canTakeOff(focus) ? 'opacity-40 border-warm-300 dark:border-warm-600 text-warm-400 dark:text-warm-600' : !worn(focus) ? 'bg-warm-900 text-white border-warm-900' : 'border-warm-400 text-warm-600 dark:text-warm-300'}`}>{t('builder.none')}</button>}
             {types.map(id => { const on = currentPlate() === id; return (
               <button key={id} onClick={() => pickType(id)} className={`h-8 px-3 rounded-full text-[12.5px] font-semibold whitespace-nowrap border transition-all active:scale-95 ${on ? 'bg-warm-900 text-white border-warm-900' : 'bg-[#FAF8F5] dark:bg-warm-900/40 border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'}`}>{plateName(id)}</button>) })}
           </div>
+          {focus === 'top' && !canTakeOff('top') && <div className="mt-1.5 text-[10.5px] text-warm-400">{t('builder.topNeedsUpper')}</div>}
         </div>
 
         {/* 색 */}
@@ -239,7 +250,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
           {reason && <div className="text-[11px] text-warm-500 truncate">{reason}</div>}
         </div>
         {nextSlot ? (
-          <button onClick={nextGuide} disabled={!optional && !worn(focus)} className="flex-none h-11 px-4 rounded-full bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 font-bold text-[13.5px] disabled:opacity-40 active:scale-[0.98]">{optional && !worn(focus) ? t('builder.guided.skip', { slot: t('builder.slot.' + nextSlot) }) : t('builder.guided.next', { slot: t('builder.slot.' + nextSlot) })} →</button>
+          <button onClick={nextGuide} disabled={!canTakeOff(focus) && !worn(focus)} className="flex-none h-11 px-4 rounded-full bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 font-bold text-[13.5px] disabled:opacity-40 active:scale-[0.98]">{canTakeOff(focus) && !worn(focus) ? t('builder.guided.skip', { slot: t('builder.slot.' + nextSlot) }) : t('builder.guided.next', { slot: t('builder.slot.' + nextSlot) })} →</button>
         ) : (
           <button onClick={() => onDone ? onDone() : build.pushStep(s.fabricMode ? 'fabric' : 'result')} disabled={!complete} className="flex-none h-11 px-5 rounded-full bg-terra-500 text-white font-bold text-[14px] disabled:opacity-40 active:scale-[0.98] shadow-terra">{doneLabel || t('builder.done')} →</button>
         )}

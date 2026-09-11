@@ -1622,7 +1622,8 @@
     "bottom": "Bottom",
     "shoes": "Shoes",
     "scarf": "Scarf",
-    "hat": "Hat"
+    "hat": "Hat",
+    "tie": "Necktie"
   },
   "evaluation": {
     "freeColor": "Free Color",
@@ -1881,6 +1882,8 @@
     "female": "W",
     "takeOff": "Take off",
     "none": "None",
+    "tieNeedsShirt": "Shirt only",
+    "topNeedsUpper": "Add an outer or inner layer first to remove the top",
     "noRec": "No color makes this much better right now",
     "pt": "pts",
     "done": "Done",
@@ -1894,7 +1897,8 @@
       "bottom": "Bottom",
       "shoes": "Shoes",
       "scarf": "Scarf",
-      "hat": "Hat"
+      "hat": "Hat",
+      "tie": "Necktie"
     },
     "guidedTitle": "One piece at a time",
     "guided": {
