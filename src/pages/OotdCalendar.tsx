@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useOotd, type OotdRecord } from '@/hooks/useOotd'
 import { COLORS_60 } from '@/lib/colors'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
 
@@ -81,22 +82,22 @@ export default function OotdCalendar() {
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       {/* 월 네비 */}
       <div className="flex items-center justify-between mb-5">
-        <button onClick={prevMonth} className="w-9 h-9 rounded-full bg-white border border-warm-400 flex items-center justify-center active:scale-90 transition-transform">
-          <ChevronLeft size={18} />
+        <button onClick={prevMonth} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 flex items-center justify-center active:scale-90 transition-transform">
+          <ChevronLeft size={18} className="text-warm-800 dark:text-warm-200" />
         </button>
         <div className="text-center">
-          <div className="font-display text-lg font-bold text-warm-900">{monthLabel}</div>
-          <div className="text-[11px] text-warm-600">{t('ootdCalendar.monthSummary', { days: daysWithRecords, coords: monthRecords.length })}</div>
+          <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{monthLabel}</div>
+          <div className="text-[11px] text-warm-600 dark:text-warm-400">{t('ootdCalendar.monthSummary', { days: daysWithRecords, coords: monthRecords.length })}</div>
         </div>
-        <button onClick={nextMonth} className="w-9 h-9 rounded-full bg-white border border-warm-400 flex items-center justify-center active:scale-90 transition-transform">
-          <ChevronRight size={18} />
+        <button onClick={nextMonth} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 flex items-center justify-center active:scale-90 transition-transform">
+          <ChevronRight size={18} className="text-warm-800 dark:text-warm-200" />
         </button>
       </div>
 
       {/* 요일 헤더 */}
       <div className="grid grid-cols-7 gap-1 mb-1">
         {(t('ootdCalendar.weekDays', { returnObjects: true }) as string[]).map((d, i) => (
-          <div key={d} className={`text-center text-[11px] font-semibold py-1 ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-warm-500'}`}>
+          <div key={d} className={`text-center text-[11px] font-semibold py-1 ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-warm-500 dark:text-warm-400'}`}>
             {d}
           </div>
         ))}
@@ -224,10 +225,7 @@ export default function OotdCalendar() {
 // ─── 캘린더용 기록 카드 (Closet RecordCard 기반, 날짜 표시 변경) ───
 function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate: any }) {
   const { t } = useTranslation()
-  const outfitHex: Record<string, string> = {}
-  Object.entries(record.colors || {}).forEach(([k, v]) => {
-    if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
-  })
+  const scene = sceneFromColors(record.colors as any, record.itemTypes)
 
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
   const weekDays = t('ootdCalendar.weekDays', { returnObjects: true }) as string[]
@@ -265,7 +263,7 @@ function CalendarRecordCard({ record, navigate }: { record: OotdRecord, navigate
       className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
     >
       <div className="flex items-center justify-center py-4 bg-warm-100 dark:bg-warm-700">
-        <MannequinSVG outfit={outfitHex} size={80} />
+        <CharacterCanvas items={scene.items} body={scene.body} width={64} />
       </div>
       <div className="px-2.5 py-2">
         <div className="flex items-center justify-between mb-0.5">

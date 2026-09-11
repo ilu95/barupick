@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BarChart3, Award, Palette, Target, GraduationCap, ScanLine, Star, ChevronRight, FileText, TrendingUp, Eye, Heart, Bookmark, ArrowLeft, Check, Gift, Trophy, Sparkles, ShoppingBag } from 'lucide-react'
 import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { COLORS_60, hcl } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -711,6 +713,12 @@ export function Insights() {
 }
 
 // ─── 저장한 코디 ───
+const HEX_TO_COLOR_KEY: Record<string, string> = Object.fromEntries(
+  Object.entries(COLORS_60).map(([key, c]) => [c.hex.toLowerCase(), key])
+)
+/** 저장된 코디는 일부 옛 경로(커뮤니티 북마크)에서 색을 컬러키 대신 hex 로 들고 있다. hex 면 컬러키로 되돌린다 */
+const asColorKey = (v: string) => (COLORS_60[v] ? v : HEX_TO_COLOR_KEY[v.toLowerCase()] || v)
+
 export function SavedCoords() {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -720,21 +728,23 @@ export function SavedCoords() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('profileSub.savedCoords.title')} ({saved.length})</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('profileSub.savedCoords.title')} ({saved.length})</h2>
       {saved.length > 0 ? (
         <div className="flex flex-col gap-2.5">
           {saved.map((item: any, idx: number) => {
-            const outfitHex: Record<string, string> = {}
-            Object.entries(item.outfit || item.colors || {}).forEach(([k, v]) => {
-              if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string)
-            })
+            const rawColors = item.outfit || item.colors || {}
+            const scene = item.scene?.items ? item.scene : sceneFromColors(
+              Object.fromEntries(Object.entries(rawColors).map(([k, v]) => [k, v ? asColorKey(v as string) : null])) as any
+            )
             return (
-              <div key={idx} className="flex items-center gap-3 bg-white border border-warm-400 rounded-2xl p-3 shadow-warm-sm">
-                <MannequinSVG outfit={outfitHex} size={60} />
+              <div key={idx} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm">
+                <div className="w-[60px] h-[60px] flex items-center justify-center flex-shrink-0 bg-warm-100 dark:bg-warm-700 rounded-xl overflow-hidden">
+                  <CharacterCanvas items={scene.items} body={scene.body} width={48} />
+                </div>
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-warm-900">{item.name || `#${idx + 1}`}</div>
-                  {item.score && <div className="text-xs text-terra-600 font-medium mt-0.5">{t('common.score', { score: item.score })}</div>}
-                  <div className="flex gap-1 mt-1">{Object.values(item.outfit || item.colors || {}).filter(Boolean).slice(0, 5).map((ck, i) => {
+                  <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{item.name || `#${idx + 1}`}</div>
+                  {item.score && <div className="text-xs text-terra-600 dark:text-terra-400 font-medium mt-0.5">{t('common.score', { score: item.score })}</div>}
+                  <div className="flex gap-1 mt-1">{Object.values(rawColors).filter(Boolean).map((v: any) => asColorKey(v)).slice(0, 5).map((ck, i) => {
                     const c = COLORS_60[ck as string]; return c ? <div key={i} className="w-3 h-3 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
                   })}</div>
                 </div>
@@ -742,7 +752,7 @@ export function SavedCoords() {
             )
           })}
         </div>
-      ) : <div className="text-center py-16"><Star size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">{t('profileSub.savedCoords.title')}</div></div>}
+      ) : <div className="text-center py-16"><Star size={40} className="text-warm-400 dark:text-warm-500 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">{t('profileSub.savedCoords.title')}</div></div>}
     </div>
   )
 }
