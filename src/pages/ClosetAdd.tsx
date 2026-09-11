@@ -4,12 +4,12 @@ import { useState, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, Edit3, ArrowLeft, X } from 'lucide-react'
-import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { ITEMS_CATALOG } from '@/lib/styles'
-import { typesFor, HAT_NAMES } from '@/lib/builderSlots'
-import { plateName, PLATE_TO_ITEM } from '@/lib/outfits'
+import { typesFor } from '@/lib/builderSlots'
+import { PLATE_TO_ITEM } from '@/lib/outfits'
 import { charSex } from '@/lib/char/map'
+import { nameOf } from '@/lib/closetAuto'
 
 const SLOT_ORDER = ['outer', 'middleware', 'top', 'inner', 'bottom', 'shoes', 'scarf', 'hat']
 
@@ -88,8 +88,7 @@ function generateThumbnail(img) {
 
 export default function ClosetAdd() {
   const navigate = useNavigate()
-  const { t, i18n } = useTranslation()
-  const ko = (i18n.language || 'ko').startsWith('ko')
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const initialSlot = SLOT_ORDER.includes(searchParams.get('category')) ? searchParams.get('category') : null
   const [mode, setMode] = useState(initialSlot ? 'manual' : 'select')
@@ -109,7 +108,6 @@ export default function ClosetAdd() {
   const [mPlate, setMPlate] = useState(null)
   const [mColor, setMColor] = useState(null)
   const [mColorTab, setMColorTab] = useState(COLOR_TABS[0].id)
-  const plateLabel = (id) => HAT_NAMES[id] ? HAT_NAMES[id][ko ? 'ko' : 'en'] : plateName(id)
 
   const resetForm = () => {
     setSelectedItem(null); setColor(null); setBrand(''); setItemName('')
@@ -128,14 +126,14 @@ export default function ClosetAdd() {
         itemType: PLATE_TO_ITEM[mPlate] ?? null,
         plate: mPlate,
         color: mColor, colorKey: mColor,
-        name: `${getColorName(mColor)} ${plateLabel(mPlate)}`,
+        name: `${getColorName(mColor)} ${nameOf(mPlate)}`,
         source: 'manual',
         createdAt: new Date().toISOString(),
       })
       if (items.length > 200) items.length = 200
       setJSON('sp_wardrobe', items)
       setSaved(true)
-      setTimeout(() => { setSaved(false); resetManual(); setMode('select') }, 1200)
+      setTimeout(() => { setSaved(false); resetManual(); navigate('/closet') }, 1200)
     } catch {}
   }
 
@@ -304,7 +302,7 @@ export default function ClosetAdd() {
         <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">1. {t('closetAdd.slot')}</div>
         <div className="flex flex-wrap gap-2">
           {SLOT_ORDER.map(slot => (
-            <button key={slot} onClick={() => { setMSlot(slot); setMPlate(null) }} className={`h-8 px-3 rounded-full text-[12px] font-semibold transition-all ${mSlot === slot ? 'bg-warm-900 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
+            <button key={slot} onClick={() => { setMSlot(slot); setMPlate(null) }} className={`h-8 px-3 rounded-full text-[12px] font-semibold transition-all ${mSlot === slot ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
               {t('builder.slot.' + slot)}
             </button>
           ))}
@@ -316,8 +314,8 @@ export default function ClosetAdd() {
           <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2">2. {t('closetAdd.type')}</div>
           <div className="flex flex-wrap gap-2">
             {mTypes.map(id => (
-              <button key={id} onClick={() => setMPlate(id)} className={`h-8 px-3 rounded-full text-[12px] font-semibold transition-all ${mPlate === id ? 'bg-warm-900 text-white' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
-                {plateLabel(id)}
+              <button key={id} onClick={() => setMPlate(id)} className={`h-8 px-3 rounded-full text-[12px] font-semibold transition-all ${mPlate === id ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95'}`}>
+                {nameOf(id)}
               </button>
             ))}
           </div>
