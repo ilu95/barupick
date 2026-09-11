@@ -1,268 +1,174 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Wand2, Palette, CloudSun, Bookmark, Scissors, Ruler, HelpCircle, ChevronRight, Flame, Calendar, Sparkles, X, Droplets, Wind, Shirt } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import TodayPick from '@/components/home/TodayPick'
-import { COLORS_60 } from '@/lib/colors'
-import { useAuth } from '@/contexts/AuthContext'
-import { useWeather, weatherEmoji, weatherText, getLayerAdvice } from '@/hooks/useWeather'
-import { sortRecordsDesc } from '@/lib/records'
-import i18n, { getLocale } from '@/i18n'
-
-import { profile as profileLib } from '@/lib/profile'
+import { ArrowRight, RefreshCw, Thermometer, ChevronRight } from 'lucide-react'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { COLORS_60, getColorName } from '@/lib/colors'
+import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { useWeather, weatherEmoji } from '@/hooks/useWeather'
+import { SITU, PARTS, ranked, alternatives, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
+import { colorKeyOf, colorKeysOf, stashPick } from '@/lib/pickPayload'
 import { loadTaste } from '@/lib/taste'
 import { myVotes } from '@/lib/votes'
+import { loadBasket } from '@/lib/voteBasket'
+import { loadWishlist } from '@/lib/closetAuto'
+import { isEasy } from '@/lib/mode'
+import { trackEvent } from '@/lib/analytics'
+
+// ═══════════════════════════════════════════════════════
+// 홈 — 유저의 니즈에서 시작하는 입구
+// 위: "오늘 뭐 입을까요?" 한 벌(참고용 방향, 8벌 순환). 아래: 무엇을 도와드릴까요 —
+// 하나씩 함께 골라보기 · 레이어드 조합 · 추가하면 좋을 아이템 · 내 옷으로 · 친구에게 물어보기 · 스타일로 30벌.
+// 모드(골라 주는/직접 만드는)는 "이대로 할게요"가 결과로 가느냐 색 고르기로 가느냐만 가른다. 기능은 숨기지 않는다.
+// ═══════════════════════════════════════════════════════
+
+const TEMP_STEPS = [15, 21, 26]
+const readLen = (k: string) => { try { return (JSON.parse(localStorage.getItem(k) || '[]') as unknown[]).length } catch { return 0 } }
 
 export default function Home() {
-  const navigate = useNavigate()
-  const tasteLabel = useMemo(() => loadTaste()?.name || null, [])
-  const lastVote = useMemo(() => myVotes()[0] || null, [])
   const { t } = useTranslation()
-  const { profile, user } = useAuth()
-  const { weather, loading: wLoading, refresh: refreshWeather } = useWeather()
+  const navigate = useNavigate()
+  const { weather, denied, refresh } = useWeather()
+  const sex = charSex()
+  const easy = isEasy()
+  const taste = useMemo(loadTaste, [])
+  const lastVote = useMemo(() => myVotes()[0] || null, [])
+  const counts = useMemo(() => ({ wardrobe: readLen('sp_wardrobe'), wish: loadWishlist().length, basket: loadBasket().length, saved: readLen('cs_saved') }), [])
+  const [situ, setSitu] = useState<Situ>(defaultSitu)
+  const [tempOverride, setTempOverride] = useState<number | null>(null)
+  const [idx, setIdx] = useState(0)
 
-  // 온보딩 체크
-  useEffect(() => {
-    if (!localStorage.getItem('sp_onboarded')) {
-      navigate('/onboarding', { replace: true })
-    }
-  }, [])
+  useEffect(() => { if (!localStorage.getItem('sp_onboarded')) navigate('/onboarding', { replace: true }) }, [])
 
-  // 시간대별 인사
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? t('home.greetingMorning') : hour < 18 ? t('home.greetingAfternoon') : t('home.greetingEvening')
-  const userName = profile?.nickname || ''
-  const greetingText = userName ? `${greeting}, ${userName}` : greeting
+  const evening = new Date().getHours() >= 17 && !!weather?.tomorrow
+  const temp = tempOverride ?? (evening ? weather!.tomorrow!.feels : (weather?.feels ?? 21))
+  const ctx: Ctx = useMemo(() => ({ sex, situ, temp, prefs: loadPrefs(), recent: loadRecent() }), [sex, situ, temp])
+  // 후보 8벌: 1위 → 다른 방향 3 → 나머지 순위. "다른 거"는 1/8 → 8/8 → 1/8 로 돈다
+  const cands: Entry[] = useMemo(() => {
+    const list = ranked(ctx); if (!list.length) return []
+    const out: Entry[] = [list[0]]; const seen = new Set([list[0].c.id])
+    for (const e of [...alternatives(list[0], ctx), ...list.slice(1)]) { if (seen.has(e.c.id)) continue; seen.add(e.c.id); out.push(e); if (out.length >= 8) break }
+    return out
+  }, [ctx])
+  useEffect(() => { setIdx(0) }, [situ, temp, sex])
+  const hero = cands.length ? cands[idx % cands.length] : null
+  useEffect(() => { if (hero) trackEvent('home_view', { id: hero.c.id, idx, situ, temp }) }, [hero?.c.id])
 
-  // 날씨 기반 배경 그라데이션
-  const weatherGradient = weather ? (
-    weather.code === 0 ? 'from-amber-50 to-sky-50' :
-    weather.code <= 3 ? 'from-sky-50 to-blue-50' :
-    weather.code <= 48 ? 'from-gray-100 to-slate-100' :
-    weather.code <= 67 ? 'from-blue-50 to-indigo-50' :
-    'from-slate-100 to-blue-100'
-  ) : 'from-warm-100 to-warm-50'
+  const scene: CharScene | null = hero ? {
+    items: PARTS.filter(k => hero.p[k]).map(k => ({ id: hero.p[k]!, color: COLORS_60[colorKeyOf(hero, k)]?.hex || '#ccc' })),
+    body: { sex, hair: DEFAULT_HAIR[sex], hairColor: DEFAULT_HAIR_COLOR },
+  } : null
+  const garments = hero ? PARTS.filter(k => hero.p[k]).map(k => plateName(hero.p[k]!)).join(' · ') : ''
+  const colors = hero ? colorKeysOf(hero) : []
+  const why = !hero ? '' : idx === 0 && evening && weather?.tomorrow
+    ? (weather.tomorrow.rain >= 50 ? t('home.pick.rain', { p: weather.tomorrow.rain })
+      : Math.abs(weather.tomorrow.feels - weather.tomorrow.todayMin) >= 5
+        ? (weather.tomorrow.feels < weather.tomorrow.todayMin ? t('home.pick.colder', { d: weather.tomorrow.todayMin - weather.tomorrow.feels }) : t('home.pick.warmer', { d: weather.tomorrow.feels - weather.tomorrow.todayMin }))
+        : reasons(hero, ctx))
+    : reasons(hero, ctx)
 
-  const advice = weather ? getLayerAdvice(weather.feels) : null
+  const go = (goto: 'result' | 'builder') => {
+    if (!hero) return
+    stashPick(hero, situ, goto)
+    trackEvent('home_pick', { id: hero.c.id, idx, goto, situ, temp })
+    navigate('/home/build')
+  }
+  const next = () => { if (!cands.length) return; const n = (idx + 1) % cands.length; setIdx(n); trackEvent('home_next', { idx: n }) }
+  const cycleTemp = () => { const i = TEMP_STEPS.indexOf(temp); setTempOverride(i < 0 ? TEMP_STEPS[0] : i === TEMP_STEPS.length - 1 ? (weather ? null : TEMP_STEPS[0]) : TEMP_STEPS[i + 1]) }
+  const openStep = (key: 'sp_guided' | 'sp_open_step', val: string, need: string) => {
+    trackEvent('home_need', { key: need })
+    try { sessionStorage.setItem(key, val) } catch {}
+    navigate('/home/build')
+  }
 
-  // 최근 OOTD 기록
-  const recentOotd = useMemo(() => {
-    try {
-      const records = JSON.parse(localStorage.getItem('sp_ootd_records') || '[]')
-      return sortRecordsDesc<any>(records)[0] || null
-    } catch { return null }
-  }, [])
+  // 니즈 카드: 각 기능이 유저에게 주는 것 한 줄씩
+  const needs: { key: string; icon: string; badge?: string; go: () => void }[] = [
+    { key: 'guided', icon: '🧩', go: () => openStep('sp_guided', '1', 'guided') },
+    { key: 'layered', icon: '🧶', go: () => { trackEvent('home_need', { key: 'layered' }); navigate('/home/picks/layered') } },
+    { key: 'items', icon: '🛍', badge: counts.wish ? t('home.needs.items.wish', { n: counts.wish }) : undefined, go: () => { trackEvent('home_need', { key: 'items' }); navigate('/closet/simulate') } },
+    { key: 'mine', icon: '👕', badge: counts.wardrobe ? t('home.needs.mine.count', { n: counts.wardrobe }) : undefined, go: () => { trackEvent('home_need', { key: 'mine' }); navigate(counts.wardrobe ? '/closet/combos' : '/closet') } },
+    { key: 'vote', icon: '🗳', badge: counts.basket ? t('home.needs.vote.basket', { n: counts.basket }) : undefined, go: () => openStep('sp_open_step', 'vote', 'vote') },
+    { key: 'styles', icon: '🎨', go: () => { trackEvent('home_need', { key: 'styles' }); navigate('/home/recommend') } },
+  ]
+  const links: { key: string; label: string; go: () => void }[] = [
+    { key: 'taste', label: taste ? t('outfit.tasteChip', { name: taste.name }) : t('outfit.tasteCta'), go: () => navigate('/home/taste') },
+    { key: 'record', label: t('home.links.record'), go: () => navigate('/record') },
+    { key: 'saved', label: counts.saved ? t('home.links.savedN', { n: counts.saved }) : t('home.links.saved'), go: () => navigate('/home/saved') },
+    { key: 'evaluate', label: t('home.links.evaluate'), go: () => navigate('/home/evaluate') },
+    { key: 'outer', label: t('home.links.outer'), go: () => navigate('/home/picks/outer') },
+  ]
+
+  const chip = (on: boolean) => `flex-none h-7 px-3 rounded-full text-[12px] font-semibold border transition-all ${on ? 'bg-warm-900 text-white border-warm-900 dark:bg-warm-100 dark:text-warm-900 dark:border-warm-100' : 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-300'}`
 
   return (
-    <div className="animate-screen-fade px-5 pt-[18px] pb-10">
-      {/* 인사 */}
-      <div className="pb-4">
-        <h1 className="font-display text-[clamp(22px,5.5vw,28px)] font-bold tracking-tight text-warm-900 dark:text-warm-100 leading-tight mb-3">
-          {greetingText}
-        </h1>
-
-        {/* 오늘의 한 벌 / 내일의 한 벌 + 이번 주 스트릭 (루프 L5) */}
-        <TodayPick />
-
-        {/* 날씨 카드 */}
-        {weather ? (
-          <button
-            onClick={() => navigate('/home/weather')}
-            className={`w-full bg-gradient-to-br ${weatherGradient} dark:from-warm-800 dark:to-warm-700 border border-warm-300 dark:border-warm-600 rounded-2xl p-4 text-left shadow-warm-sm active:scale-[0.98] transition-all mb-3`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{weatherEmoji(weather.code)}</span>
-                <div>
-                  <span className="font-display text-2xl font-bold text-warm-900 dark:text-warm-100">{weather.temp}°</span>
-                  <span className="text-xs text-warm-500 dark:text-warm-400 ml-1.5">{t('home.feelsLike', { temp: weather.feels })}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5 text-[11px] text-warm-500 dark:text-warm-400">
-                <span className="flex items-center gap-0.5"><Droplets size={11} />{weather.humidity}%</span>
-                <span className="flex items-center gap-0.5"><Wind size={11} />{weather.wind}km/h</span>
-              </div>
-            </div>
-            {advice && (
-              <div className="flex items-center gap-2 bg-white/60 dark:bg-warm-900/40 rounded-xl px-3 py-2">
-                <span className="text-sm">{advice.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs font-semibold text-warm-800 dark:text-warm-200">{advice.title}</span>
-                  <span className="text-[11px] text-warm-500 dark:text-warm-400 ml-1.5">{advice.desc}</span>
-                </div>
-                <ChevronRight size={14} className="text-warm-400 flex-shrink-0" />
-              </div>
-            )}
-          </button>
-        ) : (
-          <button onClick={() => { refreshWeather(); navigate('/home/weather') }} className="w-full flex items-center gap-2 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-4 py-3.5 text-sm text-warm-500 dark:text-warm-400 shadow-warm-sm active:scale-[0.98] transition-all mb-3">
-            <CloudSun size={16} /> {wLoading ? t('common.loading') : t('weather.noLocation')}
-          </button>
-        )}
-
-        {/* 최근 OOTD or 기록 유도 */}
-        {recentOotd ? (() => {
-          const outfitHex: Record<string, string> = {}
-          Object.entries(recentOotd.colors || {}).forEach(([k, v]) => {
-            if (v) { const c = COLORS_60[v as string]; if (c) outfitHex[k] = c.hex }
-          })
-          const d = new Date(recentOotd.date)
-          const dayLabel = d.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })
-          return (
-            <button onClick={() => navigate(`/closet/ootd/${recentOotd.date}?id=${recentOotd.id}`)} className="w-full flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-4 py-3 shadow-warm-sm active:scale-[0.98] transition-all">
-              <MannequinSVG outfit={outfitHex} size={44} />
-              <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-semibold text-warm-900 dark:text-warm-100">{t('home.recentOotd')} · {dayLabel}</div>
-                <div className="text-[11px] text-warm-500 dark:text-warm-400 mt-0.5">{t('common.score', { score: recentOotd.score })}{recentOotd.situation ? ` · ${recentOotd.situation}` : ''}</div>
-              </div>
-              <div className="flex gap-1">
-                {Object.values(recentOotd.colors || {}).filter(Boolean).slice(0, 4).map((ck, i) => {
-                  const c = COLORS_60[ck as string]
-                  return c ? <div key={i} className="w-3.5 h-3.5 rounded-full border border-warm-300" style={{ background: c.hex }} /> : null
-                })}
-              </div>
-              <ChevronRight size={14} className="text-warm-400 flex-shrink-0" />
-            </button>
-          )
-        })() : (
-          <button onClick={() => navigate('/record')} className="inline-flex items-center gap-1.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-full px-3.5 py-2 text-sm text-warm-600 dark:text-warm-400 shadow-warm-sm active:scale-[0.97] transition-all">
-            <Calendar size={16} /> {t('home.noRecords')}
-          </button>
-        )}
-      </div>
-
-      {/* 퍼스널컬러 미설정 배너 — 설정 완료 시 숨김 */}
-      {!profileLib.getPersonalColor() && (
-        <button onClick={() => navigate('/profile/personal-color')} className="w-full flex items-center gap-3 bg-terra-100 border border-terra-200 rounded-2xl px-4 py-3.5 mb-5 text-left active:scale-[0.98] transition-all">
-          <div className="w-10 h-10 rounded-xl bg-terra-200 flex items-center justify-center flex-shrink-0">
-            <Sparkles size={20} className="text-terra-600" />
-          </div>
-          <span className="text-sm text-terra-700 leading-snug flex-1">{t('home.personalColorBanner')}</span>
-          <ChevronRight size={16} className="text-terra-600 flex-shrink-0" />
+    <div className="animate-screen-fade px-5 pt-3 pb-8">
+      {/* 머리: 질문 + 기온 */}
+      <div className="flex items-center gap-2 mb-2">
+        <h1 className="font-display text-[22px] font-bold tracking-tight text-warm-900 dark:text-warm-100 flex-1">{evening ? t('home.easy.titleTomorrow') : t('home.easy.title')}</h1>
+        <button onClick={cycleTemp} title={t('outfit.weatherTap')} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1 active:scale-95">
+          {weather && tempOverride == null ? <span>{weatherEmoji(evening ? weather.tomorrow!.code : weather.code)}</span> : <Thermometer size={13} />}{temp}°
         </button>
+      </div>
+      <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mb-2">
+        {SITU.map(s => <button key={s.id} onClick={() => setSitu(s.id)} className={chip(situ === s.id)}>{t('outfit.situ.' + s.id)}</button>)}
+      </div>
+      {!weather && denied && <button onClick={() => refresh()} className="text-[11px] text-warm-500 underline mb-1">{t('home.easy.allowLocation')}</button>}
+
+      {/* 오늘의 한 벌 — 방향을 보여 주는 참고. 옷·색은 다음 화면에서 전부 바꿀 수 있다 */}
+      {hero && scene && (
+        <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl shadow-warm-sm overflow-hidden">
+          <div className="grid grid-cols-[150px_1fr] gap-2 items-end">
+            <div className="relative flex items-end justify-center" style={{ height: 232 }}>
+              <div className="absolute left-1/2 bottom-3 -translate-x-1/2 w-24 h-3 rounded-full" style={{ background: 'radial-gradient(ellipse at center, rgba(28,25,23,.16), rgba(28,25,23,0) 70%)' }} />
+              <CharacterCanvas {...scene} width={150} />
+              <span className="absolute left-2.5 top-2.5 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 tabular-nums">{(idx % cands.length) + 1}/{cands.length}</span>
+            </div>
+            <div className="pr-3.5 pb-3.5 pt-3 min-w-0 self-center">
+              <div className="flex items-start gap-1.5">
+                <div className="text-[15px] font-extrabold text-warm-900 dark:text-warm-100 leading-tight flex-1">{garments}</div>
+                <button onClick={next} aria-label={t('home.easy.other')} className="flex-none w-8 h-8 rounded-full bg-white dark:bg-warm-700 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:rotate-180 transition-transform"><RefreshCw size={14} /></button>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-1.5">
+                {colors.map((k, i) => <span key={i} className="flex items-center gap-1 text-[10.5px] text-warm-600 dark:text-warm-300"><i className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: COLORS_60[k]?.hex }} />{getColorName(k)}</span>)}
+              </div>
+              <div className="text-[12px] text-warm-600 dark:text-warm-400 leading-snug mt-2">{why}</div>
+              <div className="text-[11px] text-warm-500 leading-snug mt-1.5">{t('home.easy.note')}</div>
+            </div>
+          </div>
+          <div className="px-3 pb-3 grid grid-cols-[1fr_auto] gap-2">
+            <button onClick={() => go(easy ? 'result' : 'builder')} className="h-11 rounded-2xl bg-terra-500 text-white font-bold text-[14px] flex items-center justify-center gap-1.5 active:scale-[0.98] shadow-terra">{easy ? t('home.easy.take') : t('outfit.pickColors')} <ArrowRight size={16} /></button>
+            <button onClick={next} className="h-11 px-3.5 rounded-2xl bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-800 dark:text-warm-200 font-semibold text-[13px] flex items-center justify-center gap-1.5 active:scale-[0.98]"><RefreshCw size={13} /> {t('home.pick.other')}</button>
+          </div>
+          <div className="px-3 pb-3 -mt-1 flex items-center gap-4 text-[12px] text-warm-500">
+            {easy && <button onClick={() => go('builder')} className="underline underline-offset-2">{t('home.easy.colorsOnly')}</button>}
+            <button onClick={() => { trackEvent('home_need', { key: 'all30' }); navigate('/home/build') }} className="underline underline-offset-2">{t('home.easy.more30')}</button>
+          </div>
+        </div>
       )}
 
-      <div className="h-px bg-warm-400 mb-5" />
-
-      {/* 오늘 뭐 입지? — 항상 표시, 아이템 부족 시 비활성화 */}
-      {(() => {
-        const wardrobeCount = (() => { try { return JSON.parse(localStorage.getItem('sp_wardrobe') || '[]').length } catch { return 0 } })()
-        const enabled = wardrobeCount >= 3
-        const needed = Math.max(0, 3 - wardrobeCount)
-        return (
-          <button
-            onClick={() => enabled ? navigate('/closet/combos') : navigate('/closet/add')}
-            className={`group w-full border-[1.5px] rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm mb-4 ${
-              enabled
-                ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-warm-800 dark:to-warm-700 border-amber-300 dark:border-amber-700'
-                : 'bg-warm-100 dark:bg-warm-800 border-warm-300 dark:border-warm-600 opacity-80'
-            }`}
-          >
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 ${enabled ? 'bg-amber-200 dark:bg-amber-800' : 'bg-warm-300 dark:bg-warm-700'}`}>
-              <Shirt size={26} className={enabled ? 'text-amber-700 dark:text-amber-300' : 'text-warm-500 dark:text-warm-400'} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className={`font-display text-lg font-bold tracking-tight ${enabled ? 'text-amber-800 dark:text-amber-200' : 'text-warm-700 dark:text-warm-300'}`}>{t('closetCoord.allCombos')}</div>
-              <div className="text-sm text-warm-600 dark:text-warm-400 mt-0.5">
-                {enabled ? t('closetCoord.allCombosDesc') : t('closet.itemCount', { count: needed })}
-              </div>
-            </div>
-            <ChevronRight size={18} className={`flex-shrink-0 ${enabled ? 'text-amber-600 dark:text-amber-400' : 'text-warm-400'}`} />
+      {/* 무엇을 도와드릴까요 */}
+      <div className="mt-5 mb-2 text-[13px] font-bold text-warm-900 dark:text-warm-100">{t('home.needs.title')}</div>
+      <div className="grid grid-cols-2 gap-2">
+        {needs.map(n => (
+          <button key={n.key} onClick={n.go} className="relative text-left bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3.5 shadow-warm-sm active:scale-[0.98] transition-all min-h-[104px] flex flex-col">
+            <span className="text-[22px] leading-none">{n.icon}</span>
+            <span className="mt-2 text-[13.5px] font-extrabold text-warm-900 dark:text-warm-100 leading-tight">{t(`home.needs.${n.key}.title`)}</span>
+            <span className="mt-1 text-[11px] text-warm-500 leading-snug">{t(`home.needs.${n.key}.sub`)}</span>
+            {n.badge && <span className="mt-auto pt-2 text-[10.5px] font-bold text-terra-600">{n.badge}</span>}
           </button>
-        )
-      })()}
-
-      {/* 메인 CTA */}
-      <div className="flex flex-col gap-3 mb-6">
-        {/* 히어로 — 코디 추천받기 */}
-        <button onClick={() => { sessionStorage.removeItem('rec_session'); navigate('/home/recommend') }} className="group w-full bg-gradient-to-br from-terra-50 to-terra-100 border-[1.5px] border-terra-300 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
-          <div className="w-14 h-14 rounded-2xl bg-terra-200 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-            <Wand2 size={26} className="text-terra-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-display text-lg font-bold text-terra-700 tracking-tight">{t('home.mainCta.recommend')}</div>
-            <div className="text-sm text-warm-600 mt-0.5">{t('home.mainCta.recommendSub')}</div>
-          </div>
-          <ChevronRight size={18} className="text-terra-600 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
-        </button>
-
-        {/* 직접 만들기 */}
-        <button onClick={() => navigate('/home/build')} className="group w-full bg-white border border-warm-400 rounded-2xl p-4 flex items-center gap-3.5 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
-          <div className="w-11 h-11 rounded-xl bg-warm-300 flex items-center justify-center flex-shrink-0">
-            <Palette size={20} className="text-warm-800" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[15px] font-semibold text-warm-900 tracking-tight">{t('home.mainCta.build')}</div>
-            <div className="text-xs text-warm-600 mt-0.5">{t('home.mainCta.buildSub')}</div>
-          </div>
-          <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
-        </button>
-
-        {/* 내 컬러 취향 (30초) */}
-        <button onClick={() => navigate('/home/taste')} className="group w-full bg-white border border-warm-400 rounded-2xl p-4 flex items-center gap-3.5 text-left active:scale-[0.98] transition-all shadow-warm-sm hover:shadow-warm">
-          <div className="w-11 h-11 rounded-xl bg-terra-100 flex items-center justify-center flex-shrink-0">
-            <Sparkles size={20} className="text-terra-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[15px] font-semibold text-warm-900 tracking-tight">{tasteLabel ? t('home.taste.done', { name: tasteLabel }) : t('home.taste.title')}</div>
-            <div className="text-xs text-warm-600 mt-0.5">{tasteLabel ? t('home.taste.doneSub') : t('home.taste.sub')}</div>
-          </div>
-          <ChevronRight size={16} className="text-warm-500 flex-shrink-0 opacity-50" />
-        </button>
-
-        {lastVote && (
-          <button onClick={() => navigate('/v/' + lastVote.code)} className="w-full text-left px-4 py-2.5 rounded-2xl bg-[#FEE500]/40 border border-[#E8D34A]/60 text-[12.5px] font-semibold text-warm-800 flex items-center justify-between active:scale-[0.98]">
-            <span>🗳 {t('vote.homeLink')}</span><ChevronRight size={14} className="opacity-60" />
-          </button>
-        )}
-
-        {/* 하단 2열 */}
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => navigate('/home/weather')} className="group bg-white border border-warm-400 rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.97] transition-all shadow-warm-sm hover:shadow-warm">
-            <div className="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center flex-shrink-0">
-              <CloudSun size={18} className="text-sky-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-semibold text-warm-900">{t('home.mainCta.weather')}</div>
-            </div>
-          </button>
-
-          <button onClick={() => navigate('/home/saved')} className="group bg-white border border-warm-400 rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.97] transition-all shadow-warm-sm hover:shadow-warm">
-            <div className="w-10 h-10 rounded-xl bg-warm-300 flex items-center justify-center flex-shrink-0">
-              <Bookmark size={18} className="text-warm-700" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-semibold text-warm-900">{t('home.mainCta.saved')}</div>
-            </div>
-          </button>
-        </div>
+        ))}
       </div>
 
-      {/* 가이드 섹션 */}
-      <div className="mb-5">
-        <div className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3 flex items-center gap-1.5">
-          {t('home.guide.fabricGuide').replace(t('home.guide.fabricGuide'), '')}GUIDE
-        </div>
-        <div className="grid grid-cols-3 gap-2.5">
-          <button onClick={() => navigate('/home/fabric')} className="bg-white border border-warm-400 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm">
-            <Scissors size={24} className="text-terra-600 mx-auto mb-2" />
-            <div className="text-[13px] font-medium text-warm-800">{t('home.guide.fabricGuide')}</div>
-          </button>
-          <button onClick={() => navigate('/home/body')} className="bg-white border border-warm-400 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm">
-            <Ruler size={24} className="text-terra-600 mx-auto mb-2" />
-            <div className="text-[13px] font-medium text-warm-800">{t('home.guide.bodyGuide')}</div>
-          </button>
-          <button onClick={() => navigate('/home/quiz')} className="bg-white border border-warm-400 rounded-2xl py-5 px-2 text-center shadow-warm-sm active:scale-[0.97] transition-all hover:shadow-warm">
-            <HelpCircle size={24} className="text-terra-600 mx-auto mb-2" />
-            <div className="text-[13px] font-medium text-warm-800">{t('home.guide.quiz')}</div>
-          </button>
-        </div>
+      {/* 나머지 입구 */}
+      <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mt-3">
+        {links.map(l => <button key={l.key} onClick={l.go} className="flex-none h-8 px-3 rounded-full bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[11.5px] font-semibold text-warm-700 dark:text-warm-300 active:scale-95">{l.label}</button>)}
       </div>
 
-
+      {lastVote && (
+        <button onClick={() => navigate('/v/' + lastVote.code)} className="w-full mt-4 text-left px-4 py-2.5 rounded-2xl bg-[#FEE500]/40 border border-[#E8D34A]/60 text-[12.5px] font-semibold text-warm-800 flex items-center justify-between active:scale-[0.98]">
+          <span>🗳 {t('vote.homeLink')}</span><ChevronRight size={14} className="opacity-60" />
+        </button>
+      )}
     </div>
   )
 }
-
-

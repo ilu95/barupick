@@ -224,12 +224,15 @@ export function useCommunity() {
   // 좋아요 수는 socialStore 이벤트로 맞춘다 (상세 화면에서 눌러도 목록이 같이 움직인다)
   useEffect(() => {
     const h = (e: Event) => {
-      const { postId, delta } = (e as CustomEvent<LikeEventDetail>).detail
-      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes_count: Math.max(0, (p.likes_count || 0) + delta) } : p))
+      const { postId, delta, count } = (e as CustomEvent<LikeEventDetail>).detail
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes_count: count ?? Math.max(0, (p.likes_count || 0) + delta) } : p))
     }
     window.addEventListener(LIKE_EVENT, h)
     return () => window.removeEventListener(LIKE_EVENT, h)
   }, [])
+  // 로그인(저장소 바인딩)이 목록 로드보다 늦게 끝나거나 캐시에서 복원된 목록이면 내 좋아요를 여기서 채운다
+  // (빠지면 눌렀던 하트가 다음에 열 때 꺼져 보인다)
+  useEffect(() => { if (social.userId && posts.length) ensureLikes(posts.map(p => p.id)) }, [social.userId, posts.length])
 
   // 좋아요 토글 — 결과를 돌려주므로 화면이 실패를 알릴 수 있다
   const toggleLike = useCallback((postId: string) => {

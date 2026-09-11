@@ -7,3 +7,6 @@ dist
 "*.pem" 
 "*.p8" 
 "*.p12" 
+
+# graphify (로컬 코드 그래프)
+graphify-out/

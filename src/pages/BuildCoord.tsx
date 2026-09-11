@@ -19,8 +19,7 @@ import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildSte
 import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
-import { isEasy } from '@/lib/mode'
-import { garmentsOf, garmentKey, commitCloset, inCloset, type Garment } from '@/lib/closetAuto'
+import { garmentsOf, commitCloset, type Garment } from '@/lib/closetAuto'
 import { plateName } from '@/lib/outfits'
 import { HAT_NAMES } from '@/lib/builderSlots'
 import { trackVote } from '@/lib/analytics'
@@ -39,6 +38,7 @@ type BH = BuildHook
 export default function BuildCoord() {
   const navigate = useNavigate()
   const build = useBuild('coord')
+  const [guided, setGuided] = useState(false)   // 홈 "하나씩 함께 골라보기"로 들어왔을 때
 
   // 계측: 단계 진입 (퍼널 기준선)
   useEffect(() => { trackBuildStep(build.step, { mode: build.state.mode, style: build.state.style }) }, [build.step])
@@ -47,6 +47,12 @@ export default function BuildCoord() {
 
   // 취향 폭포(/home/taste)·코디 추천(/home/recommend)에서 고른 코디가 있으면 바로 2단계로
   useEffect(() => {
+    // 홈 니즈 카드: 하나씩 골라보기(빈 작업대 2단계) · 친구에게 물어보기(후보 화면)
+    try {
+      if (sessionStorage.getItem('sp_guided')) { sessionStorage.removeItem('sp_guided'); setGuided(true); build.pushStep('builder'); return }
+      const st = sessionStorage.getItem('sp_open_step')
+      if (st) { sessionStorage.removeItem('sp_open_step'); build.pushStep(st as BuildStep); return }
+    } catch {}
     for (const key of ['sp_taste_pick', 'sp_rec_pick']) {
       try {
         const raw = sessionStorage.getItem(key); if (!raw) continue
@@ -62,7 +68,7 @@ export default function BuildCoord() {
       <div className="max-w-[480px] mx-auto px-5 py-4 pb-8">
         {build.step === 'outfit' && <StepOutfit build={build} />}
         {build.step === 'style' && <StepStyle build={build} />}
-        {build.step === 'builder' && (build.state.mode === 'coord' ? <StepBuilderV2 build={build} easy={isEasy()} /> : <StepBuilder build={build} navigate={navigate} />)}
+        {build.step === 'builder' && (build.state.mode === 'coord' ? <StepBuilderV2 build={build} guided={guided} /> : <StepBuilder build={build} navigate={navigate} />)}
         {build.step === 'fabric' && <StepFabric build={build} />}
         {build.step === 'result' && <StepResult build={build} navigate={navigate} />}
         {build.step === 'improve' && <StepImprove build={build} />}
@@ -705,13 +711,10 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const toast = useToast()
   const { user, profile: authProfile } = useAuth() as any
   const { weather } = useWeather()
-  const easy = isEasy()   // 초보 앞문: 저장 · 물어보기만 크게, 분석표 없음
-  // 옷장은 쌓이는 곳: 이 코디의 옷들. 없는 옷은 칩으로 뺀다 (저장·물어보기 때 담긴다)
+  // 옷장은 쌓이는 곳: 원하면 이 코디의 옷을 버튼 한 번으로 담는다 (저장·물어보기와 별개, 자동으로 담지 않는다)
   const garments: Garment[] = useMemo(() => garmentsOf(build.state), [build.state])
-  const [missing, setMissing] = useState<Set<string>>(() => new Set())
   const [closetMsg, setClosetMsg] = useState<string | null>(null)
-  const toggleMissing = (g: Garment) => setMissing(prev => { const n = new Set(prev); const k = garmentKey(g); if (n.has(k)) n.delete(k); else n.add(k); return n })
-  const commitOwned = (from: string) => { const n = commitCloset(garments, missing, from); if (n > 0) setClosetMsg(t('build.closetAuto.added', { n })) }
+  const addToCloset = () => { const n = commitCloset(garments, new Set(), 'result'); setClosetMsg(n > 0 ? t('build.closetAuto.added', { n }) : t('build.closetAuto.already')) }
   const [card, setCard] = useState<{ url: string; ratio: CardRatio } | null>(null)
   const [cardBusy, setCardBusy] = useState(false)
   const score = build.getScore()
@@ -733,7 +736,6 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     : []
 
   const handleSave = () => {
-    commitOwned('save')
     const name = build.state.style ? t('styles:guide.' + build.state.style + '.name', { defaultValue: build.state.style }) : t('common.coord')
     const saved = JSON.parse(localStorage.getItem('cs_saved') || '[]')
     saved.unshift({ id: Date.now().toString(36), outfit, score, name, createdAt: Date.now(), engine: ENGINE_VERSION, pal: PALETTE_VERSION, template: build.state.templateId || null, scene: charSceneFromState(build.state), pick: pickOf(build.state) })
@@ -767,7 +769,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const shareCard = async () => { if (!card) return; const r = await shareDataUrl(card.url, `barupick-${Date.now()}.png`, t('card.title')); if (r === 'downloaded') toast.success(t('card.saved')) }
 
   // ── 루프 L3: 친구에게 물어보기 — 후보 화면에서 2~4벌을 직접 고른다 ──
-  const ask = () => { commitOwned('ask'); trackVote('create', { stage: 'open', score }); build.pushStep('vote') }
+  const ask = () => { trackVote('create', { stage: 'open', score }); build.pushStep('vote') }
   // 후보에 담기: 지금 코디를 바구니에 두고, 다른 코디를 만든 뒤 함께 고른다
   const basketAdd = () => {
     const garments = [...build.state.upper.map(l => l.plate).filter(Boolean), build.state.bottomItem, build.state.shoesItem].filter(Boolean) as string[]
@@ -786,11 +788,9 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
 
   return (
     <div className="animate-screen-enter">
-      {!easy && (
       <button onClick={() => build.setVizCollapsed(!build.vizCollapsed)} className="w-full text-center text-xs text-warm-600 py-2 mb-2 active:opacity-70">
         {build.vizCollapsed ? t('build.showMannequin') : t('build.hideMannequin')}
       </button>
-      )}
       {!build.vizCollapsed && (
         <div className="flex justify-center mb-5 py-4 bg-warm-100 dark:bg-warm-800 rounded-2xl">
           <CharacterCanvas {...sceneNow} width={180} />
@@ -821,17 +821,8 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
       </div>
 
-      {/* 초보 앞문: 분석표 없이 이유만 */}
-      {easy && reasonLines.length > 0 && (
-        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm flex flex-col gap-1.5">
-          {reasonLines.map((r, i) => (
-            <div key={i} className={`text-[12.5px] font-medium leading-snug ${r.w < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-terra-600'}`}>{r.w < 0 ? '△' : '●'} {r.txt}</div>
-          ))}
-        </div>
-      )}
-
       {/* 점수 분해도 */}
-      {!easy && scoreItems.length > 0 && (
+      {scoreItems.length > 0 && (
         <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm">
           <div className="text-xs font-semibold text-warm-500 uppercase tracking-widest mb-3">{t('build.scoreAnalysis')}</div>
           <div className="flex flex-col gap-2">
@@ -874,38 +865,17 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
       </div>
 
-      {/* 옷장에 담기: 없는 옷은 칩 한 번으로 뺀다 */}
+      {/* 옷장에 담기 (선택): 저장과는 별개 */}
       {garments.length > 0 && (
-        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3.5 mb-5 shadow-warm-sm">
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-[13px] font-bold text-warm-900 dark:text-warm-100">{t('build.closetAuto.title')}</span>
-            <span className="text-[11px] text-warm-500">{closetMsg || t('build.closetAuto.hint')}</span>
+        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3.5 mb-5 shadow-warm-sm flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="text-[13px] font-bold text-warm-900 dark:text-warm-100">{t('build.closetAuto.title')}</div>
+            <div className="text-[11px] text-warm-500 leading-snug">{closetMsg || t('build.closetAuto.hint')}</div>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {garments.map(g => { const off = missing.has(garmentKey(g)); const had = inCloset(g); return (
-              <button key={garmentKey(g)} onClick={() => toggleMissing(g)} className={`h-8 pl-1.5 pr-2.5 rounded-full text-[12px] font-semibold border flex items-center gap-1.5 transition-all active:scale-95 ${off ? 'bg-warm-100 dark:bg-warm-900/40 border-dashed border-warm-400 text-warm-400 line-through' : 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 text-warm-800 dark:text-warm-200'}`}>
-                <i className="w-4 h-4 rounded-full border border-black/10" style={{ background: COLORS_60[g.colorKey]?.hex, opacity: off ? .4 : 1 }} />{g.name}{had && !off && <span className="text-[10px] text-terra-600 font-bold">✓</span>}
-              </button>) })}
-          </div>
+          <button onClick={addToCloset} disabled={!!closetMsg} className="flex-none h-9 px-3.5 rounded-full text-[12px] font-bold border border-warm-300 dark:border-warm-600 bg-warm-100 dark:bg-warm-700 text-warm-800 dark:text-warm-200 disabled:opacity-50 active:scale-95">{closetMsg ? '✓' : t('build.closetAuto.button')}</button>
         </div>
       )}
 
-      {easy ? (
-        <>
-          <button onClick={handleSave} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 active:scale-98 shadow-terra mb-2">
-            <Bookmark size={18} /> {t('build.saveCoord')}
-          </button>
-          <button onClick={ask} className="w-full py-3.5 bg-[#FEE500] text-[#1C1917] rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 active:scale-98 mb-3">
-            <Users size={18} /> {t('vote.ask')}
-          </button>
-          <div className="flex items-center justify-center gap-4 text-[12.5px] text-warm-600 mb-6">
-            <button onClick={() => build.goBack()} className="underline underline-offset-2">{t('build.editColors')}</button>
-            <button onClick={() => makeCard('story')} disabled={cardBusy} className="underline underline-offset-2">{t('card.btn')}</button>
-            <button onClick={() => navigate('/home')} className="underline underline-offset-2">{t('build.goHome')}</button>
-          </div>
-        </>
-      ) : (
-        <>
       <button onClick={() => build.goBack()} className="w-full py-3 border border-terra-400 dark:border-terra-600 text-terra-600 dark:text-terra-400 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-98 mb-2">
         <Edit3 size={16} /> {t('build.editColors')}
       </button>
@@ -932,8 +902,6 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </button>
       </div>
       <button onClick={() => navigate('/home')} className="w-full py-2 text-sm text-warm-600 text-center active:opacity-70 mb-6">{t('build.goHome')}</button>
-        </>
-      )}
 
       {/* 오늘의 코디 카드 미리보기 */}
       {card && (

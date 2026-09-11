@@ -197,7 +197,46 @@
       "take": "I'll take this",
       "other": "Show another",
       "colorsOnly": "Just change colors",
-      "allowLocation": "Allow location to use today's temperature"
+      "allowLocation": "Allow location to use today's temperature",
+      "note": "Every garment can be changed on the next screen. Use it just for the colors if you like",
+      "more30": "30 picks · change direction"
+    },
+    "needs": {
+      "title": "What can we help with?",
+      "guided": {
+        "title": "Pick one piece at a time",
+        "sub": "Top first, one slot at a time, with matching colors for each"
+      },
+      "layered": {
+        "title": "Layered combos",
+        "sub": "Only layered outfits, for today’s temperature"
+      },
+      "items": {
+        "title": "Items worth adding",
+        "sub": "One piece that unlocks the most new combos",
+        "wish": "{{n}} to buy"
+      },
+      "mine": {
+        "title": "Outfits from my closet",
+        "sub": "Combos using only what you own",
+        "count": "{{n}} in closet"
+      },
+      "vote": {
+        "title": "Let friends choose",
+        "sub": "Send 2–4 picks and let the vote decide",
+        "basket": "{{n}} picks saved"
+      },
+      "styles": {
+        "title": "30 outfits by style",
+        "sub": "Mood → garments → colors"
+      }
+    },
+    "links": {
+      "record": "📅 Log today’s outfit",
+      "saved": "🔖 Saved",
+      "savedN": "🔖 Saved {{n}}",
+      "evaluate": "✅ Rate my outfit",
+      "outer": "🧥 Outer combos"
     }
   },
   "auth": {
@@ -308,7 +347,7 @@
     "fromCoord": "from a look",
     "wish": {
       "title": "To buy",
-      "hint": "Marked \"don't have\" in a look",
+      "hint": "Items you marked to buy",
       "simulate": "Worth buying?",
       "bought": "Bought it",
       "boughtToast": "Added to your closet",
@@ -607,9 +646,11 @@
       "me": "For me"
     },
     "closetAuto": {
-      "title": "Do you own these?",
-      "hint": "Tap what you don't have. Saving adds the rest to your closet",
-      "added": "{{n}} added to your closet"
+      "title": "Add these to your closet?",
+      "hint": "One tap if you own them. Separate from saving",
+      "added": "{{n}} added to your closet",
+      "already": "Already in your closet",
+      "button": "Add to closet"
     }
   },
   "weatherConditions": {
@@ -1836,9 +1877,11 @@
       "scarf": "Scarf",
       "hat": "Hat"
     },
-    "easyTitle": "Pick colors",
-    "moreColors": "More colors",
-    "changeGarment": "Change garment"
+    "guidedTitle": "One piece at a time",
+    "guided": {
+      "next": "Next: {{slot}}",
+      "skip": "Skip to {{slot}}"
+    }
   },
   "reminder": {
     "colderTitle": "Tomorrow morning {{temp}}°, {{d}}° colder than today",
@@ -1847,5 +1890,16 @@
     "warmerBody": "One layer less? Tap and choose colors only",
     "rainTitle": "{{p}}% chance of rain tomorrow · {{temp}}° in the morning",
     "rainBody": "Start with the shoes? Tap and choose colors only"
+  },
+  "picks": {
+    "layered": {
+      "title": "Layered combos",
+      "sub": "Only layered outfits. Tap one to pick its colors"
+    },
+    "outer": {
+      "title": "Outer combos",
+      "sub": "Only outfits with an outer layer. Tap one to pick its colors"
+    },
+    "empty": "No matching combos for this temperature and occasion. Tap the temperature above to change it"
   }
 }

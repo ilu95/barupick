@@ -99,11 +99,13 @@ export default function CommunityDetail() {
     const h = (e: Event) => {
       const d = (e as CustomEvent<LikeEventDetail>).detail
       if (d.postId !== postId) return
-      setPost((p: any) => p ? { ...p, likes_count: Math.max(0, (p.likes_count || 0) + d.delta) } : p)
+      setPost((p: any) => p ? { ...p, likes_count: d.count ?? Math.max(0, (p.likes_count || 0) + d.delta) } : p)
     }
     window.addEventListener(LIKE_EVENT, h)
     return () => window.removeEventListener(LIKE_EVENT, h)
   }, [postId])
+  // 저장소 바인딩이 게시물 로드보다 늦어도 내 좋아요를 채운다
+  useEffect(() => { if (social.userId && postId) ensureLikes([postId]) }, [social.userId, postId])
   const toggleLike = async () => {
     if (!user) { toast.toast({ message: t('common.loginRequired'), variant: 'info' }); navigate('/auth/login'); return }
     if (!postId) return
