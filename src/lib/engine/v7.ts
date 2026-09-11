@@ -154,7 +154,8 @@ function evaluate(items, ctx) {
     let fit = band(dL, TARGET[0], TARGET[1], TARGET[2], TARGET[3]);
     /* 실무 예외 4종 — v7 의 "뭉개짐" 판정이 실무에서 정상인 착장(어두운 톤온톤·올화이트·흑백)을 깎던 자리.
        모자란 만큼을 비율로 되돌린다. 원톤 전용이던 "갈라 주는 자리" 판정을 모든 경우로 일반화하고 양말도 후보에 넣는다. */
-    const recover = (f, w, k) => f + (1 - f) * w * clamp(k, 0, 1);
+    const lowFit = 1 - ramp(fit, .55, .8);                      /* 구조가 실제로 모자랄 때만 구제한다 — 이미 괜찮은 착장까지 밀어 올리면 무작위 조합이 같이 뜬다 */
+    const recover = (f, w, k) => f + (1 - f) * w * lowFit * clamp(k, 0, 1);
     const breakers = P.filter(p => p !== upperMain && p.area >= .035 && ['top', 'layer', 'inner', 'shoes', 'scarf', 'tie', 'socks'].includes(p.slot));
     const brkOf = p => ramp(Math.abs(p.c.L - upperMain.c.L), 18, 32) * ramp(Math.abs(p.c.L - bot.c.L), 12, 24);
     const brkP = breakers.reduce((m, p) => (!m || brkOf(p) > brkOf(m)) ? p : m, null);
