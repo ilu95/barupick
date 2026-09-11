@@ -1,8 +1,10 @@
 import { setJSON } from '@/lib/storage'
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Pencil, Trash2, Share, Globe, Calendar, Tag, Smile, Cloud, ArrowLeft, Image } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import { Pencil, Trash2, Globe, Tag, Smile, Cloud, Image } from 'lucide-react'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors, isPlateId } from '@/lib/char/scene'
+import { nameOf } from '@/lib/closetAuto'
 import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { useOotd } from '@/hooks/useOotd'
@@ -115,11 +117,12 @@ export default function OotdDetail() {
     )
   }
 
-  // 마네킹용 hex
+  // 공유 카드용 hex (ShareCard 전용, 판은 필요 없다)
   const outfitHex: Record<string, string> = {}
   Object.entries(record.colors || {}).forEach(([k, v]) => {
     if (v) { const c = COLORS_60[v]; if (c) outfitHex[k] = c.hex }
   })
+  const scene = useMemo(() => sceneFromColors(record.colors as any, record.itemTypes), [record])
 
   const [ry, rm, rd] = (record.date || '').split('-').map(Number)
   const dateObj = new Date(ry, rm - 1, rd)
@@ -183,30 +186,29 @@ export default function OotdDetail() {
   if (records.length > 1 && !recordId) {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
-        <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{dateLabel}</h2>
-        <p className="text-sm text-warm-600 mb-5">{t('ootdDetail.recordCount', { count: records.length })}</p>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-1">{dateLabel}</h2>
+        <p className="text-sm text-warm-600 dark:text-warm-400 mb-5">{t('ootdDetail.recordCount', { count: records.length })}</p>
         <div className="flex flex-col gap-2.5">
           {records.map(r => {
-            const hex: Record<string, string> = {}
-            Object.entries(r.colors || {}).forEach(([k, v]) => {
-              if (v) { const c = COLORS_60[v]; if (c) hex[k] = c.hex }
-            })
             const hasPhoto = r.photos && r.photos.length > 0
+            const sc = sceneFromColors(r.colors as any, r.itemTypes)
             return (
               <button
                 key={r.id}
                 onClick={() => navigate(`/closet/ootd/${date}?id=${r.id}`)}
-                className="flex items-center gap-3 bg-white border border-warm-400 rounded-2xl p-3 shadow-warm-sm active:scale-[0.98] transition-all text-left"
+                className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm active:scale-[0.98] transition-all text-left"
               >
                 {hasPhoto ? (
                   <img src={r.photos[0]} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" alt="" />
                 ) : (
-                  <MannequinSVG outfit={hex} size={60} />
+                  <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 bg-warm-100 dark:bg-warm-700 rounded-xl overflow-hidden">
+                    <CharacterCanvas items={sc.items} body={sc.body} width={60} />
+                  </div>
                 )}
                 <div className="flex-1">
-                  <span className="font-display text-sm font-bold text-terra-600">{t('common.score', { score: r.score })}</span>
-                  {r.situation && <span className="text-[11px] text-warm-600 ml-2">{r.situation}</span>}
-                  {r.memo && <div className="text-[11px] text-warm-500 truncate mt-0.5">{r.memo}</div>}
+                  <span className="font-display text-sm font-bold text-terra-600 dark:text-terra-400">{t('common.score', { score: r.score })}</span>
+                  {r.situation && <span className="text-[11px] text-warm-600 dark:text-warm-400 ml-2">{r.situation}</span>}
+                  {r.memo && <div className="text-[11px] text-warm-500 dark:text-warm-400 truncate mt-0.5">{r.memo}</div>}
                 </div>
               </button>
             )
@@ -233,29 +235,30 @@ export default function OotdDetail() {
         </div>
       )}
 
-      {/* 마네킹 + 점수 */}
+      {/* 캐릭터 + 점수 */}
       <div className="flex items-center gap-5 mb-5">
-        <div className="bg-warm-100 rounded-2xl p-4 flex-shrink-0">
-          <MannequinSVG outfit={outfitHex} size={record.photos?.length > 0 ? 80 : 120} />
+        <div className="bg-warm-100 dark:bg-warm-800 rounded-2xl p-4 flex-shrink-0 flex items-center justify-center">
+          <CharacterCanvas items={scene.items} body={scene.body} width={record.photos?.length > 0 ? 64 : 96} />
         </div>
         <div className="flex-1">
-          <div className="font-display text-3xl font-bold text-warm-900 mb-1">{t('common.score', { score: record.score })}
+          <div className="font-display text-3xl font-bold text-warm-900 dark:text-warm-100 mb-1">{t('common.score', { score: record.score })}
             {(() => { const p = getScorePercentile(record.score); return p ? <span className="ml-2 text-[10px] font-semibold bg-terra-100 text-terra-600 dark:bg-terra-900/30 dark:text-terra-400 px-2 py-0.5 rounded-full align-middle">{p.label}</span> : null })()}
           </div>
-          <div className="text-sm text-warm-600 mb-3">{dateLabel}</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400 mb-3">{dateLabel}</div>
 
           {/* 컬러 정보 */}
           <div className="flex flex-col gap-1">
             {Object.entries(record.colors || {}).filter(([_, v]) => v).map(([part, colorKey]) => {
               const c = COLORS_60[colorKey as string]
               if (!c) return null
-              const itemId = record.itemTypes?.[part]
-              const partLabel = itemId ? t('categories:itemsCatalog.' + itemId) : t('categories:names.' + part)
+              const rawId = record.itemTypes?.[part]
+              const itemLabel = rawId ? (isPlateId(rawId) ? nameOf(rawId) : t('categories:itemsCatalog.' + rawId, { defaultValue: '' })) : ''
               return (
                 <div key={part} className="flex items-center gap-1.5 text-xs">
-                  <span className="w-3.5 h-3.5 rounded flex-shrink-0 border border-warm-400" style={{ background: c.hex }} />
-                  <span className="text-warm-500 w-16 flex-shrink-0">{partLabel}</span>
-                  <span className="text-warm-800">{getColorName(colorKey as string)}</span>
+                  <span className="w-3.5 h-3.5 rounded-full flex-shrink-0 border border-warm-400 dark:border-warm-600" style={{ background: c.hex }} />
+                  <span className="text-warm-500 dark:text-warm-400 w-14 flex-shrink-0">{t('categories:names.' + part)}</span>
+                  {itemLabel && <span className="text-warm-700 dark:text-warm-300 flex-1 truncate">{itemLabel}</span>}
+                  <span className="text-warm-800 dark:text-warm-200 flex-shrink-0">{getColorName(colorKey as string)}</span>
                 </div>
               )
             })}
@@ -264,27 +267,27 @@ export default function OotdDetail() {
       </div>
 
       {/* 메타 정보 */}
-      <div className="bg-white border border-warm-400 rounded-2xl p-4 mb-5 shadow-warm-sm space-y-3">
+      <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm space-y-3">
         {record.situation && (
           <div className="flex items-center gap-2 text-sm">
-            <Tag size={14} className="text-warm-500" />
-            <span className="text-warm-800">{resolveSituation(record.situation, t)}</span>
+            <Tag size={14} className="text-warm-500 dark:text-warm-400" />
+            <span className="text-warm-800 dark:text-warm-200">{resolveSituation(record.situation, t)}</span>
           </div>
         )}
         {record.mood && (
           <div className="flex items-center gap-2 text-sm">
-            <Smile size={14} className="text-warm-500" />
-            <span className="text-warm-800">{resolveMood(record.mood, t)}</span>
+            <Smile size={14} className="text-warm-500 dark:text-warm-400" />
+            <span className="text-warm-800 dark:text-warm-200">{resolveMood(record.mood, t)}</span>
           </div>
         )}
         {(record.weather || record.weatherData) && (
           <div className="flex items-center gap-2 text-sm">
-            <Cloud size={14} className="text-warm-500" />
-            <span className="text-warm-800">{resolveWeather(record, t)}</span>
+            <Cloud size={14} className="text-warm-500 dark:text-warm-400" />
+            <span className="text-warm-800 dark:text-warm-200">{resolveWeather(record, t)}</span>
           </div>
         )}
         {record.memo && (
-          <div className="text-sm text-warm-700 bg-warm-100 rounded-xl px-3 py-2">💬 {record.memo}</div>
+          <div className="text-sm text-warm-700 dark:text-warm-300 bg-warm-100 dark:bg-warm-700 rounded-xl px-3 py-2">💬 {record.memo}</div>
         )}
       </div>
 

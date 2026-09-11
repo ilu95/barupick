@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
 import { Calendar, Star, Trash2 } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { COLORS_60, getColorName } from '@/lib/colors'
@@ -264,23 +265,23 @@ function RecordsTab({ navigate }: { navigate: any }) {
       <div className="grid grid-cols-2 gap-2.5 mb-5">
         <button
           onClick={() => navigate('/closet/calendar')}
-          className="bg-white border border-warm-400 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all"
+          className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all"
         >
           <Calendar size={24} className="text-terra-500 mx-auto mb-2" />
-          <div className="text-[13px] font-semibold text-warm-900">{t('header.calendar')}</div>
+          <div className="text-[13px] font-semibold text-warm-900 dark:text-warm-100">{t('header.calendar')}</div>
         </button>
         <button
           onClick={() => navigate('/closet/best')}
-          className="bg-white border border-warm-400 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all"
+          className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 text-center shadow-warm-sm active:scale-[0.97] transition-all"
         >
           <Star size={24} className="text-terra-500 mx-auto mb-2" />
-          <div className="text-[13px] font-semibold text-warm-900">{t('closet.bestCoordTitle')}</div>
-          <div className="text-[10px] text-warm-500 mt-0.5">{t('closet.sortByScore')}</div>
+          <div className="text-[13px] font-semibold text-warm-900 dark:text-warm-100">{t('closet.bestCoordTitle')}</div>
+          <div className="text-[10px] text-warm-500 dark:text-warm-400 mt-0.5">{t('closet.sortByScore')}</div>
         </button>
       </div>
 
       {/* 최근 기록 리스트 */}
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-600 tracking-widest uppercase mb-3">
+      <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">
         {t('home.recentOotd')} ({records.length})
       </div>
 
@@ -293,7 +294,7 @@ function RecordsTab({ navigate }: { navigate: any }) {
       ) : (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">📝</div>
-          <div className="text-sm text-warm-600 mb-4">{t('home.noRecords')}</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('home.noRecords')}</div>
           <button
             onClick={() => navigate('/record')}
             className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra"
@@ -307,10 +308,7 @@ function RecordsTab({ navigate }: { navigate: any }) {
 // ─── 기록 카드 ───
 function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any }) {
   const { t } = useTranslation()
-  const outfitHex: Record<string, string> = {}
-  Object.entries(record.colors || {}).forEach(([k, v]) => {
-    if (v) { const c = COLORS_60[v]; if (c) outfitHex[k] = c.hex }
-  })
+  const scene = sceneFromColors(record.colors as any, record.itemTypes)
 
   const dateLabel = (() => {
     const today = new Date()
@@ -357,7 +355,7 @@ function RecordCard({ record, navigate }: { record: OotdRecord, navigate: any })
       className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left"
     >
       <div className="flex items-center justify-center py-4 bg-warm-100 dark:bg-warm-700">
-        <MannequinSVG outfit={outfitHex} size={80} />
+        <CharacterCanvas items={scene.items} body={scene.body} width={64} />
       </div>
       <div className="px-2.5 py-2">
         <div className="flex items-center justify-between mb-0.5">
