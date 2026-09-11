@@ -1926,6 +1926,9 @@
         "two": "두 색",
         "taste": "취향"
       }
+    },
+    "preview": {
+      "title": "이 자리 후보"
     }
   },
   "reminder": {
