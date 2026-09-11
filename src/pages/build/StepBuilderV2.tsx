@@ -7,7 +7,10 @@ import { charSceneFromState, charSex, setCharSex, canWearTie } from '@/lib/char/
 import { PLATE_NAMES } from '@/lib/outfits'
 import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import type { BuildHook } from '@/hooks/useBuild'
-import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent } from '@/lib/analytics'
+import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuide } from '@/lib/analytics'
+import { useWardrobe } from '@/hooks/useWardrobe'
+import { loadTaste } from '@/lib/taste'
+import { useToast } from '@/components/ui/Toast'
 
 // ═══════════════════════════════════════════════════════
 // 만들기 2단계 — 새 디자인 (목업 flow-v5 의 만들기 화면)
@@ -60,6 +63,14 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     const k = slot === 'bottom' ? s.bottomColor : s.shoesColor
     return k ? COLORS_60[k]?.hex || null : null
   }
+  // 이웃 자리의 메인색 (칩 반원 오른쪽 40%): 상의↔하의, 신발→하의, 목도리·모자→아우터(입었으면)/상의, 레이어드·이너·넥타이→상의
+  const neighborKeyFor = (slot: string): string | null => {
+    if (slot === 'top') return colorOf('bottom')
+    if (slot === 'bottom') return colorOf('top')
+    if (slot === 'shoes') return colorOf('bottom')
+    if (slot === 'scarf' || slot === 'hat') return colorOf('outer') || colorOf('top')
+    return colorOf('top')
+  }
   const currentKey = (): string | null => {
     if (focus === 'hair') return null
     if (focus === 'acc') return acc === 'scarf' ? s.scarfColor : acc === 'hat' ? s.hatColor : s.tieColor
@@ -96,22 +107,42 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     if (focus === 'acc') { build.setAccItem(acc, null, null); return }
     if (isUpper(focus)) build.setSlotGarment(focus, null)
   }
-  const pickColor = (key: string, src: 'grid' | 'rec', pos: number) => {
+  const pickColor = (key: string, src: 'grid' | 'rec' | 'mine', pos: number, group?: string) => {
     if (focus === 'hair') { build.setHair(s.hair || HAIR[sex][0].id, key); return }
     const delta = build.calcScoreDelta(colorSlot, key)
-    trackColorPick('build', { slot: colorSlot, color: key, src, tab, pos, delta })
+    trackColorPick('build', { slot: colorSlot, color: key, src, tab, pos, delta, group })
     trackColorConfirm({ slot: colorSlot, item: currentPlate(), color: key, action: 'v2' as any, score_before: score })
     if (focus === 'acc') { build.setAccItem(acc, currentPlate() || TYPES[acc][0], key); return }
     if (isUpper(focus) && !layerOf(s.upper, focus)) { build.setSlotGarment(focus, types[0], key); return }
     build.setSlotColor(colorSlot, key)
   }
 
-  // 안내 층: 이 자리의 ● / △
+  // 안내 층: 이 자리의 세 묶음(무난/어울려요/포인트) / ● / △
   const guide = useMemo(() => focus === 'hair' ? null : build.getGuide(colorSlot), [colorSlot, s])
   useEffect(() => { if (focus !== 'hair') trackColorTab('build', tab, tab === 'rec' ? (guide?.rec.length || 0) : (COLOR_TABS.find(x => x.id === tab)?.keys.length || 0)) }, [tab, focus])
-  const tabs = [{ id: 'rec', label: t('colorPicker.recTab') }, ...COLOR_TABS.map(x => ({ id: x.id, label: x.label }))]
-  const chipKeys: string[] = focus === 'hair' ? [] : tab === 'rec' ? (guide?.rec || []) : (COLOR_TABS.find(x => x.id === tab)?.keys || [])
+
+  // 내 옷 색 (sp_wardrobe): 지금 자리 카테고리 색 + 취향 팔레트
+  const wardrobe = useWardrobe()
+  const tastePal = useMemo(() => new Set(loadTaste()?.pal || []), [])
+  const mineCat = colorSlot === 'inner' ? 'top' : colorSlot
+  const mineKeys = useMemo(() => Array.from(new Set(wardrobe.getItems(mineCat).map(i => i.color))), [mineCat, wardrobe.items])
+  const mineSet = useMemo(() => new Set(mineKeys), [mineKeys])
+  const showMineTab = wardrobe.items.length >= 3
+
+  const [sortBright, setSortBright] = useState(false)
+  const tabs = [
+    { id: 'rec', label: t('colorPicker.recTab') },
+    ...COLOR_TABS.map(x => ({ id: x.id, label: x.label })),
+    ...(showMineTab ? [{ id: 'mine-all', label: t('builder.mineTab') }] : []),
+  ]
+  const gridKeys: string[] = (() => {
+    const base = COLOR_TABS.find(x => x.id === tab)?.keys || []
+    if (sortBright || !guide) return base
+    return [...base].sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999) || base.indexOf(a) - base.indexOf(b))
+  })()
+  const chipKeys: string[] = focus === 'hair' || tab === 'rec' || tab === 'mine-all' ? [] : gridKeys
   const cur = currentKey()
+  const curReason = cur ? (guide?.why[cur] || HINTS[colorSlot]?.[ko ? 'ko' : 'en'] || '') : ''
 
   // 발: 점수 + 이유
   // 태그 = 이유 문장의 앞 토막(쉼표·대시 앞)이 짧을 때만, 아니면 등급 이름. 이유 줄은 감점이 있으면 감점, 없으면 가점 문장 (태그와 같으면 생략)
@@ -124,11 +155,62 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const reason = reasonRaw && reasonRaw !== tag ? reasonRaw : ''
   const complete = s.upper.length >= 1 && !!s.bottomColor && !!s.shoesColor
 
+  // 발: 한 수 (점수 72 미만 + 이득 4 이상일 때만)
+  const toast = useToast()
+  const footerMove = useMemo(() => {
+    if (!score || score >= 72) return null
+    const m = build.getBestMoves(1)[0]
+    return m && m.gain >= 4 ? m : null
+  }, [score, s])
+  const applyFooterMove = () => {
+    if (!footerMove) return
+    const undo = build.applyMove(footerMove)
+    trackEvent('move_apply_footer', { slot: footerMove.slot, to: footerMove.to, gain: footerMove.gain })
+    toast.toast({
+      message: t('build.moves.applied', { part: t('builder.slot.' + footerMove.slot), color: getColorName(footerMove.to), n: footerMove.gain }),
+      variant: 'success',
+      undoAction: () => { undo(); trackGuide('move_undo', { slot: footerMove.slot, ctx: 'footer' }) },
+      undoLabel: t('build.moves.undo'),
+    })
+  }
+
   // 하나씩 골라보기: 다음 자리로. 선택 자리(아우터·레이어드·악세서리)는 비워 둔 채 넘어갈 수 있다
   const nextSlot = guided && gi < GUIDE.length - 1 ? GUIDE[gi + 1] : null
   const nextGuide = () => { if (!nextSlot) return; setGi(gi + 1); setFocus(nextSlot); setTab('rec'); trackEvent('guided_next', { from: focus, to: nextSlot }) }
 
   const changeSex = (x: 'm' | 'w') => { setSex(x); setCharSex(x); const h = HAIR[x][0].id; build.setHair(h, s.hairColor || HAIR_COLORS[0].hex) }
+
+  // 칩: 왼쪽 후보색, 오른쪽 40% 이웃 자리 메인색(반원). 내 옷 👕 · 취향 ♥ 배지
+  const neighborHex = focus === 'hair' ? null : neighborKeyFor(colorSlot)
+  const chipBg = (hex: string) => neighborHex && neighborHex !== hex ? `linear-gradient(to right, ${hex} 0 60%, ${neighborHex} 60% 100%)` : hex
+  const renderChip = (k: string, src: 'grid' | 'rec' | 'mine', pos: number, group?: string) => {
+    const c = COLORS_60[k]; if (!c) return null
+    const on = cur === k; const mark = src === 'grid' ? guide?.marks[k] : undefined
+    return (
+      <button key={(group || src) + '-' + k} onClick={() => pickColor(k, src, pos, group)} className="w-[54px] flex-none flex flex-col items-center gap-1 active:scale-95 transition-transform">
+        <span className="relative w-9 h-9 rounded-full border-2 border-white flex items-center justify-center" style={{ background: chipBg(c.hex), boxShadow: on ? '0 0 0 2px #1C1917' : '0 0 0 1px rgba(28,25,23,.15)' }}>
+          {on && <Check size={14} className={c.hcl[2] > 60 ? 'text-warm-900' : 'text-white'} />}
+          {mark === 'rec' && !on && <i className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-terra-500 border border-white" />}
+          {mark === 'warn' && !on && <i className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-warm-900 border border-white text-white text-[8px] leading-[10px] text-center not-italic">△</i>}
+          {mineSet.has(k) && <i className="absolute -bottom-1 -left-1 text-[10px] leading-none">👕</i>}
+          {tastePal.has(k) && <i className="absolute -bottom-1 -right-1 text-[10px] leading-none">♥</i>}
+        </span>
+        <span className={`text-[10px] leading-none max-w-[54px] truncate ${on ? 'font-semibold text-warm-900 dark:text-warm-100' : 'text-warm-500'}`}>{getColorName(k)}</span>
+      </button>
+    )
+  }
+  const groupRows: { id: string; label: string; keys: string[] }[] = guide ? [
+    ...(mineKeys.length ? [{ id: 'mine', label: t('builder.group.mine'), keys: mineKeys }] : []),
+    { id: 'safe', label: t('builder.group.safe'), keys: guide.groups.safe },
+    { id: 'match', label: t('builder.group.match'), keys: guide.groups.match },
+    ...(guide.groups.point.length ? [{ id: 'point', label: t('builder.group.point'), keys: guide.groups.point }] : []),
+  ].filter(g => g.keys.length) : []
+  const mineAllGroups = useMemo(() => {
+    if (tab !== 'mine-all') return []
+    return (['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat'] as const)
+      .map(cat => ({ id: cat, label: t('builder.slot.' + cat), keys: Array.from(new Set(wardrobe.getItems(cat).map(i => i.color))) }))
+      .filter(g => g.keys.length)
+  }, [tab, wardrobe.items])
 
   return (
     <div className="-mx-5 -my-4 flex flex-col" style={{ minHeight: 'calc(100dvh - 60px)' }}>
@@ -211,31 +293,48 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
           </div>
         ) : (
           <>
-            <div className="mt-3 px-4 flex gap-3.5 overflow-x-auto [scrollbar-width:none]">
+            <div className="mt-3 px-4 flex items-center gap-3.5 overflow-x-auto [scrollbar-width:none]">
               {tabs.map(x => <button key={x.id} onClick={() => setTab(x.id)} className={`flex-none text-[12px] font-semibold pb-0.5 border-b-2 whitespace-nowrap ${tab === x.id ? 'text-warm-900 dark:text-warm-100 border-warm-900 dark:border-warm-100' : 'text-warm-500 border-transparent'}`}>{x.id === 'rec' ? <span className="text-terra-600">{x.label}</span> : x.label}</button>)}
-            </div>
-            <div className="mt-2 px-3 overflow-x-auto [scrollbar-width:none]">
-              {chipKeys.length === 0 ? (
-                <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
-              ) : (
-                <div className="grid grid-flow-col gap-1.5" style={{ gridTemplateRows: 'repeat(2, 56px)', gridAutoColumns: '54px' }}>
-                  {chipKeys.map((k, i) => {
-                    const c = COLORS_60[k]; if (!c) return null
-                    const on = cur === k; const mark = guide?.marks[k]
-                    return (
-                      <button key={k} onClick={() => pickColor(k, tab === 'rec' ? 'rec' : 'grid', i)} className="w-[54px] flex flex-col items-center gap-1 active:scale-95 transition-transform">
-                        <span className="relative w-9 h-9 rounded-full border-2 border-white flex items-center justify-center" style={{ background: c.hex, boxShadow: on ? '0 0 0 2px #1C1917' : '0 0 0 1px rgba(28,25,23,.15)' }}>
-                          {on && <Check size={14} className={c.hcl[2] > 60 ? 'text-warm-900' : 'text-white'} />}
-                          {mark === 'rec' && !on && <i className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-terra-500 border border-white" />}
-                          {mark === 'warn' && !on && <i className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-warm-900 border border-white text-white text-[8px] leading-[10px] text-center not-italic">△</i>}
-                        </span>
-                        <span className={`text-[10px] leading-none max-w-[54px] truncate ${on ? 'font-semibold text-warm-900 dark:text-warm-100' : 'text-warm-500'}`}>{getColorName(k)}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+              {tab !== 'rec' && tab !== 'mine-all' && (
+                <button onClick={() => { const next = !sortBright; setSortBright(next); trackEvent('color_sort', { slot: colorSlot, bright: next }) }} className="flex-none ml-auto text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 whitespace-nowrap">{sortBright ? t('builder.sortRec') : t('builder.sortBright')}</button>
               )}
+              {tab !== 'rec' && tab !== 'mine-all' && <span className="flex-none text-[10px] text-warm-400 whitespace-nowrap">{t('builder.legend')}</span>}
             </div>
+
+            {tab === 'rec' ? (
+              <div className="mt-2 px-3 flex flex-col gap-2.5">
+                {groupRows.length === 0 ? (
+                  <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
+                ) : groupRows.map(g => (
+                  <div key={g.id}>
+                    <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
+                    <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, g.id === 'mine' ? 'mine' : 'rec', i, g.id))}</div>
+                  </div>
+                ))}
+              </div>
+            ) : tab === 'mine-all' ? (
+              <div className="mt-2 px-3 flex flex-col gap-2.5">
+                {mineAllGroups.length === 0 ? (
+                  <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
+                ) : mineAllGroups.map(g => (
+                  <div key={g.id}>
+                    <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
+                    <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, 'mine', i, g.id))}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-2 px-3 overflow-x-auto [scrollbar-width:none]">
+                {chipKeys.length === 0 ? (
+                  <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
+                ) : (
+                  <div className="grid grid-flow-col gap-1.5" style={{ gridTemplateRows: 'repeat(2, 56px)', gridAutoColumns: '54px' }}>
+                    {chipKeys.map((k, i) => renderChip(k, 'grid', i))}
+                  </div>
+                )}
+              </div>
+            )}
+            {cur && curReason && <div className="mt-1.5 px-4 text-[11px] text-warm-500">{getColorName(cur)} — {curReason}</div>}
           </>
         )}
       </div>
@@ -246,6 +345,11 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
           <div className="flex items-baseline gap-1 text-[12px] text-warm-500">
             <b className="text-[24px] font-extrabold text-warm-900 dark:text-warm-100 tracking-tight tabular-nums">{score > 0 ? score : '--'}</b>{t('builder.pt')}
             {tag && <span className="ml-1.5 text-[12px] font-semibold text-warm-700 dark:text-warm-300 truncate">{tag}</span>}
+            {footerMove && (
+              <button onClick={applyFooterMove} className="ml-1.5 flex-none text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-terra-100 text-terra-700 dark:bg-terra-900/30 dark:text-terra-300 truncate">
+                {t('builder.moveChip', { slot: t('builder.slot.' + footerMove.slot), color: getColorName(footerMove.to), score: footerMove.score })}
+              </button>
+            )}
           </div>
           {reason && <div className="text-[11px] text-warm-500 truncate">{reason}</div>}
         </div>

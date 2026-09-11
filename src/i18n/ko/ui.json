@@ -1905,7 +1905,18 @@
     "guided": {
       "next": "다음: {{slot}}",
       "skip": "{{slot}} 없이 다음"
-    }
+    },
+    "group": {
+      "safe": "무난",
+      "match": "어울려요",
+      "point": "포인트",
+      "mine": "내 옷"
+    },
+    "sortRec": "어울리는 순",
+    "sortBright": "밝기순",
+    "legend": "● 추천 · △ 주의",
+    "mineTab": "내 옷장",
+    "moveChip": "{{slot}}를 {{color}}으로 → {{score}}점"
   },
   "reminder": {
     "colderTitle": "내일 아침 {{temp}}°, 오늘보다 {{d}}° 낮아요",
