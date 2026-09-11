@@ -6,10 +6,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Award, Palette, Target, GraduationCap, ScanLine, Star, ChevronRight, FileText, TrendingUp, Eye, Heart, Bookmark, ArrowLeft, Check, Gift, Trophy, Sparkles, ShoppingBag } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import { BarChart3, Award, Palette, Target, GraduationCap, ScanLine, Star, ChevronRight, FileText, TrendingUp, Eye, Heart, Bookmark, MessageSquare, ArrowLeft, Check, Gift, Trophy, Sparkles, ShoppingBag } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { sceneFromColors } from '@/lib/char/scene'
+import { getLocale } from '@/i18n'
 import { COLORS_60, hcl } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -559,6 +559,25 @@ export function TitleExam() {
   )
 }
 
+// ─── 내 게시물 · 인사이트 공통 ───
+/** 공개 범위 배지 — 내 게시물 격자와 인사이트 목록이 같이 쓴다 */
+function VisibilityBadge({ v }: { v: string }) {
+  const { t } = useTranslation()
+  const tone = v === 'public' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400'
+    : v === 'friends' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400'
+    : 'bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-300'
+  return <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${tone}`}>{t(`profileSub.myPosts.visibility.${v === 'public' || v === 'friends' ? v : 'private'}`)}</span>
+}
+
+/** 사진이 있으면 사진, 없으면 저장된 색으로 캐릭터를 그린다 */
+function CoordThumb({ photo, colors, width }: { photo?: string, colors: any, width: number }) {
+  if (photo) return <img src={photo} className="w-full h-full object-cover" alt="" />
+  const scene = sceneFromColors(colors || {})
+  return <CharacterCanvas items={scene.items} body={scene.body} width={width} />
+}
+
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString(getLocale(), { month: 'numeric', day: 'numeric' })
+
 // ─── 내 게시물 ───
 export function MyPosts() {
   const navigate = useNavigate()
@@ -608,11 +627,20 @@ export function MyPosts() {
 
   const { posts: filteredPosts, records: filteredRecords } = getFiltered()
 
-  const visibilityBadge = (v: string) => {
-    if (v === 'public') return <span className="text-[8px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded-full font-bold">{t('profileSub.myPosts.visibility.public')}</span>
-    if (v === 'friends') return <span className="text-[8px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-bold">{t('profileSub.myPosts.visibility.friends')}</span>
-    return <span className="text-[8px] bg-warm-200 dark:bg-warm-700 text-warm-600 dark:text-warm-400 px-1.5 py-0.5 rounded-full font-bold">{t('profileSub.myPosts.visibility.private')}</span>
-  }
+  /* 게시물과 기록은 카드가 같다 — 사진/캐릭터 · 공개 범위 배지 · 날짜 · ♡ 또는 점수 */
+  const card = (key: string, onClick: () => void, photo: string | undefined, colors: any, visibility: string, date: string, foot: React.ReactNode) => (
+    <button key={key} onClick={onClick}
+      className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl overflow-hidden shadow-warm-sm active:scale-[0.98] transition-all text-left">
+      <div className="relative aspect-[4/5] bg-warm-100 dark:bg-warm-700 flex items-center justify-center overflow-hidden">
+        <CoordThumb photo={photo} colors={colors} width={88} />
+        <div className="absolute top-1.5 left-1.5"><VisibilityBadge v={visibility} /></div>
+      </div>
+      <div className="flex items-center justify-between px-2.5 py-2">
+        <span className="text-[11px] text-warm-600 dark:text-warm-400">{date}</span>
+        <span className="text-[11px] font-semibold text-warm-900 dark:text-warm-100">{foot}</span>
+      </div>
+    </button>
+  )
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
@@ -622,8 +650,8 @@ export function MyPosts() {
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 hide-scrollbar">
         {tabs.map(tb => (
           <button key={tb.key} onClick={() => setActiveTab(tb.key as any)}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
-              activeTab === tb.key ? 'bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+            className={`flex-shrink-0 h-7 px-3 rounded-full text-[12px] font-semibold transition-all ${
+              activeTab === tb.key ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
             }`}
           >{tb.label}</button>
         ))}
@@ -631,20 +659,11 @@ export function MyPosts() {
 
       {/* 커뮤니티 게시물 */}
       {filteredPosts.length > 0 && (
-        <div className="grid grid-cols-3 gap-1.5 mb-4">
-          {filteredPosts.map(p => {
-            const hasPhoto = p.photo_urls && p.photo_urls.length > 0
-            const outfitHex: Record<string, string> = {}
-            Object.entries(p.outfit || {}).forEach(([k, v]) => { if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string) })
-            return (
-              <button key={p.id} onClick={() => navigate(`/community/${p.id}`)} className="aspect-square rounded-xl overflow-hidden bg-warm-100 dark:bg-warm-800 active:scale-95 transition-transform relative">
-                {hasPhoto ? <img src={p.photo_urls[0]} className="w-full h-full object-cover" alt="" />
-                : <div className="w-full h-full flex items-center justify-center"><MannequinSVG outfit={outfitHex} size={50} /></div>}
-                <div className="absolute top-0.5 left-0.5">{visibilityBadge(p.visibility)}</div>
-                <div className="absolute bottom-0.5 right-0.5 text-[9px] font-bold text-white bg-black/40 px-1.5 py-0.5 rounded-full">♡{p.likes_count||0}</div>
-              </button>
-            )
-          })}
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
+          {filteredPosts.map(p => card(
+            p.id, () => navigate(`/community/${p.id}`), p.photo_urls?.[0], p.outfit, p.visibility,
+            shortDate(p.created_at), <>♡ {p.likes_count || 0}</>
+          ))}
         </div>
       )}
 
@@ -652,25 +671,17 @@ export function MyPosts() {
       {filteredRecords.length > 0 && (activeTab === 'all' || activeTab === 'private') && (
         <>
           <div className="text-[11px] font-semibold text-warm-500 dark:text-warm-400 uppercase tracking-widest mb-2 mt-2">{t('profileSub.myPosts.visibility.private')} ({filteredRecords.length})</div>
-          <div className="grid grid-cols-3 gap-1.5">
-            {filteredRecords.map((r: any, idx: number) => {
-              const outfitHex: Record<string, string> = {}
-              Object.entries(r.colors || {}).forEach(([k, v]) => { if (v) outfitHex[k] = COLORS_60[v as string]?.hex || '' })
-              return (
-                <button key={r.id || idx} onClick={() => navigate(`/closet/ootd/${r.date}?id=${r.id}`)} className="aspect-square rounded-xl overflow-hidden bg-warm-50 dark:bg-warm-800 active:scale-95 transition-transform relative border border-warm-300 dark:border-warm-600">
-                  {r.photos?.[0] ? <img src={r.photos[0]} className="w-full h-full object-cover" alt="" />
-                  : <div className="w-full h-full flex items-center justify-center"><MannequinSVG outfit={outfitHex} size={50} /></div>}
-                  <div className="absolute top-0.5 left-0.5">{visibilityBadge('private')}</div>
-                  <div className="absolute bottom-0.5 right-0.5 text-[9px] font-bold text-white bg-black/40 px-1.5 py-0.5 rounded-full">{t('common.score', { score: r.score })}</div>
-                </button>
-              )
-            })}
+          <div className="grid grid-cols-2 gap-2.5">
+            {filteredRecords.map((r: any, idx: number) => card(
+              r.id || String(idx), () => navigate(`/closet/ootd/${r.date}?id=${r.id}`), r.photos?.[0], r.colors, 'private',
+              r.date, t('common.score', { score: r.score })
+            ))}
           </div>
         </>
       )}
 
       {filteredPosts.length === 0 && filteredRecords.length === 0 && (
-        <div className="text-center py-16"><FileText size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">{t('community.empty')}</div></div>
+        <div className="text-center py-16"><FileText size={40} className="text-warm-400 dark:text-warm-500 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">{t('community.empty')}</div></div>
       )}
     </div>
   )
@@ -678,36 +689,96 @@ export function MyPosts() {
 
 // ─── 인사이트 ───
 export function Insights() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { t } = useTranslation()
-  const [stats, setStats] = useState({ views: 0, likes: 0, saves: 0 })
+  const [posts, setPosts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [sort, setSort] = useState<'recent' | 'views' | 'likes'>('recent')
 
   useEffect(() => {
-    if (!user) return
-    supabase.from('posts').select('likes_count, view_count, save_count').eq('user_id', user.id)
-      .then(({ data }) => {
-        if (data) {
-          setStats({
-            views: data.reduce((s, p) => s + (p.view_count || 0), 0),
-            likes: data.reduce((s, p) => s + (p.likes_count || 0), 0),
-            saves: data.reduce((s, p) => s + (p.save_count || 0), 0),
-          })
-        }
-      })
+    if (!user) { setLoading(false); return }
+    supabase.from('posts').select('id, created_at, view_count, likes_count, save_count, comments_count, outfit, photo_urls, visibility')
+      .eq('user_id', user.id).order('created_at', { ascending: false })
+      .then(({ data }) => { setPosts(data || []); setLoading(false) })
   }, [user])
+
+  const stats = useMemo(() => posts.reduce((s, p) => ({
+    views: s.views + (p.view_count || 0), likes: s.likes + (p.likes_count || 0), saves: s.saves + (p.save_count || 0),
+  }), { views: 0, likes: 0, saves: 0 }), [posts])
+
+  const sorted = useMemo(() => {
+    const key = sort === 'views' ? 'view_count' : sort === 'likes' ? 'likes_count' : null
+    return key ? [...posts].sort((a, b) => (b[key] || 0) - (a[key] || 0)) : posts
+  }, [posts, sort])
+
+  const sortTabs = [
+    ['recent', t('community.sort.latest')], ['views', t('profileSub.insights.sortViews')], ['likes', t('profileSub.insights.sortLikes')],
+  ] as const
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('profileSub.insights.title')}</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('profileSub.insights.title')}</h2>
+
+      {/* 합계 */}
       <div className="grid grid-cols-3 gap-2.5 mb-6">
-        {[[t('postInsight.views'), stats.views, <Eye size={20} />], [t('communityDetail.like'), stats.likes, <Heart size={20} />], [t('communityDetail.save'), stats.saves, <Bookmark size={20} />]].map(([label, val, icon]) => (
-          <div key={label as string} className="bg-white border border-warm-400 rounded-2xl py-4 text-center shadow-warm-sm">
-            <div className="text-terra-500 flex justify-center mb-1">{icon as any}</div>
-            <div className="font-display text-xl font-bold text-warm-900">{val as number}</div>
-            <div className="text-[10px] text-warm-600 mt-0.5">{label as string}</div>
+        {[[t('postInsight.views'), stats.views, <Eye size={20} />], [t('postInsight.likes'), stats.likes, <Heart size={20} />], [t('postInsight.saves'), stats.saves, <Bookmark size={20} />]].map(([label, val, icon]) => (
+          <div key={label as string} className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-4 text-center shadow-warm-sm">
+            <div className="text-terra-500 dark:text-terra-400 flex justify-center mb-1">{icon as any}</div>
+            <div className="font-display text-xl font-bold text-warm-900 dark:text-warm-100">{val as number}</div>
+            <div className="text-[10px] text-warm-600 dark:text-warm-400 mt-0.5">{label as string}</div>
           </div>
         ))}
       </div>
+
+      {/* 게시물별 */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[13.5px] font-extrabold text-warm-900 dark:text-warm-100">{t('profileSub.insights.byPost')}</div>
+        <div className="flex gap-1.5">
+          {sortTabs.map(([key, label]) => (
+            <button key={key} onClick={() => setSort(key)}
+              className={`h-7 px-3 rounded-full text-[12px] font-semibold transition-all ${
+                sort === key ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-600 dark:text-warm-400'
+              }`}
+            >{label}</button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('common.loading')}</div>
+      : sorted.length === 0 ? (
+        <div className="text-center py-16">
+          <BarChart3 size={40} className="text-warm-400 dark:text-warm-500 mx-auto mb-3" />
+          <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('profileSub.insights.empty')}</div>
+          <button onClick={() => navigate('/community/post')} className="px-5 py-2.5 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">
+            {t('communityPost.title')}
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          {sorted.map(p => (
+            <button key={p.id} onClick={() => navigate(`/profile/insights/${p.id}`)}
+              className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm active:scale-[0.98] transition-all text-left">
+              <div className="w-12 h-12 rounded-xl bg-warm-100 dark:bg-warm-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <CoordThumb photo={p.photo_urls?.[0]} colors={p.outfit} width={40} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-warm-600 dark:text-warm-400">{shortDate(p.created_at)}</span>
+                  <VisibilityBadge v={p.visibility} />
+                </div>
+                <div className="flex items-center gap-2.5 mt-1 text-[11px] font-medium text-warm-700 dark:text-warm-300">
+                  <span className="flex items-center gap-1"><Eye size={11} className="text-warm-500 dark:text-warm-400" />{p.view_count || 0}</span>
+                  <span className="flex items-center gap-1"><Heart size={11} className="text-warm-500 dark:text-warm-400" />{p.likes_count || 0}</span>
+                  <span className="flex items-center gap-1"><Bookmark size={11} className="text-warm-500 dark:text-warm-400" />{p.save_count || 0}</span>
+                  <span className="flex items-center gap-1"><MessageSquare size={11} className="text-warm-500 dark:text-warm-400" />{p.comments_count || 0}</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-warm-400 dark:text-warm-500 flex-shrink-0" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

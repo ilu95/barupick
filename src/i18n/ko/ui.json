@@ -939,7 +939,11 @@
       }
     },
     "insights": {
-      "title": "인사이트"
+      "title": "인사이트",
+      "byPost": "게시물별",
+      "sortViews": "조회순",
+      "sortLikes": "좋아요순",
+      "empty": "아직 올린 게시물이 없어요"
     },
     "savedCoords": {
       "title": "저장한 코디"

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { User, MoreHorizontal, ShieldOff } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
-import { COLORS_60 } from '@/lib/colors'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSocial } from '@/hooks/useSocial'
@@ -75,19 +75,19 @@ export default function UserProfile() {
       <div className="text-center py-5 relative">
         {/* 더보기 메뉴 */}
         {!isMe && (
-          <button onClick={() => setMenuOpen(!menuOpen)} className="absolute top-2 right-0 w-8 h-8 rounded-full bg-warm-200 flex items-center justify-center active:scale-90">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="absolute top-2 right-0 w-8 h-8 rounded-full bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200 flex items-center justify-center active:scale-90">
             <MoreHorizontal size={16} />
           </button>
         )}
         {menuOpen && (
-          <div className="absolute top-12 right-0 bg-white border border-warm-400 rounded-xl shadow-warm p-2 z-10">
+          <div className="absolute top-12 right-0 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl shadow-warm p-2 z-10">
             <button
               onClick={async () => {
                 const blocked = await toggleBlock(userId)
                 setMenuOpen(false)
                 toast.success(blocked ? t('userProfile.blockedToast') : t('userProfile.unblockedToast'))
               }}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 active:bg-warm-100 rounded-lg w-full text-left"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 active:bg-warm-100 dark:active:bg-warm-700 rounded-lg w-full text-left"
             >
               <ShieldOff size={14} /> {t('common.block')}
             </button>
@@ -95,20 +95,20 @@ export default function UserProfile() {
         )}
 
         {avatar ? (
-          <img src={avatar} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-warm-300" alt="" />
+          <img src={avatar} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-warm-300 dark:border-warm-600" alt="" />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-terra-100 flex items-center justify-center mx-auto mb-3 border-2 border-warm-300">
+          <div className="w-20 h-20 rounded-full bg-terra-100 dark:bg-terra-900/40 flex items-center justify-center mx-auto mb-3 border-2 border-warm-300 dark:border-warm-600">
             <User size={28} className="text-terra-600" />
           </div>
         )}
 
-        <div className="text-lg font-bold text-warm-900">@{nick}</div>
-        {bio && <div className="text-xs text-warm-500 mt-1 px-8">{bio}</div>}
+        <div className="text-lg font-bold text-warm-900 dark:text-warm-100">@{nick}</div>
+        {bio && <div className="text-xs text-warm-500 dark:text-warm-400 mt-1 px-8">{bio}</div>}
         {mutual && !isMe && <div className="text-[11px] text-green-600 font-medium mt-1">{t('common.mutualFriend')}</div>}
         {insta && (
           <button
             onClick={() => window.open(`https://instagram.com/${insta}`, '_blank')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-xs font-medium text-warm-700 mt-2 active:scale-95 transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-800 text-xs font-medium text-warm-700 dark:text-warm-200 mt-2 active:scale-95 transition-all"
           >
             📸 @{insta}
           </button>
@@ -117,16 +117,16 @@ export default function UserProfile() {
         {/* 통계 */}
         <div className="flex justify-center gap-5 mt-4 mb-3">
           <div className="text-center">
-            <div className="font-display text-lg font-bold text-warm-900">{posts.length}</div>
-            <div className="text-[10px] text-warm-500">{t('common.coord')}</div>
+            <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{posts.length}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">{t('common.coord')}</div>
           </div>
           <div className="text-center cursor-pointer" onClick={() => navigate(`/user/${userId}/followers`)}>
-            <div className="font-display text-lg font-bold text-warm-900">{followers}</div>
-            <div className="text-[10px] text-warm-500">{t('common.followers')}</div>
+            <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{followers}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">{t('common.followers')}</div>
           </div>
           <div className="text-center cursor-pointer" onClick={() => navigate(`/user/${userId}/following`)}>
-            <div className="font-display text-lg font-bold text-warm-900">{following}</div>
-            <div className="text-[10px] text-warm-500">{t('common.followingLabel')}</div>
+            <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{following}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">{t('common.followingLabel')}</div>
           </div>
         </div>
 
@@ -135,8 +135,8 @@ export default function UserProfile() {
           <button
             onClick={() => toggleFollow(userId)}
             className={`px-5 py-2 rounded-full text-xs font-semibold active:scale-95 transition-all ${
-              mutual ? 'bg-green-100 text-green-700 border border-green-300'
-              : following_ ? 'bg-warm-200 text-warm-700 border border-warm-400'
+              mutual ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800'
+              : following_ ? 'bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200 border border-warm-400 dark:border-warm-600'
               : 'bg-terra-500 text-white shadow-terra'
             }`}
           >
@@ -147,11 +147,11 @@ export default function UserProfile() {
 
       {/* 팔로우 유도 CTA */}
       {!isMe && !following_ && !loading && (
-        <div className="bg-gradient-to-r from-terra-50 to-warm-100 border border-terra-200 rounded-2xl p-4 mb-3 flex items-center gap-3">
+        <div className="bg-gradient-to-r from-terra-50 to-warm-100 dark:from-terra-900/30 dark:to-warm-800 border border-terra-200 dark:border-terra-800 rounded-2xl p-4 mb-3 flex items-center gap-3">
           <div className="text-2xl flex-shrink-0">🔓</div>
           <div className="flex-1">
-            <div className="text-xs font-semibold text-warm-800 mb-0.5">{t('userProfile.followCta')}</div>
-            <div className="text-[11px] text-warm-500">{t('userProfile.followCtaDesc')}</div>
+            <div className="text-xs font-semibold text-warm-800 dark:text-warm-100 mb-0.5">{t('userProfile.followCta')}</div>
+            <div className="text-[11px] text-warm-500 dark:text-warm-400">{t('userProfile.followCtaDesc')}</div>
           </div>
           <button onClick={() => toggleFollow(userId)} className="px-3 py-1.5 bg-terra-500 text-white rounded-full text-[11px] font-semibold active:scale-95 flex-shrink-0 shadow-terra">
             {t('common.follow')}
@@ -160,33 +160,27 @@ export default function UserProfile() {
       )}
 
       {/* 로딩 */}
-      {loading && <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>}
+      {loading && <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('common.loading')}</div>}
 
       {/* 코디 그리드 */}
       {!loading && posts.length > 0 && (
-        <div className="border-t border-warm-300 pt-4 mt-2">
-          <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">{t('userProfile.publicCoords')}</div>
-          <div className="grid grid-cols-3 gap-1.5">
+        <div className="border-t border-warm-300 dark:border-warm-600 pt-4 mt-2">
+          <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 uppercase tracking-wider mb-3">{t('userProfile.publicCoords')}</div>
+          <div className="grid grid-cols-2 gap-2.5">
             {posts.map(post => {
-              const outfit = post.outfit || {}
-              const outfitHex: Record<string, string> = {}
-              Object.entries(outfit).forEach(([k, v]) => {
-                if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string)
-              })
               const hasPhoto = post.photo_urls && post.photo_urls.length > 0
+              const scene = hasPhoto ? null : sceneFromColors(post.outfit || {})
 
               return (
                 <button
                   key={post.id}
                   onClick={() => navigate(`/community/${post.id}`)}
-                  className="aspect-square rounded-xl overflow-hidden bg-warm-100 active:scale-95 transition-transform"
+                  className="aspect-[4/5] rounded-2xl overflow-hidden bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 shadow-warm-sm active:scale-[0.98] transition-all flex items-center justify-center"
                 >
-                  {hasPhoto ? (
-                    <img src={post.photo_urls[0]} className="w-full h-full object-cover" alt="" />
+                  {scene ? (
+                    <CharacterCanvas items={scene.items} body={scene.body} width={88} />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <MannequinSVG outfit={outfitHex} size={60} />
-                    </div>
+                    <img src={post.photo_urls[0]} className="w-full h-full object-cover" alt="" />
                   )}
                 </button>
               )
@@ -196,7 +190,7 @@ export default function UserProfile() {
       )}
 
       {!loading && posts.length === 0 && (
-        <div className="text-center py-10 text-warm-400 text-sm">{t('userProfile.noPublicCoords')}</div>
+        <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('userProfile.noPublicCoords')}</div>
       )}
     </div>
   )

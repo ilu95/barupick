@@ -68,32 +68,32 @@ export default function Notifications() {
     return t('common.daysAgo', { count: Math.floor(d / 86400) })
   }
 
-  if (!user) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('common.loginRequired')}</div>
+  if (!user) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600 dark:text-warm-400">{t('common.loginRequired')}</div>
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-xl font-bold text-warm-900">{t('notifications.title')}</h2>
+        <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100">{t('notifications.title')}</h2>
         {notis.length > 0 && (
-          <button onClick={clearAll} className="text-xs text-warm-500 active:opacity-70"><Trash2 size={14} className="inline mr-1" />{t('notifications.clearAll')}</button>
+          <button onClick={clearAll} className="text-xs text-warm-500 dark:text-warm-400 active:opacity-70"><Trash2 size={14} className="inline mr-1" />{t('notifications.clearAll')}</button>
         )}
       </div>
 
-      {loading ? <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>
+      {loading ? <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('common.loading')}</div>
       : notis.length === 0 ? (
-        <div className="text-center py-16"><Bell size={40} className="text-warm-400 mx-auto mb-3" /><div className="text-sm text-warm-600">{t('notifications.empty')}</div></div>
+        <div className="text-center py-16"><Bell size={40} className="text-warm-400 dark:text-warm-500 mx-auto mb-3" /><div className="text-sm text-warm-600 dark:text-warm-400">{t('notifications.empty')}</div></div>
       ) : (
         <div className="flex flex-col">
           {notis.map(n => (
             <button key={n.id} onClick={() => n.related_id && navigate(`/community/${n.related_id}`)}
-              className={`flex items-start gap-3 py-3.5 border-b border-warm-300 text-left ${!n.read ? 'bg-terra-50/50 -mx-5 px-5 rounded-lg' : ''}`}>
+              className={`flex items-start gap-3 py-3.5 border-b border-warm-300 dark:border-warm-600 text-left ${!n.read ? 'bg-terra-50/50 dark:bg-terra-900/20 -mx-5 px-5 rounded-lg' : ''}`}>
               <div className="flex-shrink-0 mt-0.5">
                 {n.actor?.avatar_url ? <img src={n.actor.avatar_url} className="w-9 h-9 rounded-full object-cover" alt="" />
-                : <div className="w-9 h-9 rounded-full bg-warm-200 flex items-center justify-center"><User size={16} className="text-warm-500" /></div>}
+                : <div className="w-9 h-9 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center"><User size={16} className="text-warm-500" /></div>}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">{icon(n.type)}<span className="text-sm text-warm-900"><strong>@{n.actor?.nickname || t('common.user')}</strong> {n.message}</span></div>
-                <div className="text-[11px] text-warm-500">{timeAgo(n.created_at)}</div>
+                <div className="flex items-center gap-1.5 mb-0.5">{icon(n.type)}<span className="text-sm text-warm-900 dark:text-warm-100"><strong>@{n.actor?.nickname || t('common.user')}</strong> {n.message}</span></div>
+                <div className="text-[11px] text-warm-500 dark:text-warm-400">{timeAgo(n.created_at)}</div>
               </div>
               {!n.read && <div className="w-2 h-2 rounded-full bg-terra-500 flex-shrink-0 mt-2" />}
             </button>
