@@ -110,6 +110,62 @@ export function guideFor(input: EngineInput, slot: string, recN = 12) {
   return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[] } }
 }
 
+export interface ComboCard { outfit: Record<string, string>; total: number; why: string; kind: 'safe' | 'point' | 'two' | 'taste'; mine: number }
+
+/** 지금 입은 옷(판)은 그대로, fixed 아닌 자리의 색만 6가지 패턴(무난·연유채 주색·상의 포인트·아우터 색·하의 연유채·두 색)으로 바꿔 매긴다 */
+export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: number; wardrobe?: Record<string, string[]>; taste?: string[] }): ComboCard[] {
+  const fixed = opts.fixed || new Set<string>()
+  const slots = Object.keys(input.outfit).filter(s => input.outfit[s] && !fixed.has(s))
+  if (!slots.length) return []
+  const chromaOf = (k: string) => COLORS_60[k]?.hcl[1] ?? 0
+  const pools: Record<string, { neu: string[]; soft: string[]; vivid: string[] }> = {}
+  for (const slot of slots) {
+    const delta = guideFor(input, slot).delta
+    const ranked = Object.entries(delta).filter(([k]) => k !== input.outfit[slot]).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+    const mine = opts.wardrobe?.[slot] || []
+    const withMine = (arr: string[]) => [...arr.filter(k => mine.includes(k)), ...arr.filter(k => !mine.includes(k))]
+    pools[slot] = {
+      neu: withMine(ranked.filter(k => chromaOf(k) <= 18)).slice(0, 8),
+      soft: withMine(ranked.filter(k => chromaOf(k) > 18 && chromaOf(k) <= 35)).slice(0, 8),
+      vivid: withMine(ranked.filter(k => chromaOf(k) > 35)).slice(0, 8),
+    }
+  }
+  const pick = (slot: string, bucket: 'neu' | 'soft' | 'vivid', i: number): string => {
+    const p = pools[slot][bucket].length ? pools[slot][bucket] : pools[slot].neu
+    return p.length ? p[i % p.length] : input.outfit[slot]!
+  }
+  const main = slots.find(s => s === 'outer') || slots.find(s => s === 'top') || slots[0]
+  const others = slots.filter(s => s !== main)
+  const patterns: { key: Record<string, string>; kind: ComboCard['kind'] }[] = []
+  for (let k = 0; k < 6; k++) {
+    const key: Record<string, string> = {}
+    slots.forEach(s => { key[s] = pick(s, 'neu', k) })
+    if (k === 1) key[main] = pick(main, 'soft', k)
+    if (k === 2 && slots.includes('top')) key.top = pick('top', 'vivid', k)
+    if (k === 3) key[main] = pick(main, 'vivid', k)
+    if (k === 4 && slots.includes('bottom')) key.bottom = pick('bottom', 'soft', k)
+    if (k === 5) others.slice(0, 2).forEach((sl, i) => { key[sl] = pick(sl, i === 0 ? 'vivid' : 'soft', k) })
+    patterns.push({ key, kind: k === 0 ? 'safe' : k === 5 ? 'two' : 'point' })
+  }
+  if (opts.taste?.length) {
+    const t = opts.taste, key: Record<string, string> = {}
+    slots.forEach((sl, i) => { key[sl] = t[i % t.length] })
+    patterns.push({ key, kind: 'taste' })
+  }
+  const seen = new Set<string>(); const cards: ComboCard[] = []
+  for (const { key, kind } of patterns) {
+    const sig = JSON.stringify(key); if (seen.has(sig)) continue; seen.add(sig)
+    const r = scoreOutfit({ ...input, outfit: { ...input.outfit, ...key } })
+    const why = (r.reasons.find(x => x.w > 0) || {}).txt || ''
+    const mine = slots.filter(s => (opts.wardrobe?.[s] || []).includes(key[s])).length
+    cards.push({ outfit: key, total: r.total, why, kind, mine })
+  }
+  const tasteCard = cards.find(c => c.kind === 'taste')
+  // 보기 좋은 조합만 — 60점(괜찮음) 미만은 카드로 내지 않는다
+  const rest = cards.filter(c => c.kind !== 'taste' && c.total >= 60).sort((a, b) => b.total - a.total)
+  return [...rest.slice(0, opts.n || 6), ...(tasteCard ? [tasteCard] : [])]
+}
+
 /** 옷 하나의 색만 바꿔 얻는 최선의 한 수 k개 (차분한 색 우선) */
 export function bestMovesFor(input: EngineInput, k = 3): EngineMove[] {
   const r = V7.bestMoves(toItems(input), ctxOf(input), palette(), k)

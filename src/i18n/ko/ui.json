@@ -1916,7 +1916,17 @@
     "sortBright": "밝기순",
     "legend": "● 추천 · △ 주의",
     "mineTab": "내 옷장",
-    "moveChip": "{{slot}} → {{color}} · {{score}}점"
+    "moveChip": "{{slot}} → {{color}} · {{score}}점",
+    "combos": {
+      "title": "이렇게 입으면",
+      "fixed": "고른 색은 고정했어요",
+      "kind": {
+        "safe": "무난",
+        "point": "포인트",
+        "two": "두 색",
+        "taste": "취향"
+      }
+    }
   },
   "reminder": {
     "colderTitle": "내일 아침 {{temp}}°, 오늘보다 {{d}}° 낮아요",
