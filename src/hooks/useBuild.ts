@@ -14,7 +14,7 @@ import i18n from '@/i18n'
 import { evaluationSystem } from '@/lib/evaluation'
 import { calculateHarmonyV6 } from '@/lib/recommend'
 import { colorGuide, bestMoves, type Move } from '@/lib/guide'
-import { scoreOutfit, scoreDelta, type EngineInput, type EngineResult } from '@/lib/engine'
+import { scoreOutfit, scoreDelta, combosFor, type EngineInput, type EngineResult, type ComboCard } from '@/lib/engine'
 import { platesOf, canWearTie } from '@/lib/char/map'
 import { UI_OUTERNESS, uiSlotOf, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import { PLATE_TO_ITEM } from '@/lib/outfits'
@@ -271,6 +271,19 @@ export function useBuild(mode: BuildMode = 'coord') {
     : { ...prev, tieItem: plate, tieColor: plate ? colorKey : null }), [])
   const setHair = useCallback((hair: string, hairColor: string) => setState(prev => ({ ...prev, hair, hairColor })), [])
 
+  // ── 조합 카드 하나를 한 번에 입는다 (헤어는 건드리지 않는다) ──
+  const applyColors = useCallback((outfit: Record<string, string>) => {
+    setState(prev => ({
+      ...prev,
+      bottomColor: outfit.bottom ?? prev.bottomColor,
+      shoesColor: outfit.shoes ?? prev.shoesColor,
+      scarfColor: outfit.scarf ?? prev.scarfColor,
+      hatColor: outfit.hat ?? prev.hatColor,
+      tieColor: outfit.tie ?? prev.tieColor,
+      upper: prev.upper.map(l => { const slot = uiSlotOf(l); return outfit[slot] ? { ...l, colorKey: outfit[slot] } : l }),
+    }))
+  }, [])
+
   // ── 1단계(옷 조합) 결과를 한 번에 올린다 ──
   const applyOutfit = useCallback((o: {
     layers: { itemId: string; plate: string; colorKey: string }[]
@@ -388,6 +401,12 @@ export function useBuild(mode: BuildMode = 'coord') {
   // ── 색상 추천 ──
   // ── 안내 층: 자리 하나의 ●/△, 최선의 한 수, 한 수 적용(되돌리기 반환) ──
   const getGuide = useCallback((slot: string) => colorGuide(engineInput(), slot), [engineInput])
+
+  const getCombos = useCallback((opts: { fixed?: Set<string>; n?: number; wardrobe?: Record<string, string[]>; taste?: string[] }): ComboCard[] => {
+    const outfit = getFilledOutfit(state)
+    if (Object.keys(outfit).length < 2) return []
+    try { return combosFor(engineInput(), opts) } catch { return [] }
+  }, [state, engineInput])
 
   const getBestMoves = useCallback((k = 3): Move[] => {
     const outfit = getFilledOutfit(state)
@@ -542,8 +561,8 @@ export function useBuild(mode: BuildMode = 'coord') {
     pushStep, goBack, update, reset,
     selectStyle,
     addUpper, editUpper, removeUpper, setSimpleColor, applyOutfit,
-    setSlotGarment, setSlotColor, setBottomItem, setShoesItem, setAccItem, setHair,
-    getColorRecommendations, getScore, getEvalResult, calcScoreDelta, getGuide, getBestMoves, applyMove,
+    setSlotGarment, setSlotColor, setBottomItem, setShoesItem, setAccItem, setHair, applyColors,
+    getColorRecommendations, getScore, getEvalResult, calcScoreDelta, getGuide, getCombos, getBestMoves, applyMove,
     predictSlot: (tmpItemId: string, editIdx?: number) => predictSlot(state.upper, tmpItemId, editIdx),
     outfitHex, isComplete,
     get outerType() { return getOuterType(state.upper) },

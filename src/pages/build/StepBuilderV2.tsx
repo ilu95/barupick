@@ -6,7 +6,8 @@ import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { charSceneFromState, charSex, setCharSex, canWearTie } from '@/lib/char/map'
 import { PLATE_NAMES } from '@/lib/outfits'
 import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
-import type { BuildHook } from '@/hooks/useBuild'
+import { getFilledOutfit, type BuildHook } from '@/hooks/useBuild'
+import type { ComboCard } from '@/lib/engine'
 import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuide } from '@/lib/analytics'
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { loadTaste } from '@/lib/taste'
@@ -33,6 +34,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const [gi, setGi] = useState(0)                        // guided: 지금 몇 번째 자리인지
   const [acc, setAcc] = useState<AccSlot>('scarf')
   const [tab, setTab] = useState<string>('rec')
+  const [touched, setTouched] = useState<Set<string>>(new Set())
   const s = build.state
 
   // 하의·신발은 항상 입고 시작한다 (판은 1단계 것, 없으면 기본)
@@ -112,6 +114,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     const delta = build.calcScoreDelta(colorSlot, key)
     trackColorPick('build', { slot: colorSlot, color: key, src, tab, pos, delta, group })
     trackColorConfirm({ slot: colorSlot, item: currentPlate(), color: key, action: 'v2' as any, score_before: score })
+    setTouched(prev => prev.has(colorSlot) ? prev : new Set(prev).add(colorSlot))
     if (focus === 'acc') { build.setAccItem(acc, currentPlate() || TYPES[acc][0], key); return }
     if (isUpper(focus) && !layerOf(s.upper, focus)) { build.setSlotGarment(focus, types[0], key); return }
     build.setSlotColor(colorSlot, key)
@@ -212,13 +215,36 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
       .filter(g => g.keys.length)
   }, [tab, wardrobe.items])
 
+  // 조합 카드: 지금 입은 옷은 그대로, 고르지 않은 자리만 6가지 패턴으로 색을 채운다
+  const wardrobeBySlot = useMemo(() => Object.fromEntries(
+    (['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat'] as const).map(cat => [cat, Array.from(new Set(wardrobe.getItems(cat).map(i => i.color)))])
+  ), [wardrobe.items])
+  const combos = useMemo(() => build.getCombos({ fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) }), [s, touched, wardrobeBySlot])
+  useEffect(() => { if (combos.length) trackEvent('combo_view', { n: combos.length }) }, [combos.length])
+  const filled = getFilledOutfit(s)
+  const comboActive = (c: ComboCard) => Object.entries(c.outfit).every(([slot, key]) => filled[slot] === key)
+  const activeCombo = combos.find(comboActive)
+  const comboScene = (c: ComboCard) => charSceneFromState({
+    ...s,
+    upper: s.upper.map(l => { const slot = uiSlotOf(l); return c.outfit[slot] ? { ...l, colorKey: c.outfit[slot] } : l }),
+    bottomColor: c.outfit.bottom || s.bottomColor,
+    shoesColor: c.outfit.shoes || s.shoesColor,
+    scarfColor: c.outfit.scarf || s.scarfColor,
+    hatColor: c.outfit.hat || s.hatColor,
+    tieColor: c.outfit.tie || s.tieColor,
+  }, sex)
+  const applyCombo = (c: ComboCard) => {
+    build.applyColors(c.outfit)
+    trackEvent('combo_pick', { idx: combos.indexOf(c), kind: c.kind, total: c.total, mine: c.mine })
+  }
+
   return (
     <div className="-mx-5 -my-4 flex flex-col" style={{ minHeight: 'calc(100dvh - 60px)' }}>
       {/* 머리: 뒤로 · 제목 · 리셋 · 남/여 */}
       <div className="flex items-center gap-2 px-3 pt-2 pb-1">
         <button onClick={() => onBack ? onBack() : build.goBack()} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>
         <div className="flex-1 font-display text-[17px] font-bold text-warm-900 dark:text-warm-100">{title || (guided ? t('builder.guidedTitle') : t('builder.title'))}</div>
-        <button onClick={() => build.reset()} aria-label={t('builder.reset')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><RotateCcw size={15} /></button>
+        <button onClick={() => { build.reset(); setTouched(new Set()) }} aria-label={t('builder.reset')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><RotateCcw size={15} /></button>
         <div className="flex bg-warm-200 dark:bg-warm-700 rounded-full p-0.5">
           {(['m', 'w'] as const).map(x => <button key={x} onClick={() => changeSex(x)} className={`px-3 py-1.5 rounded-full text-[12px] font-bold ${sex === x ? 'bg-warm-900 text-white' : 'text-warm-600'}`}>{x === 'm' ? t('builder.male') : t('builder.female')}</button>)}
         </div>
@@ -247,6 +273,29 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
 
       {/* 서랍 */}
       <div className="flex-1 bg-white dark:bg-warm-800 border-t border-warm-300 dark:border-warm-700 pt-2 pb-24">
+        {combos.length > 0 && (
+          <div className="px-4 pb-2 mb-2 border-b border-warm-200 dark:border-warm-700">
+            <div className="text-[10.5px] font-bold text-warm-500 mb-1.5">
+              {t('builder.combos.title')}
+              {touched.size > 0 && <span className="ml-1.5 font-normal text-warm-400">{t('builder.combos.fixed')}</span>}
+            </div>
+            <div className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
+              {combos.map((c, i) => {
+                const on = comboActive(c)
+                return (
+                  <button key={i} onClick={() => applyCombo(c)} className="flex-none w-[72px] flex flex-col items-center gap-0.5 active:scale-95 transition-transform">
+                    <span className={`rounded-xl overflow-hidden border-2 ${on ? 'border-warm-900 dark:border-warm-100' : 'border-transparent'}`}>
+                      <CharacterCanvas {...comboScene(c)} width={72} style={{ contentVisibility: 'auto' } as React.CSSProperties} />
+                    </span>
+                    <span className="text-[11px] font-bold tabular-nums text-warm-900 dark:text-warm-100">{c.total}{t('builder.pt')}</span>
+                    <span className="text-[9.5px] text-warm-500 truncate max-w-full">{t('builder.combos.kind.' + c.kind)}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {activeCombo?.why && <div className="mt-1 text-[11px] text-warm-500">{activeCombo.why}</div>}
+          </div>
+        )}
         <div className="flex items-center gap-2 px-4 h-7">
           {guided && <span className="flex-none text-[11px] font-bold px-2 py-0.5 rounded-full bg-terra-100 text-terra-700 dark:bg-terra-900/30 dark:text-terra-300 tabular-nums">{gi + 1}/{GUIDE.length}</span>}
           <div className="text-[13px] font-bold text-warm-900 dark:text-warm-100 truncate">
