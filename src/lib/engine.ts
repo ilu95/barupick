@@ -42,14 +42,22 @@ export function pcSeason(): 'spring' | 'summer' | 'autumn' | 'winter' | null {
 
 const PLATE_V7: Record<string, string> = { inner: 'inner', mid1: 'top', mid2: 'layer', outer: 'outer', bottom: 'bottom', shoe: 'shoes', scarf: 'scarf', hat: 'hat', tie: 'tie' }
 export function toItems(input: EngineInput) {
+  const hasTop = !!(input.outfit.top && COLORS_60[input.outfit.top!])
   return Object.entries(input.outfit)
-    .filter(([, key]) => key && COLORS_60[key])
+    // 이너는 상의가 있으면 목선만 살짝 보여 채점에서 뺀다 (guideFor 는 v7.guide 의 has 분기로 따로 다룬다)
+    .filter(([slot, key]) => key && COLORS_60[key] && !(slot === 'inner' && hasTop))
     .map(([slot, key]) => {
       const plate = input.plates?.[slot] || null
       // 판을 알면 그 판이 실제로 앉는 칸으로 (목폴라를 '상의' 칸에 넣어도 inner 면적으로 센다)
       const v7slot = (plate && PLATE_SLOT[plate] && PLATE_V7[PLATE_SLOT[plate]]) || TO_V7[slot] || slot
-      return { slot: v7slot, id: plate || slot, hex: COLORS_60[key!].hex, color: getColorName(key!), key: key! }
+      return { slot: v7slot, app: slot, id: plate || slot, hex: COLORS_60[key!].hex, color: getColorName(key!), key: key! }
     })
+}
+/** v7 자리 → 실제 UI 자리 (판 override 때문에 static FROM_V7 로는 못 뒤집는다 — 매번 items 에서 만든다) */
+const v7ToApp = (items: { slot: string; app: string }[]): Record<string, string> => {
+  const m: Record<string, string> = {}
+  for (const it of items) m[it.slot] = it.app
+  return m
 }
 export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason(), contrast: tasteContrast() })
 
@@ -83,12 +91,14 @@ let PAL: Record<string, { hex: string; name: string }> | null = null
 const palette = () => PAL || (PAL = Object.fromEntries(Object.entries(COLORS_60).map(([k, c]) => [k, { hex: c.hex, name: c.name }])))
 
 export function scoreOutfit(input: EngineInput): EngineResult {
-  const r = V7.evaluate(toItems(input), ctxOf(input))
+  const items = toItems(input)
+  const r = V7.evaluate(items, ctxOf(input))
   const total = calibrate(r.total), k = r.total > 0 ? total / r.total : 1   // 부분 점수도 같은 비율로 (합이 총점이 되게)
+  const slotOf = v7ToApp(items)
   return {
     total,
     parts: Object.entries(r.parts as Record<string, [number, number]>).map(([key, [v, mx]]) => ({ key: PART_KEY[key] || key, label: key, value: v * k, max: mx })),
-    reasons: (r.reasons as EngineReason[]).map(x => ({ ...x, slots: x.slots.map(s => FROM_V7[s] || s) })),
+    reasons: (r.reasons as EngineReason[]).map(x => ({ ...x, slots: x.slots.map(s => slotOf[s] || FROM_V7[s] || s) })),
     raw: r,
   }
 }
@@ -102,7 +112,10 @@ export function scoreDelta(input: EngineInput, slot: string, key: string): numbe
 
 /** 자리 하나의 ● 추천 / △ 주의 (v7 guide: 무난 4 + 어울려요 5 + 포인트(작은 자리) 3, 감점 규칙 없는 것만, 계열 겹침 3까지) */
 export function guideFor(input: EngineInput, slot: string, recN = 12) {
-  const g = V7.guide(toItems(input), ctxOf(input), TO_V7[slot] || slot, palette(), { idFor: input.plates?.[slot] || slot, recN })
+  const items = toItems(input)
+  // 이 자리에 지금 앉아있는 아이템의 실제 v7 자리(판 override 반영). 없으면(예: 상의 있을 때 이너) 기본 이름 — v7.guide 의 has 분기가 새로 더해서 안내한다
+  const v7slot = items.find(it => it.app === slot)?.slot || TO_V7[slot] || slot
+  const g = V7.guide(items, ctxOf(input), v7slot, palette(), { idFor: input.plates?.[slot] || slot, recN })
   const marks: Record<string, 'rec' | 'warn'> = {}
   for (const [k, m] of Object.entries(g.marks as Record<string, string>)) if (m === 'rec' || m === 'warn') marks[k] = m
   const delta: Record<string, number> = {}; const why: Record<string, string> = {}
@@ -168,7 +181,9 @@ export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: n
 
 /** 옷 하나의 색만 바꿔 얻는 최선의 한 수 k개 (차분한 색 우선) */
 export function bestMovesFor(input: EngineInput, k = 3): EngineMove[] {
-  const r = V7.bestMoves(toItems(input), ctxOf(input), palette(), k)
-  const base = calibrate(r.base?.total ?? V7.evaluate(toItems(input), ctxOf(input)).total)
-  return r.moves.map((m: any) => { const slot = FROM_V7[m.slot] || m.slot; const score = calibrate(m.total); return { slot, from: input.outfit[slot] || '', to: m.key, gain: score - base, score, why: m.why } })
+  const items = toItems(input)
+  const r = V7.bestMoves(items, ctxOf(input), palette(), k)
+  const base = calibrate(r.base?.total ?? V7.evaluate(items, ctxOf(input)).total)
+  const slotOf = v7ToApp(items)
+  return r.moves.map((m: any) => { const slot = slotOf[m.slot] || FROM_V7[m.slot] || m.slot; const score = calibrate(m.total); return { slot, from: input.outfit[slot] || '', to: m.key, gain: score - base, score, why: m.why } })
 }
