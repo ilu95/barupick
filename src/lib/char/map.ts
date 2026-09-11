@@ -59,8 +59,22 @@ export const DEFAULT_BOTTOM = '03_slacks_straight'
 export const DEFAULT_SHOE = '71_sneaker_canvas'
 export const DEFAULT_SCARF = '54_scarf'
 export const DEFAULT_HAT = 'c1_cap'
+export const DEFAULT_TIE = '59_tie'
 export const DEFAULT_HAIR: Record<'m' | 'w', string> = { m: 'h1_twoblock', w: 'hf5_bob' }
 export const DEFAULT_HAIR_COLOR = '#2B2320'
+
+/** mid1 칸에서 넥타이와 짝지을 수 있는 셔츠 판 (10_shirt_open 은 mid2 라 제외) */
+const SHIRT_MID1 = new Set(['08_shirt_closed', '09_shirt_short'])
+
+/** 상체 레이어 중 mid1 칸에 셔츠가 있어야 넥타이를 그릴 수 있다 */
+export function canWearTie(state: { upper: UpperLayer[] }): boolean {
+  const sorted = sortUpper(state.upper)
+  return sorted.some((l, i) => {
+    const appSlot = getSlotKey(i, sorted.length, l)
+    const plate = l.plate || defaultPlateFor(l.itemId, appSlot === 'hidden' ? 'top' : appSlot)
+    return !!plate && PLATE_SLOT[plate] === 'mid1' && SHIRT_MID1.has(plate)
+  })
+}
 
 /** 만들기 화면의 남/여 토글이 저장하는 값. 없으면 프로필 성별 */
 export function charSex(): 'm' | 'w' {
@@ -121,11 +135,12 @@ export function platesOf(state: { upper: UpperLayer[]; bottomItem?: string | nul
   out.shoes = state.shoesItem || DEFAULT_SHOE
   out.scarf = DEFAULT_SCARF
   out.hat = DEFAULT_HAT
+  out.tie = DEFAULT_TIE
   return out
 }
 
 /** 만들기 상태 → 장면. 레이어의 판(없으면 종류 기본 판) + 하의·신발·목도리 판 + 헤어. hex 표를 거치지 않는다 */
-export function charSceneFromState(state: { upper: UpperLayer[]; bottomColor: string | null; shoesColor: string | null; scarfColor: string | null; hatColor: string | null; bottomItem?: string | null; shoesItem?: string | null; scarfItem?: string | null; hatItem?: string | null; hair?: string | null; hairColor?: string | null }, sex: 'm' | 'w' = charSex()): CharScene {
+export function charSceneFromState(state: { upper: UpperLayer[]; bottomColor: string | null; shoesColor: string | null; scarfColor: string | null; hatColor: string | null; tieColor?: string | null; bottomItem?: string | null; shoesItem?: string | null; scarfItem?: string | null; hatItem?: string | null; tieItem?: string | null; hair?: string | null; hairColor?: string | null }, sex: 'm' | 'w' = charSex()): CharScene {
   const items: CharItem[] = []
   const usedSlot = new Set<string>()
   const sorted = sortUpper(state.upper)
@@ -142,6 +157,7 @@ export function charSceneFromState(state: { upper: UpperLayer[]; bottomColor: st
   items.push({ id: state.bottomItem || DEFAULT_BOTTOM, color: (state.bottomColor && COLORS_60[state.bottomColor]?.hex) || '#1C1917' })
   if (state.shoesColor && COLORS_60[state.shoesColor]) items.push({ id: state.shoesItem || DEFAULT_SHOE, color: COLORS_60[state.shoesColor].hex })
   if (state.scarfColor && COLORS_60[state.scarfColor]) items.push({ id: state.scarfItem || DEFAULT_SCARF, color: COLORS_60[state.scarfColor].hex })
+  if (state.tieColor && COLORS_60[state.tieColor] && canWearTie(state)) items.push({ id: state.tieItem || DEFAULT_TIE, color: COLORS_60[state.tieColor].hex })
   const body: CharBody = { sex, hair: state.hair && (sex === 'w' ? state.hair.startsWith('hf') : !state.hair.startsWith('hf')) ? state.hair : DEFAULT_HAIR[sex], hairColor: state.hairColor || DEFAULT_HAIR_COLOR }
   if (state.hatColor && COLORS_60[state.hatColor]) { body.hat = state.hatItem || DEFAULT_HAT; body.hatColor = COLORS_60[state.hatColor].hex }
   return { items, body }

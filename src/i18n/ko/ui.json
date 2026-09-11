@@ -1622,7 +1622,8 @@
     "bottom": "하의",
     "shoes": "신발",
     "scarf": "목도리",
-    "hat": "모자"
+    "hat": "모자",
+    "tie": "넥타이"
   },
   "evaluation": {
     "freeColor": "자유 배색",
@@ -1881,6 +1882,8 @@
     "female": "여",
     "takeOff": "벗기",
     "none": "없음",
+    "tieNeedsShirt": "셔츠 위에만",
+    "topNeedsUpper": "아우터나 이너를 먼저 입으면 상의를 뺄 수 있어요",
     "noRec": "지금 조합에서 크게 좋아지는 색이 없어요",
     "pt": "점",
     "done": "완성",
@@ -1894,7 +1897,8 @@
       "bottom": "하의",
       "shoes": "신발",
       "scarf": "목도리",
-      "hat": "모자"
+      "hat": "모자",
+      "tie": "넥타이"
     },
     "guidedTitle": "하나씩 골라보기",
     "guided": {
