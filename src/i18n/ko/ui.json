@@ -1916,7 +1916,7 @@
     "sortBright": "밝기순",
     "legend": "● 추천 · △ 주의",
     "mineTab": "내 옷장",
-    "moveChip": "{{slot}}를 {{color}}으로 → {{score}}점"
+    "moveChip": "{{slot}} → {{color}} · {{score}}점"
   },
   "reminder": {
     "colderTitle": "내일 아침 {{temp}}°, 오늘보다 {{d}}° 낮아요",

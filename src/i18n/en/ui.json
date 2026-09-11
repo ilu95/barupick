@@ -1916,7 +1916,7 @@
     "sortBright": "By brightness",
     "legend": "● recommended · △ caution",
     "mineTab": "My closet",
-    "moveChip": "{{slot}} → {{color}} = {{score}}pt"
+    "moveChip": "{{slot}} → {{color}} · {{score}}pt"
   },
   "reminder": {
     "colderTitle": "Tomorrow morning {{temp}}°, {{d}}° colder than today",
