@@ -15,7 +15,7 @@ import i18n from '@/i18n'
 import { onAppResume } from '@/lib/appLifecycle'
 
 export const LIKE_EVENT = 'bp:like'
-export interface LikeEventDetail { postId: string; liked: boolean; delta: number }
+export interface LikeEventDetail { postId: string; liked: boolean; delta: number; count?: number }   // count 가 있으면 그 값으로 맞춘다 (서버 기준)
 
 interface State {
   userId: string | null
@@ -92,8 +92,8 @@ export async function ensureLikes(postIds: string[]) {
 }
 
 const likeInflight = new Set<string>()
-function fireLike(postId: string, liked: boolean, delta: number) {
-  window.dispatchEvent(new CustomEvent<LikeEventDetail>(LIKE_EVENT, { detail: { postId, liked, delta } }))
+function fireLike(postId: string, liked: boolean, delta: number, count?: number) {
+  window.dispatchEvent(new CustomEvent<LikeEventDetail>(LIKE_EVENT, { detail: { postId, liked, delta, count } }))
 }
 
 /** 좋아요 토글. 낙관적 반영 → 실패 시 되돌리고 ok:false */
@@ -120,6 +120,11 @@ export async function toggleLike(postId: string, ownerId?: string | null): Promi
         supabase.rpc('send_notification', { p_user_id: ownerId, p_actor_id: uid, p_type: 'like', p_message: i18n.t('communityDetail.likeSuccess'), p_related_id: postId }).then(null, () => {})
       }
     }
+    // 서버가 센 수로 맞춘다 (낙관적 ±1 과 트리거 결과가 다를 때 화면이 거짓말하지 않게)
+    try {
+      const { data } = await supabase.from('posts').select('likes_count').eq('id', postId).maybeSingle()
+      if (data && typeof data.likes_count === 'number') fireLike(postId, !was, 0, data.likes_count)
+    } catch {}
     return { ok: true }
   } catch (e) {
     console.warn('[social] like toggle failed:', e)

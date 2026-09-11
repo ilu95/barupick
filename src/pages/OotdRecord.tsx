@@ -12,7 +12,6 @@ import { useOotd } from '@/hooks/useOotd'
 import { useAuth } from '@/contexts/AuthContext'
 import { charSceneFromState, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT } from '@/lib/char/map'
 import { garmentsOf, commitCloset } from '@/lib/closetAuto'
-import { isEasy } from '@/lib/mode'
 import { trackOotdRecord } from '@/lib/analytics'
 import { COLORS_60, getColorName } from '@/lib/colors'
 
@@ -32,7 +31,6 @@ export default function OotdRecord() {
   const { profile } = useAuth()
   const ootd = useOotd()
   const build = useBuild('coord')
-  const easy = isEasy()
   const [stage, setStage] = useState<'dress' | 'finish' | 'saved'>('dress')
   const [saveError, setSaveError] = useState('')
   const [customSit, setCustomSit] = useState(false)
@@ -128,7 +126,7 @@ export default function OotdRecord() {
             </div>
           </div>
         )}
-        <StepBuilderV2 build={build} easy={easy} onBack={() => navigate('/closet')} onDone={() => setStage('finish')} doneLabel={t('ootdRecord.next')} title={t('ootdRecord.whatDidYouWear')} />
+        <StepBuilderV2 build={build} onBack={() => navigate('/closet')} onDone={() => setStage('finish')} doneLabel={t('ootdRecord.next')} title={t('ootdRecord.whatDidYouWear')} />
       </div>
     )
   }

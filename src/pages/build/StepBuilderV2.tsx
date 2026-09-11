@@ -19,15 +19,17 @@ import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent } from '@/
 const UPPER: UpperSlot[] = ['outer', 'middleware', 'top', 'inner']
 const isUpper = (s: RailSlot): s is UpperSlot => (UPPER as string[]).includes(s)
 
-export default function StepBuilderV2({ build, easy = false, onBack, onDone, doneLabel, title }: { build: BuildHook; easy?: boolean; onBack?: () => void; onDone?: () => void; doneLabel?: string; title?: string }) {
+/** 하나씩 골라보기 순서: 상의 → 하의 → 신발 → 아우터 → 레이어드 → 악세서리 (헤어·이너는 레일에서 언제든) */
+const GUIDE: RailSlot[] = ['top', 'bottom', 'shoes', 'outer', 'middleware', 'acc']
+
+export default function StepBuilderV2({ build, guided = false, onBack, onDone, doneLabel, title }: { build: BuildHook; guided?: boolean; onBack?: () => void; onDone?: () => void; doneLabel?: string; title?: string }) {
   const { t, i18n } = useTranslation()
   const ko = (i18n.language || 'ko').startsWith('ko')
   const [sex, setSex] = useState<'m' | 'w'>(charSex)
-  const [focus, setFocus] = useState<RailSlot>(() => build.state.upper.length ? 'top' : 'top')
+  const [focus, setFocus] = useState<RailSlot>(GUIDE[0])
+  const [gi, setGi] = useState(0)                        // guided: 지금 몇 번째 자리인지
   const [acc, setAcc] = useState<AccSlot>('scarf')
   const [tab, setTab] = useState<string>('rec')
-  const [showTypes, setShowTypes] = useState(false)     // easy: 옷 종류는 "옷 바꾸기"를 눌러야
-  const [moreColors, setMoreColors] = useState(false)   // easy: 색 탭은 "더 많은 색"을 눌러야
   const s = build.state
 
   // 하의·신발은 항상 입고 시작한다 (판은 1단계 것, 없으면 기본)
@@ -118,6 +120,10 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
   const reason = reasonRaw && reasonRaw !== tag ? reasonRaw : ''
   const complete = s.upper.length >= 1 && !!s.bottomColor && !!s.shoesColor
 
+  // 하나씩 골라보기: 다음 자리로. 선택 자리(아우터·레이어드·악세서리)는 비워 둔 채 넘어갈 수 있다
+  const nextSlot = guided && gi < GUIDE.length - 1 ? GUIDE[gi + 1] : null
+  const nextGuide = () => { if (!nextSlot) return; setGi(gi + 1); setFocus(nextSlot); setTab('rec'); trackEvent('guided_next', { from: focus, to: nextSlot }) }
+
   const changeSex = (x: 'm' | 'w') => { setSex(x); setCharSex(x); const h = HAIR[x][0].id; build.setHair(h, s.hairColor || HAIR_COLORS[0].hex) }
 
   return (
@@ -125,7 +131,7 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
       {/* 머리: 뒤로 · 제목 · 리셋 · 남/여 */}
       <div className="flex items-center gap-2 px-3 pt-2 pb-1">
         <button onClick={() => onBack ? onBack() : build.goBack()} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>
-        <div className="flex-1 font-display text-[17px] font-bold text-warm-900 dark:text-warm-100">{title || (easy ? t('builder.easyTitle') : t('builder.title'))}</div>
+        <div className="flex-1 font-display text-[17px] font-bold text-warm-900 dark:text-warm-100">{title || (guided ? t('builder.guidedTitle') : t('builder.title'))}</div>
         <button onClick={() => build.reset()} aria-label={t('builder.reset')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><RotateCcw size={15} /></button>
         <div className="flex bg-warm-200 dark:bg-warm-700 rounded-full p-0.5">
           {(['m', 'w'] as const).map(x => <button key={x} onClick={() => changeSex(x)} className={`px-3 py-1.5 rounded-full text-[12px] font-bold ${sex === x ? 'bg-warm-900 text-white' : 'text-warm-600'}`}>{x === 'm' ? t('builder.male') : t('builder.female')}</button>)}
@@ -139,10 +145,10 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
           <CharacterCanvas {...scene} width={208} />
         </div>
         <div className="grid grid-cols-2 gap-1.5 px-1.5 pb-2 content-end">
-          {(easy ? RAIL.filter(r => ['outer', 'top', 'bottom', 'shoes'].includes(r.id) || (r.id !== 'hair' && worn(r.id))) : RAIL).map(r => {
+          {RAIL.map(r => {
             const on = focus === r.id, w = worn(r.id), sw = colorOf(r.id)
             return (
-              <button key={r.id} onClick={() => { setFocus(r.id); setTab('rec'); setShowTypes(false) }}
+              <button key={r.id} onClick={() => { setFocus(r.id); setTab('rec'); const k = GUIDE.indexOf(r.id); if (k >= 0) setGi(k) }}
                 className={`relative rounded-2xl flex flex-col items-center justify-center gap-0.5 py-1 border transition-all ${on ? 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 shadow-warm-sm text-warm-900 dark:text-warm-100' : 'border-transparent text-warm-500'}`} style={{ height: 66 }}>
                 <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-[20px] ${w ? (on ? 'bg-terra-100 dark:bg-terra-900/30' : 'bg-warm-200 dark:bg-warm-700') : 'border border-dashed border-warm-400 text-warm-400 text-[18px]'}`}>{w ? r.icon : '＋'}</span>
                 <span className="text-[10.5px] font-semibold leading-none">{t('builder.slot.' + r.id)}</span>
@@ -156,13 +162,13 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
       {/* 서랍 */}
       <div className="flex-1 bg-white dark:bg-warm-800 border-t border-warm-300 dark:border-warm-700 pt-2 pb-24">
         <div className="flex items-center gap-2 px-4 h-7">
+          {guided && <span className="flex-none text-[11px] font-bold px-2 py-0.5 rounded-full bg-terra-100 text-terra-700 dark:bg-terra-900/30 dark:text-terra-300 tabular-nums">{gi + 1}/{GUIDE.length}</span>}
           <div className="text-[13px] font-bold text-warm-900 dark:text-warm-100 truncate">
             {t('builder.slot.' + (focus === 'acc' ? acc : focus))}
             {currentPlate() && <span className="ml-1.5 font-medium text-warm-500">{plateName(currentPlate()!)}{cur ? ' · ' + getColorName(cur) : ''}</span>}
           </div>
           <div className="ml-auto text-[10.5px] text-warm-500 truncate max-w-[46%]">{HINTS[colorSlot]?.[ko ? 'ko' : 'en']}</div>
           {optional && worn(focus) && <button onClick={takeOff} className="flex-none text-[11px] font-semibold px-2.5 py-1 rounded-full border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300">{t('builder.takeOff')}</button>}
-          {easy && !showTypes && focus !== 'hair' && <button onClick={() => setShowTypes(true)} className="flex-none text-[11px] font-semibold px-2.5 py-1 rounded-full border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300">{t('builder.changeGarment')}</button>}
         </div>
 
         {focus === 'acc' && (
@@ -175,13 +181,13 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
         )}
 
         {/* 옷 종류 */}
-        {(!easy || showTypes) && <div className="mt-2 px-4 overflow-x-auto [scrollbar-width:none]">
+        <div className="mt-2 px-4 overflow-x-auto [scrollbar-width:none]">
           <div className="grid grid-flow-col gap-1.5" style={{ gridTemplateRows: types.length > 5 ? 'repeat(2, 32px)' : '32px', gridAutoColumns: 'max-content' }}>
             {optional && <button onClick={takeOff} disabled={!worn(focus)} className={`h-8 px-3 rounded-full text-[12.5px] font-semibold border border-dashed whitespace-nowrap ${!worn(focus) ? 'bg-warm-900 text-white border-warm-900' : 'border-warm-400 text-warm-600 dark:text-warm-300'}`}>{t('builder.none')}</button>}
             {types.map(id => { const on = currentPlate() === id; return (
               <button key={id} onClick={() => pickType(id)} className={`h-8 px-3 rounded-full text-[12.5px] font-semibold whitespace-nowrap border transition-all active:scale-95 ${on ? 'bg-warm-900 text-white border-warm-900' : 'bg-[#FAF8F5] dark:bg-warm-900/40 border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300'}`}>{plateName(id)}</button>) })}
           </div>
-        </div>}
+        </div>
 
         {/* 색 */}
         {focus === 'hair' ? (
@@ -194,9 +200,9 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
           </div>
         ) : (
           <>
-            {(!easy || moreColors) && <div className="mt-3 px-4 flex gap-3.5 overflow-x-auto [scrollbar-width:none]">
+            <div className="mt-3 px-4 flex gap-3.5 overflow-x-auto [scrollbar-width:none]">
               {tabs.map(x => <button key={x.id} onClick={() => setTab(x.id)} className={`flex-none text-[12px] font-semibold pb-0.5 border-b-2 whitespace-nowrap ${tab === x.id ? 'text-warm-900 dark:text-warm-100 border-warm-900 dark:border-warm-100' : 'text-warm-500 border-transparent'}`}>{x.id === 'rec' ? <span className="text-terra-600">{x.label}</span> : x.label}</button>)}
-            </div>}
+            </div>
             <div className="mt-2 px-3 overflow-x-auto [scrollbar-width:none]">
               {chipKeys.length === 0 ? (
                 <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
@@ -216,12 +222,6 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
                       </button>
                     )
                   })}
-                  {easy && !moreColors && tab === 'rec' && (
-                    <button onClick={() => setMoreColors(true)} className="w-[54px] flex flex-col items-center gap-1 active:scale-95">
-                      <span className="w-9 h-9 rounded-full border border-dashed border-warm-400 flex items-center justify-center text-warm-500 text-[18px] leading-none">＋</span>
-                      <span className="text-[10px] leading-none text-warm-500">{t('builder.moreColors')}</span>
-                    </button>
-                  )}
                 </div>
               )}
             </div>
@@ -238,7 +238,11 @@ export default function StepBuilderV2({ build, easy = false, onBack, onDone, don
           </div>
           {reason && <div className="text-[11px] text-warm-500 truncate">{reason}</div>}
         </div>
-        <button onClick={() => onDone ? onDone() : build.pushStep(s.fabricMode ? 'fabric' : 'result')} disabled={!complete} className="flex-none h-11 px-5 rounded-full bg-terra-500 text-white font-bold text-[14px] disabled:opacity-40 active:scale-[0.98] shadow-terra">{doneLabel || t('builder.done')} →</button>
+        {nextSlot ? (
+          <button onClick={nextGuide} disabled={!optional && !worn(focus)} className="flex-none h-11 px-4 rounded-full bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 font-bold text-[13.5px] disabled:opacity-40 active:scale-[0.98]">{optional && !worn(focus) ? t('builder.guided.skip', { slot: t('builder.slot.' + nextSlot) }) : t('builder.guided.next', { slot: t('builder.slot.' + nextSlot) })} →</button>
+        ) : (
+          <button onClick={() => onDone ? onDone() : build.pushStep(s.fabricMode ? 'fabric' : 'result')} disabled={!complete} className="flex-none h-11 px-5 rounded-full bg-terra-500 text-white font-bold text-[14px] disabled:opacity-40 active:scale-[0.98] shadow-terra">{doneLabel || t('builder.done')} →</button>
+        )}
       </div>
 
       {/* 접근성: 닫기 없는 X 아이콘 사용 안 함 */}
