@@ -5,7 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getLocale } from '@/i18n'
 import { Heart, Bookmark, Share, User, Flag, ChevronRight, MessageCircle, Send, Trash2, ExternalLink, Pencil } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { COLORS_60, getColorName } from '@/lib/colors'
 
 import { supabase } from '@/lib/supabase'
@@ -288,10 +289,10 @@ export default function CommunityDetail() {
   }
 
   // ── 로딩/에러 상태 ──
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('common.loading')}</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400 dark:text-warm-500">{t('common.loading')}</div>
   if (!post) return (
     <div className="animate-screen-fade px-5 pt-6 text-center py-20">
-      <div className="text-sm text-warm-600 mb-4">{loadError ? t('common.loadError') : t('postInsight.notFound')}</div>
+      <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{loadError ? t('common.loadError') : t('postInsight.notFound')}</div>
       {loadError && (
         <button onClick={loadPost} className="px-5 py-2.5 rounded-full bg-terra-500 text-white text-sm font-semibold active:scale-95 transition-all shadow-terra">{t('common.retry')}</button>
       )}
@@ -299,8 +300,7 @@ export default function CommunityDetail() {
   )
 
   const outfit = post.outfit || {}
-  const outfitHex: Record<string, string> = {}
-  Object.entries(outfit).forEach(([k, v]) => { if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string) })
+  const scene = sceneFromColors(outfit)
   const hasPhoto = post.photo_urls && post.photo_urls.length > 0
   const nick = post.profiles?.nickname || t('common.user')
   const avatar = post.profiles?.avatar_url
@@ -325,9 +325,9 @@ export default function CommunityDetail() {
             </div>
           )}
         </div>
-      ) : Object.keys(outfitHex).length > 0 && (
-        <div className="flex justify-center py-6 bg-warm-100 rounded-2xl mb-4">
-          <MannequinSVG outfit={outfitHex} size={180} />
+      ) : Object.keys(outfit).length > 0 && (
+        <div className="flex justify-center py-6 bg-warm-100 dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl mb-4">
+          <CharacterCanvas items={scene.items} body={scene.body} width={160} />
         </div>
       )}
 
@@ -337,8 +337,8 @@ export default function CommunityDetail() {
         <button
           onClick={toggleLike}
           aria-label={liked ? t('communityDetail.unlikeLabel') : t('communityDetail.like')}
-          className={`flex-1 py-2.5 rounded-xl border text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${
-            liked ? 'border-red-300 text-red-500 bg-red-50' : 'border-warm-400 bg-white text-warm-800'
+          className={`flex-1 py-2.5 rounded-2xl border text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${
+            liked ? 'border-red-300 dark:border-red-800 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20' : 'border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-800 dark:text-warm-200'
           }`}
         >
           <Heart size={16} fill={liked ? '#FF6B6B' : 'none'} stroke={liked ? '#FF6B6B' : 'currentColor'} strokeWidth={2} />
@@ -349,8 +349,8 @@ export default function CommunityDetail() {
         <button
           onClick={toggleBookmark}
           aria-label={bookmarked ? t('communityDetail.save') : t('communityDetail.save')}
-          className={`flex-1 py-2.5 rounded-xl border text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${
-            bookmarked ? 'border-terra-300 text-terra-600 bg-terra-50' : 'border-warm-400 bg-white text-warm-800'
+          className={`flex-1 py-2.5 rounded-2xl border text-sm font-medium active:scale-[0.97] transition-all flex items-center justify-center gap-1.5 ${
+            bookmarked ? 'border-terra-300 dark:border-terra-700 text-terra-600 dark:text-terra-400 bg-terra-50 dark:bg-terra-900/20' : 'border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-800 dark:text-warm-200'
           }`}
         >
           {bookmarked ? '🔖' : '📄'} {t('communityDetail.save')}
@@ -360,7 +360,7 @@ export default function CommunityDetail() {
         <button
           onClick={handleShare}
           aria-label={t('communityDetail.share')}
-          className="py-2.5 px-4 rounded-xl border border-warm-400 bg-white text-warm-700 active:scale-[0.97] transition-all"
+          className="py-2.5 px-4 rounded-2xl border border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-700 dark:text-warm-300 active:scale-[0.97] transition-all"
         >
           <Share size={16} />
         </button>
@@ -370,7 +370,7 @@ export default function CommunityDetail() {
           <button
             onClick={handleReport}
             aria-label={t('communityDetail.report')}
-            className="py-2.5 px-3 rounded-xl border border-warm-400 bg-white text-warm-500 active:scale-[0.97] transition-all"
+            className="py-2.5 px-3 rounded-2xl border border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-500 dark:text-warm-400 active:scale-[0.97] transition-all"
           >
             <Flag size={14} />
           </button>
@@ -382,13 +382,13 @@ export default function CommunityDetail() {
         <div className="flex gap-2 mb-4">
           <button
             onClick={handleEditPost}
-            className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
+            className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl text-sm font-medium text-warm-800 dark:text-warm-200 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
           >
             <Pencil size={14} /> {t('communityDetail.editPost')}
           </button>
           <button
             onClick={handleDeletePost}
-            className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
+            className="flex-1 py-2.5 bg-white dark:bg-warm-800 border border-red-200 dark:border-red-800 rounded-2xl text-sm font-medium text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-all"
           >
             <Trash2 size={14} /> {t('communityDetail.deletePost')}
           </button>
@@ -399,14 +399,14 @@ export default function CommunityDetail() {
       <div className="flex items-center gap-3 mb-4">
         <div onClick={() => navigate(`/user/${post.user_id}`)} className="flex items-center gap-2.5 cursor-pointer flex-1">
           {avatar ? <img src={avatar} className="w-9 h-9 rounded-full object-cover" alt="" />
-          : <div className="w-9 h-9 rounded-full bg-terra-100 flex items-center justify-center"><User size={16} className="text-terra-600" /></div>}
+          : <div className="w-9 h-9 rounded-full bg-terra-100 dark:bg-terra-900/30 flex items-center justify-center"><User size={16} className="text-terra-600 dark:text-terra-400" /></div>}
           <div>
-            <div className="text-sm font-semibold text-warm-900">@{nick}</div>
+            <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">@{nick}</div>
           </div>
         </div>
         {!isMe && user && (
           <button onClick={() => toggleFollow(post.user_id)}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-semibold active:scale-95 transition-all ${isFollowing(post.user_id) ? 'bg-warm-200 text-warm-700 border border-warm-400' : 'bg-terra-500 text-white shadow-terra'}`}>
+            className={`px-3 py-1.5 rounded-full text-[11px] font-semibold active:scale-95 transition-all ${isFollowing(post.user_id) ? 'bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200 border border-warm-400 dark:border-warm-600' : 'bg-terra-500 text-white shadow-terra'}`}>
             {isFollowing(post.user_id) ? t('common.following') : t('communityDetail.follow')}
           </button>
         )}
@@ -421,9 +421,9 @@ export default function CommunityDetail() {
           <span className="text-lg">📸</span>
           <div className="flex-1 text-left">
             <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">@{instaId}</div>
-            <div className="text-[10px] text-warm-500">{t('communityDetail.instagramLink')}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">{t('communityDetail.instagramLink')}</div>
           </div>
-          <ExternalLink size={14} className="text-warm-500" />
+          <ExternalLink size={14} className="text-warm-500 dark:text-warm-400" />
         </button>
       )}
 
@@ -452,21 +452,21 @@ export default function CommunityDetail() {
       {/* ═══ 캡션 + 태그 ═══ */}
       {(post.caption || post.title) && <div className="text-sm text-warm-800 dark:text-warm-200 mb-3 leading-relaxed">{post.caption || post.title}</div>}
       <div className="flex flex-wrap gap-1.5 mb-4">
-        {styleName && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-terra-100 text-terra-700">{styleName}</span>}
-        {post.score > 0 && <span className="font-display text-[11px] font-bold px-2.5 py-1 rounded-full bg-warm-900 text-white">{t('common.score', { score: post.score })}</span>}
+        {styleName && <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-terra-100 dark:bg-terra-900/30 text-terra-700 dark:text-terra-300">{styleName}</span>}
+        {post.score > 0 && <span className="font-display text-[11px] font-bold px-2.5 py-1 rounded-full bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900">{t('common.score', { score: post.score })}</span>}
       </div>
 
       {/* ═══ 컬러 정보 ═══ */}
       {Object.keys(outfit).length > 0 && (
-        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3 mb-5 shadow-warm-sm">
-          <div className="flex gap-2 flex-wrap">
+        <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 mb-5 shadow-warm-sm">
+          <div className="flex gap-x-3 gap-y-1.5 flex-wrap">
             {Object.entries(outfit).filter(([_, v]) => v).map(([part, ck]) => {
               const c = COLORS_60[ck as string]
               if (!c) return null
               return (
                 <div key={part} className="flex items-center gap-1.5 text-xs">
-                  <span className="w-4 h-4 rounded border border-warm-400" style={{ background: c.hex }} />
-                  <span className="text-warm-500">{t('categories:names.' + part)}</span>
+                  <span className="w-3.5 h-3.5 rounded-full border border-warm-400 dark:border-warm-600" style={{ background: c.hex }} />
+                  <span className="text-warm-500 dark:text-warm-400">{t('categories:names.' + part)}</span>
                   <span className="text-warm-800 dark:text-warm-200">{getColorName(ck as string)}</span>
                 </div>
               )
@@ -480,15 +480,15 @@ export default function CommunityDetail() {
         <div className="grid grid-cols-3 gap-2 mb-5">
           <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
             <div className="text-base font-bold text-warm-900 dark:text-warm-100">{post.likes_count || 0}</div>
-            <div className="text-[9px] text-warm-500">{t('communityDetail.like')}</div>
+            <div className="text-[9px] text-warm-500 dark:text-warm-400">{t('communityDetail.like')}</div>
           </div>
           <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
             <div className="text-base font-bold text-warm-900 dark:text-warm-100">{post.view_count || 0}</div>
-            <div className="text-[9px] text-warm-500">{t('postInsight.views')}</div>
+            <div className="text-[9px] text-warm-500 dark:text-warm-400">{t('postInsight.views')}</div>
           </div>
           <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-2.5 text-center">
             <div className="text-base font-bold text-warm-900 dark:text-warm-100">{post.comments_count || comments.length}</div>
-            <div className="text-[9px] text-warm-500">{t('communityDetail.comments')}</div>
+            <div className="text-[9px] text-warm-500 dark:text-warm-400">{t('communityDetail.comments')}</div>
           </div>
         </div>
       )}
@@ -497,7 +497,7 @@ export default function CommunityDetail() {
       {isFriendsPost && (
         <div className="border-t border-warm-300 dark:border-warm-600 pt-4">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-700 dark:text-warm-300 mb-3">
-            <MessageCircle size={13} /> {t('communityDetail.comments')} <span className="text-warm-500 font-normal">{comments.length}</span>
+            <MessageCircle size={13} /> {t('communityDetail.comments')} <span className="text-warm-500 dark:text-warm-400 font-normal">{comments.length}</span>
           </div>
 
           {/* 댓글 목록 */}
@@ -519,20 +519,20 @@ export default function CommunityDetail() {
                       {c.profiles?.avatar_url ? (
                         <img src={c.profiles.avatar_url} className="w-7 h-7 rounded-full object-cover mt-0.5" alt="" />
                       ) : (
-                        <div className="w-7 h-7 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center mt-0.5"><User size={12} className="text-warm-500" /></div>
+                        <div className="w-7 h-7 rounded-full bg-warm-200 dark:bg-warm-700 flex items-center justify-center mt-0.5"><User size={12} className="text-warm-500 dark:text-warm-400" /></div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-semibold text-warm-900 dark:text-warm-100">@{c.profiles?.nickname || t('common.user')}</span>
-                        <span className="text-[10px] text-warm-400">{dateStr}</span>
+                        <span className="text-[10px] text-warm-400 dark:text-warm-500">{dateStr}</span>
                       </div>
                       <div className="text-sm text-warm-800 dark:text-warm-200 mt-0.5 leading-relaxed">{c.content}</div>
                     </div>
                     {canDelete && (
                       <button
                         onClick={() => deleteComment(c.id)}
-                        className="flex-shrink-0 mt-1 p-1 text-warm-400 hover:text-red-400 active:scale-90 transition-all"
+                        className="flex-shrink-0 mt-1 p-1 text-warm-400 dark:text-warm-500 hover:text-red-400 active:scale-90 transition-all"
                         aria-label={t('common.delete')}
                       >
                         <Trash2 size={12} />

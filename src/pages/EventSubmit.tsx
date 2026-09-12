@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Camera, Check, AlertTriangle } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import CropOverlay from '@/components/ui/CropOverlay'
 import ColorPicker from '@/components/ui/ColorPicker'
 import { COLORS_60, getColorName } from '@/lib/colors'
@@ -41,8 +42,7 @@ export default function EventSubmit() {
   const filledCount = Object.values(colors).filter(Boolean).length
   const canSubmit = filledCount >= 2 && photos.length > 0 && instagramId.trim().length > 0
 
-  const outfitHex: Record<string, string> = {}
-  PARTS.forEach(p => { if (colors[p]) { const c = COLORS_60[colors[p]!]; if (c) outfitHex[p] = c.hex } })
+  const scene = sceneFromColors(colors)
 
   const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -96,7 +96,7 @@ export default function EventSubmit() {
     }
   }
 
-  if (!user) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('common.loginRequired')}</div>
+  if (!user) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600 dark:text-warm-400">{t('common.loginRequired')}</div>
 
   if (done) {
     return (
@@ -105,8 +105,8 @@ export default function EventSubmit() {
           <div className="w-16 h-16 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-4">
             <Check size={32} className="text-sage" />
           </div>
-          <div className="font-display text-lg font-bold text-warm-900">{t('eventSubmit.participationDone')}</div>
-          <div className="text-sm text-warm-600 mt-1">{t('eventSubmit.waitResult')}</div>
+          <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{t('eventSubmit.participationDone')}</div>
+          <div className="text-sm text-warm-600 dark:text-warm-400 mt-1">{t('eventSubmit.waitResult')}</div>
         </div>
       </div>
     )
@@ -116,30 +116,30 @@ export default function EventSubmit() {
     <div className="animate-screen-fade px-5 pt-2 pb-10">
       {/* 이벤트 정보 */}
       {event && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
-          <div className="text-sm font-bold text-warm-900 mb-1">{event.title}</div>
-          {event.reward && <div className="text-xs text-amber-700">🎁 {event.reward}</div>}
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-5">
+          <div className="text-sm font-bold text-warm-900 dark:text-warm-100 mb-1">{event.title}</div>
+          {event.reward && <div className="text-xs text-amber-700 dark:text-amber-400">🎁 {event.reward}</div>}
         </div>
       )}
 
       {/* 경고 */}
-      <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-5 text-xs text-red-700 leading-relaxed flex items-start gap-2">
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-3 mb-5 text-xs text-red-700 dark:text-red-300 leading-relaxed flex items-start gap-2">
         <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
         <span>{t('eventSubmit.warning')}</span>
       </div>
 
-      {/* 마네킹 미리보기 */}
+      {/* 코디 미리보기 */}
       {filledCount > 0 && (
-        <div className="flex justify-center mb-4">
-          <MannequinSVG outfit={outfitHex} size={100} />
+        <div className="flex justify-center py-4 mb-4 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl shadow-warm-sm">
+          <CharacterCanvas items={scene.items} body={scene.body} width={110} />
         </div>
       )}
 
       {/* 코디 색상 */}
-      <div className="text-sm font-bold text-warm-800 mb-1">{t('eventSubmit.coordColors')}</div>
-      <div className="text-xs text-warm-500 mb-3">
+      <div className="text-sm font-bold text-warm-800 dark:text-warm-200 mb-1">{t('eventSubmit.coordColors')}</div>
+      <div className="text-xs text-warm-500 dark:text-warm-400 mb-3">
         {t('eventSubmit.minColors')}{' '}
-        <span className="px-1.5 py-0.5 rounded-full bg-terra-100 text-terra-600 text-[10px] font-semibold">{filledCount}/5</span>
+        <span className="px-1.5 py-0.5 rounded-full bg-terra-100 dark:bg-terra-900/30 text-terra-600 dark:text-terra-400 text-[10px] font-semibold">{filledCount}/5</span>
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-2">
@@ -151,17 +151,17 @@ export default function EventSubmit() {
             <button
               key={part}
               onClick={() => setOpenPicker(isOpen ? null : part)}
-              className={`flex flex-col items-center gap-1.5 p-2.5 bg-white border ${isOpen ? 'border-terra-400 shadow-warm' : 'border-warm-400 shadow-warm-sm'} rounded-xl active:scale-95 transition-all relative`}
+              className={`flex flex-col items-center gap-1.5 p-2.5 bg-white dark:bg-warm-800 border ${isOpen ? 'border-terra-400 shadow-warm' : 'border-warm-300 dark:border-warm-600 shadow-warm-sm'} rounded-2xl active:scale-95 transition-all relative`}
             >
-              <div className="w-8 h-8 rounded-lg border border-warm-300 flex items-center justify-center" style={c ? { background: c.hex } : {}}>
-                {!c && <span className="text-warm-400 text-xs">+</span>}
+              <div className="w-8 h-8 rounded-full border border-warm-300 dark:border-warm-600 flex items-center justify-center" style={c ? { background: c.hex } : {}}>
+                {!c && <span className="text-warm-400 dark:text-warm-500 text-xs">+</span>}
               </div>
-              <div className={`text-[11px] font-semibold ${c ? 'text-terra-600' : 'text-warm-500'}`}>
+              <div className={`text-[11px] font-semibold ${c ? 'text-terra-600 dark:text-terra-400' : 'text-warm-500 dark:text-warm-400'}`}>
                 {c ? getColorName(colors[part]) : t('categories:names.' + part)}
               </div>
               {c && (
                 <span onClick={(e) => { e.stopPropagation(); setColors(prev => ({ ...prev, [part]: null })) }}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-warm-400 text-white text-[10px] flex items-center justify-center">✕</span>
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-warm-400 dark:bg-warm-600 text-white text-[10px] flex items-center justify-center">✕</span>
               )}
             </button>
           )
@@ -177,20 +177,20 @@ export default function EventSubmit() {
       )}
 
       {/* 착용샷 */}
-      <div className="text-sm font-bold text-warm-800 mb-1 mt-5">
-        {t('eventSubmit.wearPhoto')} <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">{t('eventSubmit.required')}</span>
+      <div className="text-sm font-bold text-warm-800 dark:text-warm-200 mb-1 mt-5">
+        {t('eventSubmit.wearPhoto')} <span className="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-semibold">{t('eventSubmit.required')}</span>
       </div>
-      <div className="text-xs text-warm-500 mb-3">{t('eventSubmit.wearPhotoDesc')}</div>
+      <div className="text-xs text-warm-500 dark:text-warm-400 mb-3">{t('eventSubmit.wearPhotoDesc')}</div>
       <div className="flex gap-2 mb-5">
         {photos.map((p, i) => (
-          <div key={i} className="relative w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 border border-warm-300">
+          <div key={i} className="relative w-20 h-24 rounded-2xl overflow-hidden flex-shrink-0 border border-warm-300 dark:border-warm-600">
             <img src={p} className="w-full h-full object-cover" alt="" />
             <button onClick={() => setPhotos(prev => prev.filter((_, idx) => idx !== i))}
               className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 text-white text-[9px] flex items-center justify-center">✕</button>
           </div>
         ))}
         {photos.length < 2 && (
-          <label className="flex items-center justify-center gap-2 py-3 px-4 bg-warm-100 border border-warm-300 rounded-xl text-xs text-warm-600 cursor-pointer active:scale-95 transition-all">
+          <label className="flex items-center justify-center gap-2 py-3 px-4 bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-2xl text-xs text-warm-600 dark:text-warm-300 cursor-pointer active:scale-95 transition-all">
             <Camera size={16} /> {t('common.addPhoto')}
             <input type="file" accept="image/*" className="hidden" onChange={handlePhotoAdd} />
           </label>
@@ -198,38 +198,38 @@ export default function EventSubmit() {
       </div>
 
       {/* 스타일 */}
-      <div className="text-sm font-bold text-warm-800 mb-2">{t('eventSubmit.style')} <span className="text-[10px] font-normal text-warm-400">{t('eventSubmit.optional')}</span></div>
+      <div className="text-sm font-bold text-warm-800 dark:text-warm-200 mb-2">{t('eventSubmit.style')} <span className="text-[10px] font-normal text-warm-400 dark:text-warm-500">{t('eventSubmit.optional')}</span></div>
       <div className="flex flex-wrap gap-1.5 mb-5">
         {Object.entries(STYLE_GUIDE).map(([k, v]) => (
           <button key={k} onClick={() => setStyle(style === k ? null : k)}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${style === k ? 'bg-warm-800 text-white' : 'bg-warm-100 text-warm-600 active:scale-95'}`}>
+            className={`h-7 px-3 rounded-full text-[12px] font-semibold transition-all ${style === k ? 'bg-warm-900 text-white dark:bg-warm-100 dark:text-warm-900' : 'bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 active:scale-95'}`}>
             {t('styles:guide.' + k + '.name').replace(/ 룩$/, '').replace(/ Look$/, '')}
           </button>
         ))}
       </div>
 
       {/* 인스타그램 ID (필수) */}
-      <div className="text-sm font-bold text-warm-800 mb-1">{t('eventSubmit.instagramId')} <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-semibold">{t('eventSubmit.required')}</span></div>
-      <div className="text-xs text-warm-500 mb-2">{t('eventSubmit.instagramIdDesc')}</div>
+      <div className="text-sm font-bold text-warm-800 dark:text-warm-200 mb-1">{t('eventSubmit.instagramId')} <span className="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-semibold">{t('eventSubmit.required')}</span></div>
+      <div className="text-xs text-warm-500 dark:text-warm-400 mb-2">{t('eventSubmit.instagramIdDesc')}</div>
       <input
         type="text"
         value={instagramId}
         onChange={e => setInstagramId(e.target.value.replace(/[^a-zA-Z0-9._]/g, ''))}
         placeholder={t('eventSubmit.instagramPlaceholder')}
-        className="w-full px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-all mb-5"
+        className="w-full px-4 py-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-400 dark:placeholder-warm-500 focus:outline-none focus:border-terra-400 transition-all mb-5"
       />
 
       {/* CTA */}
       <button
         onClick={handleSubmit}
         disabled={!canSubmit || submitting}
-        className={`w-full py-3.5 ${canSubmit ? 'bg-terra-500 shadow-terra' : 'bg-warm-400'} text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50`}
+        className={`w-full py-3.5 ${canSubmit ? 'bg-terra-500 shadow-terra' : 'bg-warm-400 dark:bg-warm-600'} text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50`}
       >
         {submitting ? t('eventSubmit.submitting') : t('eventSubmit.submit')}
       </button>
 
       {!canSubmit && (
-        <div className="text-center text-[11px] text-warm-500 mt-2">
+        <div className="text-center text-[11px] text-warm-500 dark:text-warm-400 mt-2">
           {filledCount < 2 ? t('eventSubmit.needColors') : ''}{' '}
           {photos.length === 0 ? t('eventSubmit.needPhoto') : ''}{' '}
           {!instagramId.trim() ? t('eventSubmit.needInstagram') : ''}

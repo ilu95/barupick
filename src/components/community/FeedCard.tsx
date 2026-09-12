@@ -1,7 +1,8 @@
 import { memo } from 'react'
 import { Heart } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { COLORS_60 } from '@/lib/colors'
 import { STYLE_GUIDE } from '@/lib/styles'
 import type { CommunityPost } from '@/hooks/useCommunity'
@@ -62,25 +63,23 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
   const title = post.caption || post.title || ''
   const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' }) : ''
 
-  // outfit의 hex 변환 (마네킹용)
-  const outfitHex: Record<string, string> = {}
-  Object.entries(outfit).forEach(([k, v]) => {
-    if (v) outfitHex[k] = COLORS_60[v]?.hex || v
-  })
+  const scene = hasPhoto ? null : sceneFromColors(outfit)
 
   // 컬러 팔레트 도트
   const colorDots = Object.values(outfit).filter(Boolean).slice(0, 5)
 
   return (
     <div
-      className="bg-white rounded-[14px] border border-warm-400 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm"
+      className="bg-white dark:bg-warm-800 rounded-2xl border border-warm-300 dark:border-warm-600 overflow-hidden cursor-pointer active:scale-[0.97] transition-transform shadow-warm-sm"
       onClick={() => navigate(`/community/${post.id}`)}
       role="article"
       aria-label={t('community.feedCardLabel', { nick, title: title || '' })}
     >
-      {/* 이미지/마네킹 영역 */}
-      <div className="bg-warm-100 flex items-center justify-center" style={{ aspectRatio: '4/5' }}>
-        {hasPhoto ? (
+      {/* 사진 / 캐릭터 */}
+      <div className="bg-warm-100 dark:bg-warm-700 flex items-center justify-center" style={{ aspectRatio: '4/5' }}>
+        {scene ? (
+          <CharacterCanvas items={scene.items} body={scene.body} width={96} />
+        ) : (
           <img
             src={photoUrl!}
             loading="lazy"
@@ -90,21 +89,19 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
               (e.target as HTMLImageElement).style.display = 'none'
             }}
           />
-        ) : (
-          <MannequinSVG outfit={outfitHex} size={120} />
         )}
       </div>
 
       {/* 정보 */}
       <div className="px-2.5 pt-2 pb-2.5">
         {title && (
-          <div className="text-xs font-semibold text-warm-900 truncate mb-0.5">{title}</div>
+          <div className="text-xs font-semibold text-warm-900 dark:text-warm-100 truncate mb-0.5">{title}</div>
         )}
 
         {/* 스타일 태그 + 컬러 도트 */}
         <div className="flex items-center gap-1.5 mb-1">
           {styleName && (
-            <span className="text-[9px] font-medium text-warm-500 bg-warm-100 border border-warm-300 rounded px-1.5 py-0.5">
+            <span className="text-[9px] font-medium text-warm-600 dark:text-warm-300 bg-warm-100 dark:bg-warm-700 border border-warm-300 dark:border-warm-600 rounded-full px-1.5 py-0.5">
               {styleName}
             </span>
           )}
@@ -124,7 +121,7 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
 
         {/* 날짜 + 좋아요 */}
         <div className="flex justify-between items-center">
-          <span className="text-[10px] text-warm-600">{dateStr}</span>
+          <span className="text-[10px] text-warm-600 dark:text-warm-400">{dateStr}</span>
           <button
             onClick={(e) => {
               e.stopPropagation()
@@ -141,18 +138,18 @@ function FeedCardInner({ post, isLiked, onLike, showComments }: Props) {
               className={isLiked ? 'animate-like-bounce' : ''}
             />
             {!post.hide_counts && (
-              <span className={isLiked ? 'text-[#FF6B6B] font-semibold' : 'text-warm-500'}>
+              <span className={isLiked ? 'text-[#FF6B6B] font-semibold' : 'text-warm-500 dark:text-warm-400'}>
                 {post.likes_count || 0}
               </span>
             )}
             {showComments && post.comments_count > 0 && (
-              <span className="text-warm-400 ml-1">💬 {post.comments_count}</span>
+              <span className="text-warm-400 dark:text-warm-500 ml-1">💬 {post.comments_count}</span>
             )}
           </button>
         </div>
 
         {/* 유저 */}
-        <div className="text-[11px] text-warm-600 mt-1 flex items-center gap-1.5">
+        <div className="text-[11px] text-warm-600 dark:text-warm-400 mt-1 flex items-center gap-1.5">
           {avatar && (
             <img src={avatar} className="w-4 h-4 rounded-full object-cover" alt="" loading="lazy" />
           )}
