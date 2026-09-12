@@ -76,13 +76,13 @@ export default function UserDiscover() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && doSearch()}
-          className="w-full pl-10 pr-16 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-colors"
+          className="w-full pl-10 pr-16 py-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 dark:placeholder-warm-400 focus:outline-none focus:border-terra-400 transition-colors"
         />
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-600" />
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-600 dark:text-warm-300" />
         <button
           onClick={doSearch}
           disabled={searching}
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-terra-500 text-white text-[11px] font-semibold rounded-xl active:scale-95 transition-all"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-terra-500 text-white text-[11px] font-semibold rounded-full active:scale-95 transition-all"
         >
           {searching ? '...' : t('userDiscover.searchButton')}
         </button>
@@ -92,10 +92,10 @@ export default function UserDiscover() {
       {results !== null && (
         <div className="mb-5">
           {results.length === 0 ? (
-            <div className="text-center py-6 text-warm-400 text-sm">{t('userDiscover.noResults')}</div>
+            <div className="text-center py-6 text-warm-500 dark:text-warm-400 text-sm">{t('userDiscover.noResults')}</div>
           ) : (
             <>
-              <div className="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-2 px-1">
+              <div className="flex items-center gap-1.5 text-[10px] text-warm-500 dark:text-warm-400 uppercase tracking-wider font-semibold mb-2 px-1">
                 <Search size={12} /> {t('userDiscover.searchResults', { count: results.length })}
               </div>
               {results.map(u => (
@@ -110,12 +110,12 @@ export default function UserDiscover() {
       {results === null && (
         <div>
           {suggested === null ? (
-            <div className="text-center py-10 text-warm-400 text-sm">{t('common.loading')}</div>
+            <div className="text-center py-10 text-warm-500 dark:text-warm-400 text-sm">{t('common.loading')}</div>
           ) : suggested.length === 0 ? (
-            <div className="text-center py-10 text-warm-400 text-sm">{t('userDiscover.noUsers')}</div>
+            <div className="text-center py-10 text-warm-500 dark:text-warm-400 text-sm">{t('userDiscover.noUsers')}</div>
           ) : (
             <>
-              <div className="flex items-center gap-1.5 text-[10px] text-warm-500 uppercase tracking-wider font-semibold mb-3 px-1">
+              <div className="flex items-center gap-1.5 text-[10px] text-warm-500 dark:text-warm-400 uppercase tracking-wider font-semibold mb-3 px-1">
                 <Sparkles size={12} /> {t('userDiscover.suggestedUsers')}
               </div>
               {suggested.map(u => (
@@ -134,27 +134,27 @@ function UserRow({ user: u, isFollowing, isFriend: isMutual, onFollow, onProfile
 }) {
   const { t } = useTranslation()
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-warm-300">
+    <div className="flex items-center gap-3 py-3 border-b border-warm-300 dark:border-warm-600">
       <div onClick={onProfile} className="flex-shrink-0 cursor-pointer">
         {u.avatar_url ? (
-          <img src={u.avatar_url} className="w-11 h-11 rounded-full object-cover border border-warm-300" alt="" />
+          <img src={u.avatar_url} className="w-11 h-11 rounded-full object-cover border border-warm-300 dark:border-warm-600" alt="" />
         ) : (
-          <div className="w-11 h-11 rounded-full bg-terra-100 flex items-center justify-center border border-warm-300">
-            <User size={18} className="text-terra-600" />
+          <div className="w-11 h-11 rounded-full bg-terra-100 dark:bg-terra-900/40 flex items-center justify-center border border-warm-300 dark:border-warm-600">
+            <User size={18} className="text-terra-600 dark:text-terra-400" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onProfile}>
-        <div className="text-sm font-semibold text-warm-900 truncate">@{u.nickname || t('common.user')}</div>
-        {u.instagram_id && <div className="text-[11px] text-warm-500">📸 {u.instagram_id}</div>}
-        {isMutual && <div className="text-[10px] text-green-600 font-medium">{t('common.mutualFriend')}</div>}
+        <div className="text-sm font-semibold text-warm-900 dark:text-warm-100 truncate">@{u.nickname || t('common.user')}</div>
+        {u.instagram_id && <div className="text-[11px] text-warm-500 dark:text-warm-400">📸 {u.instagram_id}</div>}
+        {isMutual && <div className="text-[10px] text-green-600 dark:text-green-400 font-medium">{t('common.mutualFriend')}</div>}
       </div>
       {!isMe && (
         <button
           onClick={(e) => { e.stopPropagation(); onFollow() }}
           className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold active:scale-95 transition-all flex-shrink-0 ${
-            isMutual ? 'bg-green-100 text-green-700 border border-green-300'
-            : isFollowing ? 'bg-warm-200 text-warm-700 border border-warm-400'
+            isMutual ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
+            : isFollowing ? 'bg-warm-100 dark:bg-warm-700 text-warm-700 dark:text-warm-200 border border-warm-300 dark:border-warm-600'
             : 'bg-terra-500 text-white shadow-terra'
           }`}
         >

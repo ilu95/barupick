@@ -100,7 +100,7 @@ export default function WardrobeReport() {
               <span className="font-display text-sm font-bold text-warm-700 dark:text-warm-300">{progress}%</span>
             </div>
           </div>
-          <div className="text-sm text-warm-500">{t('wardrobeReport.analyzingCloset')}</div>
+          <div className="text-sm text-warm-500 dark:text-warm-400">{t('wardrobeReport.analyzingCloset')}</div>
         </div>
       </div>
     )
@@ -136,7 +136,7 @@ export default function WardrobeReport() {
               const catLabel = t('categories:names.' + stat.item.category)
               const pct = totalCombos > 0 ? Math.round((stat.inCombos / totalCombos) * 100) : 0
               return (
-                <div key={stat.item.id} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-3.5 shadow-warm-sm">
+                <div key={stat.item.id} className="flex items-center gap-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3.5 shadow-warm-sm">
                   <span className="text-sm font-bold text-warm-500 dark:text-warm-400 w-5 text-center">{idx + 1}</span>
                   <div className="w-9 h-9 rounded-lg border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
                   <div className="flex-1">
@@ -184,7 +184,7 @@ export default function WardrobeReport() {
       {/* ─── 옷장 컬러 밸런스 ─── */}
       <div className="mb-6">
         <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('wardrobeReport.colorBalance')}</div>
-        <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 shadow-warm-sm">
+        <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-4 shadow-warm-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-lg">{colorBalance.bias === 'warm' ? '🔥' : colorBalance.bias === 'cool' ? '❄️' : '⚖️'}</span>
             <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">
@@ -224,7 +224,7 @@ export default function WardrobeReport() {
         <button onClick={() => navigate('/closet/combos')} className="w-full py-3 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra">
           <Shirt size={16} /> {t('wardrobeReport.viewAllCombos')}
         </button>
-        <button onClick={() => navigate('/closet/simulate')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl font-medium text-sm text-warm-700 dark:text-warm-300 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+        <button onClick={() => navigate('/closet/simulate')} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl font-medium text-sm text-warm-700 dark:text-warm-300 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
           <ShoppingBag size={16} /> {t('wardrobeReport.checkPurchase')}
         </button>
       </div>

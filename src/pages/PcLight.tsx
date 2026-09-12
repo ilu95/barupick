@@ -152,33 +152,33 @@ export default function PcLight() {
     return (
       <div className="animate-screen-fade px-5 pt-2 pb-10">
         <div className="text-center py-6">
-          <div className="w-20 h-20 rounded-full bg-terra-100 flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 rounded-full bg-terra-100 dark:bg-terra-900/40 flex items-center justify-center mx-auto mb-4">
             <Sparkles size={32} className="text-terra-500" />
           </div>
           <h2 className="font-display text-2xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-2">{pc?.name || result}</h2>
           <p className="text-sm text-warm-600 dark:text-warm-400 leading-relaxed px-4">{pc?.description || ''}</p>
         </div>
         {bestColors.length > 0 && (
-          <div className="mb-6">
+          <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl shadow-warm-sm p-4 mb-4">
             <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-3">{t('pcLight.bestColors')}</div>
             <div className="flex flex-wrap gap-2 justify-center">
-              {bestColors.map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30" style={{ background: c.hex }} /><span className="text-[10px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span></div> : null })}
+              {bestColors.map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-2xl border border-warm-300 dark:border-warm-600" style={{ background: c.hex }} /><span className="text-[10px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span></div> : null })}
             </div>
           </div>
         )}
         {pc?.worstColors && (
-          <div className="mb-6">
+          <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl shadow-warm-sm p-4 mb-5">
             <div className="text-xs font-semibold text-red-500 dark:text-red-400 tracking-widest uppercase mb-3">{t('pcLight.worstColors')}</div>
             <div className="flex flex-wrap gap-2 justify-center">
-              {pc.worstColors.slice(0, 6).map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-xl border border-warm-400/30 relative" style={{ background: c.hex }}><span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold drop-shadow">✕</span></div><span className="text-[10px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span></div> : null })}
+              {pc.worstColors.slice(0, 6).map(ck => { const c = COLORS_60[ck]; return c ? <div key={ck} className="flex flex-col items-center gap-1"><div className="w-12 h-12 rounded-2xl border border-warm-300 dark:border-warm-600 relative" style={{ background: c.hex }}><span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold drop-shadow">✕</span></div><span className="text-[10px] text-warm-600 dark:text-warm-400">{getColorName(ck)}</span></div> : null })}
             </div>
           </div>
         )}
         <div className="flex flex-col gap-2.5">
           <button onClick={() => { profile.setPersonalColor(result); navigate('/profile/personal-color', { replace: true }) }} className="w-full py-3.5 bg-terra-500 text-white rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-terra"><Check size={18} /> {t('pcLight.applyResult')}</button>
-          <button onClick={startOver} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">{t('common.retry')}</button>
+          <button onClick={startOver} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-200 rounded-2xl font-medium text-sm active:scale-[0.98] transition-all">{t('common.retry')}</button>
         </div>
-        <div className="text-center text-[11px] text-warm-500 mt-4 leading-relaxed">{t('pcLight.disclaimer')}</div>
+        <div className="text-center text-[11px] text-warm-500 dark:text-warm-400 mt-4 leading-relaxed">{t('pcLight.disclaimer')}</div>
       </div>
     )
   }
@@ -210,7 +210,7 @@ export default function PcLight() {
             <button onClick={() => { setMode('step'); handleAnswer(step.rightValue) }} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold text-white active:scale-[0.97] transition-all" style={{ background: step.rightColor + '99' }}>{t('pcLight.selectB', { desc: step.rightDesc })}</button>
           </div>
           {isUndertone && (
-            <button onClick={() => { setMode('step'); handleAnswer('similar') }} className="w-full py-2.5 rounded-xl text-xs font-medium text-white/60 border border-white/20 active:scale-[0.98] transition-all">{t('pcLight.similar')}</button>
+            <button onClick={() => { setMode('step'); handleAnswer('similar') }} className="w-full py-2.5 rounded-full text-xs font-medium text-white/60 border border-white/20 active:scale-[0.98] transition-all">{t('pcLight.similar')}</button>
           )}
           <button onClick={() => setMode('step')} className="w-full text-center text-xs text-white/40 mt-2 py-1 active:opacity-70">← {t('common.goBack')}</button>
         </div>
@@ -236,14 +236,14 @@ export default function PcLight() {
         <div className="text-lg font-bold mb-4">{t('pcLight.stepProgress', { current: step.stepNum, total: 7 })}</div>
 
         {/* 미리보기 — 3등분 */}
-        <div className="flex h-16 rounded-xl overflow-hidden mb-4">
+        <div className="flex h-16 rounded-2xl overflow-hidden mb-4">
           <div className="flex-[2] flex items-center justify-center" style={{ background: step.leftColor }}><span className="text-white/70 font-bold text-xl">A</span></div>
           <div className="flex-1 bg-black flex items-center justify-center"><span className="text-white/20 text-[10px]">◀ ▶</span></div>
           <div className="flex-[2] flex items-center justify-center" style={{ background: step.rightColor }}><span className="text-white/70 font-bold text-xl">B</span></div>
         </div>
 
         <div className="text-[15px] font-semibold leading-relaxed whitespace-pre-line mb-3">{step.instruction}</div>
-        <div className="text-xs text-white/40 bg-white/5 rounded-xl px-4 py-2.5 mb-3">{step.tip}</div>
+        <div className="text-xs text-white/40 bg-white/5 rounded-2xl px-4 py-2.5 mb-3">{step.tip}</div>
 
         <div className="flex justify-between text-xs text-white/50 mb-5">
           <span>{step.leftDesc}</span>
@@ -283,20 +283,20 @@ export default function PcLight() {
       </div>
 
       <div className="text-sm font-semibold mb-2">{t('pcLight.screenLayout')}</div>
-      <div className="flex h-14 rounded-xl overflow-hidden mb-2">
+      <div className="flex h-14 rounded-2xl overflow-hidden mb-2">
         <div className="flex-[2] flex items-center justify-center" style={{ background: '#FFA898' }}><span className="text-white/70 font-bold">A</span></div>
         <div className="flex-1 bg-black flex items-center justify-center"><span className="text-white/20 text-[10px]">◀ ▶</span></div>
         <div className="flex-[2] flex items-center justify-center" style={{ background: '#F8A0C0' }}><span className="text-white/70 font-bold">B</span></div>
       </div>
       <div className="text-[11px] text-white/30 text-center mb-5">{t('pcLight.screenLayoutDesc')}</div>
 
-      <div className="bg-white/5 rounded-xl px-4 py-3 mb-4 text-xs text-white/50 leading-relaxed">
+      <div className="bg-white/5 rounded-2xl px-4 py-3 mb-4 text-xs text-white/50 leading-relaxed">
         <div className="font-semibold text-white/70 mb-1">{t('pcLight.rememberTitle')}</div>
         <span className="text-green-400">{t('pcLight.matchingTone')}</span> {t('pcLight.matchingToneDesc')}<br />
         <span className="text-red-400">{t('pcLight.wrongTone')}</span> {t('pcLight.wrongToneDesc')}
       </div>
 
-      <div className="bg-white/5 rounded-xl px-4 py-3 mb-6 text-xs text-white/50 leading-relaxed">
+      <div className="bg-white/5 rounded-2xl px-4 py-3 mb-6 text-xs text-white/50 leading-relaxed">
         <div className="font-semibold text-white/70 mb-1">{t('pcLight.beforeStartTitle')}</div>
         {t('pcLight.beforeStart1')}<br />
         {t('pcLight.beforeStart2')}<br />
