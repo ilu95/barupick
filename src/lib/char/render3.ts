@@ -63,12 +63,24 @@ async function first(paths) {
 const hex2rgb = (s) => [1, 3, 5].map((i) => parseInt(s.substr(i, 2), 16));
 const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
 
+/* **천은 새틴이 아니다.** 판의 하이라이트를 그대로 태우면 밝은 쪽이 '같은 색의
+   밝은 버전' 이 아니라 형광 파스텔로 떠서 광택처럼 보인다 (대표님 2026-09-12:
+   스칼렛 가디건의 어깨·소매가 밝은 핑크로 떠 새틴 같다). 세 곳을 줄인다.
+     lift — 하이라이트 색을 얼마나 밝게 (0.42 → 0.20)
+     sat  — 그때 채도를 얼마나 (0.88 → 0.70). 밝아질수록 채도는 빠지는 게 천이다
+     gain — 판에서 가장 밝은 곳이 하이라이트 색까지 몇 %나 갈지 (1.0 → 0.55).
+            상한을 판마다 히스토그램으로 잡으므로(hi), 이게 없으면 하이라이트가
+            약하게 그려진 판도 진하게 그려진 판과 똑같은 세기로 번들거린다. */
+const SHEEN = { lift: 0.20, sat: 0.70, gain: 0.55 };
+// ponytail: 재질 구분 없이 한 값이다. 패딩·가죽·새틴을 나누려면 catalog3 에 재질
+// 플래그를 두고 판별로 SHEEN 을 고르면 된다 — 판이 재질을 말해 주기 전엔 이르다.
+
 /* 하이라이트를 '흰색'이 아니라 '같은 색의 밝은 버전'으로 잡는다. */
-function highlightOf([r, g, b]) {
+function highlightOf([r, g, b], lift, sat) {
   const mx = Math.max(r, g, b) / 255, mn = Math.min(r, g, b) / 255;
   const l = (mx + mn) / 2, d = mx - mn;
   const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
-  const l2 = l + (1 - l) * 0.42, s2 = s * 0.88;
+  const l2 = l + (1 - l) * lift, s2 = s * sat;
   let h = 0;
   if (d !== 0) {
     const R = r / 255, G = g / 255, B = b / 255;
@@ -101,7 +113,7 @@ function tint(im, path, hexColor, ref) {
   const img = ctx.getImageData(0, 0, W, H);
   const d = img.data;
   const base = hex2rgb(hexColor);
-  const high = highlightOf(base);
+  const high = highlightOf(base, SHEEN.lift, SHEEN.sat);
   const mid = lum(ref[0], ref[1], ref[2]);
 
   const hist = new Uint32Array(256); let n = 0;
@@ -118,10 +130,13 @@ function tint(im, path, hexColor, ref) {
     if (d[i + 3] <= 40) continue;
     const L = lum(d[i], d[i + 1], d[i + 2]);
     if (L <= mid) {
-      const k = L / mid;                       // 어두운 쪽은 곱셈 — 먹선이 산다
+      /* 어두운 쪽도 곱셈이지만 바닥을 둔다 — 그냥 L/mid 면 그늘이 검게 뭉쳐
+         옷이 번들거리는 만큼 반대쪽이 죽는다. 먹선은 이 계산이 아니라 알파로
+         산다(판의 테두리는 투명 배경 위의 검정이라 옷 색에 섞이지 않는다). */
+      const k = 0.35 + 0.65 * (L / mid);
       d[i] = base[0] * k; d[i + 1] = base[1] * k; d[i + 2] = base[2] * k;
     } else {
-      const u = Math.min(1, (L - mid) / (hi - mid));
+      const u = Math.min(1, (L - mid) / (hi - mid)) * SHEEN.gain;
       d[i] = base[0] + (high[0] - base[0]) * u;
       d[i + 1] = base[1] + (high[1] - base[1]) * u;
       d[i + 2] = base[2] + (high[2] - base[2]) * u;
