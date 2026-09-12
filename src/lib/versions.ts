@@ -7,7 +7,7 @@
 // ================================================================
 
 /** 색 점수 엔진. v7.1 = lib/engine.ts (CIELCh · 면적 모델 · 연속 램프). 모든 화면이 쓴다(2026-09-09). */
-export const ENGINE_VERSION = 'v8'   // v7.3 + 실무 규칙 층(패션 무채 가중치 · 톤/온도 · 명도 구조 예외)
+export const ENGINE_VERSION = 'v8.5'   // v8 + 실제 룩 495벌로 조인 규칙 조건(A~J2). 눈금은 그대로
 
 /** 팔레트 hex 판. 1 = 웹 기본색 hex. 2 = 의류색 보정 hex(50색). */
 export const PALETTE_VERSION = 2
