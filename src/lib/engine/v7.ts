@@ -1,6 +1,11 @@
 // @ts-nocheck
 // 원본: 바루픽 설계 스크래치 charlab/v7.js (2026-09-08). 검증: refset 50벌 · sim7.mjs. 고칠 때는 원본과 함께.
-/* 바루픽 컬러 점수 엔진 v7.1 — 시제품 (2차: 모든 판정을 연속 가중치로)
+/* 바루픽 컬러 점수 엔진 v8.5b — v8 + 레퍼런스 학습 수정 A~J2 (규칙은 그대로, 조건만 좁힘)
+ * 실제 룩 495벌 학습 결과. FIX 스위치를 하나씩 꺼서 어느 수정이 어떤 결과를 냈는지 가른다.
+ * 근거·측정: 바루픽_레퍼런스_학습_1단계.md, 컬러조합_연구/learn/21_v85b_output.md
+ *
+ * (아래는 v7.1 원문 주석)
+ * 바루픽 컬러 점수 엔진 v7.1 — 시제품 (2차: 모든 판정을 연속 가중치로)
  *
  * 근거: 바루픽_컬러_추천_과정_설계_연구.md 3.1/3.2/7장, sajucolor/engine.js 에서 가져온 것
  *   (개인 대비 수준, 명도 구조 배율, 강한 색 면적 규칙, 이름 목록 대신 HCL 영역),
@@ -34,6 +39,15 @@ const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const NEUTRAL_C = 14, SOFT_C = 30;
 const warmHue = h => h < 105 || h > 320;
 const earthHue = h => h >= 40 && h <= 110;
+
+/* ── 8단계 수정 스위치 (하나씩 꺼 보며 원인을 가른다) ────────── */
+export const FIX = { A: true, A2: true, B: true, C: true, D: true, D2: false, E: true, F: true, G: true, H: true, I: true, J1: true, J2: true };
+/* A. 데님을 판 id 가 아니라 색으로 본다 — h 200~290 · C 20~40 · L 35~65 */
+/* A2. 틸(h 202)·다크틸(199)까지 데님으로 삼키지 않게 색상각 바닥을 200→230 으로.
+   데님 계열 네 색(denim 276 · dusty_blue 265 · steel_blue 263 · powder_blue 235)은 그대로 들어온다 */
+const denimW = c => band(c.h, FIX.A2 ? 225 : 195, FIX.A2 ? 235 : 205, 285, 295) * band(c.C, 16, 22, 38, 46) * band(c.L, 30, 36, 64, 70);
+/* I. 브라운·코냑·마룬·옥스블러드 신발(어스·와인 색상각, 어두움)은 무채로 센다 */
+const shoeBrownW = c => band(c.h, 3, 10, 104, 112) * (1 - ramp(c.L, 48, 58)) * (1 - ramp(c.C, 50, 58));
 
 /* ── 면적 모델 (렌더러 실측, 몸 면적 대비) ────────── */
 const AREA = {
@@ -105,6 +119,7 @@ function fashionNeutral(c, id) {
   let w = 1 - ramp(c.C, 12, 20);
   if (c.h >= 250 && c.h <= 310) w = Math.max(w, 1 - ramp(c.L, 28, 36));                       // 네이비
   if (/denim|trucker/.test(id || '') && c.h > 220 && c.h < 310) w = Math.max(w, 1 - ramp(c.C, 40, 50));
+  if (FIX.A) w = Math.max(w, denimW(c));                                                      // A. 색으로 본 데님
   const e = earthW(c.h, c.L);
   if (e > 0) { const dark = 1 - ramp(c.L, 44, 52), light = ramp(c.L, 56, 64); w = Math.max(w, e * Math.max(dark * (1 - ramp(c.C, 42, 50)), light * (1 - ramp(c.C, 32, 40)))); }
   return w;
@@ -115,7 +130,10 @@ function vivid(p) {                   /* 0 차분 … 1 쨍함. 어두우면 덜
   return ramp(p.c.C, c0, c0 + 22) * ramp(p.c.L, 26, 44) * (isDenim(p) ? .3 : 1);
 }
 /* 톤 등급 — 톤 일치(R1 계열)가 쓴다. vivid 와 달리 어스 문턱이 없고 채도만 본다 */
-const toneVivid = c => ramp(c.C, 40, 50) * ramp(c.L, 30, 40);
+/* D. 어스 색상각은 vivid() 처럼 문턱을 높인다 — 카멜·머스타드는 채도가 높아도 덜 쨍하게 보인다 */
+/* D'. 어스 문턱은 색상각 45~110 에만 — 붉은 주황(20~45, 코랄·스칼렛)은 보통 문턱 그대로 */
+/* D2. 어스 문턱은 밝은 어스(L≥62: 머스타드·카멜·샌드·오트밀)에만 — 깊은 카라멜(L57)·러스트(44)는 그냥 쨍한 색이다 */
+const toneVivid = c => { const c0 = (FIX.D && c.h >= 45 && c.h <= 110 && (!FIX.D2 || c.L >= 62)) ? 58 : 40; return ramp(c.C, c0, c0 + 10) * ramp(c.L, 30, 40); };
 const tonePastel = c => ramp(c.L, 74, 82);
 const toneDeep = c => 1 - ramp(c.L, 30, 40);
 
@@ -127,7 +145,7 @@ function evaluate(items, ctx) {
   const season = SEASON_OF(ctx.month || (new Date().getMonth() + 1));
   const vis = visibleAreas(items);
   const P = items.filter(i => vis[i.slot] > .015).map(i => ({ ...i, c: lch(i.hex), area: vis[i.slot], ko: i.name || SLOT_KO[i.slot] || i.slot }));
-  P.forEach(p => { p.fn = fashionNeutral(p.c, p.id); p.wc = 1 - p.fn; p.vv = vivid(p); p.viv = toneVivid(p.c); p.pas = tonePastel(p.c); p.deep = toneDeep(p.c); p.kind = p.wc < .15 ? 'neutral' : p.wc < .75 ? 'soft' : 'chroma'; });
+  P.forEach(p => { p.fn = fashionNeutral(p.c, p.id); if (FIX.I && p.slot === 'shoes') p.fn = Math.max(p.fn, shoeBrownW(p.c)); p.wc = 1 - p.fn; p.vv = vivid(p); p.viv = toneVivid(p.c); p.pas = tonePastel(p.c); p.deep = toneDeep(p.c); p.kind = p.wc < .15 ? 'neutral' : p.wc < .75 ? 'soft' : 'chroma'; });
   const by = s => P.find(p => p.slot === s);
   const reasons = [], parts = {};
   const add = (id, txt, w, slots) => reasons.push({ id, txt, w, slots: slots || [] });
@@ -162,21 +180,42 @@ function evaluate(items, ctx) {
     const brk = brkP ? brkOf(brkP) : 0;
     if (oneTone) fit = Math.max(fit, .45 + .55 * ramp(breakers.reduce((m, p) => Math.max(m, Math.abs(p.c.L - upperMain.c.L)), 0), 18, 45));
     const hueCarry = ramp(Math.max(upperMain.c.C, bot.c.C), 30, 45) * ramp(dH(upperMain.c.h, bot.c.h), 40, 70) * (1 - brk);
-    const lightTonal = ramp(Math.min(upperMain.c.L, bot.c.L), 66, 74) * Math.max(ramp(Math.max(upperMain.c.C, bot.c.C), 10, 16), ramp(Math.min(upperMain.c.L, bot.c.L), 78, 84)) * (1 - brk);
-    const bw = upperMain.c.C <= NEUTRAL_C && bot.c.C <= NEUTRAL_C && Math.abs(upperMain.c.L - bot.c.L) > 80 ? 1 : 0;
-    fit = recover(fit, .9, brk); fit = recover(fit, .8, hueCarry); fit = recover(fit, .9, lightTonal); fit = recover(fit, .8, bw);
+    const lightTonal = ramp(Math.min(upperMain.c.L, bot.c.L), FIX.C ? 58 : 66, FIX.C ? 66 : 74) * Math.max(ramp(Math.max(upperMain.c.C, bot.c.C), 10, 16), ramp(Math.min(upperMain.c.L, bot.c.L), 78, 84)) * (1 - brk);
+    /* H. 크림·오프화이트도 무채다 — 계산 채도가 아니라 패션 무채로 본다 */
+    const bwNeutral = FIX.H ? (upperMain.fn >= .5 && bot.fn >= .5) : (upperMain.c.C <= NEUTRAL_C && bot.c.C <= NEUTRAL_C);
+    const bw = bwNeutral && Math.abs(upperMain.c.L - bot.c.L) > 80 ? 1 : 0;
+    /* J2. outer/top/bottom 이 전부 같은 색이고 갈라 주는 자리가 없으면 어떤 구제도 걸지 않는다(카멜 4벌 원톤은 낮아야 한다).
+       v7 원래의 원톤 바닥(fit .45)은 남긴다 — 그것까지 없애면 카멜 4벌이 v8 값(51)보다 한참 아래로 떨어진다 */
+    const bigThree = ['outer', 'top', 'bottom'].map(s => by(s)).filter(Boolean);
+    const j2 = FIX.J2 && bigThree.length >= 2 && bigThree.every(p => p.hex === bigThree[0].hex) && brk < .35;
+    const gk = j2 ? 0 : 1;
+    /* J1. 어두운 톤온톤 구제 — 위아래 둘 다 L<40 이고 같은 가족(또는 둘 다 패션 무채)인데
+       밝은 자리(이너·신발·양말 중 L≥70, 면적 3.5% 이상)가 갈라 주면 모자란 만큼의 70% 를 되돌린다.
+       밝은 자리가 없으면 구제 없음 — 어둡기만 한 뭉개짐과 갈라 준 다크 톤온톤을 가르는 건 그 자리다 */
+    const brightSlot = P.some(p => ['inner', 'shoes', 'socks'].includes(p.slot) && p.c.L >= 70 && p.area >= .035);
+    const darkTonal = (FIX.J1 && upperMain.c.L < 40 && bot.c.L < 40
+      && (dH(upperMain.c.h, bot.c.h) < 30 || (upperMain.fn >= .5 && bot.fn >= .5)) && brightSlot) ? 1 : 0;
+    fit = recover(fit, .9, brk * gk); fit = recover(fit, .8, hueCarry * gk); fit = recover(fit, .9, lightTonal * gk); fit = recover(fit, .8, bw * gk);
+    fit = recover(fit, .7, darkTonal * gk);
+    /* E. 위아래+신발이 전부 블랙이면 감점 절반 — 올블랙은 실무에서 정상이다 */
+    const shE = by('shoes');
+    /* E'. "올블랙"은 채도도 본다 — 네이비(C 18)·미드나잇(C 20)은 어두워도 블랙이 아니다 */
+    const isK = p => p && p.c.L < 18 && p.c.C <= NEUTRAL_C;
+    const allBlack = FIX.E && isK(upperMain) && isK(bot) && isK(shE);
+    if (allBlack) fit = fit + (1 - fit) * .5;
     if (brk > .35) add('tonal-breaker', `위아래는 비슷해도 ${nmG(brkP)} 밝기를 갈라 줘요`, 1, [brkP.slot, 'top', 'bottom']);
     else if (oneTone) add('onetone-flat', '위아래가 한 색인데 나눠 줄 밝은 곳이 없어요. 이너나 신발로 대비를 줘 보세요', -1, ['top', 'shoes', 'inner']);
     else if (dL < TARGET[1] * .6) {
       if (hueCarry > .35) add('hue-carries', `${nmW(upperMain)} ${nmN(bot)} 밝기는 비슷해도 색 계열이 달라 구분돼요`, 1, ['top', 'bottom']);
       else if (lightTonal > .35) add('light-tonal', '밝은 색끼리 톤을 맞춘 룩이에요', 1, ['top', 'bottom']);
+      else if (darkTonal > .35) add('dark-tonal', '어두운 색끼리 톤을 맞추고 밝은 곳으로 갈라 줬어요', 1, ['top', 'bottom']);
       else add('dL-low', '위아래 밝기가 비슷해서 뭉개져 보여요', -2, ['top', 'bottom', 'outer']);
     }
     else if (dL > TARGET[3]) { if (bw) add('bw-contrast', `${nm(upperMain)}와 ${nm(bot)}의 흑백 대비는 정석이에요`, 1, ['top', 'bottom']); else add('dL-high', '위아래 밝기 차이가 너무 커서 끊겨 보여요. 중간 밝기 옷을 하나 넣어 보세요', -1, ['top', 'bottom']); }
     else if (fit > .8) add('dL-ok', '위아래 밝기가 또렷하게 나뉘어요', 1, ['top', 'bottom']);
     mScore += 22 * fit;
     const o = by('outer'), t = by('top') || by('layer');
-    if (o && t) { const d2 = Math.abs(o.c.L - t.c.L); mScore += 5 * ramp(d2, 6, 22); if (d2 < 8) add('outer-inner', `${nm(o)}와 ${nm(t)} 밝기가 비슷해서 겹쳐 입은 게 안 보여요`, -1, ['outer', 'top']); }
+    if (o && t) { const d2 = Math.abs(o.c.L - t.c.L); const oi = ramp(d2, 6, 22); mScore += 5 * (allBlack ? .5 + .5 * oi : oi); if (d2 < 8) add('outer-inner', `${nm(o)}와 ${nm(t)} 밝기가 비슷해서 겹쳐 입은 게 안 보여요`, -1, ['outer', 'top']); }
     else mScore += 5;
     const wantLightBottom = ctx.body && ctx.body.bottom === 'light';
     mScore += 3 * (wantLightBottom ? ramp(bot.c.L - upperL, -8, 4) : ramp(upperL - bot.c.L, -8, 4));
@@ -192,10 +231,15 @@ function evaluate(items, ctx) {
   let cScore = n < 1 ? 16 + 4 * n : n <= 2 ? 20 - 2 * (n - 1) : n <= 3 ? 18 - 7 * (n - 2) : Math.max(3, 11 - 7 * (n - 3));
   if (n >= 2.6) add('too-many', `색이 ${Math.round(n)}가지라 많아요. 하나는 무채색으로 바꿔 보세요`, -2, P.filter(p => p.wc >= .5).map(p => p.slot));
   if (n < .3) add('all-neutral', '전부 무채색이라 안전하지만 심심해요. 작은 포인트 색을 하나 더해 보세요', 0, ['scarf', 'shoes', 'top']);
+  /* G·G'. 유채가 한 가족뿐이고 나머지가 무채면 "주인공 하나" 룩이다 — 넓이 감점을 반으로.
+     아이템 개수가 아니라 색 가족(색상각 20° 안)으로 센다: 레드 코트 + 레드 모자는 하나다 */
+  const heroFams = [];
+  P.filter(p => p.fn < .5 && p.area >= .03).forEach(p => { if (!heroFams.some(h => dH(h, p.c.h) < 20)) heroFams.push(p.c.h); });
+  const heroK = FIX.G && heroFams.length === 1 ? .5 : 1;
   const strongArea = P.reduce((s, p) => s + p.area * p.vv, 0);
-  if (strongArea > situ.accentMax) { const pen = Math.min(16, (strongArea - situ.accentMax) * 45 * situ.strict); cScore -= pen; add('accent-big', `강한 색이 전체의 ${Math.round(strongArea * 100)}%나 돼요. 포인트는 작을수록 살아요`, -2, P.filter(p => p.vv > .4).map(p => p.slot)); }
+  if (strongArea > situ.accentMax) { const pen = Math.min(16, (strongArea - situ.accentMax) * 45 * situ.strict) * heroK; cScore -= pen; add('accent-big', `강한 색이 전체의 ${Math.round(strongArea * 100)}%나 돼요. 포인트는 작을수록 살아요`, -2, P.filter(p => p.vv > .4).map(p => p.slot)); }
   const anchor = P.reduce((a, b) => (a.area >= b.area ? a : b), P[0]);
-  if (anchor && anchor.vv > .25) { cScore -= 8 * anchor.vv; add('anchor', `제일 넓은 ${nm(anchor)}가 너무 쨍해요. 넓은 자리는 차분한 색이 편해요`, -2, [anchor.slot]); }
+  if (anchor && anchor.vv > .25) { cScore -= 8 * anchor.vv * heroK; add('anchor', `제일 넓은 ${nm(anchor)}가 너무 쨍해요. 넓은 자리는 차분한 색이 편해요`, -2, [anchor.slot]); }
   const chromItems = P.filter(p => p.wc > .5 && p.area >= .05);
   if (chromItems.length >= 3 && !P.some(p => p.wc < .3 && p.area >= .05)) { const vAvg = chromItems.reduce((s, p) => s + p.vv, 0) / chromItems.length; const pen = 6 + 6 * vAvg; cScore -= pen; add('no-neutral', '무채색이 한 벌도 없어요. 눈이 쉬어 갈 색이 하나는 필요해요', -1, chromItems.map(p => p.slot)); }
   parts['색 수·면적'] = [Math.round(clamp(cScore, 0, 20)), 20];
@@ -204,6 +248,8 @@ function evaluate(items, ctx) {
   let hScore = 25;
   /* 점수는 연속으로 깎고, 문구는 눈에 띌 만큼(1.5점) 깎였을 때만 남긴다 */
   const rule = (id, txt, d, slots) => { if (!(d > 0)) return; hScore -= d; if (d >= 1.5) add(id, txt, -1, slots || []); };
+  /* F. 밝은 자리가 있으면 그레이×브라운은 문제가 아니다 */
+  const brightSomewhere = P.some(p => p.c.L >= 70 && p.area >= .035);
   const ADJ = [['outer', 'top'], ['outer', 'layer'], ['layer', 'top'], ['top', 'bottom'], ['layer', 'bottom'], ['outer', 'bottom'], ['bottom', 'shoes'], ['top', 'scarf'], ['outer', 'scarf'], ['top', 'tie']];
   const nextTo = (a, b) => ADJ.some(([x, y]) => (a.slot === x && b.slot === y) || (a.slot === y && b.slot === x));
   for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
@@ -222,10 +268,13 @@ function evaluate(items, ctx) {
     if (a.wc > .05 && b.wc > .05 && a.area >= .03 && b.area >= .03) {
       const cw = a.wc * b.wc, far = ramp(dh, 30, 50);
       const vivMis = Math.max(a.viv * (1 - b.viv), b.viv * (1 - a.viv));
-      rule('tone-mismatch', `${nmW(a)} ${nmN(b)} 하나는 쨍하고 하나는 가라앉은 색이라 톤이 안 맞아요`, 15 * cw * far * vivMis, [a.slot, b.slot]);
-      rule('tone-soft', `${nmW(a)} ${nmN(b)} 연한 톤과 깊은 톤이라 서로 어긋나요`, 6 * cw * far * (1 - vivMis) * (a.pas * b.deep + b.pas * a.deep), [a.slot, b.slot]);
+      /* C. 둘 다 뮤트거나 둘 다 파스텔이면 톤인톤이다 — 톤·온도 규칙을 걸지 않는다 */
+      const muted = p => p.c.C <= 32 && p.c.L >= 35 && p.c.L <= 78;   // C'. viv 가 아니라 계산 채도 — 코랄(47)·카라멜(45)은 뮤트가 아니다
+      const tonal = (FIX.C && ((muted(a) && muted(b)) || (a.c.L >= 78 && b.c.L >= 78))) ? 0 : 1;
+      rule('tone-mismatch', `${nmW(a)} ${nmN(b)} 하나는 쨍하고 하나는 가라앉은 색이라 톤이 안 맞아요`, 15 * cw * far * vivMis * tonal, [a.slot, b.slot]);
+      rule('tone-soft', `${nmW(a)} ${nmN(b)} 연한 톤과 깊은 톤이라 서로 어긋나요`, 6 * cw * far * (1 - vivMis) * (a.pas * b.deep + b.pas * a.deep) * tonal, [a.slot, b.slot]);
       rule('tone-same-fam', `${nmW(a)} ${nmN(b)} 같은 계열인데 하나만 쨍해서 어긋나요`, 8 * cw * (1 - far) * (a.viv * b.pas + b.viv * a.pas), [a.slot, b.slot]);
-      if (warmHue(a.c.h) !== warmHue(b.c.h)) rule('temp', `${nmW(a)} ${nmN(b)} 따뜻한 색과 차가운 색이라 어긋나요. 하나를 무채색으로 바꿔 보세요`, 10 * cw * ramp(dh, 60, 90), [a.slot, b.slot]);
+      if (warmHue(a.c.h) !== warmHue(b.c.h)) rule('temp', `${nmW(a)} ${nmN(b)} 따뜻한 색과 차가운 색이라 어긋나요. 하나를 무채색으로 바꿔 보세요`, 10 * cw * ramp(dh, 60, 90) * tonal, [a.slot, b.slot]);
     }
     /* 브라운 × 그레이: 온도가 반대라 서로를 탁하게 한다. 밝기까지 비슷하면 더 나쁘다 */
     if (bigPair) {
@@ -233,20 +282,23 @@ function evaluate(items, ctx) {
         ? earthW(r.c.h, r.c.L) * ramp(r.c.C, 12, 20) * (1 - ramp(r.c.C, 40, 48)) * ramp(r.c.L, 26, 34) * (1 - ramp(r.c.L, 58, 66)) * (1 - ramp(Math.abs(g.c.L - r.c.L), 14, 24))
         : 0;
       const ab = gb(a, b), ba = gb(b, a); const [g, r] = ab >= ba ? [a, b] : [b, a];
-      rule('gray-brown', `${nmW(g)} ${nmN(r)} 온도가 달라 서로 탁하게 해요. 그레이 대신 네이비나 블랙이 나아요`, 12 * Math.max(ab, ba), [g.slot, r.slot]);
+      rule('gray-brown', `${nmW(g)} ${nmN(r)} 온도가 달라 서로 탁하게 해요. 그레이 대신 네이비나 블랙이 나아요`, (FIX.F ? (brightSomewhere ? 0 : 6) : 12) * Math.max(ab, ba), [g.slot, r.slot]);
     }
     /* 블랙 × 네이비: 둘 다 어두운데 구분이 안 된다 */
-    const isBlack = p => p.c.C <= NEUTRAL_C && p.c.L < 18, isNavy = p => p.c.h >= 250 && p.c.h <= 310 && p.c.L < 30 && p.c.C > 15;
+    const isBlack = p => p.c.C <= NEUTRAL_C && p.c.L < 18, isNavy = p => p.c.h >= 250 && p.c.h <= 310 && p.c.L < 30 && p.c.C > 15 && !(FIX.B && denimW(p.c) >= .5);
     if (bigPair && nextTo(a, b) && ((isBlack(a) && isNavy(b)) || (isBlack(b) && isNavy(a)))) { hScore -= 8; add('black-navy', `${nm(a)}와 ${nm(b)}가 붙으면 검정인지 남색인지 구분이 안 돼요`, -1, [a.slot, b.slot]); }
   }
-  const darkBig = P.filter(p => p.c.L < 42 && p.area >= .05);
-  const darkFams = []; darkBig.forEach(p => { const key = p.c.C <= NEUTRAL_C ? 'k' : String(Math.round(p.c.h / 40)); if (!darkFams.includes(key)) darkFams.push(key); });
+  /* B. 옷 자리만 세고(모자·신발·목도리 제외), 데님은 빼고, 브라운·올리브는 한 가족으로 */
+  const darkBig = P.filter(p => p.c.L < 42 && p.area >= .05
+    && (!FIX.B || (['outer', 'layer', 'top', 'bottom'].includes(p.slot) && denimW(p.c) < .5)));
+  const darkFams = []; darkBig.forEach(p => { const key = p.c.C <= NEUTRAL_C ? 'k' : (FIX.B && p.c.h >= 20 && p.c.h <= 125) ? 'e' : String(Math.round(p.c.h / 40)); if (!darkFams.includes(key)) darkFams.push(key); });
   if (darkFams.length >= 3) { hScore -= 12; add('dark-mix', '검정·남색·갈색처럼 어두운 색이 세 가지나 섞여 탁해요. 하나는 밝게 해 보세요', -1, darkBig.map(p => p.slot)); }
   let blackBrown = false;
   for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) { const a = P[i], b = P[j]; const bp = ['outer', 'layer', 'top', 'bottom'].includes(a.slot) && ['outer', 'layer', 'top', 'bottom'].includes(b.slot); const blk = p => p.c.C <= NEUTRAL_C && p.c.L < 18, brn = p => earthHue(p.c.h) && p.c.C > 18 && p.c.L < 45; if (bp && nextTo(a, b) && ((blk(a) && brn(b)) || (blk(b) && brn(a)))) { blackBrown = true; hScore -= 3; add('black-brown', `${nm(a)}와 ${nm(b)}는 서로를 탁하게 해요`, -1, [a.slot, b.slot]); } }
   /* 어스 톤 바탕에 형광에 가까운 색 하나 — 무채 바탕이면 포인트지만 어스 바탕에서는 겉돈다 */
   const big = p => ['outer', 'layer', 'top', 'bottom'].includes(p.slot);
-  const neonP = P.filter(p => p.area >= .03).reduce((m, p) => (!m || p.viv * ramp(p.c.L, 50, 60) * p.wc > m.viv * ramp(m.c.L, 50, 60) * m.wc) ? p : m, null);
+  /* D. 어스-네온은 정말 밝고 쨍한 색만 — L 65 이상 · C 50 이상 */
+  const neonP = P.filter(p => p.area >= .03 && (!FIX.D || (p.c.L >= 65 && p.c.C >= 50))).reduce((m, p) => (!m || p.viv * ramp(p.c.L, 50, 60) * p.wc > m.viv * ramp(m.c.L, 50, 60) * m.wc) ? p : m, null);
   if (neonP) {
     const neon = neonP.viv * ramp(neonP.c.L, 50, 60) * neonP.wc;
     const earthBase = P.filter(big).reduce((s, p) => s + p.area * p.fn * earthW(p.c.h, p.c.L) * ramp(p.c.C, 10, 16), 0);

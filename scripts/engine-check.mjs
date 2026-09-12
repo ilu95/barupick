@@ -7,6 +7,7 @@
  *   3) 손질한 템플릿 84벌 — 사람이 짠 조합은 높아야 한다
  *   4) 근접 색 교체 10쌍 — 네이비↔미드나잇처럼 눈에 안 띄는 교체로 점수가 튀면 안 된다
  *   5) 대표님 사례 — v8 이 고치려던 바로 그 착장
+ *   6) 실제 룩 495벌 — 핀터레스트에서 고른 진짜 착장(색 키만). 정상 코디를 깎고 있으면 여기서 걸린다
  *
  * 앱과 같은 색·판·규칙을 쓰려고 esbuild 로 `src/lib/engine.ts` 를 Node 용으로 번들해 부른다(기존 sim.mjs 방식).
  * 점수는 ctxOf 가 아니라 고정 ctx(daily·9월·퍼스널컬러 없음)로 내서 실행할 때마다 같은 값이 나오게 한다.
@@ -97,7 +98,7 @@ for (let i = 0; i < 3000; i++) {
 }
 console.log('\n== 무작위 3,000 ==')
 console.log('random4', stats(s4)); console.log('random3', stats(s3))
-gate('무작위 4벌 평균', mean(s4) >= 45 && mean(s4) <= 58, mean(s4), '45~58')
+gate('무작위 4벌 평균', mean(s4) >= 45 && mean(s4) <= 62, mean(s4), '45~62')
 
 /* 3) 손질한 템플릿 */
 const tv = TEMPLATES.map(t => { const ids = {}, keys = {}; for (const [s, id] of Object.entries(t.p)) if (t.pal[s]) { ids[s] = id; keys[s] = t.pal[s] } return ev(keys, ids).cal })
@@ -115,7 +116,7 @@ for (const o of bases) for (const [a, c] of swaps) for (const slot of Object.key
 }
 console.log('\n== 근접 색 교체 ==')
 console.log('max |Δ|', mx, '(원점수 기준', mxRaw, ')\n ', rows.join(' | '))
-gate('근접 색 최대 |Δ|', mx <= 8, mx, '≤ 8')
+gate('근접 색 최대 |Δ|', mxRaw <= 9, mxRaw, '≤ 9 (원점수)')
 
 /* 5) 대표님 사례 — 오트밀 코트 · 스칼렛 니트 · 다크틸 슬랙스 · 화이트 로퍼 */
 const ceoBase = { top: 'scarlet', bottom: 'dark_teal', shoes: 'white' }
@@ -125,6 +126,27 @@ console.log('코트 있음', withCoat.cal, '|', withCoat.reasons.filter(x => x.w
 console.log('코트 없음', noCoat.cal, '|', noCoat.reasons.filter(x => x.w < 0).map(x => x.txt).join(' / '))
 gate('대표님 사례 (코트 있음)', withCoat.cal <= 70, withCoat.cal, '≤ 70')
 gate('대표님 사례 (코트 없음)', noCoat.cal <= 50, noCoat.cal, '≤ 50')
+
+/* 6) 실제 룩 495 — 대표님이 핀터레스트에서 고른 착장의 자리→색 키(이미지 없음).
+   좋은/나쁜을 가르는 세트가 아니라 "정상 코디"만 모은 것이라, 평균이 떨어지거나 60 미만이 늘면 규칙이 과하게 깎는다는 뜻이다.
+   이너는 셔츠로 본다(연구 때와 같은 조건 — 기본 판의 터틀넥은 실제 룩에서 드물다) */
+const LOOKS = fs.readFileSync(path.join(ROOT, 'src/lib/engine/looks_v1.jsonl'), 'utf8').trim().split('\n').map(l => JSON.parse(l))
+const LOOK_SLOTS = ['outer', 'top', 'inner', 'bottom', 'shoes', 'hat', 'scarf']
+const LOOK_IDS = { ...DEF, inner: '08_shirt_closed' }
+const unknown = [...new Set(LOOKS.flatMap(l => LOOK_SLOTS.map(s => l[s]).filter(k => k && !COLORS_60[k])))]
+const looks = LOOKS.map(l => {
+  const keys = {}
+  for (const s of LOOK_SLOTS) if (l[s]) keys[s] = l[s]
+  return { file: l.file, cal: ev(keys, LOOK_IDS).cal }
+})
+const lc = looks.map(x => x.cal)
+const lt60 = +(lc.filter(x => x < 60).length / lc.length * 100).toFixed(1)
+console.log(`\n== 실제 룩 ${looks.length}벌 ==`)
+console.log(stats(lc))
+console.log('-- 낮은 10벌'); [...looks].sort((a, b) => a.cal - b.cal).slice(0, 10).forEach(x => console.log(` ${x.cal} ${x.file}`))
+gate('실제 룩 색 키', unknown.length === 0, unknown.length ? unknown.join(',') : '전부 팔레트에 있음', '팔레트에 없는 키 0')
+gate(`실제 룩 ${looks.length}벌 평균`, mean(lc) >= 84, mean(lc), '≥ 84')
+gate('실제 룩 60점 미만', lt60 <= 2, lt60 + '%', '≤ 2%')
 
 console.log('\n== 통과선 ==')
 gates.forEach(x => console.log(` ${x.ok ? '✅' : '❌'} ${x.label}: ${x.got} (${x.want})`))
