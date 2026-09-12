@@ -1,3 +1,5 @@
 /* Chinese Simplified */
 "CFBundleDisplayName" = "BaruPick";
 "NSLocationWhenInUseUsageDescription" = "需要位置信息以根据天气推荐穿搭。";
+"NSCameraUsageDescription" = "拍摄衣物或穿搭照片进行登记时会使用相机。";
+"NSPhotoLibraryUsageDescription" = "在衣橱、记录和帖子中添加照片时会使用照片图库。";
