@@ -70,5 +70,9 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>날씨 기반 코디 추천을 위해 위치 정보가 필요합니다.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>옷이나 코디 사진을 찍어 등록할 때 카메라를 씁니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>옷장·기록·게시물에 사진을 올릴 때 사진 보관함을 씁니다.</string>
 </dict>
 </plist>

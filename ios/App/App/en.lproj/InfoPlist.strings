@@ -1,3 +1,5 @@
 /* English */
 "CFBundleDisplayName" = "BaruPick";
 "NSLocationWhenInUseUsageDescription" = "Location access is needed to suggest outfits based on the weather.";
+"NSCameraUsageDescription" = "Used to take photos of your clothes or outfits when adding them.";
+"NSPhotoLibraryUsageDescription" = "Used to add photos from your library to your closet, records, and posts.";

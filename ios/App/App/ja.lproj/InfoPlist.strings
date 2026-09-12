@@ -1,3 +1,5 @@
 /* Japanese */
 "CFBundleDisplayName" = "バルピック";
 "NSLocationWhenInUseUsageDescription" = "天気に合ったコーデを提案するために位置情報が必要です。";
+"NSCameraUsageDescription" = "服やコーデの写真を撮って登録するときにカメラを使います。";
+"NSPhotoLibraryUsageDescription" = "クローゼット・記録・投稿に写真を追加するときに写真ライブラリを使います。";
