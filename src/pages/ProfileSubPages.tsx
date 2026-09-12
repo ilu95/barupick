@@ -283,9 +283,10 @@ export function ColorPattern() {
   const { t } = useTranslation()
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('profileSub.colorPattern.title')}</h2>
-      <p className="text-sm text-warm-600 mb-5">{t('header.colorPattern')}</p>
-      <div className="text-center py-12"><ScanLine size={48} className="text-terra-500 mx-auto mb-4" /><div className="text-sm text-warm-600">{t('profileSub.colorPattern.title')}</div></div>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('profileSub.colorPattern.title')}</h2>
+      <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl shadow-warm-sm py-14 text-center">
+        <ScanLine size={40} className="text-terra-500 mx-auto" />
+      </div>
     </div>
   )
 }

@@ -187,7 +187,7 @@ export default function PurchaseSimulate() {
 
         <div className="flex flex-col gap-3">
           <button onClick={startRecommend} className="w-full bg-gradient-to-br from-amber-50 to-orange-50 dark:from-warm-800 dark:to-warm-700 border border-amber-300 dark:border-amber-700 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm">
-            <div className="w-12 h-12 rounded-xl bg-amber-200 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-amber-200 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
               <Sparkles size={22} className="text-amber-700 dark:text-amber-300" />
             </div>
             <div className="flex-1">
@@ -197,8 +197,8 @@ export default function PurchaseSimulate() {
             <ChevronRight size={16} className="text-amber-500" />
           </button>
 
-          <button onClick={() => { setMode('manual'); setManualStep('category') }} className="w-full bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm">
-            <div className="w-12 h-12 rounded-xl bg-warm-200 dark:bg-warm-700 flex items-center justify-center flex-shrink-0">
+          <button onClick={() => { setMode('manual'); setManualStep('category') }} className="w-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm">
+            <div className="w-12 h-12 rounded-2xl bg-warm-200 dark:bg-warm-700 flex items-center justify-center flex-shrink-0">
               <Target size={22} className="text-warm-600 dark:text-warm-400" />
             </div>
             <div className="flex-1">
@@ -209,7 +209,7 @@ export default function PurchaseSimulate() {
           </button>
 
           <button onClick={() => { setMode('picked'); setPickedStep('items'); setPickedItems([]); setPickedCategory(null); setPickedResults([]) }} className="w-full bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-warm-800 dark:to-warm-700 border border-violet-300 dark:border-violet-700 rounded-2xl p-5 flex items-center gap-4 text-left active:scale-[0.98] transition-all shadow-warm-sm">
-            <div className="w-12 h-12 rounded-xl bg-violet-200 dark:bg-violet-800 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-violet-200 dark:bg-violet-800 flex items-center justify-center flex-shrink-0">
               <Shirt size={22} className="text-violet-700 dark:text-violet-300" />
             </div>
             <div className="flex-1">
@@ -267,7 +267,7 @@ export default function PurchaseSimulate() {
                 <div key={`${rec.category}-${rec.color}`} className={`bg-white dark:bg-warm-800 border ${v.border} rounded-2xl p-4 shadow-warm-sm`}>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-bold text-warm-500 dark:text-warm-400 w-6 text-center">{idx + 1}</span>
-                    <div className="w-10 h-10 rounded-xl border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
+                    <div className="w-10 h-10 rounded-2xl border border-warm-300 dark:border-warm-600 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">{rec.colorName} {rec.catLabel}</span>
@@ -353,15 +353,15 @@ export default function PurchaseSimulate() {
                     const brandLabel = item.brand ? `${item.brand} · ` : ''
                     return (
                       <button key={item.id} onClick={() => togglePickedItem(item.id)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-all active:scale-[0.97]
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-all active:scale-[0.97]
                           ${isSelected
                             ? 'border-violet-400 dark:border-violet-500 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 ring-1 ring-violet-300 dark:ring-violet-600'
                             : 'border-warm-300 dark:border-warm-600 bg-white dark:bg-warm-800 text-warm-700 dark:text-warm-300'
                           }`}>
                         {item.photoThumb ? (
-                          <img src={item.photoThumb} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0 border border-warm-300 dark:border-warm-500" />
+                          <img src={item.photoThumb} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0 border border-warm-300 dark:border-warm-600" />
                         ) : (
-                          <span className="w-4 h-4 rounded-full border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c.hex }} />
+                          <span className="w-4 h-4 rounded-full border border-warm-300 dark:border-warm-600 flex-shrink-0" style={{ background: c.hex }} />
                         )}
                         <span className="truncate max-w-[140px]">{brandLabel}{displayName}</span>
                         {isSelected && <Check size={12} className="text-violet-500" />}
@@ -439,7 +439,7 @@ export default function PurchaseSimulate() {
             <div className="flex flex-wrap gap-2">
               {PICK_TARGET_ITEMS.map(item => (
                 <button key={item.id} onClick={() => runPickedSim(itemToCategory(item.id))}
-                  className="px-3 py-2 rounded-full text-[12px] font-medium bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95 transition-all">
+                  className="px-3 py-2 rounded-full text-[12px] font-medium bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-300 active:scale-95 transition-all">
                   {item.emoji} {t('categories:itemsCatalog.' + item.id)}
                 </button>
               ))}
@@ -479,7 +479,7 @@ export default function PurchaseSimulate() {
             {pickedAnalyzing && (
               <div className="flex flex-col items-center py-16">
                 <div className="w-10 h-10 border-2 border-violet-300 border-t-violet-500 rounded-full animate-spin mb-4" />
-                <div className="text-sm text-warm-500">{t('common.analyzing')}</div>
+                <div className="text-sm text-warm-500 dark:text-warm-400">{t('common.analyzing')}</div>
               </div>
             )}
 
@@ -492,7 +492,7 @@ export default function PurchaseSimulate() {
                     <div key={r.colorKey} className={`bg-white dark:bg-warm-800 border ${v.border} rounded-2xl p-4 shadow-warm-sm`}>
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-warm-500 dark:text-warm-400 w-6 text-center">{idx + 1}</span>
-                        <div className="w-10 h-10 rounded-xl border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
+                        <div className="w-10 h-10 rounded-2xl border border-warm-300 dark:border-warm-600 flex-shrink-0" style={{ background: c?.hex || '#ddd' }} />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-semibold text-warm-900 dark:text-warm-100">{getColorName(r.colorKey)}</span>
@@ -542,7 +542,7 @@ export default function PurchaseSimulate() {
               const count = wardrobe.getItems(cat.key).length
               return (
                 <button key={cat.key} onClick={() => handleCategory(cat.key)}
-                  className="flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl px-5 py-4 active:scale-[0.98] transition-all shadow-warm-sm">
+                  className="flex items-center gap-4 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl px-5 py-4 active:scale-[0.98] transition-all shadow-warm-sm">
                   <span className="text-2xl">{cat.emoji}</span>
                   <div className="flex-1 text-left">
                     <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{t(cat.labelKey)}</div>
@@ -572,7 +572,7 @@ export default function PurchaseSimulate() {
         <div className="animate-screen-fade">
           {/* 선택 요약 */}
           <div className="flex items-center gap-3 bg-warm-100 dark:bg-warm-700 rounded-2xl px-4 py-3 mb-5">
-            <div className="w-10 h-10 rounded-xl border border-warm-300 dark:border-warm-500 flex-shrink-0" style={{ background: color ? COLORS_60[color]?.hex || '#ddd' : '#ddd' }} />
+            <div className="w-10 h-10 rounded-2xl border border-warm-300 dark:border-warm-600 flex-shrink-0" style={{ background: color ? COLORS_60[color]?.hex || '#ddd' : '#ddd' }} />
             <div className="flex-1">
               <div className="text-sm font-semibold text-warm-900 dark:text-warm-100">{getColorName(color)}</div>
               <div className="text-[11px] text-warm-500 dark:text-warm-400">{t(CATEGORIES.find(c => c.key === category)?.labelKey || '')}</div>
@@ -583,7 +583,7 @@ export default function PurchaseSimulate() {
           {manualAnalyzing && (
             <div className="flex flex-col items-center py-16">
               <div className="w-10 h-10 border-2 border-terra-300 border-t-terra-500 rounded-full animate-spin mb-4" />
-              <div className="text-sm text-warm-500">{t('common.analyzing')}</div>
+              <div className="text-sm text-warm-500 dark:text-warm-400">{t('common.analyzing')}</div>
             </div>
           )}
 
@@ -597,15 +597,15 @@ export default function PurchaseSimulate() {
                   <div className="text-sm text-warm-600 dark:text-warm-400">{simResult.reason}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2.5 mb-5">
-                  <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-3 text-center">
+                  <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3 text-center">
                     <div className="text-xl font-bold text-warm-900 dark:text-warm-100 font-display">+{simResult.comboDelta}</div>
                     <div className="text-[10px] text-warm-500">{t('purchaseSimulate.newCombos')}</div>
                   </div>
-                  <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-3 text-center">
+                  <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3 text-center">
                     <div className="text-xl font-bold text-warm-900 dark:text-warm-100 font-display">{simResult.bestScore}</div>
                     <div className="text-[10px] text-warm-500">{t('purchaseSimulate.bestScore')}</div>
                   </div>
-                  <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-xl py-3 text-center">
+                  <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl py-3 text-center">
                     <div className="text-xl font-bold text-warm-900 dark:text-warm-100 font-display">{simResult.avgScore}</div>
                     <div className="text-[10px] text-warm-500">{t('purchaseSimulate.avgScore')}</div>
                   </div>
