@@ -6,7 +6,8 @@ import { useWeather } from '@/hooks/useWeather'
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CloudSun, Thermometer, Droplets, Wind, HelpCircle, Scissors, Ruler, ShoppingBag, ExternalLink, Trophy, ChevronRight, Palette, ArrowRight, ArrowLeft, Check, ThumbsUp, ThumbsDown, Minus, CheckCircle, XCircle, Sparkles } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { STYLE_GUIDE, MOOD_GROUPS, LAYER_LEVELS, STYLE_ICONS } from '@/lib/styles'
 import { STYLE_MOODS } from '@/lib/styleMoods'
@@ -864,8 +865,8 @@ export function EventDetail() {
     })
   }, [eventId])
 
-  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400">{t('common.loading')}</div>
-  if (!event) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600">{t('eventDetail.notFound')}</div>
+  if (loading) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-400 dark:text-warm-500">{t('common.loading')}</div>
+  if (!event) return <div className="animate-screen-fade px-5 pt-6 text-center py-20 text-sm text-warm-600 dark:text-warm-400">{t('eventDetail.notFound')}</div>
 
   const now = new Date(), start = new Date(event.start_date), end = new Date(event.end_date)
   const isActive = now >= start && now <= end
@@ -879,23 +880,29 @@ export function EventDetail() {
         {event.reward && <div className="text-sm font-semibold">🎁 {event.reward}</div>}
       </div>
 
-      <div className="text-xs font-semibold text-warm-600 uppercase tracking-wider mb-3">{t('eventDetail.submissions', { count: submissions.length })}</div>
+      <div className="text-xs font-semibold text-warm-600 dark:text-warm-400 uppercase tracking-wider mb-3">{t('eventDetail.submissions', { count: submissions.length })}</div>
       {submissions.length > 0 ? (
         <div className="grid grid-cols-2 gap-2.5">
           {submissions.map((sub, idx) => {
-            const outfitHex: Record<string, string> = {}
-            Object.entries(sub.outfit || {}).forEach(([k, v]) => { if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string) })
+            const scene = sceneFromColors(sub.outfit || {})
+            const colorKeys = Object.values(sub.outfit || {}).filter(Boolean).slice(0, 5)
             return (
-              <div key={sub.id} className="bg-white border border-warm-400 rounded-2xl p-3 shadow-warm-sm text-center">
+              <div key={sub.id} className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl p-3 shadow-warm-sm text-center">
                 {idx < 3 && <div className="text-lg mb-1">{['🥇', '🥈', '🥉'][idx]}</div>}
                 {sub.photo_urls?.[0] ? <img src={sub.photo_urls[0]} className="w-full aspect-square rounded-xl object-cover mb-2" alt="" />
-                : <div className="flex justify-center mb-2"><MannequinSVG outfit={outfitHex} size={80} /></div>}
-                <div className="text-xs font-semibold text-terra-600">{t('common.score', { score: sub.score })}</div>
+                : <div className="flex justify-center mb-2 py-2 bg-warm-100 dark:bg-warm-700 rounded-xl"><CharacterCanvas items={scene.items} body={scene.body} width={76} /></div>}
+                <div className="flex justify-center gap-0.5 mb-1">
+                  {colorKeys.map((ck, i) => {
+                    const c = COLORS_60[ck as string]
+                    return c ? <span key={i} className="w-2.5 h-2.5 rounded-full border border-warm-400/50" style={{ background: c.hex }} /> : null
+                  })}
+                </div>
+                <div className="text-xs font-semibold text-terra-600 dark:text-terra-400">{t('common.score', { score: sub.score })}</div>
               </div>
             )
           })}
         </div>
-      ) : <div className="text-center py-10 text-warm-400 text-sm">{t('eventDetail.noSubmissions')}</div>}
+      ) : <div className="text-center py-10 text-warm-400 dark:text-warm-500 text-sm">{t('eventDetail.noSubmissions')}</div>}
 
       {isActive && (
         <button onClick={() => navigate(`/community/event/${eventId}/submit`)}

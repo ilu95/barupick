@@ -2,9 +2,10 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Image, Globe, Users, Lock, Camera, Check } from 'lucide-react'
-import MannequinSVG from '@/components/mannequin/MannequinSVG'
+import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import { sceneFromColors } from '@/lib/char/scene'
 import CropOverlay from '@/components/ui/CropOverlay'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, getColorName } from '@/lib/colors'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { trackCommunityPost } from '@/lib/analytics'
@@ -30,18 +31,15 @@ export default function CommunityPost() {
     } catch { return {} }
   })()
 
-  const outfitHex: Record<string, string> = {}
-  Object.entries(savedOutfit).forEach(([k, v]) => {
-    if (v) outfitHex[k] = COLORS_60[v as string]?.hex || (v as string)
-  })
-
-  const hasOutfit = Object.keys(outfitHex).length > 0
+  const outfitParts = Object.entries(savedOutfit).filter(([, v]) => v && COLORS_60[v as string]) as [string, string][]
+  const hasOutfit = outfitParts.length > 0
+  const scene = sceneFromColors(savedOutfit)
 
   if (!user) {
     return (
       <div className="animate-screen-fade px-5 pt-6 pb-10 text-center py-20">
         <div className="text-4xl mb-3">🔐</div>
-        <div className="text-sm text-warm-600 mb-4">{t('common.loginRequired')}</div>
+        <div className="text-sm text-warm-600 dark:text-warm-400 mb-4">{t('common.loginRequired')}</div>
         <button onClick={() => navigate('/auth/login')} className="px-5 py-2 bg-terra-500 text-white rounded-full text-sm font-semibold active:scale-95 transition-all shadow-terra">
           {t('auth.loginButton')}
         </button>
@@ -111,7 +109,7 @@ export default function CommunityPost() {
           <div className="w-16 h-16 rounded-full bg-sage/20 flex items-center justify-center mx-auto mb-4">
             <Check size={32} className="text-sage" />
           </div>
-          <div className="font-display text-lg font-bold text-warm-900">{t('communityPost.postSuccess')}</div>
+          <div className="font-display text-lg font-bold text-warm-900 dark:text-warm-100">{t('communityPost.postSuccess')}</div>
         </div>
       </div>
     )
@@ -119,32 +117,43 @@ export default function CommunityPost() {
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('communityPost.title')}</h2>
+      <h2 className="font-display text-xl font-bold text-warm-900 dark:text-warm-100 tracking-tight mb-5">{t('communityPost.title')}</h2>
 
-      {/* 마네킹 미리보기 */}
+      {/* 코디 미리보기 */}
       {hasOutfit && (
-        <div className="flex justify-center mb-5 py-4 bg-warm-100 rounded-2xl">
-          <MannequinSVG outfit={outfitHex} size={120} />
+        <div className="bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-3xl p-4 mb-5 shadow-warm-sm">
+          <div className="flex justify-center mb-3">
+            <CharacterCanvas items={scene.items} body={scene.body} width={120} />
+          </div>
+          <div className="flex gap-x-3 gap-y-1.5 flex-wrap justify-center">
+            {outfitParts.map(([part, ck]) => (
+              <div key={part} className="flex items-center gap-1.5 text-xs">
+                <span className="w-3.5 h-3.5 rounded-full border border-warm-400 dark:border-warm-600" style={{ background: COLORS_60[ck].hex }} />
+                <span className="text-warm-500 dark:text-warm-400">{t('categories:names.' + part)}</span>
+                <span className="text-warm-800 dark:text-warm-200">{getColorName(ck)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* 캡션 */}
       <div className="mb-4">
-        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block">{t('communityPost.caption')}</label>
+        <label className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2 block">{t('communityPost.caption')}</label>
         <textarea
           value={caption}
           onChange={e => setCaption(e.target.value)}
           placeholder={t('communityPost.captionPlaceholder')}
           maxLength={200}
-          className="w-full h-24 px-4 py-3 bg-white border border-warm-400 rounded-2xl text-sm text-warm-900 placeholder-warm-500 focus:outline-none focus:border-terra-400 resize-none"
+          className="w-full h-24 px-4 py-3 bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 rounded-2xl text-sm text-warm-900 dark:text-warm-100 placeholder-warm-500 dark:placeholder-warm-400 focus:outline-none focus:border-terra-400 resize-none"
         />
-        <div className="text-right text-[11px] text-warm-500 mt-1">{caption.length}/200</div>
+        <div className="text-right text-[11px] text-warm-500 dark:text-warm-400 mt-1">{caption.length}/200</div>
       </div>
 
       {/* 사진 */}
       <div className="mb-4">
-        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block flex items-center gap-1">
-          <Image size={12} /> {t('communityPost.photos')} <span className="text-warm-400 normal-case tracking-normal">(max 4)</span>
+        <label className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2 block flex items-center gap-1">
+          <Image size={12} /> {t('communityPost.photos')} <span className="text-warm-400 dark:text-warm-500 normal-case tracking-normal">(max 4)</span>
         </label>
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
           {photos.map((p, i) => (
@@ -155,8 +164,8 @@ export default function CommunityPost() {
             </div>
           ))}
           {photos.length < 4 && (
-            <label className="w-16 h-16 rounded-xl border-2 border-dashed border-warm-400 flex flex-col items-center justify-center cursor-pointer flex-shrink-0 active:scale-95 bg-warm-100">
-              <Camera size={18} className="text-warm-600" />
+            <label className="w-16 h-16 rounded-2xl border-2 border-dashed border-warm-400 dark:border-warm-600 flex flex-col items-center justify-center cursor-pointer flex-shrink-0 active:scale-95 bg-warm-100 dark:bg-warm-700">
+              <Camera size={18} className="text-warm-600 dark:text-warm-300" />
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoAdd} />
             </label>
           )}
@@ -165,7 +174,7 @@ export default function CommunityPost() {
 
       {/* 공개 범위 */}
       <div className="mb-4">
-        <label className="text-xs font-semibold text-warm-600 tracking-widest uppercase mb-2 block">{t('communityPost.visibility.public')}</label>
+        <label className="text-xs font-semibold text-warm-600 dark:text-warm-400 tracking-widest uppercase mb-2 block">{t('communityPost.visibility.public')}</label>
         <div className="flex gap-2">
           {[
             { key: 'public', icon: <Globe size={13} />, label: t('communityPost.visibility.public') },
@@ -174,8 +183,8 @@ export default function CommunityPost() {
             <button
               key={v.key}
               onClick={() => setVisibility(v.key as any)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                visibility === v.key ? 'bg-terra-500 text-white shadow-terra' : 'bg-white border border-warm-400 text-warm-700'
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
+                visibility === v.key ? 'bg-terra-500 text-white shadow-terra' : 'bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-warm-700 dark:text-warm-200'
               }`}
             >{v.icon} {v.label}</button>
           ))}
@@ -184,14 +193,14 @@ export default function CommunityPost() {
 
       {/* 인스타 토글 */}
       {profile?.instagram_id && (
-        <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl px-4 py-3 mb-5">
+        <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-700 rounded-2xl px-4 py-3 mb-5">
           <div>
-            <div className="text-sm font-medium text-warm-900">{t('communityPost.instagramToggle')}</div>
-            <div className="text-[10px] text-warm-500">@{profile.instagram_id}</div>
+            <div className="text-sm font-medium text-warm-900 dark:text-warm-100">{t('communityPost.instagramToggle')}</div>
+            <div className="text-[10px] text-warm-500 dark:text-warm-400">@{profile.instagram_id}</div>
           </div>
           <button
             onClick={() => setShowInstagram(!showInstagram)}
-            className={`w-11 h-6 rounded-full transition-all ${showInstagram ? 'bg-terra-500' : 'bg-warm-400'}`}
+            className={`w-11 h-6 rounded-full transition-all ${showInstagram ? 'bg-terra-500' : 'bg-warm-400 dark:bg-warm-600'}`}
           >
             <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${showInstagram ? 'translate-x-5' : 'translate-x-0.5'}`} />
           </button>
