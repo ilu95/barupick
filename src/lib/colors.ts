@@ -234,15 +234,15 @@ export const COLOR_TABS = [
   },
   {
     id: 'beige_brown', get label() { return i18n.language === 'ko' ? TAB_LABELS.beige_brown.ko : TAB_LABELS.beige_brown.en }, emoji: '🤎',
-    keys: ['linen','ecru','champagne','bone','beige','sand','wheat','oatmeal','stone','mushroom','greige','khaki','tan','camel','fawn','honey','caramel','cognac','copper','cinnamon','sienna','brown','walnut','mocha','cocoa','chestnut','taupe','chocolate','espresso'],
+    keys: ['linen','ecru','champagne','bone','beige','sand','wheat','oatmeal','stone','mushroom','greige','khaki','tan','camel','fawn','honey','caramel','cognac','copper','cinnamon','sienna','brown','walnut','mocha','cocoa','chestnut','taupe','chocolate','dark_brown','espresso'],
   },
   {
     id: 'red_pink', get label() { return i18n.language === 'ko' ? TAB_LABELS.red_pink.ko : TAB_LABELS.red_pink.en }, emoji: '❤️',
-    keys: ['shell_pink','pastel_pink','nude_pink','rose_pink','blush','old_rose','dusty_rose','rose_gold','salmon','carnation','flamingo','coral','hot_pink','pink','fuchsia','raspberry','scarlet','red','cherry','crimson','cardinal','ruby','dark_red','burgundy','wine','oxblood','maroon'],
+    keys: ['shell_pink','pastel_pink','pastel_rose','nude_pink','pastel_coral','rose_pink','blush','old_rose','dusty_rose','rose_gold','salmon','carnation','flamingo','coral','hot_pink','pink','fuchsia','raspberry','scarlet','red','cherry','crimson','cardinal','ruby','dark_red','burgundy','wine','oxblood','maroon'],
   },
   {
     id: 'orange_yellow', get label() { return i18n.language === 'ko' ? TAB_LABELS.orange_yellow.ko : TAB_LABELS.orange_yellow.en }, emoji: '🟡',
-    keys: ['lemon','pastel_yellow','butter','canary','yellow','saffron','gold','mustard','marigold','amber','peach','apricot','nectarine','orange','tangerine','pumpkin','burnt_orange','terracotta','rust','brick'],
+    keys: ['pastel_lemon','lemon','pastel_yellow','butter','canary','yellow','saffron','gold','mustard','marigold','amber','peach','apricot','nectarine','orange','tangerine','pumpkin','burnt_orange','terracotta','rust','brick'],
   },
   {
     id: 'green', get label() { return i18n.language === 'ko' ? TAB_LABELS.green.ko : TAB_LABELS.green.en }, emoji: '🟢',
@@ -250,11 +250,11 @@ export const COLOR_TABS = [
   },
   {
     id: 'blue', get label() { return i18n.language === 'ko' ? TAB_LABELS.blue.ko : TAB_LABELS.blue.en }, emoji: '🔵',
-    keys: ['ice_blue','pastel_sky','pastel_blue','baby_blue','sky_blue','powder_blue','dusty_blue','steel_blue','cornflower','denim','azure','blue','cobalt','royal_blue','sapphire','petrol','prussian_blue','navy','midnight'],
+    keys: ['ice_blue','pastel_sky','pastel_aqua','cyan','pastel_blue','baby_blue','sky_blue','powder_blue','dusty_blue','steel_blue','cornflower','denim','azure','blue','cobalt','royal_blue','sapphire','petrol','prussian_blue','navy','dark_blue','midnight','dark_teal'],
   },
   {
     id: 'purple', get label() { return i18n.language === 'ko' ? TAB_LABELS.purple.ko : TAB_LABELS.purple.en }, emoji: '🟣',
-    keys: ['pastel_lavender','lavender','pastel_lilac','lilac','periwinkle','wisteria','heather','pastel_purple','orchid','mauve','amethyst','purple','violet','plum','mulberry','grape','eggplant','indigo'],
+    keys: ['pastel_lavender','lavender','pastel_lilac','lilac','periwinkle','wisteria','heather','pastel_purple','magenta','orchid','mauve','amethyst','purple','violet','plum','mulberry','grape','eggplant','indigo','dark_purple'],
   },
 ]
 

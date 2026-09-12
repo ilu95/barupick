@@ -24,7 +24,7 @@ fs.mkdirSync(path.dirname(OUT), { recursive: true })
 await build({
   stdin: {
     contents: [
-      `export { COLORS_60, getColorName } from './src/lib/colors'`,
+      `export { COLORS_60, COLOR_TABS, getColorName } from './src/lib/colors'`,
       `export { TEMPLATES } from './src/lib/outfits'`,
       `export * as V7 from './src/lib/engine/v7'`,
       `export { calibrate } from './src/lib/engine'`,
@@ -45,7 +45,7 @@ globalThis.window = Object.assign(globalThis, { addEventListener: noop, removeEv
 globalThis.document = { documentElement: { lang: 'ko', setAttribute: noop, classList: { add: noop, remove: noop, toggle: noop } }, addEventListener: noop, removeEventListener: noop, createElement: () => ({ style: {}, setAttribute: noop }), body: { appendChild: noop } }
 globalThis.CustomEvent = class { constructor(t, o) { this.type = t; this.detail = o && o.detail } }
 
-const { COLORS_60, getColorName, TEMPLATES, V7, calibrate } = await import(pathToFileURL(OUT).href)
+const { COLORS_60, COLOR_TABS, getColorName, TEMPLATES, V7, calibrate } = await import(pathToFileURL(OUT).href)
 const REF = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/lib/engine/refset_v2.json'), 'utf8'))
 
 /* 자리별 기본 판 — 판을 안 주면 이걸 쓴다(면적이 판에서 나오므로 고정해야 비교가 된다) */
@@ -147,6 +147,10 @@ console.log('-- 낮은 10벌'); [...looks].sort((a, b) => a.cal - b.cal).slice(0
 gate('실제 룩 색 키', unknown.length === 0, unknown.length ? unknown.join(',') : '전부 팔레트에 있음', '팔레트에 없는 키 0')
 gate(`실제 룩 ${looks.length}벌 평균`, mean(lc) >= 84, mean(lc), '≥ 84')
 gate('실제 룩 60점 미만', lt60 <= 2, lt60 + '%', '≤ 2%')
+
+/* 7) 색 탭 — COLOR_TABS 어느 탭에도 없는 키는 색 피커에서 고를 수 없다(숨은 색) */
+const notInTabs = Object.keys(COLORS_60).filter(k => !COLOR_TABS.some(t => t.keys.includes(k)))
+gate('색 피커에 없는 색 키', notInTabs.length === 0, notInTabs.length ? notInTabs.join(',') : `${Object.keys(COLORS_60).length}색 전부 탭에 있음`, '탭에 없는 키 0')
 
 console.log('\n== 통과선 ==')
 gates.forEach(x => console.log(` ${x.ok ? '✅' : '❌'} ${x.label}: ${x.got} (${x.want})`))
