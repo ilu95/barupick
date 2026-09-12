@@ -537,7 +537,7 @@ export function useBuild(mode: BuildMode = 'coord') {
     return recs.sort((a, b) => b.score - a.score).slice(0, 20)
   }, [state])
 
-  // ── outfitHex for MannequinSVG ──
+  // ── outfitHex: 자리 → hex (공유 카드 등이 쓴다) ──
   const outfitHex = useMemo(() => {
     const hex: Record<string, string> = {}
     const outfit = upperToOutfit(state)
