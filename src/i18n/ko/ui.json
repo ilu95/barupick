@@ -1911,11 +1911,14 @@
       "skip": "{{slot}} 없이 다음"
     },
     "group": {
+      "pc": "나에게 맞는 색",
       "safe": "무난",
       "match": "어울려요",
       "point": "포인트",
       "mine": "내 옷"
     },
+    "pcHint": "퍼스널컬러를 정하면 나에게 맞는 색부터 보여 드려요",
+    "pcHintLink": "퍼스널컬러 정하기",
     "sortRec": "어울리는 순",
     "sortBright": "밝기순",
     "legend": "● 추천 · △ 주의",

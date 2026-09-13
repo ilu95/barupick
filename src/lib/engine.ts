@@ -13,6 +13,7 @@ import { COLORS_60, getColorName } from './colors'
 import { profile } from './profile'
 import { tasteContrast } from './taste'
 import { PLATE_SLOT } from './outfits'
+import { PERSONAL_COLOR_12 } from './personalColor'
 
 const TO_V7: Record<string, string> = { outer: 'outer', middleware: 'layer', top: 'top', inner: 'inner', bottom: 'bottom', shoes: 'shoes', scarf: 'scarf', hat: 'hat', tie: 'tie' }
 const FROM_V7: Record<string, string> = Object.fromEntries(Object.entries(TO_V7).map(([a, b]) => [b, a]))
@@ -40,6 +41,24 @@ export function pcSeason(): 'spring' | 'summer' | 'autumn' | 'winter' | null {
   } catch { return null }
 }
 
+/** 12타입 원본 키 그대로(예: 'winter_deep') — PERSONAL_COLOR_12 조회용 */
+export function pcType(): string | null {
+  try { return profile.getPersonalColor() || null } catch { return null }
+}
+
+/** 12타입표의 bestColors/avoidColors(색 키) → hex Set. 표에 없는 타입이면 전부 빈 Set */
+function pcColorSets(type: string | null) {
+  const entry = type ? PERSONAL_COLOR_12[type] : null
+  const toHex = (keys: string[]) => new Set(keys.map(k => COLORS_60[k]?.hex).filter(Boolean) as string[])
+  return {
+    pcName: entry ? (entry.name as string) : null,
+    pcBest: entry ? toHex(entry.bestColors) : new Set<string>(),
+    pcAvoid: entry ? toHex(entry.avoidColors) : new Set<string>(),
+    // 핵심 Best 얼굴 근처 8 — bestColors 앞 8개
+    pcFace: entry ? toHex(entry.bestColors.slice(0, 8)) : new Set<string>(),
+  }
+}
+
 const PLATE_V7: Record<string, string> = { inner: 'inner', mid1: 'top', mid2: 'layer', outer: 'outer', bottom: 'bottom', shoe: 'shoes', scarf: 'scarf', hat: 'hat', tie: 'tie' }
 export function toItems(input: EngineInput) {
   const hasTop = !!(input.outfit.top && COLORS_60[input.outfit.top!])
@@ -59,7 +78,7 @@ const v7ToApp = (items: { slot: string; app: string }[]): Record<string, string>
   for (const it of items) m[it.slot] = it.app
   return m
 }
-export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason(), contrast: tasteContrast() })
+export const ctxOf = (input: EngineInput) => ({ situ: input.situ || 'daily', month: input.month || (new Date().getMonth() + 1), pc: pcSeason(), contrast: tasteContrast(), ...pcColorSets(pcType()) })
 
 /** 조합표 그대로 채점: parts = v7 slot → 판 id, keys = slot → 색 키 (취향 폭포·1단계가 쓴다) */
 /**
@@ -120,7 +139,7 @@ export function guideFor(input: EngineInput, slot: string, recN = 12) {
   for (const [k, m] of Object.entries(g.marks as Record<string, string>)) if (m === 'rec' || m === 'warn') marks[k] = m
   const delta: Record<string, number> = {}; const why: Record<string, string> = {}
   for (const x of g.list) { delta[x.key] = x.d; why[x.key] = x.why }
-  return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[] } }
+  return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[]; mine: string[] } }
 }
 
 export interface ComboCard { outfit: Record<string, string>; total: number; why: string; kind: 'safe' | 'point' | 'two' | 'taste'; mine: number }
