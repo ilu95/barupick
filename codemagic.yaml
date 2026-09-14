@@ -25,7 +25,12 @@ workflows:
         script: npm install
       
       - name: Build web app
-        script: npm run build
+        script: |
+          # 운영 DB 변수가 없으면 여기서 멈춘다. 없이 빌드하면 supabase.ts 의 DEV_URL 폴백이
+          # 조용히 개발 DB(ywqaxxcvzhwhascbkyhp)를 물고 TestFlight 까지 올라간다.
+          : "${VITE_SUPABASE_URL:?app 환경 변수 그룹에 VITE_SUPABASE_URL 이 없습니다}"
+          : "${VITE_SUPABASE_ANON_KEY:?app 환경 변수 그룹에 VITE_SUPABASE_ANON_KEY 가 없습니다}"
+          npm run build
       
       - name: Sync Capacitor
         script: npx cap sync ios
@@ -105,7 +110,10 @@ workflows:
         script: npm install
 
       - name: Build web app
-        script: npm run build
+        script: |
+          : "${VITE_SUPABASE_URL:?app 환경 변수 그룹에 VITE_SUPABASE_URL 이 없습니다}"
+          : "${VITE_SUPABASE_ANON_KEY:?app 환경 변수 그룹에 VITE_SUPABASE_ANON_KEY 가 없습니다}"
+          npm run build
 
       - name: Install Capacitor Android
         script: npm install @capacitor/android
