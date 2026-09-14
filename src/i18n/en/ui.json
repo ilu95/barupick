@@ -209,7 +209,7 @@
       "noon": "12pm",
       "evening": "6pm",
       "night": "9pm",
-      "range": "About {{lo}}° in the morning, up to {{hi}}° in the day",
+      "range": "Down to {{lo}}°, up to {{hi}}°",
       "seeWeather": "See weather"
     },
     "needs": {

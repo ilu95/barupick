@@ -85,23 +85,23 @@ function toneFail(c, pc) {
   if (!pc) return null;
   if (pc === 'winter') {
     if (c.C > NEUTRAL_C && c.C < 32 && c.L > 40 && c.L < 75) return '탁한';
-    if (earthHue(c.h) && c.C > NEUTRAL_C && c.C < 65) return '웜 어스';
-    if (c.h >= 15 && c.h <= 50 && c.C >= 30 && c.C <= 68 && c.L > 50) return '웜 소프트';
+    if (earthHue(c.h) && c.C > NEUTRAL_C && c.C < 65) return '따뜻한 흙빛';
+    if (c.h >= 15 && c.h <= 50 && c.C >= 30 && c.C <= 68 && c.L > 50) return '부드러운 웜톤';
   }
   if (pc === 'summer') {
-    if (c.C >= 55 && warmHue(c.h)) return '쨍한 웜';
+    if (c.C >= 55 && warmHue(c.h)) return '쨍한 웜톤';
     if (c.L < 22 && c.C < 20) return '너무 어두운';
-    if (earthHue(c.h) && c.C >= 25 && c.L < 60) return '웜 어스';
+    if (earthHue(c.h) && c.C >= 25 && c.L < 60) return '따뜻한 흙빛';
   }
   if (pc === 'autumn') {
     if (c.C <= NEUTRAL_C && c.L < 20) return '새까만';
     if (c.L > 85 && c.C > NEUTRAL_C && !warmHue(c.h)) return '차가운 파스텔';
-    if (c.C >= 50 && !warmHue(c.h)) return '쨍한 쿨';
+    if (c.C >= 50 && !warmHue(c.h)) return '쨍한 쿨톤';
   }
   if (pc === 'spring') {
     if (c.L < 25 && c.C < 30) return '너무 어두운';
     if (c.C > NEUTRAL_C && c.C < 30 && c.L > 35 && c.L < 70) return '탁한';
-    if (c.C >= 45 && !warmHue(c.h) && c.L < 45) return '깊은 쿨';
+    if (c.C >= 45 && !warmHue(c.h) && c.L < 45) return '어두운 쿨톤';
   }
   return null;
 }
@@ -203,19 +203,21 @@ function evaluate(items, ctx) {
     const isK = p => p && p.c.L < 18 && p.c.C <= NEUTRAL_C;
     const allBlack = FIX.E && isK(upperMain) && isK(bot) && isK(shE);
     if (allBlack) fit = fit + (1 - fit) * .5;
-    if (brk > .35) add('tonal-breaker', `위아래는 비슷해도 ${nmG(brkP)} 밝기를 갈라 줘요`, 1, [brkP.slot, 'top', 'bottom']);
-    else if (oneTone) add('onetone-flat', '위아래가 한 색인데 나눠 줄 밝은 곳이 없어요. 이너나 신발로 대비를 줘 보세요', -1, ['top', 'shoes', 'inner']);
+    /* 갈라 주는 자리는 밝을 수도 어두울 수도 있다(brkOf 는 절대값) — 말을 방향에 맞춰야 한다 */
+    const brkUp = brkP && brkP.c.L > (upperMain.c.L + bot.c.L) / 2;
+    if (brk > .35) add('tonal-breaker', `위아래 색이 비슷한데 ${nmG(brkP)} ${brkUp ? '밝아서 답답해 보이지 않아요' : '어두워서 밋밋하지 않아요'}`, 1, [brkP.slot, 'top', 'bottom']);
+    else if (oneTone) add('onetone-flat', '위아래가 온통 같은 색이라 밋밋해요. 이너나 신발만 밝은 걸로 바꿔도 확 살아나요', -1, ['top', 'shoes', 'inner']);
     else if (dL < TARGET[1] * .6) {
-      if (hueCarry > .35) add('hue-carries', `${nmW(upperMain)} ${nmN(bot)} 밝기는 비슷해도 색 계열이 달라 구분돼요`, 1, ['top', 'bottom']);
-      else if (lightTonal > .35) add('light-tonal', '밝은 색끼리 톤을 맞춘 룩이에요', 1, ['top', 'bottom']);
-      else if (darkTonal > .35) add('dark-tonal', '어두운 색끼리 톤을 맞추고 밝은 곳으로 갈라 줬어요', 1, ['top', 'bottom']);
-      else add('dL-low', '위아래 밝기가 비슷해서 뭉개져 보여요', -2, ['top', 'bottom', 'outer']);
+      if (hueCarry > .35) add('hue-carries', `${nmW(upperMain)} ${nmN(bot)} 비슷하게 밝지만 색이 달라서 따로따로 잘 보여요`, 1, ['top', 'bottom']);
+      else if (lightTonal > .35) add('light-tonal', '밝은 색으로만 맞춰 입어서 가볍고 산뜻해요', 1, ['top', 'bottom']);
+      else if (darkTonal > .35) add('dark-tonal', '어두운 색으로 차분하게 맞추고 한 군데만 밝게 둬서 답답하지 않아요', 1, ['top', 'bottom']);
+      else add('dL-low', '위아래 색이 너무 비슷해서 한 덩어리로 보여요', -2, ['top', 'bottom', 'outer']);
     }
-    else if (dL > TARGET[3]) { if (bw) add('bw-contrast', `${nm(upperMain)}와 ${nm(bot)}의 흑백 대비는 정석이에요`, 1, ['top', 'bottom']); else add('dL-high', '위아래 밝기 차이가 너무 커서 끊겨 보여요. 중간 밝기 옷을 하나 넣어 보세요', -1, ['top', 'bottom']); }
-    else if (fit > .8) add('dL-ok', '위아래 밝기가 또렷하게 나뉘어요', 1, ['top', 'bottom']);
+    else if (dL > TARGET[3]) { if (bw) add('bw-contrast', `${nmW(upperMain)} ${nmN(bot)} 흑백 조합이라 실패할 일이 없어요`, 1, ['top', 'bottom']); else add('dL-high', '위아래가 너무 확 차이 나서 뚝 끊겨 보여요. 중간쯤 되는 색을 하나 걸치면 자연스러워져요', -1, ['top', 'bottom']); }
+    else if (fit > .8) add('dL-ok', '위아래가 또렷하게 나뉘어서 보기 좋아요', 1, ['top', 'bottom']);
     mScore += 22 * fit;
     const o = by('outer'), t = by('top') || by('layer');
-    if (o && t) { const d2 = Math.abs(o.c.L - t.c.L); const oi = ramp(d2, 6, 22); mScore += 5 * (allBlack ? .5 + .5 * oi : oi); if (d2 < 8) add('outer-inner', `${nm(o)}와 ${nm(t)} 밝기가 비슷해서 겹쳐 입은 게 안 보여요`, -1, ['outer', 'top']); }
+    if (o && t) { const d2 = Math.abs(o.c.L - t.c.L); const oi = ramp(d2, 6, 22); mScore += 5 * (allBlack ? .5 + .5 * oi : oi); if (d2 < 8) add('outer-inner', `${nmW(o)} ${nmN(t)} 밝기가 비슷해서 겹쳐 입은 티가 안 나요`, -1, ['outer', 'top']); }
     else mScore += 5;
     const wantLightBottom = ctx.body && ctx.body.bottom === 'light';
     mScore += 3 * (wantLightBottom ? ramp(bot.c.L - upperL, -8, 4) : ramp(upperL - bot.c.L, -8, 4));
@@ -229,19 +231,19 @@ function evaluate(items, ctx) {
   const n = fams.reduce((s, f) => s + f.w, 0);
   // 무채색 일색은 안전한 정석이라 크게 깎지 않는다 (v7.3: 12+4n → 16+4n). 색이 하나 있으면 20, 둘째부터 서서히, 셋째부터 가파르게
   let cScore = n < 1 ? 16 + 4 * n : n <= 2 ? 20 - 2 * (n - 1) : n <= 3 ? 18 - 7 * (n - 2) : Math.max(3, 11 - 7 * (n - 3));
-  if (n >= 2.6) add('too-many', `색이 ${Math.round(n)}가지라 많아요. 하나는 무채색으로 바꿔 보세요`, -2, P.filter(p => p.wc >= .5).map(p => p.slot));
-  if (n < .3) add('all-neutral', '전부 무채색이라 안전하지만 심심해요. 작은 포인트 색을 하나 더해 보세요', 0, ['scarf', 'shoes', 'top']);
+  if (n >= 2.6) add('too-many', `색이 ${Math.round(n)}가지나 섞여서 좀 복잡해요. 하나는 검정이나 회색처럼 무난한 색으로 바꿔 보세요`, -2, P.filter(p => p.wc >= .5).map(p => p.slot));
+  if (n < .3) add('all-neutral', '검정·흰색·회색뿐이라 무난하긴 한데 밋밋해요. 목도리나 신발에 색을 하나 넣어 보세요', 0, ['scarf', 'shoes', 'top']);
   /* G·G'. 유채가 한 가족뿐이고 나머지가 무채면 "주인공 하나" 룩이다 — 넓이 감점을 반으로.
      아이템 개수가 아니라 색 가족(색상각 20° 안)으로 센다: 레드 코트 + 레드 모자는 하나다 */
   const heroFams = [];
   P.filter(p => p.fn < .5 && p.area >= .03).forEach(p => { if (!heroFams.some(h => dH(h, p.c.h) < 20)) heroFams.push(p.c.h); });
   const heroK = FIX.G && heroFams.length === 1 ? .5 : 1;
   const strongArea = P.reduce((s, p) => s + p.area * p.vv, 0);
-  if (strongArea > situ.accentMax) { const pen = Math.min(16, (strongArea - situ.accentMax) * 45 * situ.strict) * heroK; cScore -= pen; add('accent-big', `강한 색이 전체의 ${Math.round(strongArea * 100)}%나 돼요. 포인트는 작을수록 살아요`, -2, P.filter(p => p.vv > .4).map(p => p.slot)); }
+  if (strongArea > situ.accentMax) { const pen = Math.min(16, (strongArea - situ.accentMax) * 45 * situ.strict) * heroK; cScore -= pen; add('accent-big', `쨍한 색이 몸의 ${Math.round(strongArea * 100)}%를 차지해요. 포인트 색은 좁게 쓸수록 눈에 띄어요`, -2, P.filter(p => p.vv > .4).map(p => p.slot)); }
   const anchor = P.reduce((a, b) => (a.area >= b.area ? a : b), P[0]);
-  if (anchor && anchor.vv > .25) { cScore -= 8 * anchor.vv * heroK; add('anchor', `제일 넓은 ${nm(anchor)}가 너무 쨍해요. 넓은 자리는 차분한 색이 편해요`, -2, [anchor.slot]); }
+  if (anchor && anchor.vv > .25) { cScore -= 8 * anchor.vv * heroK; add('anchor', `가장 넓은 ${nmG(anchor)} 너무 쨍해요. 넓게 차지하는 옷일수록 차분한 색이라야 편해 보여요`, -2, [anchor.slot]); }
   const chromItems = P.filter(p => p.wc > .5 && p.area >= .05);
-  if (chromItems.length >= 3 && !P.some(p => p.wc < .3 && p.area >= .05)) { const vAvg = chromItems.reduce((s, p) => s + p.vv, 0) / chromItems.length; const pen = 6 + 6 * vAvg; cScore -= pen; add('no-neutral', '무채색이 한 벌도 없어요. 눈이 쉬어 갈 색이 하나는 필요해요', -1, chromItems.map(p => p.slot)); }
+  if (chromItems.length >= 3 && !P.some(p => p.wc < .3 && p.area >= .05)) { const vAvg = chromItems.reduce((s, p) => s + p.vv, 0) / chromItems.length; const pen = 6 + 6 * vAvg; cScore -= pen; add('no-neutral', '전부 색이 있는 옷이라 눈이 쉴 곳이 없어요. 검정이나 흰색을 하나 넣어 보세요', -1, chromItems.map(p => p.slot)); }
   parts['색 수·면적'] = [Math.round(clamp(cScore, 0, 20)), 20];
 
   /* 3. 조화 25 — 실무 규칙 층이 들어오면서 20 → 25 (상황·계절 10 → 5 로 상쇄, 합 100 유지) */
@@ -256,12 +258,12 @@ function evaluate(items, ctx) {
     const a = P[i], b = P[j]; const w = Math.min(a.wc, b.wc); const dh = dH(a.c.h, b.c.h), dl = Math.abs(a.c.L - b.c.L);
     const bigPair = ['outer', 'layer', 'top', 'bottom'].includes(a.slot) && ['outer', 'layer', 'top', 'bottom'].includes(b.slot);
     if (w > .05) {
-      if (bigPair && dh >= 15 && dh < 32 && dl < 25 && a.wc > .5 && b.wc > .5) { hScore -= 3 * w; add('tone-flat', `${nm(a)}와 ${nm(b)}는 같은 계열인데 밝기까지 비슷해요. 하나를 훨씬 밝거나 어둡게 해 보세요`, -1, [a.slot, b.slot]); }
-      if (bigPair && dh < 15 && dl < 18 && Math.abs(a.c.C - b.c.C) < 22) { hScore -= 5 * w; if (w > .4) add('dup', `${nm(a)}와 ${nm(b)}가 거의 같은 색이라 흐릿해요. 밝기 차이를 줘 보세요`, -1, [a.slot, b.slot]); }
+      if (bigPair && dh >= 15 && dh < 32 && dl < 25 && a.wc > .5 && b.wc > .5) { hScore -= 3 * w; add('tone-flat', `${nmW(a)} ${nmN(b)} 색도 밝기도 비슷해서 심심해요. 둘 중 하나를 확 밝히거나 어둡게 하면 살아나요`, -1, [a.slot, b.slot]); }
+      if (bigPair && dh < 15 && dl < 18 && Math.abs(a.c.C - b.c.C) < 22) { hScore -= 5 * w; if (w > .4) add('dup', `${nmW(a)} ${nmG(b)} 거의 같은 색이라 구분이 안 돼요. 하나를 더 밝게 해 보세요`, -1, [a.slot, b.slot]); }
       const vv = Math.min(a.vv, b.vv);
-      if (nextTo(a, b) && vv > .2) { hScore -= 7 * vv; if (vv > .5) add('clash', `${nm(a)}와 ${nm(b)}가 둘 다 쨍해서 붙으면 튀어요`, -1, [a.slot, b.slot]); }
-      if (nextTo(a, b) && dh > 150 && vv > .3) { hScore -= 4 * vv; add('comp', `${nm(a)}와 ${nm(b)}는 보색이라 서로를 밀어내요`, -1, [a.slot, b.slot]); }
-      if (nextTo(a, b) && dh >= 18 && dh <= 75 && vv > .35 && Math.abs(a.c.C - b.c.C) < 30) { hScore -= 8 * vv; add('analog-vivid', `${nm(a)}와 ${nm(b)}는 비슷한 계열인데 둘 다 쨍해서 서로 부딪혀요. 하나는 톤을 낮춰 보세요`, -1, [a.slot, b.slot]); }
+      if (nextTo(a, b) && vv > .2) { hScore -= 7 * vv; if (vv > .5) add('clash', `${nmW(a)} ${nmG(b)} 둘 다 쨍해서 붙여 놓으면 눈이 아파요`, -1, [a.slot, b.slot]); }
+      if (nextTo(a, b) && dh > 150 && vv > .3) { hScore -= 4 * vv; add('comp', `${nmW(a)} ${nmN(b)} 정반대 색이라 서로 부딪혀요`, -1, [a.slot, b.slot]); }
+      if (nextTo(a, b) && dh >= 18 && dh <= 75 && vv > .35 && Math.abs(a.c.C - b.c.C) < 30) { hScore -= 8 * vv; add('analog-vivid', `${nmW(a)} ${nmN(b)} 비슷한 색인데 둘 다 쨍해요. 하나는 좀 연한 색으로 바꿔 보세요`, -1, [a.slot, b.slot]); }
     }
     /* 실무 규칙 — 톤 일치와 온도. 붙어 있는지·넓은지가 아니라 "입은 색"(면적 3% 이상) 전부가 대상이다.
        옛 temp 규칙은 R2 가 대신한다(채도 조건 없이, 무채가 아닌 두 색이면 걸린다) */
@@ -286,15 +288,15 @@ function evaluate(items, ctx) {
     }
     /* 블랙 × 네이비: 둘 다 어두운데 구분이 안 된다 */
     const isBlack = p => p.c.C <= NEUTRAL_C && p.c.L < 18, isNavy = p => p.c.h >= 250 && p.c.h <= 310 && p.c.L < 30 && p.c.C > 15 && !(FIX.B && denimW(p.c) >= .5);
-    if (bigPair && nextTo(a, b) && ((isBlack(a) && isNavy(b)) || (isBlack(b) && isNavy(a)))) { hScore -= 8; add('black-navy', `${nm(a)}와 ${nm(b)}가 붙으면 검정인지 남색인지 구분이 안 돼요`, -1, [a.slot, b.slot]); }
+    if (bigPair && nextTo(a, b) && ((isBlack(a) && isNavy(b)) || (isBlack(b) && isNavy(a)))) { hScore -= 8; add('black-navy', `${nmW(a)} ${nmG(b)} 붙어 있으면 검정인지 남색인지 헷갈려요`, -1, [a.slot, b.slot]); }
   }
   /* B. 옷 자리만 세고(모자·신발·목도리 제외), 데님은 빼고, 브라운·올리브는 한 가족으로 */
   const darkBig = P.filter(p => p.c.L < 42 && p.area >= .05
     && (!FIX.B || (['outer', 'layer', 'top', 'bottom'].includes(p.slot) && denimW(p.c) < .5)));
   const darkFams = []; darkBig.forEach(p => { const key = p.c.C <= NEUTRAL_C ? 'k' : (FIX.B && p.c.h >= 20 && p.c.h <= 125) ? 'e' : String(Math.round(p.c.h / 40)); if (!darkFams.includes(key)) darkFams.push(key); });
-  if (darkFams.length >= 3) { hScore -= 12; add('dark-mix', '검정·남색·갈색처럼 어두운 색이 세 가지나 섞여 탁해요. 하나는 밝게 해 보세요', -1, darkBig.map(p => p.slot)); }
+  if (darkFams.length >= 3) { hScore -= 12; add('dark-mix', '어두운 색이 세 가지나 섞여서 칙칙해 보여요. 하나는 밝은 색으로 바꿔 보세요', -1, darkBig.map(p => p.slot)); }
   let blackBrown = false;
-  for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) { const a = P[i], b = P[j]; const bp = ['outer', 'layer', 'top', 'bottom'].includes(a.slot) && ['outer', 'layer', 'top', 'bottom'].includes(b.slot); const blk = p => p.c.C <= NEUTRAL_C && p.c.L < 18, brn = p => earthHue(p.c.h) && p.c.C > 18 && p.c.L < 45; if (bp && nextTo(a, b) && ((blk(a) && brn(b)) || (blk(b) && brn(a)))) { blackBrown = true; hScore -= 3; add('black-brown', `${nm(a)}와 ${nm(b)}는 서로를 탁하게 해요`, -1, [a.slot, b.slot]); } }
+  for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) { const a = P[i], b = P[j]; const bp = ['outer', 'layer', 'top', 'bottom'].includes(a.slot) && ['outer', 'layer', 'top', 'bottom'].includes(b.slot); const blk = p => p.c.C <= NEUTRAL_C && p.c.L < 18, brn = p => earthHue(p.c.h) && p.c.C > 18 && p.c.L < 45; if (bp && nextTo(a, b) && ((blk(a) && brn(b)) || (blk(b) && brn(a)))) { blackBrown = true; hScore -= 3; add('black-brown', `${nmW(a)} ${nmN(b)} 같이 입으면 서로 칙칙해 보여요`, -1, [a.slot, b.slot]); } }
   /* 어스 톤 바탕에 형광에 가까운 색 하나 — 무채 바탕이면 포인트지만 어스 바탕에서는 겉돈다 */
   const big = p => ['outer', 'layer', 'top', 'bottom'].includes(p.slot);
   /* D. 어스-네온은 정말 밝고 쨍한 색만 — L 65 이상 · C 50 이상 */
@@ -317,35 +319,35 @@ function evaluate(items, ctx) {
     const tiedTo = x => x && dH(shoe.c.h, x.c.h) < 30 && Math.abs(shoe.c.L - x.c.L) < 30;
     const tied = Math.max(1 - shoe.wc, tiedTo(anc) ? 1 : 0, tiedTo(tp) ? .8 : 0);
     eScore += 5 * tied;
-    if (tied < .4) add('shoe', `${nm(shoe)} 신발 색이 따로 놀아요. 하의 색이나 무채색으로 맞춰 보세요`, -1, ['shoes']);
-    else if (shoe.wc > .5 && tiedTo(anc)) add('shoe-tie', '신발이 하의 색과 이어져 다리가 길어 보여요', 1, ['shoes']);
+    if (tied < .4) add('shoe', `${nmG(shoe)} 혼자 따로 놀아요. 하의랑 같은 색이거나 검정·흰색이면 무난해요`, -1, ['shoes']);
+    else if (shoe.wc > .5 && tiedTo(anc)) add('shoe-tie', '신발을 하의랑 같은 색으로 맞춰서 다리가 길어 보여요', 1, ['shoes']);
     const darkBottomBrownShoe = anc && anc.c.C <= NEUTRAL_C && anc.c.L < 18 && earthHue(shoe.c.h) && shoe.c.C > 20 && shoe.c.L < 50;
-    if (darkBottomBrownShoe) { eScore -= 2; add('black-brown', '블랙 하의에 브라운 신발은 어색해요. 블랙이나 화이트 신발이 나아요', -1, ['shoes']); }
+    if (darkBottomBrownShoe) { eScore -= 2; add('black-brown', '검정 하의에 갈색 신발은 잘 안 어울려요. 검정이나 흰색 신발이 나아요', -1, ['shoes']); }
   } else eScore += 5;
   const points = P.filter(p => p.vv > .5 && p.area <= .12);
   eScore += points.length <= 1 ? 5 : points.length === 2 ? 2 : 0;
-  if (points.length >= 2) add('points', `포인트 색이 ${points.length}곳이에요. 한 곳이면 충분해요`, -1, points.map(p => p.slot));
+  if (points.length >= 2) add('points', `눈에 띄는 색이 ${points.length}군데나 있어요. 한 군데만 있어도 충분해요`, -1, points.map(p => p.slot));
   else if (points.length === 1 && n <= 2.2) {
     /* 포인트는 바탕이 무채일 때만 포인트다. 코트가 가라앉은 색인데 안쪽만 쨍하면 포인트가 아니라 따로 노는 것 */
     const pt = points[0], base = P.filter(p => p !== pt && p.area >= .03);
     const baseArea = base.reduce((s, p) => s + p.area, 0);
     const baseFn = baseArea ? base.reduce((s, p) => s + p.area * p.fn, 0) / baseArea : 1;
-    if (baseArea < .6 || baseFn >= .5) add('point-one', `${nm(pt)} 하나가 포인트가 됐어요`, 1, [pt.slot]);
-    else { eScore -= 8; add('point-buried', `바탕이 가라앉은 색인데 ${nm(pt)}만 쨍해서 포인트가 아니라 따로 놀아요`, -1, [pt.slot]); }
+    if (baseArea < .6 || baseFn >= .5) add('point-one', `${nmG(pt)} 포인트로 딱 살았어요`, 1, [pt.slot]);
+    else { eScore -= 8; add('point-buried', `나머지가 다 가라앉은 색이라 ${nmN(pt)} 포인트라기보다 혼자 튀어 보여요`, -1, [pt.slot]); }
   }
-  points.forEach(pt => { const others = P.filter(p => p !== pt && p.wc > .2); if (others.length && !others.some(o => dH(o.c.h, pt.c.h) < 40 || warmHue(o.c.h) === warmHue(pt.c.h))) { eScore -= 2; add('point-odd', `${nm(pt)} 포인트가 다른 색들과 온도가 달라 겉돌아요`, -1, [pt.slot]); } });
+  points.forEach(pt => { const others = P.filter(p => p !== pt && p.wc > .2); if (others.length && !others.some(o => dH(o.c.h, pt.c.h) < 40 || warmHue(o.c.h) === warmHue(pt.c.h))) { eScore -= 2; add('point-odd', `${nmN(pt)} 다른 색들이랑 결이 달라서 겉돌아요`, -1, [pt.slot]); } });
   parts['시선 정리'] = [Math.round(clamp(eScore, 0, 10)), 10];
 
   /* 5. 상황·계절 5 — 안은 10점 눈금 그대로 두고 마지막에 반으로 접는다 (조화 20 → 25 와 맞바꿔 합 100 유지) */
   let sScore = 6;
-  P.filter(p => p.area >= .2).forEach(p => { const over = ramp(p.c.C - situ.bigC, 0, 30) * ramp(p.c.L, 26, 44); if (over > .1) { sScore -= 4 * over * situ.strict; if (over > .4) add('situ-big', `${nm(p)}는 이 자리엔 조금 쨍해요`, -1, [p.slot]); } });
+  P.filter(p => p.area >= .2).forEach(p => { const over = ramp(p.c.C - situ.bigC, 0, 30) * ramp(p.c.L, 26, 44); if (over > .1) { sScore -= 4 * over * situ.strict; if (over > .4) add('situ-big', `${nmN(p)} 이런 자리에 입기엔 조금 쨍해요`, -1, [p.slot]); } });
   const avgL = P.reduce((s, p) => s + p.c.L * p.area, 0);
-  if (season === 'summer') { const pen = 3 * ramp(38 - avgL, 0, 12); sScore -= pen; if (pen > 1.5) add('season-heavy', '여름치고 전체가 어두워요. 한 벌은 밝게 해 보세요', -1, ['top']); }
-  if (season === 'winter' && avgL > 80 && n < .3) { sScore -= 2; add('season-light', '겨울인데 전체가 하얘요. 한 벌은 깊은 색으로 해 보세요', 0, ['outer', 'bottom']); }
-  if (season === 'autumn' && P.some(p => p.area >= .1 && p.wc > .2 && earthHue(p.c.h) && p.c.L < 72)) { sScore += 2; add('season-earth', '가을에 맞는 어스 톤이에요', 1, []); }
-  if (season === 'spring' && P.some(p => p.area >= .1 && p.c.L > 76 && p.wc > .2)) { sScore += 2; add('season-fresh', '봄에 맞게 밝고 맑아요', 1, []); }
-  if (season === 'summer' && avgL > 62) { sScore += 2; add('season-cool', '여름에 맞게 가벼워요', 1, []); }
-  if (season === 'winter' && P.some(p => p.c.L < 30 && p.area > .3)) { sScore += 2; add('season-deep', '겨울에 맞게 깊이가 있어요', 1, []); }
+  if (season === 'summer') { const pen = 3 * ramp(38 - avgL, 0, 12); sScore -= pen; if (pen > 1.5) add('season-heavy', '여름인데 전체적으로 어두워요. 하나만 밝은 색으로 바꿔도 훨씬 시원해 보여요', -1, ['top']); }
+  if (season === 'winter' && avgL > 80 && n < .3) { sScore -= 2; add('season-light', '겨울인데 전체적으로 너무 하얘요. 하나는 진한 색으로 바꿔 보세요', 0, ['outer', 'bottom']); }
+  if (season === 'autumn' && P.some(p => p.area >= .1 && p.wc > .2 && earthHue(p.c.h) && p.c.L < 72)) { sScore += 2; add('season-earth', '가을에 어울리는 차분한 흙빛이에요', 1, []); }
+  if (season === 'spring' && P.some(p => p.area >= .1 && p.c.L > 76 && p.wc > .2)) { sScore += 2; add('season-fresh', '봄에 어울리게 밝고 맑아요', 1, []); }
+  if (season === 'summer' && avgL > 62) { sScore += 2; add('season-cool', '여름에 어울리게 가벼워 보여요', 1, []); }
+  if (season === 'winter' && P.some(p => p.c.L < 30 && p.area > .3)) { sScore += 2; add('season-deep', '겨울에 어울리게 묵직하고 깊어요', 1, []); }
   parts['상황·계절'] = [Math.round(clamp(sScore, 0, 10) * .5), 5];
 
   /* 6. 나에게 15 */
@@ -356,16 +358,16 @@ function evaluate(items, ctx) {
   if (hasPC) {
     P.filter(p => ['outer', 'layer', 'top', 'scarf', 'tie', 'hat'].includes(p.slot) && p.area >= .03).forEach(p => {
       if (has12) {
-        if (ctx.pcAvoid.has(p.hex)) { fScore -= 8; faceAvoidHit = true; add('tone', `${nm(p)}는 ${ctx.pcName}에게 안 맞아요. 아래쪽에 쓰면 괜찮아요`, -2, [p.slot]); }
-        else if (ctx.pcFace.has(p.hex)) { fScore += 4; add('tone-face', `${nm(p)}는 얼굴 근처에 두기 좋은 색이에요`, 1, [p.slot]); }
+        if (ctx.pcAvoid.has(p.hex)) { fScore -= 8; faceAvoidHit = true; add('tone', `${nmN(p)} ${ctx.pcName} 톤에는 잘 안 받아요. 하의나 신발처럼 얼굴에서 먼 곳에 쓰면 괜찮아요`, -2, [p.slot]); }
+        else if (ctx.pcFace.has(p.hex)) { fScore += 4; add('tone-face', `${nmN(p)} 얼굴 옆에 두면 안색이 좋아 보이는 색이에요`, 1, [p.slot]); }
       } else {
-        const bad = toneFail(p.c, pc); if (bad) { fScore -= 6; add('tone', `${nm(p)}는 ${bad} 색이라 얼굴이 가라앉아요. 아래쪽에 쓰면 괜찮아요`, -2, [p.slot]); }
+        const bad = toneFail(p.c, pc); if (bad) { fScore -= 6; add('tone', `${nmN(p)} ${bad} 색이라 얼굴이 칙칙해 보여요. 아래쪽에 쓰면 괜찮아요`, -2, [p.slot]); }
       }
     });
     if (ctx.body) {
       const t = by('top') || by('outer');
-      if (t && ctx.body.top === 'light' && t.c.L < 55) { fScore -= 3; add('body-top', '체형을 보면 상의는 밝은 쪽이 균형이 맞아요', -1, ['top']); }
-      if (t && ctx.body.top === 'dark' && t.c.L > 55) { fScore -= 3; add('body-top', '체형을 보면 상의는 어두운 쪽이 균형이 맞아요', -1, ['top']); }
+      if (t && ctx.body.top === 'light' && t.c.L < 55) { fScore -= 3; add('body-top', '체형상 상의를 밝게 입으면 균형이 더 잘 맞아요', -1, ['top']); }
+      if (t && ctx.body.top === 'dark' && t.c.L > 55) { fScore -= 3; add('body-top', '체형상 상의를 어둡게 입으면 균형이 더 잘 맞아요', -1, ['top']); }
     }
     parts['나에게'] = [Math.round(clamp(fScore, 0, 15)), 15];
   }
