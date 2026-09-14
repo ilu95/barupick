@@ -203,7 +203,9 @@ function evaluate(items, ctx) {
     const isK = p => p && p.c.L < 18 && p.c.C <= NEUTRAL_C;
     const allBlack = FIX.E && isK(upperMain) && isK(bot) && isK(shE);
     if (allBlack) fit = fit + (1 - fit) * .5;
-    if (brk > .35) add('tonal-breaker', `위아래 색이 비슷한데 ${nmG(brkP)} 밝아서 답답해 보이지 않아요`, 1, [brkP.slot, 'top', 'bottom']);
+    /* 갈라 주는 자리는 밝을 수도 어두울 수도 있다(brkOf 는 절대값) — 말을 방향에 맞춰야 한다 */
+    const brkUp = brkP && brkP.c.L > (upperMain.c.L + bot.c.L) / 2;
+    if (brk > .35) add('tonal-breaker', `위아래 색이 비슷한데 ${nmG(brkP)} ${brkUp ? '밝아서 답답해 보이지 않아요' : '어두워서 밋밋하지 않아요'}`, 1, [brkP.slot, 'top', 'bottom']);
     else if (oneTone) add('onetone-flat', '위아래가 온통 같은 색이라 밋밋해요. 이너나 신발만 밝은 걸로 바꿔도 확 살아나요', -1, ['top', 'shoes', 'inner']);
     else if (dL < TARGET[1] * .6) {
       if (hueCarry > .35) add('hue-carries', `${nmW(upperMain)} ${nmN(bot)} 비슷하게 밝지만 색이 달라서 따로따로 잘 보여요`, 1, ['top', 'bottom']);
