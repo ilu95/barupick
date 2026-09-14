@@ -718,6 +718,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
   const addToCloset = () => { const n = commitCloset(garments, new Set(), 'result'); setClosetMsg(n > 0 ? t('build.closetAuto.added', { n }) : t('build.closetAuto.already')) }
   const [card, setCard] = useState<{ url: string; ratio: CardRatio } | null>(null)
   const [cardBusy, setCardBusy] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
   const score = build.getScore()
   const evalResult = build.getEvalResult()
   const circumference = 2 * Math.PI * 52
@@ -732,9 +733,22 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
 
   // 엔진 v7.1: 명도 구조 30 · 색 수·면적 20 · 조화 20 · 시선 정리 10 · 상황·계절 10 · 나에게 15(퍼스널컬러 있을 때)
   const scoreItems = evalResult ? evalResult.parts.map(p => ({ label: t('build.v7parts.' + p.key, { defaultValue: p.label }), value: p.value, max: p.max, desc: '' })) : []
-  const reasonLines = evalResult && i18n.language.startsWith('ko')
-    ? [...evalResult.reasons.filter(r => r.w < 0).slice(0, 2), ...evalResult.reasons.filter(r => r.w > 0).slice(0, 2)]
-    : []
+  // 결과 화면: 그래프보다 말이 먼저. 가점 최대 2줄 + 감점 1줄(있을 때만) — 이유 문장은 한국어만 있다
+  const praiseLines = evalResult && i18n.language.startsWith('ko') ? evalResult.reasons.filter(r => r.w > 0).slice(0, 2) : []
+  const concernLine = evalResult && i18n.language.startsWith('ko') ? evalResult.reasons.filter(r => r.w < 0)[0] : null
+  const bestMove = useMemo(() => concernLine ? (build.getBestMoves(1)[0] || null) : null, [concernLine?.txt, build.state])
+  const moveGood = bestMove && bestMove.gain >= 3 ? bestMove : null
+  const applyBestMove = () => {
+    if (!moveGood) return
+    const undo = build.applyMove(moveGood)
+    trackGuide('move_apply', { slot: moveGood.slot, from: moveGood.from, to: moveGood.to, gain: moveGood.gain, score_before: score, ctx: 'result' })
+    toast.toast({
+      message: t('build.moves.applied', { part: getBuildPartLabel(moveGood.slot, build.state.upper, build.state), color: getColorName(moveGood.to), n: moveGood.gain }),
+      variant: 'success',
+      undoAction: () => { undo(); trackGuide('move_undo', { slot: moveGood.slot, ctx: 'result' }) },
+      undoLabel: t('build.moves.undo'),
+    })
+  }
 
   const handleSave = () => {
     const name = build.state.style ? t('styles:guide.' + build.state.style + '.name', { defaultValue: build.state.style }) : t('common.coord')
@@ -822,26 +836,49 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         </div>
       </div>
 
-      {/* 점수 분해도 */}
-      {scoreItems.length > 0 && (
+      {/* 이 코디에 대한 말 — 그래프보다 먼저. 칭찬 최대 2줄 + 아쉬운 점 1줄(있을 때만) + 고치는 한 수 */}
+      {(praiseLines.length > 0 || concernLine) && (
         <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-4 shadow-warm-sm">
-          <div className="text-xs font-semibold text-warm-500 uppercase tracking-widest mb-3">{t('build.scoreAnalysis')}</div>
-          <div className="flex flex-col gap-2">
-            {scoreItems.map(item => (
-              <div key={item.label} className="flex items-center gap-2">
-                <span className="text-[11px] text-warm-600 w-16 flex-shrink-0">{item.label}</span>
-                <div className="flex-1 h-2 bg-warm-200 dark:bg-warm-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-terra-400 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }} />
-                </div>
-                <span className="text-[11px] font-display font-bold text-warm-700 w-8 text-right">{Math.round(item.value)}</span>
-              </div>
+          <div className="flex flex-col gap-1">
+            {praiseLines.map((r, i) => (
+              <div key={i} className="text-[14px] font-medium leading-snug text-terra-600 dark:text-terra-400">● {r.txt}</div>
             ))}
           </div>
-          {reasonLines.length > 0 && (
-            <div className="mt-3 flex flex-col gap-1">
-              {reasonLines.map((r, i) => (
-                <div key={i} className={`text-[11px] font-medium leading-snug ${r.w < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-terra-600'}`}>{r.w < 0 ? '△' : '●'} {r.txt}</div>
-              ))}
+          {concernLine && (
+            <div className="mt-2 pt-2 border-t border-warm-200 dark:border-warm-700">
+              <div className="text-[13px] font-medium leading-snug text-amber-700 dark:text-amber-400">△ {concernLine.txt}</div>
+              {moveGood && (
+                <button onClick={applyBestMove}
+                  className="mt-2 w-full py-2 rounded-xl bg-terra-50 dark:bg-terra-900/20 border border-terra-300 dark:border-terra-700 text-[12.5px] font-semibold text-terra-700 dark:text-terra-300 active:scale-[0.98]">
+                  {t('builder.moveChip', { slot: getBuildPartLabel(moveGood.slot, build.state.upper, build.state), color: getColorName(moveGood.to), score: score + moveGood.gain })}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 점수 분해도 — 접힘 기본, 그래프를 보고 싶을 때만 */}
+      {scoreItems.length > 0 && (
+        <div className="mb-4">
+          <button onClick={() => { const next = !detailOpen; setDetailOpen(next); if (next) trackGuide('score_detail_open', { score }) }}
+            className="w-full flex items-center gap-1 text-[12px] font-semibold text-warm-600 dark:text-warm-400 py-1.5 active:opacity-70">
+            <span className="w-3 inline-block">{detailOpen ? '▾' : '▸'}</span> {t('build.scoreDetail')}
+          </button>
+          {detailOpen && (
+            <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mt-1 shadow-warm-sm">
+              <div className="text-xs font-semibold text-warm-500 uppercase tracking-widest mb-3">{t('build.scoreAnalysis')}</div>
+              <div className="flex flex-col gap-2">
+                {scoreItems.map(item => (
+                  <div key={item.label} className="flex items-center gap-2">
+                    <span className="text-[11px] text-warm-600 w-16 flex-shrink-0">{item.label}</span>
+                    <div className="flex-1 h-2 bg-warm-200 dark:bg-warm-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-terra-400 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }} />
+                    </div>
+                    <span className="text-[11px] font-display font-bold text-warm-700 w-8 text-right">{Math.round(item.value)}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
