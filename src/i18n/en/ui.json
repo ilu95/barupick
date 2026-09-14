@@ -201,6 +201,17 @@
       "note": "Every garment can be changed on the next screen. Use it just for the colors if you like",
       "more30": "30 picks · change direction"
     },
+    "when": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "now": "Now",
+      "morning": "8am",
+      "noon": "12pm",
+      "evening": "6pm",
+      "night": "9pm",
+      "range": "About {{lo}}° in the morning, up to {{hi}}° in the day",
+      "seeWeather": "See weather"
+    },
     "needs": {
       "title": "What can we help with?",
       "guided": {

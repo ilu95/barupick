@@ -18,6 +18,8 @@ export interface WeatherData {
   code: number
   /** 내일 예보 (저녁 알림·내일의 한 벌). feels = 내일 아침 체감(최저), todayMin = 오늘 아침 체감 */
   tomorrow?: { feels: number; hi: number; code: number; rain: number; todayMin: number }
+  /** 시간대별(오늘 00시~내일 23시, 48개). time 은 현지 시각 문자열 그대로("2026-09-15T08:00") */
+  hourly?: { time: string[]; feels: number[]; code: number[]; rain: number[] }
 }
 
 export type WeatherStatus = 'idle' | 'loading' | 'ok' | 'denied' | 'unavailable'
@@ -107,7 +109,7 @@ function getPosition(): Promise<GeolocationPosition> {
 }
 
 async function fetchOpenMeteo(lat: number, lon: number): Promise<WeatherData> {
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=apparent_temperature_max,apparent_temperature_min,weather_code,precipitation_probability_max&forecast_days=2&timezone=auto`)
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=apparent_temperature_max,apparent_temperature_min,weather_code,precipitation_probability_max&hourly=apparent_temperature,weather_code,precipitation_probability&forecast_days=2&timezone=auto`)
   const data = await res.json()
   const c = data.current
   const w: WeatherData = { temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature), humidity: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m), code: c.weather_code }
@@ -117,7 +119,54 @@ async function fetchOpenMeteo(lat: number, lon: number): Promise<WeatherData> {
       w.tomorrow = { feels: Math.round(d.apparent_temperature_min[1]), hi: Math.round(d.apparent_temperature_max[1]), code: d.weather_code[1], rain: Math.round(d.precipitation_probability_max?.[1] ?? 0), todayMin: Math.round(d.apparent_temperature_min[0]) }
     }
   } catch {}
+  try {
+    const h = data.hourly
+    if (h && h.time && h.time.length) {
+      w.hourly = { time: h.time, feels: h.apparent_temperature, code: h.weather_code, rain: h.precipitation_probability }
+    }
+  } catch {}
   return w
+}
+
+const slot = (ymd: string, h: number) => `${ymd}T${String(h).padStart(2, '0')}:00`
+
+function hourIndex(w: WeatherData | null, day: 'today' | 'tomorrow', hour: number): number {
+  const h = w?.hourly
+  if (!h || !h.time.length) return -1
+  const ymd = h.time[day === 'today' ? 0 : 24]?.slice(0, 10)
+  if (!ymd) return -1
+  return h.time.indexOf(slot(ymd, hour))
+}
+
+/** 고른 날짜/시간의 체감기온. 시간별 자료가 없으면 null — 화면이 기존 대비책(TEMP_STEPS)으로 넘어간다 */
+export function feelsAt(w: WeatherData | null, day: 'today' | 'tomorrow', hour: number | 'now'): number | null {
+  if (!w) return null
+  if (hour === 'now') return day === 'today' ? w.feels : (w.tomorrow?.feels ?? null)
+  const i = hourIndex(w, day, hour)
+  return i < 0 ? null : Math.round(w!.hourly!.feels[i])
+}
+
+/** 고른 날짜/시간의 날씨 코드(아이콘용). 시간별 자료가 없으면 null */
+export function codeAt(w: WeatherData | null, day: 'today' | 'tomorrow', hour: number | 'now'): number | null {
+  if (!w) return null
+  if (hour === 'now') return day === 'today' ? w.code : (w.tomorrow?.code ?? null)
+  const i = hourIndex(w, day, hour)
+  return i < 0 ? null : w!.hourly!.code[i]
+}
+
+/** 그날 08~20시 체감기온의 최저·최고 */
+export function dayRange(w: WeatherData | null, day: 'today' | 'tomorrow'): { lo: number; hi: number } | null {
+  const h = w?.hourly
+  if (!h || !h.time.length) return null
+  const ymd = h.time[day === 'today' ? 0 : 24]?.slice(0, 10)
+  if (!ymd) return null
+  const vals: number[] = []
+  for (let hr = 8; hr <= 20; hr++) {
+    const i = h.time.indexOf(slot(ymd, hr))
+    if (i >= 0) vals.push(h.feels[i])
+  }
+  if (!vals.length) return null
+  return { lo: Math.round(Math.min(...vals)), hi: Math.round(Math.max(...vals)) }
 }
 
 /**

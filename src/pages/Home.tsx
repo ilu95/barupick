@@ -5,7 +5,7 @@ import { ArrowRight, RefreshCw, Thermometer, ChevronRight } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
-import { useWeather, weatherEmoji } from '@/hooks/useWeather'
+import { useWeather, weatherEmoji, feelsAt, codeAt, dayRange } from '@/hooks/useWeather'
 import { SITU, PARTS, ranked, alternatives, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { colorKeyOf, colorKeysOf, stashPick } from '@/lib/pickPayload'
 import { loadTaste } from '@/lib/taste'
@@ -23,25 +23,42 @@ import { trackEvent } from '@/lib/analytics'
 // ═══════════════════════════════════════════════════════
 
 const TEMP_STEPS = [15, 21, 26]
+const TIME_CHIPS: { key: string; hour: number | 'now' }[] = [
+  { key: 'now', hour: 'now' },
+  { key: 'morning', hour: 8 },
+  { key: 'noon', hour: 12 },
+  { key: 'evening', hour: 18 },
+  { key: 'night', hour: 21 },
+]
 const readLen = (k: string) => { try { return (JSON.parse(localStorage.getItem(k) || '[]') as unknown[]).length } catch { return 0 } }
 
 export default function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { weather, denied, refresh } = useWeather()
+  const { weather, status, denied, refresh } = useWeather({ auto: false })
   const sex = charSex()
   const easy = isEasy()
   const taste = useMemo(loadTaste, [])
   const lastVote = useMemo(() => myVotes()[0] || null, [])
   const counts = useMemo(() => ({ wardrobe: readLen('sp_wardrobe'), wish: loadWishlist().length, basket: loadBasket().length, saved: readLen('cs_saved') }), [])
   const [situ, setSitu] = useState<Situ>(defaultSitu)
+  const [day, setDay] = useState<'today' | 'tomorrow'>(() => (new Date().getHours() >= 17 ? 'tomorrow' : 'today'))
+  const [hour, setHour] = useState<number | 'now'>(() => (new Date().getHours() >= 17 ? 8 : 'now'))
   const [tempOverride, setTempOverride] = useState<number | null>(null)
   const [idx, setIdx] = useState(0)
 
   useEffect(() => { if (!localStorage.getItem('sp_onboarded')) navigate('/onboarding', { replace: true }) }, [])
 
-  const evening = new Date().getHours() >= 17 && !!weather?.tomorrow
-  const temp = tempOverride ?? (evening ? weather!.tomorrow!.feels : (weather?.feels ?? 21))
+  const ensureWeather = () => { if (!weather) refresh() }
+  const selectDay = (d: 'today' | 'tomorrow') => { setDay(d); setHour(d === 'tomorrow' ? 8 : 'now'); ensureWeather() }
+  const selectHour = (h: number | 'now') => { setHour(h); ensureWeather() }
+
+  const nowHour = new Date().getHours()
+  const timeChips = day === 'today' ? TIME_CHIPS.filter(c => c.hour === 'now' || (c.hour as number) >= nowHour) : TIME_CHIPS.filter(c => c.hour !== 'now')
+
+  const realTemp = feelsAt(weather, day, hour)
+  const temp = realTemp ?? tempOverride ?? 21
+  const range = dayRange(weather, day)
   const ctx: Ctx = useMemo(() => ({ sex, situ, temp, prefs: loadPrefs(), recent: loadRecent() }), [sex, situ, temp])
   // 후보 8벌: 1위 → 다른 방향 3 → 나머지 순위. "다른 거"는 1/8 → 8/8 → 1/8 로 돈다
   const cands: Entry[] = useMemo(() => {
@@ -50,9 +67,9 @@ export default function Home() {
     for (const e of [...alternatives(list[0], ctx), ...list.slice(1)]) { if (seen.has(e.c.id)) continue; seen.add(e.c.id); out.push(e); if (out.length >= 8) break }
     return out
   }, [ctx])
-  useEffect(() => { setIdx(0) }, [situ, temp, sex])
+  useEffect(() => { setIdx(0) }, [situ, temp, sex, day, hour])
   const hero = cands.length ? cands[idx % cands.length] : null
-  useEffect(() => { if (hero) trackEvent('home_view', { id: hero.c.id, idx, situ, temp }) }, [hero?.c.id])
+  useEffect(() => { if (hero) trackEvent('home_view', { id: hero.c.id, idx, situ, temp, day, hour }) }, [hero?.c.id])
 
   const scene: CharScene | null = hero ? {
     items: PARTS.filter(k => hero.p[k]).map(k => ({ id: hero.p[k]!, color: COLORS_60[colorKeyOf(hero, k)]?.hex || '#ccc' })),
@@ -60,7 +77,7 @@ export default function Home() {
   } : null
   const garments = hero ? PARTS.filter(k => hero.p[k]).map(k => plateName(hero.p[k]!)).join(' · ') : ''
   const colors = hero ? colorKeysOf(hero) : []
-  const why = !hero ? '' : idx === 0 && evening && weather?.tomorrow
+  const why = !hero ? '' : idx === 0 && day === 'tomorrow' && weather?.tomorrow
     ? (weather.tomorrow.rain >= 50 ? t('home.pick.rain', { p: weather.tomorrow.rain })
       : Math.abs(weather.tomorrow.feels - weather.tomorrow.todayMin) >= 5
         ? (weather.tomorrow.feels < weather.tomorrow.todayMin ? t('home.pick.colder', { d: weather.tomorrow.todayMin - weather.tomorrow.feels }) : t('home.pick.warmer', { d: weather.tomorrow.feels - weather.tomorrow.todayMin }))
@@ -70,11 +87,11 @@ export default function Home() {
   const go = (goto: 'result' | 'builder') => {
     if (!hero) return
     stashPick(hero, situ, goto)
-    trackEvent('home_pick', { id: hero.c.id, idx, goto, situ, temp })
+    trackEvent('home_pick', { id: hero.c.id, idx, goto, situ, temp, day, hour })
     navigate('/home/build')
   }
   const next = () => { if (!cands.length) return; const n = (idx + 1) % cands.length; setIdx(n); trackEvent('home_next', { idx: n }) }
-  const cycleTemp = () => { const i = TEMP_STEPS.indexOf(temp); setTempOverride(i < 0 ? TEMP_STEPS[0] : i === TEMP_STEPS.length - 1 ? (weather ? null : TEMP_STEPS[0]) : TEMP_STEPS[i + 1]) }
+  const cycleTemp = () => { const i = TEMP_STEPS.indexOf(temp); setTempOverride(i < 0 || i === TEMP_STEPS.length - 1 ? TEMP_STEPS[0] : TEMP_STEPS[i + 1]) }
   const openStep = (key: 'sp_guided' | 'sp_open_step', val: string, need: string) => {
     trackEvent('home_need', { key: need })
     try { sessionStorage.setItem(key, val) } catch {}
@@ -104,11 +121,28 @@ export default function Home() {
     <div className="animate-screen-fade px-5 pt-3 pb-8">
       {/* 머리: 질문 + 기온 */}
       <div className="flex items-center gap-2 mb-2">
-        <h1 className="font-display text-[22px] font-bold tracking-tight text-warm-900 dark:text-warm-100 flex-1">{evening ? t('home.easy.titleTomorrow') : t('home.easy.title')}</h1>
-        <button onClick={cycleTemp} title={t('outfit.weatherTap')} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1 active:scale-95">
-          {weather && tempOverride == null ? <span>{weatherEmoji(evening ? weather.tomorrow!.code : weather.code)}</span> : <Thermometer size={13} />}{temp}°
-        </button>
+        <h1 className="font-display text-[22px] font-bold tracking-tight text-warm-900 dark:text-warm-100 flex-1">{day === 'tomorrow' ? t('home.easy.titleTomorrow') : t('home.easy.title')}</h1>
+        {weather ? (
+          <div title={t('outfit.weatherTap')} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1">
+            <span>{weatherEmoji(codeAt(weather, day, hour) ?? weather.code)}</span>{temp}°
+          </div>
+        ) : status === 'unavailable' ? (
+          <button onClick={cycleTemp} title={t('outfit.weatherTap')} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1 active:scale-95">
+            <Thermometer size={13} />{temp}°
+          </button>
+        ) : (
+          <button onClick={() => refresh()} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1 active:scale-95">
+            {t('home.when.seeWeather')}
+          </button>
+        )}
       </div>
+      <div className="flex gap-1.5 mb-1.5">
+        {(['today', 'tomorrow'] as const).map(d => <button key={d} onClick={() => selectDay(d)} className={chip(day === d)}>{t(`home.when.${d}`)}</button>)}
+      </div>
+      <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mb-1.5">
+        {timeChips.map(c => <button key={c.key} onClick={() => selectHour(c.hour)} className={chip(hour === c.hour)}>{t(`home.when.${c.key}`)}</button>)}
+      </div>
+      {range && range.hi - range.lo >= 5 && <div className="text-[11px] text-warm-500 mb-1.5">{t('home.when.range', { lo: range.lo, hi: range.hi })}</div>}
       <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mb-2">
         {SITU.map(s => <button key={s.id} onClick={() => setSitu(s.id)} className={chip(situ === s.id)}>{t('outfit.situ.' + s.id)}</button>)}
       </div>
