@@ -126,7 +126,7 @@ export default function Home() {
           <div title={t('outfit.weatherTap')} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1">
             <span>{weatherEmoji(codeAt(weather, day, hour) ?? weather.code)}</span>{temp}°
           </div>
-        ) : status === 'unavailable' ? (
+        ) : status === 'unavailable' || status === 'denied' ? (
           <button onClick={cycleTemp} title={t('outfit.weatherTap')} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1 active:scale-95">
             <Thermometer size={13} />{temp}°
           </button>
