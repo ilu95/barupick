@@ -15,7 +15,8 @@ import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styl
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
 import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType, predictSlot } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
-import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide } from '@/lib/analytics'
+import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide, trackShop } from '@/lib/analytics'
+import { findShopMatches, SUBCAT_BY_PLATE, type ShopGroup } from '@/lib/shop'
 import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
@@ -731,6 +732,49 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     trackBuildComplete({ score, n_upper: build.state.upper.length, colors: outfit, style: build.state.style, mode: build.state.mode, fabric: !!build.state.fabricMode })
   }, [])
 
+  // 자사몰 연결: "코디 색상" 카드의 칸마다 재고가 있으면 그 줄에 › 를 붙인다 (칸 단위 노출, HANDOFF-shop-link-fix.md #2)
+  // 칸(cat) → 판(plate): 색상 카드가 쓰는 outfit 의 cat 키를 SUBCAT_BY_PLATE 로 찾으려면 판이 필요해서, 같은 정렬 규칙으로 다시 만든다
+  const platesByCat: Record<string, string> = {}
+  if (build.state.bottomItem) platesByCat.bottom = build.state.bottomItem
+  if (build.state.shoesItem) platesByCat.shoes = build.state.shoesItem
+  if (build.state.scarfItem) platesByCat.scarf = build.state.scarfItem
+  if (build.state.hatItem) platesByCat.hat = build.state.hatItem
+  if (build.state.tieItem) platesByCat.tie = build.state.tieItem
+  sortUpper(build.state.upper).forEach((l, i, sorted) => {
+    const slot = getSlotKey(i, sorted.length, l)
+    if (slot !== 'hidden' && l.plate) platesByCat[slot] = l.plate
+  })
+  const [shopGroups, setShopGroups] = useState<Record<string, ShopGroup>>({})
+  useEffect(() => {
+    const items = [
+      ...build.state.upper.filter(l => l.plate).map(l => ({ plate: l.plate as string, colorKey: l.colorKey })),
+      build.state.bottomItem && { plate: build.state.bottomItem, colorKey: build.state.bottomColor },
+      build.state.shoesItem && { plate: build.state.shoesItem, colorKey: build.state.shoesColor },
+      build.state.scarfItem && { plate: build.state.scarfItem, colorKey: build.state.scarfColor },
+      build.state.hatItem && { plate: build.state.hatItem, colorKey: build.state.hatColor },
+      build.state.tieItem && { plate: build.state.tieItem, colorKey: build.state.tieColor },
+    ].filter(Boolean) as { plate: string; colorKey: string }[]
+    let alive = true
+    findShopMatches(items, build.state.style).then(groups => {
+      if (!alive) return
+      const map: Record<string, ShopGroup> = {}
+      for (const g of groups) if (g.products.length > 0) map[g.subcat] = g
+      setShopGroups(map)
+      // view 계측: 실제로 › 가 그려지는 줄마다 한 번씩
+      for (const [cat] of filledParts) {
+        const subcat = platesByCat[cat] && SUBCAT_BY_PLATE[platesByCat[cat]]
+        const g = subcat ? map[subcat] : undefined
+        if (g) trackShop('button_view', { subcat: g.subcat, n: g.products.length, slot: cat })
+      }
+    }).catch(() => {})
+    return () => { alive = false }
+  }, [])
+  const openShopSlot = (cat: string, group: ShopGroup) => {
+    trackShop('button_tap', { subcat: group.subcat, n: group.products.length, slot: cat })
+    try { sessionStorage.setItem('sp_shop_picks', JSON.stringify(group)) } catch {}
+    navigate('/shop/picks')
+  }
+
   // 엔진 v7.1: 명도 구조 30 · 색 수·면적 20 · 조화 20 · 시선 정리 10 · 상황·계절 10 · 나에게 15(퍼스널컬러 있을 때)
   const scoreItems = evalResult ? evalResult.parts.map(p => ({ label: t('build.v7parts.' + p.key, { defaultValue: p.label }), value: p.value, max: p.max, desc: '' })) : []
   // 결과 화면: 그래프보다 말이 먼저. 가점 최대 2줄 + 감점 1줄(있을 때만) — 이유 문장은 한국어만 있다
@@ -892,12 +936,18 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         <div className="flex gap-2 flex-wrap justify-center py-1">
           {filledParts.map(([cat, colorKey]) => {
             const c = COLORS_60[colorKey]; if (!c) return null
+            const subcat = platesByCat[cat] && SUBCAT_BY_PLATE[platesByCat[cat]]
+            const group = subcat ? shopGroups[subcat] : undefined
+            const Tag = group ? 'button' : 'div' as any
             return (
-              <div key={cat} className="flex flex-col items-center gap-1">
+              <Tag key={cat} onClick={group ? () => openShopSlot(cat, group) : undefined} className="flex flex-col items-center gap-1 active:opacity-70">
                 <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold border border-warm-400/30"
                   style={{ background: c.hex, color: c.hcl[2] > 60 ? '#1C1917' : '#fff' }}>{getColorName(colorKey)}</div>
-                <div className="text-[10px] text-warm-700 dark:text-warm-300">{getBuildPartLabel(cat, build.state.upper, build.state)}</div>
-              </div>
+                <div className="text-[10px] text-warm-700 dark:text-warm-300 flex items-center gap-0.5">
+                  <span>{getBuildPartLabel(cat, build.state.upper, build.state)}</span>
+                  {group && <ChevronRight size={11} className="text-terra-500 flex-shrink-0" />}
+                </div>
+              </Tag>
             )
           })}
         </div>
@@ -928,6 +978,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
           <Plus size={15} /> {t('vote.basketAdd')}
         </button>
       </div>
+
       <div className="grid grid-cols-3 gap-2 mb-4">
         <button onClick={() => makeCard('story')} disabled={cardBusy} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm disabled:opacity-60">
           <Share size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{cardBusy ? t('card.making') : t('card.btn')}</span>

@@ -49,6 +49,7 @@ const Quiz = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m
 const FabricGuide = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.FabricGuide })))
 const BodyGuide = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.BodyGuide })))
 const Shop = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Shop })))
+const ShopPicks = lazy(() => import('@/pages/ShopPicks'))
 const Terms = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Terms })))
 const Privacy = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Privacy })))
 const Support = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Support })))
@@ -167,6 +168,7 @@ export default function App() {
                   <Route path="/user/:userId/following" element={<FollowList />} />
 
                   <Route path="/shop" element={<Shop />} />
+                  <Route path="/shop/picks" element={<ShopPicks />} />
 
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/profile/level" element={<MyLevel />} />

@@ -222,3 +222,8 @@ export function trackTaste(kind: 'start' | 'answer' | 'reveal' | 'fall_view' | '
 export function trackVote(kind: 'create' | 'view' | 'answer' | 'share' | 'cta', meta: Record<string, any>) {
   trackEvent('vote_' + kind, { ...meta, ...VER })
 }
+
+// 결과 화면 → 자사몰 상품 연결: 버튼 노출·탭 (subcat, n = 후보 수)
+export function trackShop(kind: 'button_view' | 'button_tap', meta: Record<string, any>) {
+  trackEvent('shop_' + kind, { ...meta, ...VER })
+}

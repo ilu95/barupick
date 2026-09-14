@@ -599,6 +599,8 @@
     "scoreDetail": "점수 자세히 보기",
     "coordColors": "코디 색상",
     "editColors": "색 수정하기",
+    "shopCta": "없는 옷이 있다면",
+    "shopBtn": "{{color}} {{item}} 보러 가기 · {{n}}",
     "communityBtn": "커뮤니티",
     "similarCoords": "비슷한 코디",
     "goHome": "처음으로 돌아가기",
@@ -1408,7 +1410,12 @@
     "partnerCta": "입점 문의하기",
     "brandDesc": "BARUSA · 프레피 & 올드머니 빈티지",
     "posts": "게시물",
-    "followers": "팔로워"
+    "followers": "팔로워",
+    "picks": {
+      "title": "{{color}} {{item}} {{n}}",
+      "empty": "지금은 딱 맞는 상품이 없어요",
+      "backHome": "홈으로"
+    }
   },
   "terms": {
     "title": "이용약관",
