@@ -8,7 +8,7 @@
 import { guideFor, bestMovesFor, type EngineInput, type EngineMove } from './engine'
 
 export type Mark = 'rec' | 'warn'
-export interface Guide { rec: string[]; warn: string[]; marks: Record<string, Mark>; delta: Record<string, number>; why: Record<string, string>; groups: { safe: string[]; match: string[]; point: string[] } }
+export interface Guide { rec: string[]; warn: string[]; marks: Record<string, Mark>; delta: Record<string, number>; why: Record<string, string>; groups: { safe: string[]; match: string[]; point: string[]; mine: string[] } }
 export type Move = EngineMove
 
 export function colorGuide(input: EngineInput, slot: string, recN = 12): Guide {

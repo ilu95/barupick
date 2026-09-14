@@ -1911,11 +1911,14 @@
       "skip": "Skip to {{slot}}"
     },
     "group": {
+      "pc": "Your colors",
       "safe": "Safe",
       "match": "Matches",
       "point": "Accent",
       "mine": "My clothes"
     },
+    "pcHint": "Set your personal color to see the colors that suit you first",
+    "pcHintLink": "Set personal color",
     "sortRec": "Best match",
     "sortBright": "By brightness",
     "legend": "● recommended · △ caution",

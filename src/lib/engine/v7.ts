@@ -350,9 +350,17 @@ function evaluate(items, ctx) {
 
   /* 6. 나에게 15 */
   const hasPC = !!pc; let fScore = 15;
+  /* 12타입표(ctx.pcAvoid/pcFace)가 있으면 그걸로, 없으면 옛 toneFail 문턱으로 — J. 12타입 색 연동 */
+  const has12 = hasPC && !!(ctx.pcAvoid && ctx.pcAvoid.size);
+  let faceAvoidHit = false;
   if (hasPC) {
     P.filter(p => ['outer', 'layer', 'top', 'scarf', 'tie', 'hat'].includes(p.slot) && p.area >= .03).forEach(p => {
-      const bad = toneFail(p.c, pc); if (bad) { fScore -= 6; add('tone', `${nm(p)}는 ${bad} 색이라 얼굴이 가라앉아요. 아래쪽에 쓰면 괜찮아요`, -2, [p.slot]); }
+      if (has12) {
+        if (ctx.pcAvoid.has(p.hex)) { fScore -= 8; faceAvoidHit = true; add('tone', `${nm(p)}는 ${ctx.pcName}에게 안 맞아요. 아래쪽에 쓰면 괜찮아요`, -2, [p.slot]); }
+        else if (ctx.pcFace.has(p.hex)) { fScore += 4; add('tone-face', `${nm(p)}는 얼굴 근처에 두기 좋은 색이에요`, 1, [p.slot]); }
+      } else {
+        const bad = toneFail(p.c, pc); if (bad) { fScore -= 6; add('tone', `${nm(p)}는 ${bad} 색이라 얼굴이 가라앉아요. 아래쪽에 쓰면 괜찮아요`, -2, [p.slot]); }
+      }
     });
     if (ctx.body) {
       const t = by('top') || by('outer');
@@ -364,7 +372,9 @@ function evaluate(items, ctx) {
   const others = Object.entries(parts).filter(([k]) => k !== '명도 구조').reduce((s, [, [v]]) => s + v, 0);
   const maxOthers = hasPC ? 70 : 55;
   const raw = parts['명도 구조'][0] + others * (0.7 + 0.3 * fitL);
-  const total = Math.round(clamp(raw * (100 / (30 + maxOthers)), 0, 100));
+  let total = Math.round(clamp(raw * (100 / (30 + maxOthers)), 0, 100));
+  /* 얼굴 근처에 12타입 회피색이 있으면 등급이 실제로 떨어지게 총점을 한 번 더 누른다 */
+  if (faceAvoidHit) total = Math.min(total, 84);
   reasons.sort((a, b) => a.w - b.w);
   return { total, parts, reasons, vis, fitL, contrast, season, n: +n.toFixed(2), P: P.map(p => ({ slot: p.slot, id: p.id, hex: p.hex, kind: p.kind, wc: +p.wc.toFixed(2), vv: +p.vv.toFixed(2), area: +p.area.toFixed(3), L: +p.c.L.toFixed(1), C: +p.c.C.toFixed(1), h: +p.c.h.toFixed(0) })) };
 }
@@ -389,7 +399,9 @@ function guide(items, ctx, slot, palette, opts) {
     list.push({ key, hex, total: r.total, d: r.total - base.total, warn, why: (r.reasons.find(x => x.w > 0 && x.slots.includes(slot)) || r.reasons.find(x => x.w > 0) || {}).txt || '' });
   }
   list.forEach(x => { x.vv = vivid({ c: lch(x.hex), id: '' }); });
-  list.forEach(x => { const c = lch(x.hex); x.adj = x.total - 2 * x.vv - 1.5 * ramp(c.C, NEUTRAL_C, SOFT_C); });   /* 동점이면 차분한 색 먼저 */
+  const pcFace = ctx.pcFace;
+  /* J3. 내 퍼스널컬러 핵심색은 점수는 그대로 두고 정렬만 앞으로 */
+  list.forEach(x => { const c = lch(x.hex); x.adj = x.total - 2 * x.vv - 1.5 * ramp(c.C, NEUTRAL_C, SOFT_C) + (pcFace && pcFace.has(x.hex) ? 3 : 0); });   /* 동점이면 차분한 색 먼저 */
   list.sort((a, b) => b.total - a.total || a.vv - b.vv || a.key.localeCompare(b.key));
   const top = list[0] ? list[0].total : 0;
   /* 추천 세 묶음: 무난(무채·연유채) 최대 4 + 어울려요(유채 상위) 최대 5 + 포인트(작은 자리에서만 쨍한 색) 최대 3. 감점 규칙 없는 것만, 계열 겹침 3개까지 */
@@ -402,9 +414,13 @@ function guide(items, ctx, slot, palette, opts) {
   const point = SMALL_SLOTS.includes(slot)
     ? list.filter(x => x.vv >= .4 && !x.warn.some(w => w.w <= -1)).sort((a, b) => b.total - a.total || a.key.localeCompare(b.key)).slice(0, 3)
     : [];
-  const groups = { safe: safe.map(x => x.key), match: match.map(x => x.key), point: point.map(x => x.key) };
+  /* 내 퍼스널컬러 핵심색 중 다른 감점 규칙에 안 걸린 것 최대 4 */
+  const mine = pcFace && pcFace.size
+    ? list.filter(x => pcFace.has(x.hex) && !x.warn.length).sort((a, b) => b.total - a.total || a.key.localeCompare(b.key)).slice(0, 4)
+    : [];
+  const groups = { safe: safe.map(x => x.key), match: match.map(x => x.key), point: point.map(x => x.key), mine: mine.map(x => x.key) };
   const seen = new Set(); const rec = [];
-  for (const x of [...safe, ...match, ...point]) if (!seen.has(x.key)) { seen.add(x.key); rec.push(x); }
+  for (const x of [...mine, ...safe, ...match, ...point]) if (!seen.has(x.key)) { seen.add(x.key); rec.push(x); }
   const marks = {}; list.forEach(x => { marks[x.key] = seen.has(x.key) ? 'rec' : (x.warn.length && x.d <= -4) ? 'warn' : ''; });
   return { base, list, rec, groups, marks };
 }

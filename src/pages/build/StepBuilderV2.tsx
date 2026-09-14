@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, RotateCcw, X, Check } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
@@ -12,6 +13,7 @@ import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuid
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { loadTaste } from '@/lib/taste'
 import { useToast } from '@/components/ui/Toast'
+import { profile } from '@/lib/profile'
 
 // ═══════════════════════════════════════════════════════
 // 만들기 2단계 — 새 디자인 (목업 flow-v5 의 만들기 화면)
@@ -28,6 +30,7 @@ const GUIDE: RailSlot[] = ['top', 'bottom', 'shoes', 'outer', 'middleware', 'acc
 
 export default function StepBuilderV2({ build, guided = false, onBack, onDone, doneLabel, title }: { build: BuildHook; guided?: boolean; onBack?: () => void; onDone?: () => void; doneLabel?: string; title?: string }) {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const ko = (i18n.language || 'ko').startsWith('ko')
   const [sex, setSex] = useState<'m' | 'w'>(charSex)
   const [focus, setFocus] = useState<RailSlot>(GUIDE[0])
@@ -202,7 +205,11 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
       </button>
     )
   }
+  // 퍼스널컬러 핵심색 추천 (guide.groups.mine = 엔진의 pcFace 그룹 — 옷장 "내 옷" 그룹과 이름이 겹쳐 UI id 는 'pc' 로 구분)
+  const pcKeys = guide?.groups.mine || []
+  const hasPersonalColor = !!profile.getPersonalColor()
   const groupRows: { id: string; label: string; keys: string[] }[] = guide ? [
+    ...(pcKeys.length ? [{ id: 'pc', label: t('builder.group.pc'), keys: pcKeys }] : []),
     ...(mineKeys.length ? [{ id: 'mine', label: t('builder.group.mine'), keys: mineKeys }] : []),
     { id: 'safe', label: t('builder.group.safe'), keys: guide.groups.safe },
     { id: 'match', label: t('builder.group.match'), keys: guide.groups.match },
@@ -406,6 +413,11 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
                     <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, g.id === 'mine' ? 'mine' : 'rec', i, g.id))}</div>
                   </div>
                 ))}
+                {!hasPersonalColor && (
+                  <div className="px-1 text-[11px] text-warm-500">
+                    {t('builder.pcHint')} · <button onClick={() => navigate('/profile/personal-color')} className="underline font-semibold">{t('builder.pcHintLink')}</button>
+                  </div>
+                )}
               </div>
             ) : tab === 'mine-all' ? (
               <div className="mt-2 px-3 flex flex-col gap-2.5">
