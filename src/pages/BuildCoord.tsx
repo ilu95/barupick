@@ -15,7 +15,8 @@ import { MOOD_GROUPS, STYLE_GUIDE, STYLE_ICONS, ITEMS_CATALOG } from '@/lib/styl
 import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getFabricCompat, evaluateFabricCombo } from '@/lib/categories'
 import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType, predictSlot } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
-import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide } from '@/lib/analytics'
+import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide, trackShop } from '@/lib/analytics'
+import { findShopMatches, type ShopGroup } from '@/lib/shop'
 import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
@@ -731,6 +732,35 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
     trackBuildComplete({ score, n_upper: build.state.upper.length, colors: outfit, style: build.state.style, mode: build.state.mode, fabric: !!build.state.fabricMode })
   }, [])
 
+  // 자사몰 연결: 코디에서 연결 가능한 칸 중 후보가 가장 많은 하나만 보여준다 (5개 미만이면 숨김)
+  const [shopMatch, setShopMatch] = useState<ShopGroup | null>(null)
+  useEffect(() => {
+    const items = [
+      ...build.state.upper.filter(l => l.plate).map(l => ({ plate: l.plate as string, colorKey: l.colorKey })),
+      build.state.bottomItem && { plate: build.state.bottomItem, colorKey: build.state.bottomColor },
+      build.state.shoesItem && { plate: build.state.shoesItem, colorKey: build.state.shoesColor },
+      build.state.scarfItem && { plate: build.state.scarfItem, colorKey: build.state.scarfColor },
+      build.state.hatItem && { plate: build.state.hatItem, colorKey: build.state.hatColor },
+      build.state.tieItem && { plate: build.state.tieItem, colorKey: build.state.tieColor },
+    ].filter(Boolean) as { plate: string; colorKey: string }[]
+    let alive = true
+    findShopMatches(items, build.state.style).then(groups => {
+      if (!alive) return
+      const best = groups[0]
+      if (best && best.products.length >= 5) {
+        setShopMatch(best)
+        trackShop('button_view', { subcat: best.subcat, n: best.products.length })
+      }
+    }).catch(() => {})
+    return () => { alive = false }
+  }, [])
+  const openShop = () => {
+    if (!shopMatch) return
+    trackShop('button_tap', { subcat: shopMatch.subcat, n: shopMatch.products.length })
+    try { sessionStorage.setItem('sp_shop_picks', JSON.stringify(shopMatch)) } catch {}
+    navigate('/shop/picks')
+  }
+
   // 엔진 v7.1: 명도 구조 30 · 색 수·면적 20 · 조화 20 · 시선 정리 10 · 상황·계절 10 · 나에게 15(퍼스널컬러 있을 때)
   const scoreItems = evalResult ? evalResult.parts.map(p => ({ label: t('build.v7parts.' + p.key, { defaultValue: p.label }), value: p.value, max: p.max, desc: '' })) : []
   // 결과 화면: 그래프보다 말이 먼저. 가점 최대 2줄 + 감점 1줄(있을 때만) — 이유 문장은 한국어만 있다
@@ -928,6 +958,17 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
           <Plus size={15} /> {t('vote.basketAdd')}
         </button>
       </div>
+
+      {/* 자사몰 연결: 코디에 없는 옷이 있으면 — 광고처럼 억지로 넣지 않고, 후보 5개 미만이면 아예 숨긴다 */}
+      {shopMatch && (
+        <div className="mb-4">
+          <div className="text-center text-[12px] text-warm-500 dark:text-warm-400 mb-1.5">{t('build.shopCta')}</div>
+          <button onClick={openShop} className="w-full py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl font-semibold text-sm text-warm-800 dark:text-warm-200 active:scale-98 shadow-warm-sm">
+            {t('build.shopBtn', { color: getColorName(shopMatch.colorKey), item: shopMatch.subcat, n: shopMatch.products.length })}
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-3 gap-2 mb-4">
         <button onClick={() => makeCard('story')} disabled={cardBusy} className="flex flex-col items-center gap-1.5 py-3 bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl active:scale-97 shadow-warm-sm disabled:opacity-60">
           <Share size={18} className="text-warm-700 dark:text-warm-300" /><span className="text-[11px] text-warm-600 font-medium">{cardBusy ? t('card.making') : t('card.btn')}</span>

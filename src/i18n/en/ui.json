@@ -588,6 +588,8 @@
     "scoreDetail": "Score details",
     "coordColors": "Coord Colors",
     "editColors": "Edit Colors",
+    "shopCta": "Missing a piece?",
+    "shopBtn": "See {{color}} {{item}} · {{n}}",
     "communityBtn": "Community",
     "similarCoords": "Similar Coords",
     "goHome": "Go back home",
@@ -1397,7 +1399,12 @@
     "partnerCta": "Contact Us",
     "brandDesc": "BARUSA · Preppy & Old Money Vintage",
     "posts": "Posts",
-    "followers": "Followers"
+    "followers": "Followers",
+    "picks": {
+      "title": "{{color}} {{item}} {{n}}",
+      "empty": "No matching items right now",
+      "backHome": "Home"
+    }
   },
   "terms": {
     "title": "Terms of Service",
