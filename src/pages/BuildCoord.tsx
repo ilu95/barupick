@@ -2,7 +2,7 @@
 import { setJSON } from '@/lib/storage'
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3 } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Bookmark, Share, Users, Palette, Scissors, ChevronRight, Sparkles, Check, ThumbsUp, ThumbsDown, Minus, RefreshCw, Wind, Thermometer, Plus, X, Edit3, ShoppingBag } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import StepOutfit from '@/pages/build/StepOutfit'
 import StepBuilderV2 from '@/pages/build/StepBuilderV2'
@@ -38,7 +38,7 @@ type BH = BuildHook
 // ═══════════════════════════════════════
 export default function BuildCoord() {
   const navigate = useNavigate()
-  const build = useBuild('coord')
+  const build = useBuild('coord', { persist: true })
   const [guided, setGuided] = useState(false)   // 홈 "하나씩 함께 골라보기"로 들어왔을 때
 
   // 계측: 단계 진입 (퍼널 기준선)
@@ -936,22 +936,45 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
         <div className="flex gap-2 flex-wrap justify-center py-1">
           {filledParts.map(([cat, colorKey]) => {
             const c = COLORS_60[colorKey]; if (!c) return null
-            const subcat = platesByCat[cat] && SUBCAT_BY_PLATE[platesByCat[cat]]
-            const group = subcat ? shopGroups[subcat] : undefined
-            const Tag = group ? 'button' : 'div' as any
             return (
-              <Tag key={cat} onClick={group ? () => openShopSlot(cat, group) : undefined} className="flex flex-col items-center gap-1 active:opacity-70">
+              <div key={cat} className="flex flex-col items-center gap-1">
                 <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-[9px] font-semibold border border-warm-400/30"
                   style={{ background: c.hex, color: c.hcl[2] > 60 ? '#1C1917' : '#fff' }}>{getColorName(colorKey)}</div>
-                <div className="text-[10px] text-warm-700 dark:text-warm-300 flex items-center gap-0.5">
-                  <span>{getBuildPartLabel(cat, build.state.upper, build.state)}</span>
-                  {group && <ChevronRight size={11} className="text-terra-500 flex-shrink-0" />}
-                </div>
-              </Tag>
+                <div className="text-[10px] text-warm-700 dark:text-warm-300">{getBuildPartLabel(cat, build.state.upper, build.state)}</div>
+              </div>
             )
           })}
         </div>
       </div>
+
+      {/* 이 코디, 실제 상품으로 보기: 재고 있는 칸이 하나도 없으면 그리지 않는다 */}
+      {(() => {
+        const chips = filledParts.map(([cat, colorKey]) => {
+          const plate = platesByCat[cat]
+          const subcat = plate && SUBCAT_BY_PLATE[plate]
+          const group = subcat ? shopGroups[subcat] : undefined
+          if (!group) return null
+          return { cat, colorKey: colorKey as string, plate: plate as string, group }
+        }).filter(Boolean) as { cat: string; colorKey: string; plate: string; group: ShopGroup }[]
+        if (chips.length === 0) return null
+        return (
+          <div className="bg-white dark:bg-warm-800 border border-warm-400 dark:border-warm-600 rounded-2xl p-4 mb-5 shadow-warm-sm">
+            <div className="flex items-center gap-1.5 text-[13px] font-bold text-warm-900 dark:text-warm-100 mb-0.5">
+              <ShoppingBag size={16} className="text-terra-500" /> {t('build.shop.title')}
+            </div>
+            <div className="text-[11px] text-warm-500 mb-3">{t('build.shop.sub')}</div>
+            <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              {chips.map(({ cat, colorKey, plate, group }) => (
+                <button key={cat} onClick={() => openShopSlot(cat, group)}
+                  className="flex-none flex items-center gap-1 h-9 px-3.5 rounded-full border border-warm-400 dark:border-warm-600 text-[12px] font-semibold text-warm-800 dark:text-warm-200 active:scale-95 whitespace-nowrap">
+                  {t('build.shop.chip', { color: getColorName(colorKey), item: plateName(plate), n: group.products.length })}
+                  <ChevronRight size={13} className="text-terra-500 flex-shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* 옷장에 담기 (선택): 저장과는 별개 */}
       {garments.length > 0 && (
