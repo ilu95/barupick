@@ -5,11 +5,15 @@
 // 프로덕션 전용 Supabase 프로젝트(kwcogjzwpnvqwmifizce)에 있다 (2026-09-14 직접 조회 확인).
 // color_primary(한글 색이름)는 32%가 비어 있어 hex(color_hex_primary, 99.9% 채움)로만 비교한다.
 // cafe24_url 은 이미 완성된 링크이므로 그대로 연다 — 절대 조립하지 않는다.
-// 근거: HANDOFF-shop-link.md (09-14 전면 수정판)
+//
+// 색 매칭은 거리식이 아니라 계열(레드/블루/그린…) 매칭이다 — 판매중 상품의 color_hex_primary 는
+// 30여 종뿐인 웹 기본색이라(자사몰 원본 데이터 실측), 어떤 거리식·threshold 로도 옷 색과 맞지 않는다.
+// COLOR_TABS(7계열, colors.ts)를 그대로 쓰고 무채색만 밝기로 셋(light/mid/dark)으로 더 쪼갠다.
+// 근거: HANDOFF-shop-link.md, HANDOFF-shop-link-fix.md (09-14)
 // ================================================================
 import { createClient } from '@supabase/supabase-js'
 import { lch } from '@/lib/engine/v7'
-import { COLORS_60 } from '@/lib/colors'
+import { COLORS_60, COLOR_TABS } from '@/lib/colors'
 
 const SHOP_URL = 'https://kwcogjzwpnvqwmifizce.supabase.co'
 // 공개용 anon key (RLS 로 보호됨 — 프로덕션 번들에 이미 노출되어 있는 값과 동일)
@@ -50,20 +54,39 @@ export const STYLE_TAG_BY_ID: Record<string, string> = {
   preppy: '프레피', workwear: '워크웨어', oldmoney: '올드머니', gorpcore: '아웃도어', athleisure: '스포츠', street: '스트릿',
 }
 
-/** ΔL·ΔC 는 작게, Δh 는 크게 — 완전히 다른 색이 "가장 가까운 색"이 되지 않도록 threshold 로 자른다.
- *  값은 scripts/shop-check.mjs 로 25/35/45 를 비교해 정했다(PR 본문 참고). */
-export const COLOR_DIST_THRESHOLD = 35
+/** 무채색만 밝기로 셋으로 더 쪼갠다 — 화이트·그레이·블랙이 "무채색" 한 칸으로 뭉치지 않게.
+ *  L(CIELab)은 lch()가 실제로 재는 값이라(엔진도 이걸 쓴다) 여기서도 이 기준으로만 나눈다. */
+type AchromaticBand = 'light' | 'mid' | 'dark'
+const achromaticBand = (L: number): AchromaticBand => (L >= 80 ? 'light' : L < 35 ? 'dark' : 'mid')
 
-const dH = (a: number, b: number) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d }
-
-/** 앱 팔레트 hcl [h,C,L] vs 상품 hex 를 같은 공간(LCh)에서 비교한다 */
-export function colorDist(colorKey: string, productHex: string): number {
-  const hcl = COLORS_60[colorKey]?.hcl
-  if (!hcl) return Infinity
-  const [h, C, L] = hcl
-  const p = lch(productHex)
-  return dH(h, p.h) + Math.abs(L - p.L) * 0.3 + Math.abs(C - p.C) * 0.3
+/** 앱 색상 키(148색) → 계열 라벨. COLOR_TABS(7계열)를 한 번 뒤집어 만든다 — 148색을 손으로 적지 않는다. */
+const COLOR_LABEL_BY_KEY: Record<string, string> = {}
+for (const tab of COLOR_TABS) {
+  for (const key of tab.keys) {
+    COLOR_LABEL_BY_KEY[key] = tab.id === 'achromatic'
+      ? `achromatic_${achromaticBand(lch(COLORS_60[key].hex).L)}`
+      : tab.id
+  }
 }
+
+/** 상품 hex → 계열 라벨. 판매중 상품의 color_hex_primary 는 30여 종뿐이다(자사몰 실측, 옷 색이 아니라
+ *  웹 기본색). 계열이 애매한 것(베이지·세이지 등)은 눈으로 보고 정했다 — HANDOFF-shop-link-fix.md 참고.
+ *  scripts/shop-check.mjs 가 이 표에 없는 새 hex 가 나오면 찍어 알려준다. */
+export const PRODUCT_HEX_LABEL: Record<string, string> = {
+  '#FFFFFF': 'achromatic_light', '#FFFFF0': 'achromatic_light', '#D3D3D3': 'achromatic_light',
+  '#808080': 'achromatic_mid',
+  '#000000': 'achromatic_dark', '#36454F': 'achromatic_dark',
+  '#F5F5DC': 'beige_brown', '#8B4513': 'beige_brown', '#C19A6B': 'beige_brown', '#C3B091': 'beige_brown',
+  '#654321': 'beige_brown', '#4B3621': 'beige_brown', '#FFFDD0': 'beige_brown',
+  '#FF0000': 'red_pink', '#FF69B4': 'red_pink', '#800020': 'red_pink', '#FFD1DC': 'red_pink', '#FFC1CC': 'red_pink',
+  '#FF8C00': 'orange_yellow', '#FFFF00': 'orange_yellow', '#FDFD96': 'orange_yellow',
+  '#808000': 'green', '#00FF00': 'green', '#C8D5B9': 'green', '#B2DFDB': 'green', '#228B22': 'green', '#008080': 'green', '#006400': 'green',
+  '#0000FF': 'blue', '#000080': 'blue', '#AEC6CF': 'blue', '#C0E0FF': 'blue', '#00008B': 'blue', '#4169E1': 'blue',
+  '#800080': 'purple', '#E6E6FA': 'purple', '#4B0082': 'purple', '#D8BFD8': 'purple',
+}
+
+export function colorLabel(colorKey: string): string | undefined { return COLOR_LABEL_BY_KEY[colorKey] }
+export function productLabel(productHex: string): string | undefined { return PRODUCT_HEX_LABEL[productHex.toUpperCase()] }
 
 export interface ShopProduct {
   cafe24_url: string
@@ -102,19 +125,20 @@ export async function findShopMatches(items: OutfitItem[], styleId?: string | nu
     .eq('is_sold', false)
     .in('subcategory', subcats)
     .not('color_hex_primary', 'is', null)
-    .limit(200)
+    .limit(1000) // 판매중 전체(1,209개)가 실질적으로 다 들어오는 값 — 200이면 판별로 잘려서 후보가 60%씩 빠진다
   if (error || !data) return []
 
   const styleTag = styleId ? STYLE_TAG_BY_ID[styleId] : null
   const groups = entries.map(({ subcat, colorKey }) => {
+    const label = colorLabel(colorKey)
+    const appL = lch(COLORS_60[colorKey]?.hex ?? '#808080').L
     const products = (data as ShopProduct[])
-      .filter(p => p.subcategory === subcat)
-      .map(p => ({ p, dist: colorDist(colorKey, p.color_hex_primary) }))
-      .filter(x => x.dist <= COLOR_DIST_THRESHOLD)
+      .filter(p => p.subcategory === subcat && productLabel(p.color_hex_primary) === label)
+      .map(p => ({ p, dL: Math.abs(appL - lch(p.color_hex_primary).L) }))
       .sort((a, b) => {
         const ta = styleTag && a.p.style_tags?.includes(styleTag) ? 0 : 1
         const tb = styleTag && b.p.style_tags?.includes(styleTag) ? 0 : 1
-        return ta - tb || a.dist - b.dist
+        return ta - tb || a.dL - b.dL
       })
       .map(x => x.p)
     return { subcat, colorKey, products }

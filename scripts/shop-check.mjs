@@ -2,8 +2,9 @@
  * 자사몰 연결 점검 — npm run shop:check (네트워크 사용, engine:check 와 별도 커맨드)
  *
  *   1) 앱 판 중 subcategory 매핑이 없는 것 (의도적으로 뺀 것: 신발·타이·양말·원피스류)
- *   2) 주요 12판 × 주요 10색 조합의 실제 후보 수 — 5개 미만인 조합이 몇 개인지
- *   3) 색 거리 threshold 25/35/45 비교 — 후보 수와 눈에 띄는 오배색 여부
+ *   2) 판매중 상품의 color_hex_primary 중 PRODUCT_HEX_LABEL 표에 없는 새 hex 가 있는지
+ *   3) 주요 12판 × 주요 10색 조합의 실제 후보 수 — 5개 미만인 조합이 몇 개인지
+ *   4) 후보로 잡힌 상품 hex 목록 — 계열이 엉뚱하게 섞였는지 눈으로 확인
  *
  * engine-check.mjs 와 같은 방식으로 esbuild 번들 + Node 실행.
  */
@@ -22,7 +23,7 @@ await build({
       `export { COLORS_60, getColorName } from './src/lib/colors'`,
       `export { PLATE_NAMES, PLATE_SLOT } from './src/lib/outfits'`,
       `export { TYPES, TYPES_W } from './src/lib/builderSlots'`,
-      `export { SUBCAT_BY_PLATE, shopSupabase, colorDist } from './src/lib/shop'`,
+      `export { SUBCAT_BY_PLATE, shopSupabase, colorLabel, productLabel, PRODUCT_HEX_LABEL } from './src/lib/shop'`,
     ].join('\n'),
     resolveDir: ROOT,
     loader: 'ts',
@@ -41,7 +42,7 @@ globalThis.window = Object.assign(globalThis, { addEventListener: noop, removeEv
 globalThis.document = { documentElement: { lang: 'ko', setAttribute: noop, classList: { add: noop, remove: noop, toggle: noop } }, addEventListener: noop, removeEventListener: noop, createElement: () => ({ style: {}, setAttribute: noop }), body: { appendChild: noop } }
 globalThis.CustomEvent = class { constructor(t, o) { this.type = t; this.detail = o && o.detail } }
 
-const { PLATE_NAMES, PLATE_SLOT, TYPES, TYPES_W, SUBCAT_BY_PLATE, shopSupabase, colorDist } = await import(pathToFileURL(OUT).href)
+const { PLATE_NAMES, PLATE_SLOT, TYPES, TYPES_W, SUBCAT_BY_PLATE, shopSupabase, colorLabel, productLabel, PRODUCT_HEX_LABEL } = await import(pathToFileURL(OUT).href)
 
 // ── 1) 매핑 없는 앱 판 (신발·양말·타이·원피스류는 HANDOFF 범위 밖이라 의도적으로 제외) ──
 const allWearPlates = new Set([...Object.keys(PLATE_NAMES), ...Object.values(TYPES).flat(), ...Object.values(TYPES_W).flat()])
@@ -50,7 +51,7 @@ console.log('== 1) subcategory 매핑 없는 판 (신발 제외) ==')
 console.log(unmapped.length ? unmapped.join(', ') : '(없음)')
 console.log('→ 신발 판은 재고 0이라 원천적으로 미매핑')
 
-// ── 2) 12 주요 판 × 10 주요 색 → 실제 후보 수, threshold 25/35/45 비교 ──
+// ── 2) 판매중 상품 전체 조회 + PRODUCT_HEX_LABEL 표에 없는 새 hex 확인 ──
 const MAJOR_PLATES = ['08_shirt_closed', '11_knit_crew', '35_sweat', '16_hoodie', '15_cardigan', '17_coat_long', '19_blazer', '18_jacket_short', '20_leather', '21_windbreaker', '29_puffer', '01_denim_straight']
 const MAJOR_COLORS = ['white', 'black', 'navy', 'beige', 'gray', 'charcoal', 'camel', 'olive', 'burgundy', 'brown']
 
@@ -62,27 +63,35 @@ const { data, error } = await shopSupabase
   .eq('is_sold', false)
   .in('subcategory', subcats)
   .not('color_hex_primary', 'is', null)
-  .limit(1000) // 점검용: 실제 화면 질의는 200
+  .limit(1000)
 if (error) { console.error('조회 실패', error); process.exit(1) }
 console.log(`조회된 상품 ${data.length}개`)
 
-for (const THRESHOLD of [25, 35, 45]) {
-  console.log(`\n== threshold ${THRESHOLD} (헤더: ${MAJOR_COLORS.join(' ')}) ==`)
-  let under5 = 0, total = 0
-  for (const plate of MAJOR_PLATES) {
-    const subcat = SUBCAT_BY_PLATE[plate]
-    const counts = MAJOR_COLORS.map(colorKey => {
-      const n = data.filter(p => p.subcategory === subcat && colorDist(colorKey, p.color_hex_primary) <= THRESHOLD).length
-      total++; if (n < 5) under5++
-      return n
-    })
-    console.log(`${plate}(${subcat}): ${counts.join(' ')}`)
-  }
-  console.log(`→ 5개 미만 조합: ${under5}/${total}`)
+console.log('\n== 2) PRODUCT_HEX_LABEL 표에 없는 hex ==')
+const unknownHex = [...new Set(data.map(p => p.color_hex_primary.toUpperCase()).filter(h => !PRODUCT_HEX_LABEL[h]))]
+console.log(unknownHex.length ? unknownHex.join(', ') : '(없음 — 표에 다 있음)')
 
-  // 눈에 띄는 오배색 샘플 — 파랑 계열 색에 threshold 안에서 잡힌 상품 중 색상명이 크게 다른 것
-  const navySample = data.filter(p => p.subcategory === '셔츠' && colorDist('navy', p.color_hex_primary) <= THRESHOLD).slice(0, 5)
-  console.log('  navy·셔츠 샘플 hex:', navySample.map(p => p.color_hex_primary).join(', ') || '(없음)')
+// ── 3) 12 주요 판 × 10 주요 색 → 실제 후보 수 ──
+console.log(`\n== 3) 후보 수 (헤더: ${MAJOR_COLORS.join(' ')}) ==`)
+let under5 = 0, total = 0
+for (const plate of MAJOR_PLATES) {
+  const subcat = SUBCAT_BY_PLATE[plate]
+  const counts = MAJOR_COLORS.map(colorKey => {
+    const label = colorLabel(colorKey)
+    const n = data.filter(p => p.subcategory === subcat && productLabel(p.color_hex_primary) === label).length
+    total++; if (n < 5) under5++
+    return n
+  })
+  console.log(`${plate}(${subcat}): ${counts.join(' ')}`)
+}
+console.log(`→ 5개 미만 조합: ${under5}/${total}`)
+
+// ── 4) 후보 hex 눈으로 확인 — 화이트·블랙·그레이·네이비·카멜·버건디 여섯 색 ──
+console.log('\n== 4) 후보 상품 hex 목록 (셔츠 subcat, 색상별) ==')
+for (const colorKey of ['white', 'black', 'gray', 'navy', 'camel', 'burgundy']) {
+  const label = colorLabel(colorKey)
+  const hexes = data.filter(p => p.subcategory === '셔츠' && productLabel(p.color_hex_primary) === label).map(p => p.color_hex_primary)
+  console.log(`${colorKey}(${label}): ${hexes.join(', ') || '(없음)'}`)
 }
 
-console.log('\n== 완료 == 위 표를 보고 shop.ts 의 COLOR_DIST_THRESHOLD·PR 본문을 정한다.')
+console.log('\n== 완료 ==')
