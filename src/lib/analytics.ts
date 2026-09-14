@@ -208,7 +208,8 @@ export function trackOutfit(kind: 'view' | 'adopt' | 'pick' | 'feedback' | 'anch
 }
 
 // 2단계 안내 층: 더 올리려면? 열기 · 한 수 적용 · 되돌리기 (● 탭 노출·선택은 color_tab/color_pick 의 tab='rec' 로 잡힌다)
-export function trackGuide(kind: 'moves_open' | 'move_apply' | 'move_undo', meta: Record<string, any>) {
+// score_detail_open: 결과 화면 "점수 자세히 보기" 접힘을 여는 비율
+export function trackGuide(kind: 'moves_open' | 'move_apply' | 'move_undo' | 'score_detail_open', meta: Record<string, any>) {
   trackEvent('guide_' + kind, { ...meta, ...VER })
 }
 
