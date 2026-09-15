@@ -93,7 +93,19 @@ function snapshot() { return store }
 function isFresh() { return !!store.weather && Date.now() - store.ts < TTL_MS }
 function deniedRecently() { return Date.now() - getJSON<number>(DENIED_KEY, 0) < DENIED_MEMO_MS }
 
-async function permissionState(): Promise<PermissionState | 'unknown'> {
+const ymdOf = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+/** 옛 모양(hourly 없음) 이거나 hourly 가 오늘이 아닌 날짜로 시작하면(캐시가 날짜를 넘겨 묵음) 못 쓰는 자료다.
+ *  기기 현지 날짜와 문자열로 비교한다 — new Date() 로 문자열을 파싱하면 타임존에 따라 하루씩 밀릴 수 있다. */
+function isUsable(w: WeatherData | null): boolean {
+  if (!w?.hourly?.time.length) return false
+  return w.hourly.time[0].slice(0, 10) === ymdOf(new Date())
+}
+
+/** 다시 안 받아도 되는 자료인지 — 신선하고(isFresh) 쓸 수 있어야(isUsable) 한다 */
+export function isGood() { return isFresh() && isUsable(store.weather) }
+
+export async function permissionState(): Promise<PermissionState | 'unknown'> {
   try {
     if (!navigator.permissions?.query) return 'unknown'
     const p = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
@@ -130,12 +142,17 @@ async function fetchOpenMeteo(lat: number, lon: number): Promise<WeatherData> {
 
 const slot = (ymd: string, h: number) => `${ymd}T${String(h).padStart(2, '0')}:00`
 
+/** 오늘/내일의 실제 달력 날짜 문자열 — h.time[0]/[24] 인덱스는 캐시가 날짜를 넘기면 틀린 날을 가리킨다 */
+function dayYmd(day: 'today' | 'tomorrow'): string {
+  const d = new Date()
+  if (day === 'tomorrow') d.setDate(d.getDate() + 1)
+  return ymdOf(d)
+}
+
 function hourIndex(w: WeatherData | null, day: 'today' | 'tomorrow', hour: number): number {
   const h = w?.hourly
   if (!h || !h.time.length) return -1
-  const ymd = h.time[day === 'today' ? 0 : 24]?.slice(0, 10)
-  if (!ymd) return -1
-  return h.time.indexOf(slot(ymd, hour))
+  return h.time.indexOf(slot(dayYmd(day), hour))
 }
 
 /** 고른 날짜/시간의 체감기온. 시간별 자료가 없으면 null — 화면이 기존 대비책(TEMP_STEPS)으로 넘어간다 */
@@ -158,8 +175,7 @@ export function codeAt(w: WeatherData | null, day: 'today' | 'tomorrow', hour: n
 export function dayRange(w: WeatherData | null, day: 'today' | 'tomorrow'): { lo: number; hi: number } | null {
   const h = w?.hourly
   if (!h || !h.time.length) return null
-  const ymd = h.time[day === 'today' ? 0 : 24]?.slice(0, 10)
-  if (!ymd) return null
+  const ymd = dayYmd(day)
   const vals: number[] = []
   for (let hr = 8; hr <= 20; hr++) {
     const i = h.time.indexOf(slot(ymd, hr))
@@ -175,7 +191,7 @@ export function dayRange(w: WeatherData | null, day: 'today' | 'tomorrow'): { lo
  */
 export function refreshWeather(force = false): Promise<WeatherData | null> {
   if (inflight) return inflight
-  if (!force && isFresh()) return Promise.resolve(store.weather)
+  if (!force && isGood()) return Promise.resolve(store.weather)
   if (!isOnline()) return Promise.resolve(store.weather)
   if (!force && deniedRecently()) { if (store.status !== 'ok') emit({ status: 'denied' }); return Promise.resolve(store.weather) }
 
@@ -218,7 +234,7 @@ let resumeHooked = false
 function hookResume() {
   if (resumeHooked || typeof window === 'undefined') return
   resumeHooked = true
-  onAppResume(() => { if (!isFresh()) refreshWeather(false) })
+  onAppResume(() => { if (!isGood()) refreshWeather(false) })
 }
 
 /**

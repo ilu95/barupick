@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, RefreshCw, Thermometer, ChevronRight } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
-import { useWeather, weatherEmoji, feelsAt, codeAt, dayRange } from '@/hooks/useWeather'
+import { useWeather, weatherEmoji, feelsAt, codeAt, dayRange, isGood, permissionState } from '@/hooks/useWeather'
 import { SITU, PARTS, ranked, alternatives, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { colorKeyOf, colorKeysOf, stashPick } from '@/lib/pickPayload'
 import { loadTaste } from '@/lib/taste'
@@ -49,7 +49,22 @@ export default function Home() {
 
   useEffect(() => { if (!localStorage.getItem('sp_onboarded')) navigate('/onboarding', { replace: true }) }, [])
 
-  const ensureWeather = () => { if (!weather) refresh() }
+  // 마운트 시 캐시가 못 쓰는 자료(옛 모양·날짜 지남)면 조용히 갱신 — 단, 위치 권한이 이미 허용된
+  // 경우에만. 'prompt' 상태에서 부르면 #95 이전의 "들어오자마자 뜨는 위치 팝업"이 되살아난다.
+  const retriedRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (isGood()) return
+    permissionState().then(p => { if (p === 'granted') refresh() })
+  }, [])
+
+  const ensureWeather = () => {
+    if (!weather || !isGood()) { refresh(); return }
+    const key = `${day}|${hour}`
+    if (feelsAt(weather, day, hour) == null && retriedRef.current !== key) {
+      retriedRef.current = key
+      refresh()
+    }
+  }
   const selectDay = (d: 'today' | 'tomorrow') => { setDay(d); setHour(d === 'tomorrow' ? 8 : 'now'); ensureWeather() }
   const selectHour = (h: number | 'now') => { setHour(h); ensureWeather() }
 
