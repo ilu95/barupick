@@ -600,9 +600,9 @@
     "coordColors": "Coord Colors",
     "editColors": "Edit Colors",
     "shop": {
-      "title": "See these as real products",
+      "title": "Browse real products",
       "sub": "Similar pieces we have in stock",
-      "chip": "{{color}} {{item}} · {{n}}"
+      "chip": "{{item}} · {{n}}"
     },
     "communityBtn": "Community",
     "similarCoords": "Similar Coords",
@@ -1415,7 +1415,7 @@
     "posts": "Posts",
     "followers": "Followers",
     "picks": {
-      "title": "{{color}} {{item}} {{n}}",
+      "title": "{{item}} {{n}}",
       "empty": "No matching items right now",
       "backHome": "Home"
     }

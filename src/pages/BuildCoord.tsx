@@ -16,7 +16,7 @@ import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, getF
 import { useBuild, type BuildStep, type BuildHook, type EditMode, upperToOutfit, getFilledOutfit, getSlotKey, getSlotLabel, sortUpper, getOuterType, getMidType, predictSlot } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
 import { trackSave, trackClick, trackColorPick, trackColorConfirm, trackBuildStep, trackBuildComplete, trackShare, trackGuide, trackShop } from '@/lib/analytics'
-import { findShopMatches, SUBCAT_BY_PLATE, type ShopGroup } from '@/lib/shop'
+import { findShopMatches, SUBCAT_BY_PLATE, shopItemLabel, type ShopGroup } from '@/lib/shop'
 import type { Move } from '@/lib/guide'
 import { drawCoordCard, shareDataUrl, type CardRatio } from '@/lib/coordCard'
 import { addToBasket } from '@/lib/voteBasket'
@@ -964,10 +964,10 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
             </div>
             <div className="text-[11px] text-warm-500 mb-3">{t('build.shop.sub')}</div>
             <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {chips.map(({ cat, colorKey, plate, group }) => (
+              {chips.map(({ cat, colorKey, group }) => (
                 <button key={cat} onClick={() => openShopSlot(cat, group)}
                   className="flex-none flex items-center gap-1 h-9 px-3.5 rounded-full border border-warm-400 dark:border-warm-600 text-[12px] font-semibold text-warm-800 dark:text-warm-200 active:scale-95 whitespace-nowrap">
-                  {t('build.shop.chip', { color: getColorName(colorKey), item: plateName(plate), n: group.products.length })}
+                  {t('build.shop.chip', { item: shopItemLabel(getColorName(colorKey), plateName(group.plate)), n: group.products.length })}
                   <ChevronRight size={13} className="text-terra-500 flex-shrink-0" />
                 </button>
               ))}

@@ -3,17 +3,16 @@
 //
 // products_cache 는 앱 DB(ywqaxxcvzhwhascbkyhp)가 아니라 별도의
 // 프로덕션 전용 Supabase 프로젝트(kwcogjzwpnvqwmifizce)에 있다 (2026-09-14 직접 조회 확인).
-// color_primary(한글 색이름)는 32%가 비어 있어 hex(color_hex_primary, 99.9% 채움)로만 비교한다.
 // cafe24_url 은 이미 완성된 링크이므로 그대로 연다 — 절대 조립하지 않는다.
 //
-// 색 매칭은 거리식이 아니라 계열(레드/블루/그린…) 매칭이다 — 판매중 상품의 color_hex_primary 는
-// 30여 종뿐인 웹 기본색이라(자사몰 원본 데이터 실측), 어떤 거리식·threshold 로도 옷 색과 맞지 않는다.
-// COLOR_TABS(7계열, colors.ts)를 그대로 쓰고 무채색만 밝기로 셋(light/mid/dark)으로 더 쪼갠다.
-// 근거: HANDOFF-shop-link.md, HANDOFF-shop-link-fix.md (09-14)
+// 색 매칭은 product_data_json.final_colors.main.key — 앱 팔레트 키 그대로다(판매중 99.1%에 있음).
+// color_hex_primary·final_colors 의 hex/hcl 은 팔레트 v3.1 이전 값이라 낡았다(예: 상품 navy #000080 ≠
+// 앱 navy #1F2A44) — 쓰지 않는다. 키만 꺼내 앱 팔레트(COLORS_60)로 다시 읽어 거리를 잰다.
+// 근거: HANDOFF-shop-color-v2.md (09-15, CEO 지적대로 계열 매칭 → 키 매칭으로 교체)
 // ================================================================
 import { createClient } from '@supabase/supabase-js'
 import { lch } from '@/lib/engine/v7'
-import { COLORS_60, COLOR_TABS } from '@/lib/colors'
+import { COLORS_60 } from '@/lib/colors'
 
 const SHOP_URL = 'https://kwcogjzwpnvqwmifizce.supabase.co'
 // 공개용 anon key (RLS 로 보호됨 — 프로덕션 번들에 이미 노출되어 있는 값과 동일)
@@ -54,62 +53,88 @@ export const STYLE_TAG_BY_ID: Record<string, string> = {
   preppy: '프레피', workwear: '워크웨어', oldmoney: '올드머니', gorpcore: '아웃도어', athleisure: '스포츠', street: '스트릿',
 }
 
-/** 무채색만 밝기로 셋으로 더 쪼갠다 — 화이트·그레이·블랙이 "무채색" 한 칸으로 뭉치지 않게.
- *  L(CIELab)은 lch()가 실제로 재는 값이라(엔진도 이걸 쓴다) 여기서도 이 기준으로만 나눈다. */
-type AchromaticBand = 'light' | 'mid' | 'dark'
-const achromaticBand = (L: number): AchromaticBand => (L >= 80 ? 'light' : L < 35 ? 'dark' : 'mid')
-
-/** 앱 색상 키(148색) → 계열 라벨. COLOR_TABS(7계열)를 한 번 뒤집어 만든다 — 148색을 손으로 적지 않는다. */
-const COLOR_LABEL_BY_KEY: Record<string, string> = {}
-for (const tab of COLOR_TABS) {
-  for (const key of tab.keys) {
-    COLOR_LABEL_BY_KEY[key] = tab.id === 'achromatic'
-      ? `achromatic_${achromaticBand(lch(COLORS_60[key].hex).L)}`
-      : tab.id
-  }
+/** 판 id → 상품명으로 종류를 더 좁히는 규칙. 규칙이 없는 판은 subcategory 만으로 충분해 그대로 통과한다.
+ *  통과 조건: include 매치 OR (exclude 가 있고, exclude 에 안 걸림) — "이름에 표시가 있으면 그것만 고르고,
+ *  아무 표시도 없으면 그 subcategory 의 기본형으로 본다"(HANDOFF-shop-garment-type.md, 09-15 대표님 지적:
+ *  목폴라 보던 사람에게 니트 스웨터를 억지로 보여주지 않는다). 대소문자 무시(상품명에 V넥·v넥 섞여 있음).
+ *  통과 0건이면 그 칸은 후보 없음 — subcategory 로 되돌아가 넓히지 않는다. */
+export const NAME_RULE_BY_PLATE: Record<string, { include: RegExp; exclude?: RegExp }> = {
+  '13_knit_turtle': { include: /목폴라|터틀|하이넥/i },
+  '12_knit_vneck': { include: /브이넥|v넥/i },
+  '11_knit_crew': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥/i },
+  '46_knit_crop': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥/i },
+  '14_knit_vest': { include: /베스트|조끼/i },
+  '45_vest_padding': { include: /베스트|조끼/i },
+  '63_chino': { include: /치노/i },
+  '03_slacks_straight': { include: /슬랙스|트라우저/i },
+  '04_slacks_wide': { include: /슬랙스|트라우저/i },
+  '01_denim_straight': { include: /데님|청바지/i },
+  '02_denim_wide': { include: /데님|청바지/i },
+  '38_denim_slim': { include: /데님|청바지/i },
+  '60_denim_barrel': { include: /데님|청바지/i },
+  '62_denim_boot': { include: /데님|청바지/i },
 }
 
-/** 상품 hex → 계열 라벨. 판매중 상품의 color_hex_primary 는 30여 종뿐이다(자사몰 실측, 옷 색이 아니라
- *  웹 기본색). 계열이 애매한 것(베이지·세이지 등)은 눈으로 보고 정했다 — HANDOFF-shop-link-fix.md 참고.
- *  scripts/shop-check.mjs 가 이 표에 없는 새 hex 가 나오면 찍어 알려준다. */
-export const PRODUCT_HEX_LABEL: Record<string, string> = {
-  '#FFFFFF': 'achromatic_light', '#FFFFF0': 'achromatic_light', '#D3D3D3': 'achromatic_light',
-  '#808080': 'achromatic_mid',
-  '#000000': 'achromatic_dark', '#36454F': 'achromatic_dark',
-  '#F5F5DC': 'beige_brown', '#8B4513': 'beige_brown', '#C19A6B': 'beige_brown', '#C3B091': 'beige_brown',
-  '#654321': 'beige_brown', '#4B3621': 'beige_brown', '#FFFDD0': 'beige_brown',
-  '#FF0000': 'red_pink', '#FF69B4': 'red_pink', '#800020': 'red_pink', '#FFD1DC': 'red_pink', '#FFC1CC': 'red_pink',
-  '#FF8C00': 'orange_yellow', '#FFFF00': 'orange_yellow', '#FDFD96': 'orange_yellow',
-  '#808000': 'green', '#00FF00': 'green', '#C8D5B9': 'green', '#B2DFDB': 'green', '#228B22': 'green', '#008080': 'green', '#006400': 'green',
-  '#0000FF': 'blue', '#000080': 'blue', '#AEC6CF': 'blue', '#C0E0FF': 'blue', '#00008B': 'blue', '#4169E1': 'blue',
-  '#800080': 'purple', '#E6E6FA': 'purple', '#4B0082': 'purple', '#D8BFD8': 'purple',
+export function matchesNameRule(plate: string, productName: string): boolean {
+  const rule = NAME_RULE_BY_PLATE[plate]
+  if (!rule) return true
+  if (rule.include.test(productName)) return true
+  return rule.exclude ? !rule.exclude.test(productName) : false
 }
 
-export function colorLabel(colorKey: string): string | undefined { return COLOR_LABEL_BY_KEY[colorKey] }
-export function productLabel(productHex: string): string | undefined { return PRODUCT_HEX_LABEL[productHex.toUpperCase()] }
+/** 상품 색 키. 질의에서 product_data_json->final_colors->main->>key 만 color_key 로 뽑아 온다 —
+ *  jsonb 를 통째로 받으면 3개 subcategory 기준 1.3MB 인데 키만 받으면 0.2MB 다(실측, 6배 차이).
+ *  결과 화면을 볼 때마다 나가는 요청이라 모바일 데이터로 그냥 둘 수 없다. 없으면(0.9%) 후보에서 뺀다.
+ *  final_colors.sub(보조색)는 이번엔 안 쓴다 — 후보만 늘고 정확도가 떨어진다. 나중에 후보가
+ *  모자랄 때 main 매칭에 sub 도 더해 넓히는 식으로 풀면 된다. */
+export function productColorKey(p: { color_key: string | null }): string | undefined {
+  return p.color_key ?? undefined
+}
+
+/** 코디 색 ↔ 상품 색 거리 — 둘 다 앱 팔레트(COLORS_60) hex 를 lch() 로 다시 재서 잰다
+ *  (상품에 박힌 hex·hcl 은 팔레트 v3.1 이전 값이라 쓰지 않는다). 채도가 낮을수록(무채에 가까울수록)
+ *  색상각 차이는 의미가 옅어지므로 접어 준다. */
+export function colorDistance(colorKeyA: string, colorKeyB: string): number {
+  const a = COLORS_60[colorKeyA], b = COLORS_60[colorKeyB]
+  if (!a || !b) return Infinity
+  const la = lch(a.hex), lb = lch(b.hex)
+  const dH = Math.abs(((la.h - lb.h + 540) % 360) - 180)
+  const hueFold = Math.min(la.C, lb.C, 20) / 20 // 채도 20 이하(무채에 가까움)면 색상각 차이를 접는다
+  return Math.abs(la.L - lb.L) + Math.abs(la.C - lb.C) + dH * hueFold
+}
+
+/** 같은 키가 아니어도 후보로 넓히는 거리 문턱. scripts/shop-check.mjs 로 눈으로 정함(HANDOFF-shop-color-v2.md #3):
+ *  버건디-와인(31)·버건디-마룬(31) 은 넣고, 그레이-차콜(34)·올리브-브라운(47)·버건디-핑크(102) 는 뺀다. */
+export const SHOP_MATCH_THRESHOLD = 32
 
 export interface ShopProduct {
   cafe24_url: string
   product_name: string
   subcategory: string
-  color_hex_primary: string
+  color_key: string | null
   price: number | null
   original_price: number | null
   image_url: string | null
   style_tags: string[] | null
 }
 
-export interface OutfitItem { plate: string; colorKey: string }
-export interface ShopGroup { subcat: string; colorKey: string; products: ShopProduct[] }
+/** 칩·목록 머리에 쓸 이름. 판 이름에 색 이름이 이미 들어 있으면 색을 앞에 또 붙이지 않는다
+ *  ("데님" + "일자 데님" → "데님 일자 데님" 이 되는 걸 막는다). */
+export function shopItemLabel(colorName: string, plateLabel: string): string {
+  return plateLabel.includes(colorName) ? plateLabel : `${colorName} ${plateLabel}`
+}
 
-/** 현재 코디에서 연결 가능한 (subcategory, 그 칸의 색) 목록. 같은 subcat 이 여럿이면 처음 것만 쓴다 */
-export function shopEntries(items: OutfitItem[]): { subcat: string; colorKey: string }[] {
+export interface OutfitItem { plate: string; colorKey: string }
+export interface ShopGroup { plate: string; subcat: string; colorKey: string; products: ShopProduct[] }
+
+/** 현재 코디에서 연결 가능한 (판, subcategory, 그 칸의 색) 목록. 같은 subcat 이 여럿이면 처음 것만 쓴다 */
+export function shopEntries(items: OutfitItem[]): { plate: string; subcat: string; colorKey: string }[] {
   const seen = new Set<string>()
-  const out: { subcat: string; colorKey: string }[] = []
+  const out: { plate: string; subcat: string; colorKey: string }[] = []
   for (const { plate, colorKey } of items) {
     const subcat = SUBCAT_BY_PLATE[plate]
     if (!subcat || seen.has(subcat)) continue
-    seen.add(subcat); out.push({ subcat, colorKey })
+    seen.add(subcat); out.push({ plate, subcat, colorKey })
   }
   return out
 }
@@ -121,27 +146,34 @@ export async function findShopMatches(items: OutfitItem[], styleId?: string | nu
   const subcats = entries.map(e => e.subcat)
   const { data, error } = await shopSupabase
     .from('products_cache')
-    .select('cafe24_url,product_name,subcategory,color_hex_primary,price,original_price,image_url,style_tags')
+    .select('cafe24_url,product_name,subcategory,color_key:product_data_json->final_colors->main->>key,price,original_price,image_url,style_tags')
     .eq('is_sold', false)
     .in('subcategory', subcats)
-    .not('color_hex_primary', 'is', null)
     .limit(1000) // 판매중 전체(1,209개)가 실질적으로 다 들어오는 값 — 200이면 판별로 잘려서 후보가 60%씩 빠진다
   if (error || !data) return []
 
   const styleTag = styleId ? STYLE_TAG_BY_ID[styleId] : null
-  const groups = entries.map(({ subcat, colorKey }) => {
-    const label = colorLabel(colorKey)
-    const appL = lch(COLORS_60[colorKey]?.hex ?? '#808080').L
+  const groups = entries.map(({ plate, subcat, colorKey }) => {
     const products = (data as ShopProduct[])
-      .filter(p => p.subcategory === subcat && productLabel(p.color_hex_primary) === label)
-      .map(p => ({ p, dL: Math.abs(appL - lch(p.color_hex_primary).L) }))
+      .filter(p => p.subcategory === subcat && matchesNameRule(plate, p.product_name))
+      .map(p => {
+        const productKey = productColorKey(p)
+        if (!productKey) return null
+        const sameKey = productKey === colorKey
+        const d = sameKey ? 0 : colorDistance(colorKey, productKey)
+        return sameKey || d <= SHOP_MATCH_THRESHOLD ? { p, sameKey, d } : null
+      })
+      .filter((x): x is { p: ShopProduct; sameKey: boolean; d: number } => x !== null)
+      // 같은 키 먼저, 그다음 거리 가까운 순, 스타일 태그는 마지막 소프트 가중(동률 정리).
       .sort((a, b) => {
+        if (a.sameKey !== b.sameKey) return a.sameKey ? -1 : 1
+        if (a.d !== b.d) return a.d - b.d
         const ta = styleTag && a.p.style_tags?.includes(styleTag) ? 0 : 1
         const tb = styleTag && b.p.style_tags?.includes(styleTag) ? 0 : 1
-        return ta - tb || a.dL - b.dL
+        return ta - tb
       })
       .map(x => x.p)
-    return { subcat, colorKey, products }
+    return { plate, subcat, colorKey, products }
   })
   return groups.sort((a, b) => b.products.length - a.products.length)
 }
