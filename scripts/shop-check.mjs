@@ -61,7 +61,7 @@ const subcats = [...new Set(MAJOR_PLATES.map(p => SUBCAT_BY_PLATE[p]))]
 console.log('\n조회 subcategory:', subcats.join(', '))
 const { data, error } = await shopSupabase
   .from('products_cache')
-  .select('cafe24_url,product_name,subcategory,product_data_json,style_tags')
+  .select('cafe24_url,product_name,subcategory,color_key:product_data_json->final_colors->main->>key,style_tags')
   .eq('is_sold', false)
   .in('subcategory', subcats)
   .limit(1000)

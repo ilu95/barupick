@@ -602,7 +602,7 @@
     "shop": {
       "title": "실제 상품 구경하기",
       "sub": "바루사에 있는 비슷한 옷이에요",
-      "chip": "{{color}} {{item}} {{n}}"
+      "chip": "{{item}} {{n}}"
     },
     "communityBtn": "커뮤니티",
     "similarCoords": "비슷한 코디",
@@ -1415,7 +1415,7 @@
     "posts": "게시물",
     "followers": "팔로워",
     "picks": {
-      "title": "{{color}} {{item}} {{n}}",
+      "title": "{{item}} {{n}}",
       "empty": "지금은 딱 맞는 상품이 없어요",
       "backHome": "홈으로"
     }

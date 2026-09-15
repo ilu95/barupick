@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Browser } from '@capacitor/browser'
 import { getColorName } from '@/lib/colors'
 import { plateName } from '@/lib/outfits'
-import type { ShopProduct } from '@/lib/shop'
+import { shopItemLabel, type ShopProduct } from '@/lib/shop'
 
 // ================================================================
 // /shop/picks — 결과 화면 "없는 옷이 있다면" 버튼이 이어지는 상품 목록.
@@ -41,7 +41,7 @@ export default function ShopPicks() {
     )
   }
 
-  const title = t('shop.picks.title', { color: getColorName(payload.colorKey), item: plateName(payload.plate), n: payload.products.length })
+  const title = t('shop.picks.title', { item: shopItemLabel(getColorName(payload.colorKey), plateName(payload.plate)), n: payload.products.length })
   const open = (p: ShopProduct) => { Browser.open({ url: p.cafe24_url }).catch(() => {}) }
 
   return (

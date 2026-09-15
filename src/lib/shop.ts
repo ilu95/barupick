@@ -82,11 +82,13 @@ export function matchesNameRule(plate: string, productName: string): boolean {
   return rule.exclude ? !rule.exclude.test(productName) : false
 }
 
-/** 상품 색 키(product_data_json.final_colors.main.key). 없으면(0.9%) 후보에서 뺀다.
+/** 상품 색 키. 질의에서 product_data_json->final_colors->main->>key 만 color_key 로 뽑아 온다 —
+ *  jsonb 를 통째로 받으면 3개 subcategory 기준 1.3MB 인데 키만 받으면 0.2MB 다(실측, 6배 차이).
+ *  결과 화면을 볼 때마다 나가는 요청이라 모바일 데이터로 그냥 둘 수 없다. 없으면(0.9%) 후보에서 뺀다.
  *  final_colors.sub(보조색)는 이번엔 안 쓴다 — 후보만 늘고 정확도가 떨어진다. 나중에 후보가
- *  모자랄 때(subcat당 후보 부족) main 매칭에 sub 도 더해 넓히는 식으로 풀면 된다. */
-export function productColorKey(p: { product_data_json: any }): string | undefined {
-  return p.product_data_json?.final_colors?.main?.key
+ *  모자랄 때 main 매칭에 sub 도 더해 넓히는 식으로 풀면 된다. */
+export function productColorKey(p: { color_key: string | null }): string | undefined {
+  return p.color_key ?? undefined
 }
 
 /** 코디 색 ↔ 상품 색 거리 — 둘 다 앱 팔레트(COLORS_60) hex 를 lch() 로 다시 재서 잰다
@@ -109,11 +111,17 @@ export interface ShopProduct {
   cafe24_url: string
   product_name: string
   subcategory: string
-  product_data_json: any
+  color_key: string | null
   price: number | null
   original_price: number | null
   image_url: string | null
   style_tags: string[] | null
+}
+
+/** 칩·목록 머리에 쓸 이름. 판 이름에 색 이름이 이미 들어 있으면 색을 앞에 또 붙이지 않는다
+ *  ("데님" + "일자 데님" → "데님 일자 데님" 이 되는 걸 막는다). */
+export function shopItemLabel(colorName: string, plateLabel: string): string {
+  return plateLabel.includes(colorName) ? plateLabel : `${colorName} ${plateLabel}`
 }
 
 export interface OutfitItem { plate: string; colorKey: string }
@@ -138,7 +146,7 @@ export async function findShopMatches(items: OutfitItem[], styleId?: string | nu
   const subcats = entries.map(e => e.subcat)
   const { data, error } = await shopSupabase
     .from('products_cache')
-    .select('cafe24_url,product_name,subcategory,product_data_json,price,original_price,image_url,style_tags')
+    .select('cafe24_url,product_name,subcategory,color_key:product_data_json->final_colors->main->>key,price,original_price,image_url,style_tags')
     .eq('is_sold', false)
     .in('subcategory', subcats)
     .limit(1000) // 판매중 전체(1,209개)가 실질적으로 다 들어오는 값 — 200이면 판별로 잘려서 후보가 60%씩 빠진다
