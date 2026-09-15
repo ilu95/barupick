@@ -600,7 +600,7 @@
     "coordColors": "코디 색상",
     "editColors": "색 수정하기",
     "shop": {
-      "title": "이 코디, 실제 상품으로 보기",
+      "title": "실제 상품 구경하기",
       "sub": "바루사에 있는 비슷한 옷이에요",
       "chip": "{{color}} {{item}} {{n}}"
     },

@@ -600,7 +600,7 @@
     "coordColors": "Coord Colors",
     "editColors": "Edit Colors",
     "shop": {
-      "title": "See these as real products",
+      "title": "Browse real products",
       "sub": "Similar pieces we have in stock",
       "chip": "{{color}} {{item}} · {{n}}"
     },
