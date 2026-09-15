@@ -599,8 +599,11 @@
     "scoreDetail": "Score details",
     "coordColors": "Coord Colors",
     "editColors": "Edit Colors",
-    "shopCta": "Missing a piece?",
-    "shopBtn": "See {{color}} {{item}} · {{n}}",
+    "shop": {
+      "title": "See these as real products",
+      "sub": "Similar pieces we have in stock",
+      "chip": "{{color}} {{item}} · {{n}}"
+    },
     "communityBtn": "Community",
     "similarCoords": "Similar Coords",
     "goHome": "Go back home",

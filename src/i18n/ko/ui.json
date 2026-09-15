@@ -599,8 +599,11 @@
     "scoreDetail": "점수 자세히 보기",
     "coordColors": "코디 색상",
     "editColors": "색 수정하기",
-    "shopCta": "없는 옷이 있다면",
-    "shopBtn": "{{color}} {{item}} 보러 가기 · {{n}}",
+    "shop": {
+      "title": "이 코디, 실제 상품으로 보기",
+      "sub": "바루사에 있는 비슷한 옷이에요",
+      "chip": "{{color}} {{item}} {{n}}"
+    },
     "communityBtn": "커뮤니티",
     "similarCoords": "비슷한 코디",
     "goHome": "처음으로 돌아가기",

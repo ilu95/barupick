@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════
 // useBuild.ts v2 — 자유형 레이어 빌더 + 자동 슬롯 매핑
 // ═══════════════════════════════════════════════════════
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { COLORS_60 } from '@/lib/colors'
 import { STYLE_GUIDE, MOOD_GROUPS, ITEMS_CATALOG, type ItemDef } from '@/lib/styles'
 import { STYLE_MOODS } from '@/lib/styleMoods'
@@ -185,12 +185,51 @@ const initialState = (mode: BuildMode = 'coord'): BuildState => ({
 
 let uidCounter = 0
 
-export function useBuild(mode: BuildMode = 'coord') {
-  const [step, setStep] = useState<BuildStep>(mode === 'coord' ? 'outfit' : 'style')
-  const [state, setState] = useState<BuildState>(initialState(mode))
-  const [history, setHistory] = useState<BuildStep[]>([])
+// ═══ 뒤로 가기가 직전 화면으로: /home/build 를 나갔다 돌아와도 이어지도록 세션에 담는다 ═══
+// (localStorage 가 아니다 — 앱을 껐다 켜면 새로 시작하는 게 맞다)
+const BUILD_SESSION_KEY = 'sp_build_session'
+// 홈에서 새 코디로 들어오는 길: 이 중 하나라도 있으면 그게 이겨야 한다 (BuildCoord.tsx 마운트 effect 참고)
+const INCOMING_PICK_KEYS = ['sp_guided', 'sp_open_step', 'sp_taste_pick', 'sp_rec_pick']
+
+interface BuildSession { mode: BuildMode; step: BuildStep; history: BuildStep[]; state: BuildState }
+
+function hasIncomingPick(): boolean {
+  try { return INCOMING_PICK_KEYS.some(k => sessionStorage.getItem(k) != null) } catch { return false }
+}
+
+function loadBuildSession(mode: BuildMode): BuildSession | null {
+  if (hasIncomingPick()) return null
+  try {
+    const raw = sessionStorage.getItem(BUILD_SESSION_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as BuildSession
+    if (parsed.mode !== mode) return null
+    if (!(parsed.state?.upper?.length > 0 || parsed.state?.bottomColor)) return null
+    return parsed
+  } catch { return null }
+}
+
+// persist: true 인 호출(BuildCoord)만 세션에 이어 붙인다. OotdRecord 등 다른 화면은 useBuild('coord') 를
+// 매번 새로 쓰므로 같은 키를 공유하면 서로 다른 화면의 미완성 코디가 섞여 든다.
+export function useBuild(mode: BuildMode = 'coord', opts?: { persist?: boolean }) {
+  const persist = !!opts?.persist
+  // 마운트 시 한 번만 복원 — 빈 껍데기는 되살리지 않는다 (uidCounter 도 복원값 뒤로 민다)
+  const [restored] = useState<BuildSession | null>(() => {
+    if (!persist) return null
+    const r = loadBuildSession(mode)
+    if (r) uidCounter = Math.max(0, ...r.state.upper.map(l => l.uid)) + 1
+    return r
+  })
+  const [step, setStep] = useState<BuildStep>(restored?.step ?? (mode === 'coord' ? 'outfit' : 'style'))
+  const [state, setState] = useState<BuildState>(restored?.state ?? initialState(mode))
+  const [history, setHistory] = useState<BuildStep[]>(restored?.history ?? [])
   const [vizCollapsed, setVizCollapsed] = useState(false)
   const [editMode, setEditMode] = useState<EditMode>({ type: 'idle' })
+
+  useEffect(() => {
+    if (!persist) return
+    try { sessionStorage.setItem(BUILD_SESSION_KEY, JSON.stringify({ mode, step, history, state })) } catch {}
+  }, [persist, mode, step, history, state])
 
   const pushStep = useCallback((next: BuildStep) => {
     setHistory(prev => [...prev, step])
@@ -215,7 +254,8 @@ export function useBuild(mode: BuildMode = 'coord') {
     setStep(mode === 'coord' ? 'outfit' : 'style')
     setHistory([])
     setEditMode({ type: 'idle' })
-  }, [mode])
+    if (persist) { try { sessionStorage.removeItem(BUILD_SESSION_KEY) } catch {} }
+  }, [mode, persist])
 
   // ── 스타일 선택 ──
   const selectStyle = useCallback((style: string | null) => {
