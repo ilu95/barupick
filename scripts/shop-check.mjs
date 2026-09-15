@@ -3,10 +3,12 @@
  *
  *   1) 앱 판 중 subcategory 매핑이 없는 것 (의도적으로 뺀 것: 신발·타이·양말·원피스류)
  *   2) 판매중 상품의 final_colors.main.key 중 앱 팔레트(COLORS_60)에 없는 키가 있는지 · 키 자체가 없는 상품 비율
- *   3) 주요 12판 × 주요 10색 조합의 후보 수 — 같은 키만 vs SHOP_MATCH_THRESHOLD 로 넓힌 뒤
- *   4) 문턱 후보(20/32/45)마다, 코디 색마다 어떤 상품 색 이름이 딸려 오는지 한글로 — 문턱을 눈으로 정하는 근거
+ *   3) 판별 규칙(NAME_RULE_BY_PLATE)이 있는 판마다 규칙 통과 재고 수, 규칙이 없어 subcategory 만으로 통과하는 판 목록
+ *   4) 주요 12판 × 주요 10색 조합의 후보 수 — 이름 규칙 적용 후, 같은 키만 vs SHOP_MATCH_THRESHOLD 로 넓힌 뒤. 후보 0인 칸 개수
+ *   5) 문턱 후보(20/32/45)마다, 코디 색마다 어떤 상품 색 이름이 딸려 오는지 한글로 — 문턱을 눈으로 정하는 근거
  *
  * engine-check.mjs 와 같은 방식으로 esbuild 번들 + Node 실행.
+ * 근거: HANDOFF-shop-garment-type.md (09-15, 옷 종류는 subcategory 가 아니라 상품명에서 좁힌다)
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -23,7 +25,7 @@ await build({
       `export { COLORS_60, getColorName } from './src/lib/colors'`,
       `export { PLATE_NAMES, PLATE_SLOT } from './src/lib/outfits'`,
       `export { TYPES, TYPES_W } from './src/lib/builderSlots'`,
-      `export { SUBCAT_BY_PLATE, shopSupabase, productColorKey, colorDistance, SHOP_MATCH_THRESHOLD } from './src/lib/shop'`,
+      `export { SUBCAT_BY_PLATE, NAME_RULE_BY_PLATE, matchesNameRule, shopSupabase, productColorKey, colorDistance, SHOP_MATCH_THRESHOLD } from './src/lib/shop'`,
     ].join('\n'),
     resolveDir: ROOT,
     loader: 'ts',
@@ -42,7 +44,7 @@ globalThis.window = Object.assign(globalThis, { addEventListener: noop, removeEv
 globalThis.document = { documentElement: { lang: 'ko', setAttribute: noop, classList: { add: noop, remove: noop, toggle: noop } }, addEventListener: noop, removeEventListener: noop, createElement: () => ({ style: {}, setAttribute: noop }), body: { appendChild: noop } }
 globalThis.CustomEvent = class { constructor(t, o) { this.type = t; this.detail = o && o.detail } }
 
-const { COLORS_60, getColorName, PLATE_NAMES, PLATE_SLOT, TYPES, TYPES_W, SUBCAT_BY_PLATE, shopSupabase, productColorKey, colorDistance, SHOP_MATCH_THRESHOLD } = await import(pathToFileURL(OUT).href)
+const { COLORS_60, getColorName, PLATE_NAMES, PLATE_SLOT, TYPES, TYPES_W, SUBCAT_BY_PLATE, NAME_RULE_BY_PLATE, matchesNameRule, shopSupabase, productColorKey, colorDistance, SHOP_MATCH_THRESHOLD } = await import(pathToFileURL(OUT).href)
 
 // ── 1) 매핑 없는 앱 판 (신발·양말·타이·원피스류는 HANDOFF 범위 밖이라 의도적으로 제외) ──
 const allWearPlates = new Set([...Object.keys(PLATE_NAMES), ...Object.values(TYPES).flat(), ...Object.values(TYPES_W).flat()])
@@ -73,21 +75,37 @@ console.log('\n== 2) 색 키 상태 ==')
 console.log(`키 없음: ${noKey}/${data.length}`)
 console.log(`앱 팔레트에 없는 키: ${unknownKeys.length ? unknownKeys.join(', ') : '(없음)'}`)
 
-// ── 3) 12 주요 판 × 10 주요 색 → 같은 키 후보 수 / 문턱 넓힌 뒤 후보 수 ──
-console.log(`\n== 3) 후보 수(같은키/넓힌뒤, 문턱=${SHOP_MATCH_THRESHOLD}) — 헤더: ${MAJOR_COLORS.join(' ')} ==`)
+// ── 3) 판별 규칙(NAME_RULE_BY_PLATE) 통과 재고 — 규칙 없는 판은 subcategory 만으로 통과 ──
+console.log('\n== 3) 이름 규칙 통과 재고 ==')
 for (const plate of MAJOR_PLATES) {
   const subcat = SUBCAT_BY_PLATE[plate]
-  const withKey = data.filter(p => p.subcategory === subcat).map(productColorKey).filter(Boolean)
+  const inSubcat = data.filter(p => p.subcategory === subcat)
+  const rule = NAME_RULE_BY_PLATE[plate]
+  if (!rule) continue
+  const passed = inSubcat.filter(p => matchesNameRule(plate, p.product_name)).length
+  console.log(`${plate}(${subcat}): 규칙 통과 ${passed}/${inSubcat.length}`)
+}
+const noRule = MAJOR_PLATES.filter(p => !NAME_RULE_BY_PLATE[p])
+console.log(`규칙 없음(subcategory 만으로 통과): ${noRule.length ? noRule.join(', ') : '(없음)'}`)
+
+// ── 4) 12 주요 판 × 10 주요 색 → 이름 규칙 적용 후, 같은 키 후보 수 / 문턱 넓힌 뒤 후보 수 ──
+console.log(`\n== 4) 후보 수(이름 규칙 적용 후, 같은키/넓힌뒤, 문턱=${SHOP_MATCH_THRESHOLD}) — 헤더: ${MAJOR_COLORS.join(' ')} ==`)
+let zeroCells = 0
+for (const plate of MAJOR_PLATES) {
+  const subcat = SUBCAT_BY_PLATE[plate]
+  const withKey = data.filter(p => p.subcategory === subcat && matchesNameRule(plate, p.product_name)).map(productColorKey).filter(Boolean)
   const cells = MAJOR_COLORS.map(colorKey => {
     const same = withKey.filter(k => k === colorKey).length
     const wide = withKey.filter(k => k === colorKey || colorDistance(colorKey, k) <= SHOP_MATCH_THRESHOLD).length
+    if (wide === 0) zeroCells++
     return `${same}/${wide}`
   })
   console.log(`${plate}(${subcat}): ${cells.join(' ')}`)
 }
+console.log(`후보 0인 칸: ${zeroCells}/${MAJOR_PLATES.length * MAJOR_COLORS.length}`)
 
-// ── 4) 문턱 후보마다 딸려 오는 상품 색 이름 — 분홍이 버건디에 섞이면 문턱이 넓은 것 ──
-console.log('\n== 4) 문턱별로 딸려 오는 상품 색 (조회된 12판 전체 기준) ==')
+// ── 5) 문턱 후보마다 딸려 오는 상품 색 이름 — 분홍이 버건디에 섞이면 문턱이 넓은 것 ──
+console.log('\n== 5) 문턱별로 딸려 오는 상품 색 (조회된 12판 전체 기준, 색 매칭만 — 이름 규칙 무관) ==')
 const allKeys = keys.filter(Boolean)
 const CHECK_COLORS = ['burgundy', 'gray', 'navy', 'camel', 'white', 'olive']
 for (const threshold of [20, 32, 45]) {

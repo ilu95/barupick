@@ -53,6 +53,35 @@ export const STYLE_TAG_BY_ID: Record<string, string> = {
   preppy: '프레피', workwear: '워크웨어', oldmoney: '올드머니', gorpcore: '아웃도어', athleisure: '스포츠', street: '스트릿',
 }
 
+/** 판 id → 상품명으로 종류를 더 좁히는 규칙. 규칙이 없는 판은 subcategory 만으로 충분해 그대로 통과한다.
+ *  통과 조건: include 매치 OR (exclude 가 있고, exclude 에 안 걸림) — "이름에 표시가 있으면 그것만 고르고,
+ *  아무 표시도 없으면 그 subcategory 의 기본형으로 본다"(HANDOFF-shop-garment-type.md, 09-15 대표님 지적:
+ *  목폴라 보던 사람에게 니트 스웨터를 억지로 보여주지 않는다). 대소문자 무시(상품명에 V넥·v넥 섞여 있음).
+ *  통과 0건이면 그 칸은 후보 없음 — subcategory 로 되돌아가 넓히지 않는다. */
+export const NAME_RULE_BY_PLATE: Record<string, { include: RegExp; exclude?: RegExp }> = {
+  '13_knit_turtle': { include: /목폴라|터틀|하이넥/i },
+  '12_knit_vneck': { include: /브이넥|v넥/i },
+  '11_knit_crew': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥/i },
+  '46_knit_crop': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥/i },
+  '14_knit_vest': { include: /베스트|조끼/i },
+  '45_vest_padding': { include: /베스트|조끼/i },
+  '63_chino': { include: /치노/i },
+  '03_slacks_straight': { include: /슬랙스|트라우저/i },
+  '04_slacks_wide': { include: /슬랙스|트라우저/i },
+  '01_denim_straight': { include: /데님|청바지/i },
+  '02_denim_wide': { include: /데님|청바지/i },
+  '38_denim_slim': { include: /데님|청바지/i },
+  '60_denim_barrel': { include: /데님|청바지/i },
+  '62_denim_boot': { include: /데님|청바지/i },
+}
+
+export function matchesNameRule(plate: string, productName: string): boolean {
+  const rule = NAME_RULE_BY_PLATE[plate]
+  if (!rule) return true
+  if (rule.include.test(productName)) return true
+  return rule.exclude ? !rule.exclude.test(productName) : false
+}
+
 /** 상품 색 키(product_data_json.final_colors.main.key). 없으면(0.9%) 후보에서 뺀다.
  *  final_colors.sub(보조색)는 이번엔 안 쓴다 — 후보만 늘고 정확도가 떨어진다. 나중에 후보가
  *  모자랄 때(subcat당 후보 부족) main 매칭에 sub 도 더해 넓히는 식으로 풀면 된다. */
@@ -88,16 +117,16 @@ export interface ShopProduct {
 }
 
 export interface OutfitItem { plate: string; colorKey: string }
-export interface ShopGroup { subcat: string; colorKey: string; products: ShopProduct[] }
+export interface ShopGroup { plate: string; subcat: string; colorKey: string; products: ShopProduct[] }
 
-/** 현재 코디에서 연결 가능한 (subcategory, 그 칸의 색) 목록. 같은 subcat 이 여럿이면 처음 것만 쓴다 */
-export function shopEntries(items: OutfitItem[]): { subcat: string; colorKey: string }[] {
+/** 현재 코디에서 연결 가능한 (판, subcategory, 그 칸의 색) 목록. 같은 subcat 이 여럿이면 처음 것만 쓴다 */
+export function shopEntries(items: OutfitItem[]): { plate: string; subcat: string; colorKey: string }[] {
   const seen = new Set<string>()
-  const out: { subcat: string; colorKey: string }[] = []
+  const out: { plate: string; subcat: string; colorKey: string }[] = []
   for (const { plate, colorKey } of items) {
     const subcat = SUBCAT_BY_PLATE[plate]
     if (!subcat || seen.has(subcat)) continue
-    seen.add(subcat); out.push({ subcat, colorKey })
+    seen.add(subcat); out.push({ plate, subcat, colorKey })
   }
   return out
 }
@@ -116,9 +145,9 @@ export async function findShopMatches(items: OutfitItem[], styleId?: string | nu
   if (error || !data) return []
 
   const styleTag = styleId ? STYLE_TAG_BY_ID[styleId] : null
-  const groups = entries.map(({ subcat, colorKey }) => {
+  const groups = entries.map(({ plate, subcat, colorKey }) => {
     const products = (data as ShopProduct[])
-      .filter(p => p.subcategory === subcat)
+      .filter(p => p.subcategory === subcat && matchesNameRule(plate, p.product_name))
       .map(p => {
         const productKey = productColorKey(p)
         if (!productKey) return null
@@ -136,7 +165,7 @@ export async function findShopMatches(items: OutfitItem[], styleId?: string | nu
         return ta - tb
       })
       .map(x => x.p)
-    return { subcat, colorKey, products }
+    return { plate, subcat, colorKey, products }
   })
   return groups.sort((a, b) => b.products.length - a.products.length)
 }

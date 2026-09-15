@@ -967,7 +967,7 @@ function StepResult({ build, navigate }: { build: BH; navigate: any }) {
               {chips.map(({ cat, colorKey, group }) => (
                 <button key={cat} onClick={() => openShopSlot(cat, group)}
                   className="flex-none flex items-center gap-1 h-9 px-3.5 rounded-full border border-warm-400 dark:border-warm-600 text-[12px] font-semibold text-warm-800 dark:text-warm-200 active:scale-95 whitespace-nowrap">
-                  {t('build.shop.chip', { color: getColorName(colorKey), item: group.subcat, n: group.products.length })}
+                  {t('build.shop.chip', { color: getColorName(colorKey), item: plateName(group.plate), n: group.products.length })}
                   <ChevronRight size={13} className="text-terra-500 flex-shrink-0" />
                 </button>
               ))}

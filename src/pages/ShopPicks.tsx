@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft } from 'lucide-react'
 import { Browser } from '@capacitor/browser'
 import { getColorName } from '@/lib/colors'
+import { plateName } from '@/lib/outfits'
 import type { ShopProduct } from '@/lib/shop'
 
 // ================================================================
@@ -12,7 +13,7 @@ import type { ShopProduct } from '@/lib/shop'
 // 로 넘긴다 — 여기서 다시 조회하지 않는다. cafe24_url 은 조립하지 않고 그대로 연다.
 // ================================================================
 
-interface ShopPicksPayload { subcat: string; colorKey: string; products: ShopProduct[] }
+interface ShopPicksPayload { plate: string; colorKey: string; products: ShopProduct[] }
 
 export default function ShopPicks() {
   const { t } = useTranslation()
@@ -40,7 +41,7 @@ export default function ShopPicks() {
     )
   }
 
-  const title = t('shop.picks.title', { color: getColorName(payload.colorKey), item: payload.subcat, n: payload.products.length })
+  const title = t('shop.picks.title', { color: getColorName(payload.colorKey), item: plateName(payload.plate), n: payload.products.length })
   const open = (p: ShopProduct) => { Browser.open({ url: p.cafe24_url }).catch(() => {}) }
 
   return (
