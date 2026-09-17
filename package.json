@@ -10,7 +10,8 @@
     "lint": "eslint src/",
     "lint:i18n": "eslint src/ --rule 'i18next/no-literal-string: error'",
     "engine:check": "node scripts/engine-check.mjs",
-    "shop:check": "node scripts/shop-check.mjs"
+    "shop:check": "node scripts/shop-check.mjs",
+    "temp:check": "node scripts/temp-check.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.1",
