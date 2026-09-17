@@ -454,6 +454,8 @@ const F: Record<string, number> = {
   "60_denim_barrel": 2,
   "61_pants_balloon": 2,
   "39_cargo": 1.5,
+  "05_shorts": 1.5,
+  "80_sandal_slide": 1.5,
   "24_skirt_pleat": 3,
   "49_skirt_long": 3,
   "74_loafer": 3.5,
@@ -466,14 +468,21 @@ const F: Record<string, number> = {
   "59_tie": 5
 }
 
-/** 보온 */
+/** 보온 — 상의뿐 아니라 하의·신발까지. 하의·신발 값은 작다: 같은 상의일 때
+    반바지·샌들과 코듀로이·워커를 가르는 정도지, 상의를 뒤집지는 않는다. */
 const W: Record<string, number> = {
-  "29_puffer": 3,
-  "17_coat_long": 3,
+  "32_padding_long": 4.2,
+  "29_puffer": 4,
+  "43_mustang": 3.5,
+  "17_coat_long": 3.2,
   "28_coat_short": 2.5,
   "30_trench": 2,
+  "44_field": 2,
+  "42_fleece": 1.8,
+  "20_leather": 1.8,
   "19_blazer": 1.5,
   "31_trucker": 1.5,
+  "21_windbreaker": 1,
   "15_cardigan": 1,
   "14_knit_vest": 0.7,
   "10_shirt_open": 0.5,
@@ -488,7 +497,40 @@ const W: Record<string, number> = {
   "37_polo": 0.4,
   "07_tee_long": 0.5,
   "06_tee_short": 0.2,
-  "36_tank": 0.1
+  "36_tank": 0.1,
+  "05_shorts": -0.3,
+  "01_denim_straight": 0.2,
+  "02_denim_wide": 0.2,
+  "38_denim_slim": 0.2,
+  "60_denim_barrel": 0.2,
+  "62_denim_boot": 0.2,
+  "61_pants_balloon": 0.2,
+  "63_chino": 0.15,
+  "39_cargo": 0.15,
+  "03_slacks_straight": 0.35,
+  "04_slacks_wide": 0.35,
+  "64_corduroy": 0.45,
+  "40_track": 0.1,
+  "50_leggings": 0.15,
+  "65_overall": 0.3,
+  "23_skirt_wrap": 0.1,
+  "24_skirt_pleat": 0.1,
+  "25_skirt_denim": 0.1,
+  "34_skirt_knit": 0.2,
+  "48_skirt_mini": 0.05,
+  "49_skirt_long": 0.1,
+  "80_sandal_slide": -0.2,
+  "71_sneaker_canvas": 0,
+  "78_flats_ballet": 0,
+  "72_sneaker_runner": 0.05,
+  "73_sneaker_chunky": 0.1,
+  "79_maryjane": 0.1,
+  "74_loafer": 0.15,
+  "77_derby": 0.2,
+  "75_boots_chelsea": 0.35,
+  "76_boots_walker": 0.4,
+  "82_boots_long": 0.4,
+  "81_boots_ugg": 0.5
 }
 
 /** 조합 48벌: id · 상황 · 스타일 · 옷 · 여성 치환 · 추천 팔레트(바루픽 색 키) */
@@ -1968,6 +2010,232 @@ export const TEMPLATES: Template[] = [
       "bottom": "black",
       "shoes": "white"
     }
+  },
+  {
+    "id": "d19",
+    "tag": "daily",
+    "st": "캐주얼",
+    "p": {
+      "top": "06_tee_short",
+      "bottom": "05_shorts",
+      "shoes": "71_sneaker_canvas"
+    },
+    "w": null,
+    "pal": {
+      "top": "white",
+      "bottom": "khaki",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "d20",
+    "tag": "daily",
+    "st": "시티보이",
+    "p": {
+      "layer": "10_shirt_open",
+      "top": "06_tee_short",
+      "bottom": "05_shorts",
+      "shoes": "80_sandal_slide"
+    },
+    "w": null,
+    "pal": {
+      "layer": "beige",
+      "top": "white",
+      "bottom": "navy",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "d21",
+    "tag": "daily",
+    "st": "프레피",
+    "p": {
+      "top": "37_polo",
+      "bottom": "05_shorts",
+      "shoes": "74_loafer"
+    },
+    "w": {
+      "shoes": "78_flats_ballet"
+    },
+    "pal": {
+      "top": "navy",
+      "bottom": "beige",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "a14",
+    "tag": "active",
+    "st": "애슬레저",
+    "p": {
+      "top": "06_tee_short",
+      "bottom": "05_shorts",
+      "shoes": "72_sneaker_runner"
+    },
+    "w": null,
+    "pal": {
+      "top": "gray",
+      "bottom": "black",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "a15",
+    "tag": "active",
+    "st": "고프코어",
+    "p": {
+      "top": "36_tank",
+      "bottom": "05_shorts",
+      "shoes": "73_sneaker_chunky"
+    },
+    "w": null,
+    "pal": {
+      "top": "white",
+      "bottom": "olive",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "h17",
+    "tag": "home",
+    "st": "놈코어",
+    "p": {
+      "top": "06_tee_short",
+      "bottom": "05_shorts",
+      "shoes": "80_sandal_slide"
+    },
+    "w": null,
+    "pal": {
+      "top": "ivory",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "w16",
+    "tag": "work",
+    "st": "미니멀",
+    "p": {
+      "top": "09_shirt_short",
+      "bottom": "63_chino",
+      "shoes": "77_derby"
+    },
+    "w": {
+      "shoes": "78_flats_ballet"
+    },
+    "pal": {
+      "top": "white",
+      "bottom": "beige",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "w17",
+    "tag": "work",
+    "st": "프레피",
+    "p": {
+      "top": "37_polo",
+      "bottom": "63_chino",
+      "shoes": "74_loafer"
+    },
+    "w": {
+      "bottom": "24_skirt_pleat"
+    },
+    "pal": {
+      "top": "navy",
+      "bottom": "beige",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "f11",
+    "tag": "formal",
+    "st": "댄디",
+    "p": {
+      "top": "08_shirt_closed",
+      "bottom": "63_chino",
+      "shoes": "77_derby"
+    },
+    "w": {
+      "shoes": "78_flats_ballet"
+    },
+    "pal": {
+      "top": "white",
+      "bottom": "beige",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "f12",
+    "tag": "formal",
+    "st": "컨템포러리",
+    "p": {
+      "outer": "28_coat_short",
+      "top": "13_knit_turtle",
+      "bottom": "04_slacks_wide",
+      "shoes": "75_boots_chelsea"
+    },
+    "w": null,
+    "pal": {
+      "outer": "charcoal",
+      "top": "black",
+      "bottom": "charcoal",
+      "shoes": "black"
+    }
+  },
+  {
+    "id": "h18",
+    "tag": "home",
+    "st": "애슬레저",
+    "p": {
+      "outer": "29_puffer",
+      "top": "16_hoodie",
+      "bottom": "40_track",
+      "shoes": "73_sneaker_chunky"
+    },
+    "w": null,
+    "pal": {
+      "outer": "black",
+      "top": "gray",
+      "bottom": "charcoal",
+      "shoes": "white"
+    }
+  },
+  {
+    "id": "h19",
+    "tag": "home",
+    "st": "아메카지",
+    "p": {
+      "outer": "29_puffer",
+      "top": "13_knit_turtle",
+      "bottom": "01_denim_straight",
+      "shoes": "76_boots_walker"
+    },
+    "w": null,
+    "pal": {
+      "outer": "khaki",
+      "top": "cream",
+      "bottom": "denim",
+      "shoes": "brown"
+    }
+  },
+  {
+    "id": "f13",
+    "tag": "formal",
+    "st": "세미포멀",
+    "p": {
+      "top": "08_shirt_closed",
+      "bottom": "63_chino",
+      "shoes": "74_loafer"
+    },
+    "w": {
+      "shoes": "78_flats_ballet"
+    },
+    "pal": {
+      "top": "ivory",
+      "bottom": "khaki",
+      "shoes": "brown"
+    }
   }
 ]
 
@@ -2005,8 +2273,22 @@ const ga = (w: string) => w + (jong(w) ? '이' : '가')
 export const partsOf = (c: Template, sex: 'm' | 'w'): Parts => ({ ...c.p, ...((sex === 'w' && c.w) || {}) })
 export const sig = (p: Parts) => PARTS.map(k => p[k] || '-').join('|')
 export const formality = (p: Parts) => { const ks = PARTS.filter(k => p[k]); let f = ks.reduce((a, k) => a + (F[p[k]!] ?? 3), 0) / Math.max(1, ks.length); if (p.outer && F[p.outer] >= 4) f += .2; return Math.min(5, f) }
-const warmth = (p: Parts) => PARTS.filter(k => p[k] && W[p[k]!] !== undefined).reduce((a, k) => a + W[p[k]!], 0)
-export const idealW = (t: number): [number, number] => t >= 26 ? [0, 1] : t >= 20 ? [1, 2] : t >= 15 ? [2, 3.2] : [3, 5]
+export const warmth = (p: Parts) => PARTS.filter(k => p[k] && W[p[k]!] !== undefined).reduce((a, k) => a + W[p[k]!], 0)
+
+/* 기온 → 알맞은 보온 합. 통용 기온별 옷차림표(8칸)를 앵커로 두고 그 사이를 선으로 잇는다.
+   칸으로 끊으면 20°와 25°가 같은 칸이라 24°에 블레이저가 그대로 남았다(대표님 지적 09-17).
+   값은 하의·신발 보온까지 더한 합 기준이다. 어떤 기온에서 계속 어긋나면(npm run temp:check)
+   폭을 넓히지 말고 그 기온의 앵커를 옮긴다. */
+const W_ANCHORS: [number, number][] = [   // [기온, 알맞은 보온 합]
+  [-10, 6.0], [2, 5.3], [6, 4.4], [9, 3.7], [12, 3.0], [16, 2.0], [19, 1.35], [22, 0.9], [25, 0.5], [28, 0.2], [32, 0],
+]
+/** 앵커 사이 선형 보간, 양 끝은 고정 */
+const lerp = (pts: [number, number][], x: number) => {
+  for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]
+    if (x <= x1) return i === 1 && x <= x0 ? y0 : y0 + (y1 - y0) * (x - x0) / (x1 - x0) }
+  return pts[pts.length - 1][1]
+}
+export const idealW = (t: number): [number, number] => { const c = lerp(W_ANCHORS, t); return [c - 0.3, c + 0.3] }
 const dist = (x: number, [a, b]: [number, number]) => x < a ? a - x : x > b ? x - b : 0
 const situOf = (s: Situ) => SITU.find(x => x.id === s) || SITU[1]
 
