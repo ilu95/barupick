@@ -30,13 +30,13 @@ export const SUBCAT_BY_PLATE: Record<string, string> = {
   '35_sweat': '맨투맨',
   '16_hoodie': '후드',
   '15_cardigan': '가디건',
-  '14_knit_vest': '조끼', '45_vest_padding': '조끼',
+  '14_knit_vest': '조끼',
   '17_coat_long': '코트', '28_coat_short': '코트', '30_trench': '코트',
   '19_blazer': '블레이저',
   '18_jacket_short': '자켓', '31_trucker': '자켓', '41_jacket_crop': '자켓',
   '20_leather': '가죽자켓', '43_mustang': '가죽자켓',
   '21_windbreaker': '바람막이', '42_fleece': '바람막이',
-  '29_puffer': '패딩', '32_padding_long': '패딩',
+  '29_puffer': '패딩', '32_padding_long': '패딩', '45_vest_padding': '패딩',
   '22_sukajan': '스카잔',
   '01_denim_straight': '바지', '02_denim_wide': '바지', '03_slacks_straight': '바지', '04_slacks_wide': '바지',
   '38_denim_slim': '바지', '39_cargo': '바지', '40_track': '바지', '60_denim_barrel': '바지',
@@ -46,6 +46,7 @@ export const SUBCAT_BY_PLATE: Record<string, string> = {
   '48_skirt_mini': '스커트', '49_skirt_long': '스커트',
   '54_scarf': '머플러', '55_snood': '머플러', '56_scarf_silk': '머플러', '57_scarf_cable': '머플러', '58_scarf_blanket': '머플러',
   'c1_cap': '모자', 'c2_beanie': '모자', 'c3_bucket': '모자', 'c4_beret': '모자',
+  '06_tee_short': '티셔츠', '07_tee_long': '티셔츠',
 }
 
 /** 코디 스타일 id → products_cache.style_tags 값. 겹치는 6개 태그만 있다(정렬용, 필터 아님) */
@@ -57,28 +58,66 @@ export const STYLE_TAG_BY_ID: Record<string, string> = {
  *  통과 조건: include 매치 OR (exclude 가 있고, exclude 에 안 걸림) — "이름에 표시가 있으면 그것만 고르고,
  *  아무 표시도 없으면 그 subcategory 의 기본형으로 본다"(HANDOFF-shop-garment-type.md, 09-15 대표님 지적:
  *  목폴라 보던 사람에게 니트 스웨터를 억지로 보여주지 않는다). 대소문자 무시(상품명에 V넥·v넥 섞여 있음).
- *  통과 0건이면 그 칸은 후보 없음 — subcategory 로 되돌아가 넓히지 않는다. */
-export const NAME_RULE_BY_PLATE: Record<string, { include: RegExp; exclude?: RegExp }> = {
-  '13_knit_turtle': { include: /목폴라|터틀|하이넥/i },
+ *  통과 0건이면 그 칸은 후보 없음 — subcategory 로 되돌아가 넓히지 않는다.
+ *  09-17 대표님 지적으로 판 전체로 확장(HANDOFF-shop-garment-audit.md): 플란넬 트라우저가 슬랙스로
+ *  뜨는 문제 → `트라우저` 제거. subcategory 하나에 여러 종류가 섞인 판(코트/자켓/모자/스웨터/맨투맨/
+ *  패딩/조끼/바지/티셔츠)에 규칙 추가. `include` 는 선택이다 — 뺀 판은 exclude 에 안 걸리면 통과("표시
+ *  없으면 기본형"). include 를 꼭 채워야 했다면 "자켓"·"가죽"·"패딩"·"맨투맨"·"반바지" 처럼 subcategory
+ *  이름 자체가 상품명에도 다 들어있는 넓은 말이 exclude 대상 상품에도 섞여 있어(예: "무스탕 가죽 자켓")
+ *  exclude 보다 먼저 매치돼 걸러지지 않는다 — 그래서 이 판들은 exclude 만 쓴다. `include AND exclude`
+ *  조합(둘 다 있어야 통과)은 함수가 못 받아 하나의 include 정규식(양방향 순서)으로 합쳤다(45_vest_padding,
+ *  실제로는 패딩 subcategory 소속 — SUBCAT_BY_PLATE 도 조끼에서 패딩으로 옮겼다). */
+export const NAME_RULE_BY_PLATE: Record<string, { include?: RegExp; exclude?: RegExp }> = {
+  // 상의
+  '13_knit_turtle': { include: /목폴라|터틀|하이넥|모크넥/i },
   '12_knit_vneck': { include: /브이넥|v넥/i },
-  '11_knit_crew': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥/i },
-  '46_knit_crop': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥/i },
-  '14_knit_vest': { include: /베스트|조끼/i },
-  '45_vest_padding': { include: /베스트|조끼/i },
+  '11_knit_crew': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥|셔츠|남방|집업/i },
+  '46_knit_crop': { include: /크루넥|라운드넥/i, exclude: /목폴라|터틀|하이넥|브이넥|v넥|셔츠|남방|집업/i },
+  '14_knit_vest': { include: /니트/i },
+  '45_vest_padding': { include: /(패딩|퀼팅).*(조끼|베스트)|(조끼|베스트).*(패딩|퀼팅)/i },
+  '35_sweat': { exclude: /하키/i },
+  '16_hoodie': { include: /후드/i },
+  '07_tee_long': { include: /긴팔|롱슬리브/i },
+  '06_tee_short': { include: /반팔|숏슬리브/i },
+
+  // 바지
   '63_chino': { include: /치노/i },
-  '03_slacks_straight': { include: /슬랙스|트라우저/i },
-  '04_slacks_wide': { include: /슬랙스|트라우저/i },
+  '03_slacks_straight': { include: /슬랙스/i },
+  '04_slacks_wide': { include: /슬랙스/i },
   '01_denim_straight': { include: /데님|청바지/i },
   '02_denim_wide': { include: /데님|청바지/i },
   '38_denim_slim': { include: /데님|청바지/i },
   '60_denim_barrel': { include: /데님|청바지/i },
   '62_denim_boot': { include: /데님|청바지/i },
+  '64_corduroy': { include: /코듀로이|골덴/i },
+  '39_cargo': { include: /카고/i },
+  '40_track': { include: /트랙|져지|저지/i },
+  '05_shorts': { exclude: /스윔|수영/i },
+
+  // 아우터
+  '30_trench': { include: /트렌치/i },
+  '17_coat_long': { exclude: /트렌치/i },
+  '28_coat_short': { exclude: /트렌치/i },
+  '31_trucker': { include: /트러커|데님 자켓|청자켓/i },
+  '41_jacket_crop': { include: /크롭/i },
+  '18_jacket_short': { exclude: /크롭|트러커|데님|셔츠 자켓|리메이크/i },
+  '43_mustang': { include: /무스탕|시어링/i },
+  '20_leather': { exclude: /무스탕|시어링/i },
+  '29_puffer': { exclude: /조끼|베스트|퀼팅/i },
+  '32_padding_long': { exclude: /조끼|베스트|퀼팅/i },
+  '42_fleece': { include: /플리스|후리스/i },
+
+  // 모자
+  'c1_cap': { include: /캡/i },
+  'c2_beanie': { include: /비니/i },
+  'c3_bucket': { include: /버킷|벙거지/i },
+  'c4_beret': { include: /베레/i },
 }
 
 export function matchesNameRule(plate: string, productName: string): boolean {
   const rule = NAME_RULE_BY_PLATE[plate]
   if (!rule) return true
-  if (rule.include.test(productName)) return true
+  if (rule.include && rule.include.test(productName)) return true
   return rule.exclude ? !rule.exclude.test(productName) : false
 }
 

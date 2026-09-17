@@ -75,18 +75,32 @@ console.log('\n== 2) 색 키 상태 ==')
 console.log(`키 없음: ${noKey}/${data.length}`)
 console.log(`앱 팔레트에 없는 키: ${unknownKeys.length ? unknownKeys.join(', ') : '(없음)'}`)
 
-// ── 3) 판별 규칙(NAME_RULE_BY_PLATE) 통과 재고 — 규칙 없는 판은 subcategory 만으로 통과 ──
-console.log('\n== 3) 이름 규칙 통과 재고 ==')
-for (const plate of MAJOR_PLATES) {
+// ── 3) 판별 규칙(NAME_RULE_BY_PLATE) 통과 재고 — 규칙이 있는 모든 판 대상, 규칙 없는 판은 subcategory 만으로 통과 ──
+console.log('\n== 3) 이름 규칙 통과 재고 (규칙 있는 모든 판) ==')
+const ruledPlates = Object.keys(NAME_RULE_BY_PLATE)
+const ruledSubcats = [...new Set(ruledPlates.map(p => SUBCAT_BY_PLATE[p]).filter(Boolean))]
+const { data: ruleData, error: ruleError } = await shopSupabase
+  .from('products_cache')
+  .select('cafe24_url,product_name,subcategory')
+  .eq('is_sold', false)
+  .in('subcategory', ruledSubcats)
+  .limit(1000)
+if (ruleError) { console.error('조회 실패', ruleError); process.exit(1) }
+
+const zeroPassPlates = []
+for (const plate of ruledPlates) {
   const subcat = SUBCAT_BY_PLATE[plate]
-  const inSubcat = data.filter(p => p.subcategory === subcat)
-  const rule = NAME_RULE_BY_PLATE[plate]
-  if (!rule) continue
+  const inSubcat = ruleData.filter(p => p.subcategory === subcat)
   const passed = inSubcat.filter(p => matchesNameRule(plate, p.product_name)).length
   console.log(`${plate}(${subcat}): 규칙 통과 ${passed}/${inSubcat.length}`)
+  if (passed === 0) zeroPassPlates.push(plate)
 }
-const noRule = MAJOR_PLATES.filter(p => !NAME_RULE_BY_PLATE[p])
-console.log(`규칙 없음(subcategory 만으로 통과): ${noRule.length ? noRule.join(', ') : '(없음)'}`)
+console.log(`\n통과 0인 판(${zeroPassPlates.length}개): ${zeroPassPlates.length ? zeroPassPlates.join(', ') : '(없음)'}`)
+
+const noRulePlates = Object.keys(SUBCAT_BY_PLATE).filter(p => !NAME_RULE_BY_PLATE[p])
+const noRuleSubcats = [...new Set(noRulePlates.map(p => SUBCAT_BY_PLATE[p]))]
+console.log(`\n규칙 없이 subcategory 만으로 통과하는 판(${noRulePlates.length}개): ${noRulePlates.join(', ')}`)
+console.log(`→ subcategory: ${noRuleSubcats.join(', ')}`)
 
 // ── 4) 12 주요 판 × 10 주요 색 → 이름 규칙 적용 후, 같은 키 후보 수 / 문턱 넓힌 뒤 후보 수 ──
 console.log(`\n== 4) 후보 수(이름 규칙 적용 후, 같은키/넓힌뒤, 문턱=${SHOP_MATCH_THRESHOLD}) — 헤더: ${MAJOR_COLORS.join(' ')} ==`)
@@ -120,3 +134,4 @@ for (const threshold of [20, 32, 45]) {
 }
 
 console.log('\n== 완료 ==')
+process.exit(0) // 네트워크 스크립트라 supabase-js 클라이언트가 핸들을 쥐고 있어 자연 종료가 안 된다
