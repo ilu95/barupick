@@ -133,6 +133,7 @@ workflows:
           cd android/app
           NEW_VERSION_CODE=$(date +%s)
           sed -i "s/versionCode [0-9]*/versionCode $NEW_VERSION_CODE/" build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.1.0\"/" build.gradle
           echo "Version code set to $NEW_VERSION_CODE"
 
 
