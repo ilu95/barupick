@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { BarChart3, Award, Palette, ScanLine, GraduationCap, Target, FileText, ShieldOff, SlidersHorizontal, Share, ChevronRight, Pencil, Camera, User, ScanFace, Trophy, Settings, LogOut, LogIn } from 'lucide-react'
+import { BarChart3, Award, Palette, ScanLine, GraduationCap, Target, FileText, ShieldOff, SlidersHorizontal, Share, ChevronRight, Pencil, Camera, User, ScanFace, Trophy, Settings, LogOut, LogIn, HelpCircle } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
@@ -268,6 +268,7 @@ export default function Profile() {
         {user && <MenuItem icon={<BarChart3 size={18} />} label={t('profile.menu.insights')} badge="📊 NEW" onClick={() => navigate('/profile/insights')} />}
         {user && <MenuItem icon={<ShieldOff size={18} />} label={t('profile.menu.blockList')} onClick={() => navigate('/profile/block-list')} />}
         <MenuItem icon={<SlidersHorizontal size={18} />} label={t('profile.menu.settings')} onClick={() => navigate('/profile/settings')} />
+        <MenuItem icon={<HelpCircle size={18} />} label={t('profile.menu.support')} onClick={() => navigate('/support')} />
         <MenuItem icon={<Share size={18} />} label={t('common.share')} onClick={() => {
           navigator.share?.({ title: t('header.home'), text: 'AI', url: 'https://barupick.vercel.app' }).catch(() => {})
         }} last />
