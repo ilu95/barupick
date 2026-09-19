@@ -17,6 +17,7 @@ import { CATEGORY_NAMES, FABRIC_ITEMS, FABRIC_SEASONS, FABRIC_COMPAT_RULES, eval
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
+import { FeedbackModal } from '@/pages/Settings'
 import { profile } from '@/lib/profile'
 import { useTranslation } from 'react-i18next'
 
@@ -762,13 +763,14 @@ export function Terms() {
 // ─── 고객 지원 ───
 export function Support() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { user } = useAuth()
   const faqs = [
     { q: t('support.faq1Q'), a: t('support.faq1A') },
     { q: t('support.faq2Q'), a: t('support.faq2A') },
     { q: t('support.faq3Q'), a: t('support.faq3A') },
   ]
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
@@ -782,7 +784,7 @@ export function Support() {
           <h3 className="text-[15px] font-semibold text-warm-900">{t('support.emailTitle')}</h3>
         </div>
         <p className="text-sm text-warm-600 mb-2">{t('support.emailDesc')}</p>
-        <a href="mailto:barusa.corp@gmail.com" className="text-sm text-terra-600 font-semibold">barusa.corp@gmail.com</a>
+        <a href={`mailto:${t('support.email')}`} className="text-sm text-terra-600 font-semibold">{t('support.email')}</a>
       </div>
 
       {/* 앱 내 피드백 */}
@@ -792,7 +794,7 @@ export function Support() {
           <h3 className="text-[15px] font-semibold text-warm-900">{t('support.feedbackTitle')}</h3>
         </div>
         <p className="text-sm text-warm-600 mb-2">{t('support.feedbackDesc')}</p>
-        <button onClick={() => navigate('/profile/settings?feedback=1')} className="text-sm text-terra-600 font-semibold">
+        <button onClick={() => setFeedbackOpen(true)} className="text-sm text-terra-600 font-semibold">
           {t('settings.feedback')} →
         </button>
       </div>
@@ -821,8 +823,10 @@ export function Support() {
       {/* 개발사 정보 */}
       <div className="mt-6 text-center text-xs text-warm-500 space-y-1">
         <div>{t('support.developer')}: {t('support.developerName')}</div>
-        <div>barusa.corp@gmail.com</div>
+        <div>{t('support.email')}</div>
       </div>
+
+      {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} userId={user?.id} />}
     </div>
   )
 }
@@ -830,15 +834,19 @@ export function Support() {
 // ─── 개인정보처리방침 ───
 export function Privacy() {
   const { t } = useTranslation()
+  const sections = Array.from({ length: 8 }, (_, i) => i + 1)
   return (
     <div className="animate-screen-fade px-5 pt-2 pb-10">
-      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-5">{t('privacy.title')}</h2>
-      <div className="bg-white border border-warm-400 rounded-2xl p-5 shadow-warm-sm text-sm text-warm-700 leading-relaxed space-y-3">
-        <p><strong>{t('privacy.section1Title')}</strong> {t('privacy.section1Content')}</p>
-        <p><strong>{t('privacy.section2Title')}</strong> {t('privacy.section2Content')}</p>
-        <p><strong>{t('privacy.section3Title')}</strong> {t('privacy.section3Content')}</p>
-        <p><strong>{t('privacy.section4Title')}</strong> {t('privacy.section4Content')}</p>
-        <p><strong>{t('privacy.section5Title')}</strong> {t('privacy.section5Content')}</p>
+      <h2 className="font-display text-xl font-bold text-warm-900 tracking-tight mb-1">{t('privacy.title')}</h2>
+      <p className="text-xs text-warm-500 mb-5">{t('privacy.effective')}</p>
+      <div className="bg-white border border-warm-400 rounded-2xl p-5 shadow-warm-sm text-sm text-warm-700 leading-relaxed space-y-4 whitespace-pre-line">
+        <p>{t('privacy.intro')}</p>
+        {sections.map(n => (
+          <div key={n}>
+            <p className="font-semibold text-warm-900 mb-1">{t(`privacy.s${n}Title`)}</p>
+            <p>{t(`privacy.s${n}Body`)}</p>
+          </div>
+        ))}
       </div>
     </div>
   )

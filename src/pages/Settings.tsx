@@ -4,7 +4,7 @@ import { getWeatherNow } from '@/hooks/useWeather'
 import { setString } from '@/lib/storage'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight, Bell, Wand2 } from 'lucide-react'
+import { Moon, Eye, EyeOff, Cloud, MessageSquare, FileText, Shield, LogOut, UserX, Info, Download, Globe, ChevronRight, Bell, Wand2, HelpCircle } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { useAutoSync, useLastSyncTime, useSyncStatus } from '@/hooks/useAutoSync'
@@ -211,6 +211,10 @@ export default function Settings() {
 
       {/* 정보 */}
       <SectionHeader icon={<Info size={14} />} title={t('settings.info')} />
+      <button onClick={() => navigate('/support')} className="w-full flex items-center gap-2.5 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
+        <HelpCircle size={18} className="text-warm-600" />
+        <span className="text-[15px] text-warm-900 dark:text-warm-100 flex-1">{t('settings.support')}</span>
+      </button>
       <button onClick={() => navigate('/terms')} className="w-full flex items-center gap-2.5 py-3.5 border-b border-warm-300 text-left active:bg-warm-200/50 rounded-lg transition-colors">
         <FileText size={18} className="text-warm-600" />
         <span className="text-[15px] text-warm-900 dark:text-warm-100 flex-1">{t('settings.terms')}</span>
@@ -278,7 +282,7 @@ function ToggleItem({ icon, label, desc, value, onChange, last }: {
   )
 }
 
-function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: string }) {
+export function FeedbackModal({ onClose, userId }: { onClose: () => void, userId?: string }) {
   const toast = useToast()
   const { t } = useTranslation()
   const [type, setType] = useState('')
