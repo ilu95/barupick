@@ -142,7 +142,8 @@ export function guideFor(input: EngineInput, slot: string, recN = 12) {
   return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[]; mine: string[] } }
 }
 
-export interface ComboCard { outfit: Record<string, string>; total: number; why: string; kind: 'safe' | 'point' | 'two' | 'taste' | 'tone'; mine: number }
+/** rawTotal = 보정(calibrate) 전 v7 총점. 92점 천장에서 동점이 쏟아질 때 순위를 가르는 데만 쓴다 — 화면 점수는 total */
+export interface ComboCard { outfit: Record<string, string>; total: number; rawTotal?: number; why: string; kind: 'safe' | 'point' | 'two' | 'taste' | 'tone'; mine: number }
 
 /** 지금 입은 옷(판)은 그대로, fixed 아닌 자리의 색만 6가지 패턴(무난·연유채 주색·상의 포인트·아우터 색·하의 연유채·두 색)으로 바꿔 매긴다 */
 export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: number; wardrobe?: Record<string, string[]>; taste?: string[] }): ComboCard[] {
@@ -246,10 +247,10 @@ export function catalogFor(input: EngineInput, locked: Set<string>, n = 12): Com
   for (const { key, kind } of patterns) {
     const sig = JSON.stringify(key); if (seen.has(sig)) continue; seen.add(sig)
     const r = scoreOutfit({ ...input, outfit: { ...input.outfit, ...key } })
-    cards.push({ outfit: key, total: r.total, why: (r.reasons.find(x => x.w > 0) || {}).txt || '', kind, mine: 0 })
+    cards.push({ outfit: key, total: r.total, rawTotal: r.raw?.total ?? r.total, why: (r.reasons.find(x => x.w > 0) || {}).txt || '', kind, mine: 0 })
   }
-  // 점수만으로 줄 세운다 (같은 점수는 위 순서대로). 60점 자르기는 화면이 한다
-  return cards.sort((a, b) => b.total - a.total).slice(0, n)
+  // 점수 → 원점수 순으로 줄 세운다 (그래도 같으면 위 순서대로). 60점 자르기는 화면이 한다
+  return cards.sort((a, b) => b.total - a.total || (b.rawTotal ?? 0) - (a.rawTotal ?? 0)).slice(0, n)
 }
 
 /** 옷 하나의 색만 바꿔 얻는 최선의 한 수 k개 (차분한 색 우선) */

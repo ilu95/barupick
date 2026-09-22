@@ -2029,6 +2029,12 @@
     "hard": "△ This color is a hard one to match",
     "lockThis": "Pin this {{slot}}",
     "make": "Make this one",
-    "weatherNote": "Weather is not considered here — this screen is about color. Adjust warmth when you build"
+    "none": "None",
+    "tempNow": "Now {{t}}°",
+    "tempStep": "{{t}}°",
+    "noOuterWarm": "No outerwear looks at this temperature. Try a cooler one",
+    "noneFound": "No looks match these pins. Try unpinning one",
+    "scarfWarm": "A scarf on a warm day — just for the color",
+    "weatherNote": "Pieces are for {{t}}°. Focus on the colors"
   }
 }

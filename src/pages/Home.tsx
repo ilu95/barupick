@@ -6,6 +6,7 @@ import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
 import { useWeather, weatherEmoji, feelsAt, codeAt, dayRange, isGood, permissionState } from '@/hooks/useWeather'
+import { tempOf, nextTemp } from '@/hooks/useTemp'
 import { SITU, PARTS, ranked, alternatives, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { colorKeyOf, colorKeysOf, stashPick } from '@/lib/pickPayload'
 import { loadTaste } from '@/lib/taste'
@@ -22,7 +23,6 @@ import { trackEvent } from '@/lib/analytics'
 // 모드(골라 주는/직접 만드는)는 "이대로 할게요"가 결과로 가느냐 색 고르기로 가느냐만 가른다. 기능은 숨기지 않는다.
 // ═══════════════════════════════════════════════════════
 
-const TEMP_STEPS = [15, 21, 26]
 const TIME_CHIPS: { key: string; hour: number | 'now' }[] = [
   { key: 'now', hour: 'now' },
   { key: 'morning', hour: 8 },
@@ -72,7 +72,7 @@ export default function Home() {
   const timeChips = day === 'today' ? TIME_CHIPS.filter(c => c.hour === 'now' || (c.hour as number) >= nowHour) : TIME_CHIPS.filter(c => c.hour !== 'now')
 
   const realTemp = feelsAt(weather, day, hour)
-  const temp = realTemp ?? tempOverride ?? 21
+  const temp = tempOf(realTemp, tempOverride)
   const range = dayRange(weather, day)
   const ctx: Ctx = useMemo(() => ({ sex, situ, temp, prefs: loadPrefs(), recent: loadRecent() }), [sex, situ, temp])
   // 후보 8벌: 1위 → 다른 방향 3 → 나머지 순위. "다른 거"는 1/8 → 8/8 → 1/8 로 돈다
@@ -106,7 +106,7 @@ export default function Home() {
     navigate('/home/build')
   }
   const next = () => { if (!cands.length) return; const n = (idx + 1) % cands.length; setIdx(n); trackEvent('home_next', { idx: n }) }
-  const cycleTemp = () => { const i = TEMP_STEPS.indexOf(temp); setTempOverride(i < 0 || i === TEMP_STEPS.length - 1 ? TEMP_STEPS[0] : TEMP_STEPS[i + 1]) }
+  const cycleTemp = () => setTempOverride(nextTemp(temp))
   const openStep = (key: 'sp_guided' | 'sp_open_step', val: string, need: string) => {
     trackEvent('home_need', { key: need })
     try { sessionStorage.setItem(key, val) } catch {}
