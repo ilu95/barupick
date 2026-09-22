@@ -1,8 +1,9 @@
 // ================================================================
 // shop.ts — 결과 화면 → 자사몰(바루사) 상품 연결
 //
-// products_cache 는 앱 DB(ywqaxxcvzhwhascbkyhp)가 아니라 별도의
-// 프로덕션 전용 Supabase 프로젝트(kwcogjzwpnvqwmifizce)에 있다 (2026-09-14 직접 조회 확인).
+// products_cache 는 앱 DB(kwcogjzwpnvqwmifizce)가 아니라 별도의
+// 자사몰 전용 Supabase 프로젝트 barusa-shop(egyczajelrhmimkadpnd, 서울)에 있다
+// (2026-09-23 kwcogjzwpnvqwmifizce → barusa-shop 이전).
 // cafe24_url 은 이미 완성된 링크이므로 그대로 연다 — 절대 조립하지 않는다.
 //
 // 색 매칭은 product_data_json.final_colors.main.key — 앱 팔레트 키 그대로다(판매중 99.1%에 있음).
@@ -14,9 +15,9 @@ import { createClient } from '@supabase/supabase-js'
 import { lch } from '@/lib/engine/v7'
 import { COLORS_60 } from '@/lib/colors'
 
-const SHOP_URL = 'https://kwcogjzwpnvqwmifizce.supabase.co'
+const SHOP_URL = 'https://egyczajelrhmimkadpnd.supabase.co'
 // 공개용 anon key (RLS 로 보호됨 — 프로덕션 번들에 이미 노출되어 있는 값과 동일)
-const SHOP_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3Y29nanp3cG52cXdtaWZpemNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNzYwODQsImV4cCI6MjA4Nzg1MjA4NH0.9vxFkBSMERxEtQnwEPceEAosLCZjY9NLQO9qfx-MZlw'
+const SHOP_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVneWN6YWplbHJobWlta2FkcG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNTE2MDQsImV4cCI6MjEwNTYyNzYwNH0.34GPF3DcEDpz--CwNqAqM29Izo5EM7jtHMzSSx029rg'
 
 const envUrl = import.meta.env.VITE_SHOP_SUPABASE_URL as string | undefined
 const envKey = import.meta.env.VITE_SHOP_SUPABASE_ANON_KEY as string | undefined
