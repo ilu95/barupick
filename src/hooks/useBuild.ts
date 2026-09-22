@@ -170,7 +170,7 @@ export function predictSlot(upper: UpperLayer[], tmpItemId: string, editIdx?: nu
 
 // ═══ 메인 훅 ═══
 
-const initialState = (mode: BuildMode = 'coord'): BuildState => ({
+export const initialState = (mode: BuildMode = 'coord'): BuildState => ({
   mode,
   style: null,
   fabricMode: false,
@@ -184,6 +184,79 @@ const initialState = (mode: BuildMode = 'coord'): BuildState => ({
 })
 
 let uidCounter = 0
+
+// ═══ 상태 만들기 — 훅 밖에서도 쓴다 (코디 카탈로그가 같은 점수를 내려면 같은 길을 타야 한다) ═══
+
+export interface ApplyOutfitInput {
+  layers: { itemId: string; plate: string; colorKey: string }[]
+  bottom?: { plate: string; colorKey: string }
+  shoes?: { plate: string; colorKey: string }
+  scarf?: { plate: string; colorKey: string } | null
+  hat?: { plate: string; colorKey: string } | null
+  tie?: { plate: string; colorKey: string } | null
+  style?: string | null
+  templateId?: string | null
+  situ?: string | null
+  /** 초보 앞문: 색 고르기를 건너뛰고 바로 결과로 (뒤로 가면 색 고르기) */
+  goto?: 'builder' | 'result'
+}
+
+/** 1단계(옷 조합) 결과를 상태에 올린 꼴 */
+export function outfitToState(prev: BuildState, o: ApplyOutfitInput): BuildState {
+  const upper: UpperLayer[] = []
+  for (const l of o.layers) {
+    const item = ITEMS_CATALOG.find(i => i.id === l.itemId)
+    if (!item || upper.some(x => x.itemId === item.id) || upper.length >= 4) continue
+    upper.push({ uid: uidCounter++, itemId: item.id, colorKey: l.colorKey, outerness: item.outerness, plate: l.plate })
+  }
+  return {
+    ...prev,
+    style: o.style ?? null,
+    upper: sortUpper(upper),
+    bottomColor: o.bottom?.colorKey ?? prev.bottomColor,
+    shoesColor: o.shoes?.colorKey ?? prev.shoesColor,
+    bottomItem: o.bottom?.plate ?? null,
+    shoesItem: o.shoes?.plate ?? null,
+    scarfColor: o.scarf ? o.scarf.colorKey : prev.scarfColor,
+    scarfItem: o.scarf ? o.scarf.plate : prev.scarfItem,
+    hatColor: o.hat ? o.hat.colorKey : prev.hatColor,
+    hatItem: o.hat ? o.hat.plate : prev.hatItem,
+    tieColor: o.tie ? o.tie.colorKey : prev.tieColor,
+    tieItem: o.tie ? o.tie.plate : prev.tieItem,
+    templateId: o.templateId ?? null,
+    situ: o.situ ?? prev.situ ?? null,
+  }
+}
+
+/** 조합 카드 하나를 한 번에 입은 꼴 (헤어는 건드리지 않는다) */
+export function colorsToState(prev: BuildState, outfit: Record<string, string>): BuildState {
+  return {
+    ...prev,
+    bottomColor: outfit.bottom ?? prev.bottomColor,
+    shoesColor: outfit.shoes ?? prev.shoesColor,
+    scarfColor: outfit.scarf ?? prev.scarfColor,
+    hatColor: outfit.hat ?? prev.hatColor,
+    tieColor: outfit.tie ?? prev.tieColor,
+    upper: prev.upper.map(l => { const slot = uiSlotOf(l); return outfit[slot] ? { ...l, colorKey: outfit[slot] } : l }),
+  }
+}
+
+/** 엔진 v7.1 입력: 자리별 색 + 판 + 상황 */
+// 상체는 outerness 버킷(outer/middleware/top/inner)으로 자리를 정한다 — 새 만들기 화면이 그 버킷으로 칸을 채운다.
+export function engineInputOf(state: BuildState): EngineInput {
+  const outfit: Record<string, string> = {}
+  const plates: Record<string, string> = platesOf(state)
+  for (const l of state.upper) { const s = uiSlotOf(l); outfit[s] = l.colorKey; if (l.plate) plates[s] = l.plate }
+  if (state.bottomColor) outfit.bottom = state.bottomColor
+  if (state.shoesColor) outfit.shoes = state.shoesColor
+  if (state.scarfColor) outfit.scarf = state.scarfColor
+  if (state.hatColor) outfit.hat = state.hatColor
+  if (state.tieColor && canWearTie(state)) outfit.tie = state.tieColor
+  if (state.scarfItem) plates.scarf = state.scarfItem
+  if (state.hatItem) plates.hat = state.hatItem
+  if (state.tieItem) plates.tie = state.tieItem
+  return { outfit, plates, situ: state.situ || 'daily' }
+}
 
 // ═══ 뒤로 가기가 직전 화면으로: /home/build 를 나갔다 돌아와도 이어지도록 세션에 담는다 ═══
 // (localStorage 가 아니다 — 앱을 껐다 켜면 새로 시작하는 게 맞다)
@@ -313,56 +386,12 @@ export function useBuild(mode: BuildMode = 'coord', opts?: { persist?: boolean }
 
   // ── 조합 카드 하나를 한 번에 입는다 (헤어는 건드리지 않는다) ──
   const applyColors = useCallback((outfit: Record<string, string>) => {
-    setState(prev => ({
-      ...prev,
-      bottomColor: outfit.bottom ?? prev.bottomColor,
-      shoesColor: outfit.shoes ?? prev.shoesColor,
-      scarfColor: outfit.scarf ?? prev.scarfColor,
-      hatColor: outfit.hat ?? prev.hatColor,
-      tieColor: outfit.tie ?? prev.tieColor,
-      upper: prev.upper.map(l => { const slot = uiSlotOf(l); return outfit[slot] ? { ...l, colorKey: outfit[slot] } : l }),
-    }))
+    setState(prev => colorsToState(prev, outfit))
   }, [])
 
   // ── 1단계(옷 조합) 결과를 한 번에 올린다 ──
-  const applyOutfit = useCallback((o: {
-    layers: { itemId: string; plate: string; colorKey: string }[]
-    bottom?: { plate: string; colorKey: string }
-    shoes?: { plate: string; colorKey: string }
-    scarf?: { plate: string; colorKey: string } | null
-    hat?: { plate: string; colorKey: string } | null
-    tie?: { plate: string; colorKey: string } | null
-    style?: string | null
-    templateId?: string | null
-    situ?: string | null
-    /** 초보 앞문: 색 고르기를 건너뛰고 바로 결과로 (뒤로 가면 색 고르기) */
-    goto?: 'builder' | 'result'
-  }) => {
-    setState(prev => {
-      const upper: UpperLayer[] = []
-      for (const l of o.layers) {
-        const item = ITEMS_CATALOG.find(i => i.id === l.itemId)
-        if (!item || upper.some(x => x.itemId === item.id) || upper.length >= 4) continue
-        upper.push({ uid: uidCounter++, itemId: item.id, colorKey: l.colorKey, outerness: item.outerness, plate: l.plate })
-      }
-      return {
-        ...prev,
-        style: o.style ?? null,
-        upper: sortUpper(upper),
-        bottomColor: o.bottom?.colorKey ?? prev.bottomColor,
-        shoesColor: o.shoes?.colorKey ?? prev.shoesColor,
-        bottomItem: o.bottom?.plate ?? null,
-        shoesItem: o.shoes?.plate ?? null,
-        scarfColor: o.scarf ? o.scarf.colorKey : prev.scarfColor,
-        scarfItem: o.scarf ? o.scarf.plate : prev.scarfItem,
-        hatColor: o.hat ? o.hat.colorKey : prev.hatColor,
-        hatItem: o.hat ? o.hat.plate : prev.hatItem,
-        tieColor: o.tie ? o.tie.colorKey : prev.tieColor,
-        tieItem: o.tie ? o.tie.plate : prev.tieItem,
-        templateId: o.templateId ?? null,
-        situ: o.situ ?? prev.situ ?? null,
-      }
-    })
+  const applyOutfit = useCallback((o: ApplyOutfitInput) => {
+    setState(prev => outfitToState(prev, o))
     setEditMode({ type: 'idle' })
     if (o.goto === 'result') { setHistory(prev => [...prev, step, 'builder']); setStep('result') }
     else pushStep('builder')
@@ -401,21 +430,7 @@ export function useBuild(mode: BuildMode = 'coord', opts?: { persist?: boolean }
   }, [])
 
   // ── 엔진 v7.1 입력: 자리별 색 + 판 + 상황 ──
-  // 상체는 outerness 버킷(outer/middleware/top/inner)으로 자리를 정한다 — 새 만들기 화면이 그 버킷으로 칸을 채운다.
-  const engineInput = useCallback((): EngineInput => {
-    const outfit: Record<string, string> = {}
-    const plates: Record<string, string> = platesOf(state)
-    for (const l of state.upper) { const s = uiSlotOf(l); outfit[s] = l.colorKey; if (l.plate) plates[s] = l.plate }
-    if (state.bottomColor) outfit.bottom = state.bottomColor
-    if (state.shoesColor) outfit.shoes = state.shoesColor
-    if (state.scarfColor) outfit.scarf = state.scarfColor
-    if (state.hatColor) outfit.hat = state.hatColor
-    if (state.tieColor && canWearTie(state)) outfit.tie = state.tieColor
-    if (state.scarfItem) plates.scarf = state.scarfItem
-    if (state.hatItem) plates.hat = state.hatItem
-    if (state.tieItem) plates.tie = state.tieItem
-    return { outfit, plates, situ: state.situ || 'daily' }
-  }, [state])
+  const engineInput = useCallback((): EngineInput => engineInputOf(state), [state])
 
   // ── 점수 ──
   const getScore = useCallback((): number => {

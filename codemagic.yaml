@@ -59,9 +59,9 @@ workflows:
           NEW_BUILD=$(date +%s)
           echo "Setting build number to $NEW_BUILD"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD" ios/App/App/Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.1.1" ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.2.0" ios/App/App/Info.plist
           sed -i '' "s/CURRENT_PROJECT_VERSION = [^;]*/CURRENT_PROJECT_VERSION = $NEW_BUILD/g" ios/App/App.xcodeproj/project.pbxproj
-          sed -i '' "s/MARKETING_VERSION = [^;]*/MARKETING_VERSION = 1.1.1/g" ios/App/App.xcodeproj/project.pbxproj
+          sed -i '' "s/MARKETING_VERSION = [^;]*/MARKETING_VERSION = 1.2.0/g" ios/App/App.xcodeproj/project.pbxproj
           cat ios/App/App/Info.plist | grep -A1 CFBundleVersion
           grep "CURRENT_PROJECT_VERSION" ios/App/App.xcodeproj/project.pbxproj | head -3
 
@@ -133,7 +133,7 @@ workflows:
           cd android/app
           NEW_VERSION_CODE=$(date +%s)
           sed -i "s/versionCode [0-9]*/versionCode $NEW_VERSION_CODE/" build.gradle
-          sed -i "s/versionName \"[^\"]*\"/versionName \"1.1.1\"/" build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.2.0\"/" build.gradle
           echo "Version code set to $NEW_VERSION_CODE"
 
 

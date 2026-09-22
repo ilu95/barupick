@@ -142,7 +142,7 @@ export function guideFor(input: EngineInput, slot: string, recN = 12) {
   return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[]; mine: string[] } }
 }
 
-export interface ComboCard { outfit: Record<string, string>; total: number; why: string; kind: 'safe' | 'point' | 'two' | 'taste'; mine: number }
+export interface ComboCard { outfit: Record<string, string>; total: number; why: string; kind: 'safe' | 'point' | 'two' | 'taste' | 'tone'; mine: number }
 
 /** 지금 입은 옷(판)은 그대로, fixed 아닌 자리의 색만 6가지 패턴(무난·연유채 주색·상의 포인트·아우터 색·하의 연유채·두 색)으로 바꿔 매긴다 */
 export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: number; wardrobe?: Record<string, string[]>; taste?: string[] }): ComboCard[] {
@@ -196,6 +196,60 @@ export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: n
   // 보기 좋은 조합만 — 60점(괜찮음) 미만은 카드로 내지 않는다
   const rest = cards.filter(c => c.kind !== 'taste' && c.total >= 60).sort((a, b) => b.total - a.total)
   return [...rest.slice(0, opts.n || 6), ...(tasteCard ? [tasteCard] : [])]
+}
+
+/** 자물쇠(locked) 밖의 자리 색을 후보 풀에서 조합해 매긴다. combosFor 보다 넓게(≤ n), 무작위 없음 */
+export function catalogFor(input: EngineInput, locked: Set<string>, n = 12): ComboCard[] {
+  const slots = Object.keys(input.outfit).filter(s => input.outfit[s] && !locked.has(s))
+  if (!slots.length) return []
+  const chromaOf = (k: string) => COLORS_60[k]?.hcl[1] ?? 0
+  const hueOf = (k: string) => COLORS_60[k]?.hcl[0] ?? 0
+  const lumOf = (k: string) => COLORS_60[k]?.hcl[2] ?? 0
+  const hueGap = (a: number, b: number) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d }
+  // 풀은 combosFor 와 같은 방법 — 자리별 guideFor 의 delta 순위를 채도로 3등분한다 (옷장 가산점은 없다)
+  const ranks: Record<string, string[]> = {}
+  const pools: Record<string, { neu: string[]; soft: string[]; vivid: string[] }> = {}
+  for (const slot of slots) {
+    const delta = guideFor(input, slot).delta
+    const ranked = Object.entries(delta).filter(([k]) => k !== input.outfit[slot]).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+    ranks[slot] = ranked
+    pools[slot] = {
+      neu: ranked.filter(k => chromaOf(k) <= 18).slice(0, 8),
+      soft: ranked.filter(k => chromaOf(k) > 18 && chromaOf(k) <= 35).slice(0, 8),
+      vivid: ranked.filter(k => chromaOf(k) > 35).slice(0, 8),
+    }
+  }
+  const pick = (slot: string, bucket: 'neu' | 'soft' | 'vivid', i: number): string => {
+    const p = pools[slot][bucket].length ? pools[slot][bucket] : pools[slot].neu
+    return p.length ? p[i % p.length] : input.outfit[slot]!
+  }
+  const main = slots.find(s => s === 'outer') || slots.find(s => s === 'top') || slots[0]
+  const base = (i: number) => { const key: Record<string, string> = {}; slots.forEach(s => { key[s] = pick(s, 'neu', i) }); return key }
+  const patterns: { key: Record<string, string>; kind: ComboCard['kind'] }[] = []
+  // 전부 무채 → 한 자리만 연유채 → 한 자리만 유채 → 두 색 → 톤온톤 순으로 후보를 늘어놓는다
+  for (let i = 0; i < 4; i++) patterns.push({ key: base(i), kind: 'safe' })
+  for (const s of slots) for (let i = 0; i < 2; i++) patterns.push({ key: { ...base(i), [s]: pick(s, 'soft', i) }, kind: 'point' })
+  for (const s of slots) for (let i = 0; i < 2; i++) patterns.push({ key: { ...base(i), [s]: pick(s, 'vivid', i) }, kind: 'point' })
+  for (const s of slots.filter(x => x !== main).slice(0, 3)) patterns.push({ key: { ...base(0), [main]: pick(main, 'vivid', 0), [s]: pick(s, 'soft', 0) }, kind: 'two' })
+  // 톤온톤 — 잠근 색(없으면 주 자리 색)과 같은 계열에서 밝기만 달리한다
+  const anchor = input.outfit[Object.keys(TO_V7).find(s => locked.has(s) && input.outfit[s]) || main]
+  if (anchor && COLORS_60[anchor]) {
+    const tone: Record<string, string[]> = {}
+    for (const s of slots) {
+      const fam = ranks[s].filter(k => hueGap(hueOf(k), hueOf(anchor)) <= 25)
+      const lit = fam.filter(k => Math.abs(lumOf(k) - lumOf(anchor)) >= 8)
+      tone[s] = lit.length ? lit : fam
+    }
+    for (let i = 0; i < 2; i++) patterns.push({ key: Object.fromEntries(slots.map(s => [s, tone[s].length ? tone[s][i % tone[s].length] : pick(s, 'neu', i)])), kind: 'tone' })
+  }
+  const seen = new Set<string>(); const cards: ComboCard[] = []
+  for (const { key, kind } of patterns) {
+    const sig = JSON.stringify(key); if (seen.has(sig)) continue; seen.add(sig)
+    const r = scoreOutfit({ ...input, outfit: { ...input.outfit, ...key } })
+    cards.push({ outfit: key, total: r.total, why: (r.reasons.find(x => x.w > 0) || {}).txt || '', kind, mine: 0 })
+  }
+  // 점수만으로 줄 세운다 (같은 점수는 위 순서대로). 60점 자르기는 화면이 한다
+  return cards.sort((a, b) => b.total - a.total).slice(0, n)
 }
 
 /** 옷 하나의 색만 바꿔 얻는 최선의 한 수 k개 (차분한 색 우선) */

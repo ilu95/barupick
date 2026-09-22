@@ -214,6 +214,10 @@
     },
     "needs": {
       "title": "What can we help with?",
+      "catalog": {
+        "title": "Outfits in this color",
+        "sub": "Pin a color to a slot — navy top, say — and only outfits that work with it remain"
+      },
       "guided": {
         "title": "Pick one piece at a time",
         "sub": "Top first, one slot at a time, with matching colors for each"
@@ -1964,7 +1968,8 @@
         "safe": "Safe",
         "point": "Accent",
         "two": "Two-tone",
-        "taste": "Your taste"
+        "taste": "Your taste",
+        "tone": "Tone on tone"
       }
     },
     "preview": {
@@ -2012,5 +2017,18 @@
       "techwear": "Gore-Tex, cargo pants and tech runners for a functional city look",
       "genderless": "Oversized shirt and wide pants, free of gender lines"
     }
+  },
+  "catalog": {
+    "title": "Look catalog",
+    "hint": "The more colors you pin, the shorter the list. Unpinned slots are filled with colors that match",
+    "any": "Any color",
+    "unlock": "Unpin — any color",
+    "unlockAll": "Unpin all",
+    "count": "{{n}} outfits in this color",
+    "countAll": "{{n}} outfits for today",
+    "hard": "△ This color is a hard one to match",
+    "lockThis": "Pin this {{slot}}",
+    "make": "Make this one",
+    "weatherNote": "Weather is not considered here — this screen is about color. Adjust warmth when you build"
   }
 }

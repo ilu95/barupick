@@ -44,6 +44,7 @@ const TitleExam = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ defa
 const MyPosts = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.MyPosts })))
 const Insights = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.Insights })))
 const SavedCoords = lazy(() => import('@/pages/ProfileSubPages').then(m => ({ default: m.SavedCoords })))
+const ColorCatalog = lazy(() => import('@/pages/ColorCatalog'))
 const Weather = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Weather })))
 const Quiz = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.Quiz })))
 const FabricGuide = lazy(() => import('@/pages/RemainingPages').then(m => ({ default: m.FabricGuide })))
@@ -139,6 +140,7 @@ export default function App() {
                   <Route path="/home/build/improve" element={<BuildCoord />} />
                   <Route path="/home/evaluate" element={<BuildCoord />} />
                   <Route path="/home/recommend" element={<RecommendCoord />} />
+                  <Route path="/home/catalog" element={<ColorCatalog />} />
                   <Route path="/home/today" element={<Navigate to="/closet/combos" replace />} />
                   <Route path="/home/weather" element={<Weather />} />
                   <Route path="/home/saved" element={<SavedCoords />} />
