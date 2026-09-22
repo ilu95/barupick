@@ -28,6 +28,7 @@ const TITLE_KEYS: Record<string, string> = {
   '/auth/signup': 'auth.signupTitle',
   '/home/build': 'header.build',
   '/home/recommend': 'header.recommend',
+  '/home/catalog': 'catalog.title',
   '/home/weather': 'header.weather',
   '/home/saved': 'header.saved',
   '/home/quiz': 'header.quiz',

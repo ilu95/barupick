@@ -115,6 +115,7 @@ export default function Home() {
 
   // 니즈 카드: 각 기능이 유저에게 주는 것 한 줄씩
   const needs: { key: string; icon: string; badge?: string; go: () => void }[] = [
+    { key: 'catalog', icon: '🎯', go: () => { trackEvent('home_need', { key: 'catalog' }); navigate('/home/catalog') } },
     { key: 'guided', icon: '🧩', go: () => openStep('sp_guided', '1', 'guided') },
     { key: 'layered', icon: '🧶', go: () => { trackEvent('home_need', { key: 'layered' }); navigate('/home/picks/layered') } },
     { key: 'items', icon: '🛍', badge: counts.wish ? t('home.needs.items.wish', { n: counts.wish }) : undefined, go: () => { trackEvent('home_need', { key: 'items' }); navigate('/closet/simulate') } },
