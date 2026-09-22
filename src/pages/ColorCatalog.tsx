@@ -5,11 +5,13 @@ import { ArrowRight, Pin, X } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { charSex, charSceneFromState } from '@/lib/char/map'
-import { uiSlotOf } from '@/lib/builderSlots'
+import { uiSlotOf, typesFor } from '@/lib/builderSlots'
 import { SITU, ranked, sig, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { pickPayload } from '@/lib/pickPayload'
 import { initialState, outfitToState, engineInputOf, type BuildState } from '@/hooks/useBuild'
 import { catalogFor, scoreOutfit, type ComboCard, type EngineInput } from '@/lib/engine'
+import { useWeather } from '@/hooks/useWeather'
+import { TEMP_STEPS, DEFAULT_TEMP, nowTemp } from '@/hooks/useTemp'
 import { trackEvent } from '@/lib/analytics'
 
 // ═══════════════════════════════════════════════════════
@@ -18,16 +20,26 @@ import { trackEvent } from '@/lib/analytics'
 // 맞는 것만 남는다. 점수는 만들기와 같은 길(outfitToState → engineInputOf → engine)로
 // 매기므로 [이대로 만들기] 를 눌러 넘어간 결과 화면 점수가 카드 총점과 정확히 같다.
 // 무작위는 없다 — 같은 고정·같은 상황이면 언제나 같은 목록이 나온다.
+//
+// v2: 옷 모양은 지금 기온을 따르고(기온 칩), 92점 동점은 원점수로 갈라 바탕 코디를
+// 번갈아 보여 주며, 모자·머플러도 잠글 수 있다(잠갔을 때만 입는다).
 // ═══════════════════════════════════════════════════════
 
-/** 자물쇠를 걸 수 있는 자리 (화면에 줄로 보이는 네 자리) */
-const LOCK_SLOTS = ['outer', 'top', 'bottom', 'shoes'] as const
+/** 자물쇠를 걸 수 있는 자리. hat·scarf 는 바탕 코디에 원래 없어서 잠근 그때만 입는다 */
+const LOCK_SLOTS = ['outer', 'top', 'bottom', 'shoes', 'hat', 'scarf'] as const
 type LockSlot = typeof LOCK_SLOTS[number]
+/** 잠가야만 생기는 자리 — 자물쇠를 풀면 코디에서 사라진다 */
+const ACC_SLOTS = ['hat', 'scarf'] as const
 
 const MAX_CARDS = 24
 const MIN_CARDS = 6
 const SAME_MAIN_MAX = 4
+const HEAD = 8
+const HEAD_BASE_MAX = 4
 const OK_SCORE = 60
+const WARM = 26
+/** 완전 동점일 때의 마지막 갈림 — 무난한 것부터 */
+const KINDS = ['safe', 'point', 'two', 'tone', 'taste']
 
 type Locks = Partial<Record<LockSlot, string>>
 
@@ -41,6 +53,11 @@ const parseLocks = (raw: string | null): Locks => {
 }
 const formatLocks = (l: Locks) => LOCK_SLOTS.filter(s => l[s]).map(s => `${s}:${l[s]}`).join(',')
 
+const rawOf = (c: ComboCard) => c.rawTotal ?? c.total
+const tieKey = (c: ComboCard) => `${c.total}|${rawOf(c)}`
+/** 이 카드의 주색 — 못 박은 색은 빼고 본다 (카드마다 같으니 세면 전부 걸린다) */
+const mainOf = (x: Card, locks: Locks) => LOCK_SLOTS.filter(s => !locks[s]).map(s => x.full[s]).find(Boolean) || ''
+
 interface Base { e: Entry; state: BuildState; input: EngineInput }
 interface Card { c: ComboCard; base: Base; full: Record<string, string>; hard: boolean }
 
@@ -48,6 +65,7 @@ export default function ColorCatalog() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const sex = charSex()
+  const { weather } = useWeather({ auto: false })
   const [sp, setSp] = useSearchParams()
   const [sheet, setSheet] = useState<LockSlot | null>(null)
   const [open, setOpen] = useState<Card | null>(null)
@@ -56,33 +74,49 @@ export default function ColorCatalog() {
   const situ = (SITU.find(s => s.id === sp.get('situ'))?.id ?? defaultSitu()) as Situ
   const lockRaw = sp.get('lock')
   const locks = useMemo(() => parseLocks(lockRaw), [lockRaw])
+  const lockKey = useMemo(() => formatLocks(locks), [locks])
   const lockedSlots = useMemo(() => LOCK_SLOTS.filter(s => locks[s]), [locks])
 
-  const setParams = (next: { lock?: Locks; situ?: Situ }) => {
+  // ── 기온: 날씨가 있으면 지금 체감, 유저가 칩을 고르면 그게 이긴다 (URL 에 남아 재진입해도 같다) ──
+  const now = nowTemp(weather)
+  const rawTemp = Number(sp.get('temp'))
+  const picked = TEMP_STEPS.includes(rawTemp) ? rawTemp : null
+  const temp = picked ?? now ?? DEFAULT_TEMP
+  const selTemp: number | 'now' = picked ?? (now != null ? 'now' : DEFAULT_TEMP)
+
+  const setParams = (next: { lock?: Locks; situ?: Situ; temp?: number | null }) => {
     const lock = formatLocks(next.lock ?? locks)
     const q: Record<string, string> = { situ: next.situ ?? situ }
     if (lock) q.lock = lock
+    const tp = next.temp === undefined ? picked : next.temp
+    if (tp != null) q.temp = String(tp)
     setSp(q, { replace: true })
   }
 
-  // ── 바탕 코디: 오늘 순위에서 판이 서로 다른 것 4벌. 잠근 자리가 없는 코디는 뺀다 ──
+  // 잠근 모자·머플러는 바탕 코디에 얹어서 입힌다 (안 잠갔으면 null — 코디에 원래 없다)
+  const accs = useMemo(() => ({
+    hat: locks.hat ? { plate: typesFor('hat', sex)[0], colorKey: locks.hat } : null,
+    scarf: locks.scarf ? { plate: typesFor('scarf', sex)[0], colorKey: locks.scarf } : null,
+  }), [locks.hat, locks.scarf, sex])
+
+  // ── 바탕 코디: 이 기온 순위에서 판이 서로 다른 것 4벌. 잠근 자리가 없는 코디는 뺀다 ──
   // (아우터를 잠갔는데 아우터가 없는 코디를 보여 주면 자물쇠가 거짓말이 된다)
   const bases = useMemo<Base[]>(() => {
-    const ctx: Ctx = { sex, situ, temp: 21, prefs: loadPrefs(), recent: loadRecent() }
+    const ctx: Ctx = { sex, situ, temp, prefs: loadPrefs(), recent: loadRecent() }
     const seen = new Set<string>()
     const out: Base[] = []
     for (const e of ranked(ctx)) {
       const s = sig(e.p)
       if (seen.has(s)) continue
       seen.add(s)
-      const state = outfitToState(initialState('coord'), pickPayload(e, situ, 'result'))
+      const state = outfitToState(initialState('coord'), { ...pickPayload(e, situ, 'result'), ...accs })
       const input = engineInputOf(state)
       if (lockedSlots.some(k => !input.outfit[k])) continue
       out.push({ e, state, input })
       if (out.length >= 4) break
     }
     return out
-  }, [sex, situ, lockedSlots.join(',')])
+  }, [sex, situ, temp, lockKey, accs])
 
   // ── 카드: 바탕마다 자물쇠 밖의 자리를 카탈로그로 펼치고 합쳐 줄 세운다 ──
   const cards = useMemo<Card[]>(() => {
@@ -98,29 +132,51 @@ export default function ColorCatalog() {
       }
       for (const c of list) all.push({ c, base, full: { ...input.outfit, ...c.outfit }, hard: false })
     }
-    all.sort((a, b) => b.c.total - a.c.total)
+    // 점수 → 원점수(보정 전) → 종류 순. 표시 점수는 92에서 천장을 치니 그 안을 원점수가 가른다
+    all.sort((a, b) => b.c.total - a.c.total || rawOf(b.c) - rawOf(a.c) || KINDS.indexOf(a.c.kind) - KINDS.indexOf(b.c.kind))
+    // 완전 동점 묶음은 바탕 코디를 번갈아 — 첫 줄부터 여러 벌이 섞여 보이게
+    const sorted: Card[] = []
+    for (let i = 0; i < all.length;) {
+      let j = i
+      while (j < all.length && tieKey(all[j].c) === tieKey(all[i].c)) j++
+      const lanes = bases.map(b => all.slice(i, j).filter(x => x.base === b))
+      const depth = Math.max(0, ...lanes.map(l => l.length))
+      for (let k = 0; k < depth; k++) for (const lane of lanes) if (lane[k]) sorted.push(lane[k])
+      i = j
+    }
     const bySig = new Set<string>()
     const mainCount: Record<string, number> = {}
+    const baseCount: Record<string, number> = {}
     const kept: Card[] = []
-    for (const x of all) {
+    const spare: Card[] = []
+    const take = (x: Card) => {
+      mainCount[mainOf(x, locks)] = (mainCount[mainOf(x, locks)] || 0) + 1
+      baseCount[x.base.e.c.id] = (baseCount[x.base.e.c.id] || 0) + 1
+      kept.push(x)
+    }
+    for (const x of sorted) {
       const key = Object.keys(x.full).sort().map(s => s + ':' + x.full[s]).join('|')
       if (bySig.has(key)) continue
       bySig.add(key)
       // 한 가지 주색이 목록을 덮지 않게. 단 못 박은 색은 세지 않는다 — 카드마다 같으니 세면 전부 걸린다
-      const main = LOCK_SLOTS.filter(s => !locks[s]).map(s => x.full[s]).find(Boolean) || ''
+      const main = mainOf(x, locks)
       if (main && (mainCount[main] || 0) >= SAME_MAIN_MAX) continue
-      mainCount[main] = (mainCount[main] || 0) + 1
-      kept.push(x)
+      // 첫 줄부터 여러 벌이 보이게 — 머리 8장은 한 바탕 코디가 절반을 넘기지 않는다.
+      // 밀어 둔 카드는 머리가 차는 즉시 도로 넣는다(바탕이 하나뿐이면 그대로 원래 순서가 된다)
+      if (kept.length < HEAD && (baseCount[x.base.e.c.id] || 0) >= HEAD_BASE_MAX) { spare.push(x); continue }
+      take(x)
       if (kept.length >= MAX_CARDS) break
+      if (kept.length === HEAD) while (spare.length && kept.length < MAX_CARDS) take(spare.shift()!)
     }
+    for (const x of spare) { if (kept.length >= MAX_CARDS) break; take(x) }
     // 60점 미만은 내리되, 너무 적으면 △ 를 달아서라도 보여 준다 (0장은 없다)
     const good = kept.filter(x => x.c.total >= OK_SCORE)
     return (good.length >= MIN_CARDS ? good : kept.slice(0, Math.max(MIN_CARDS, good.length)))
       .map(x => ({ ...x, hard: x.c.total < OK_SCORE }))
-  }, [bases, lockRaw])
+  }, [bases, lockKey])
 
-  useEffect(() => { trackEvent('catalog_view', { locks: lockedSlots.length, situ, n: cards.length }) }, [lockRaw, situ])
-  useEffect(() => { setOpen(null) }, [lockRaw, situ])
+  useEffect(() => { trackEvent('catalog_view', { locks: lockedSlots.length, situ, temp, n: cards.length }) }, [lockKey, situ, temp])
+  useEffect(() => { setOpen(null) }, [lockKey, situ, temp])
 
   const sceneOf = (x: Card) => charSceneFromState({
     ...x.base.state,
@@ -152,8 +208,10 @@ export default function ColorCatalog() {
       bottom: recolor(p.bottom, 'bottom'),
       shoes: recolor(p.shoes, 'shoes'),
       tie: recolor(p.tie, 'tie'),
+      // 잠근 모자·머플러도 같이 넘겨야 결과 화면이 카드와 같은 한 벌이 된다 (색은 잠근 색 그대로)
+      ...accs,
     }
-    trackEvent('catalog_make', { id: x.base.e.c.id, total: x.c.total, kind: x.c.kind, locks: lockedSlots.length })
+    trackEvent('catalog_make', { id: x.base.e.c.id, total: x.c.total, kind: x.c.kind, locks: lockedSlots.length, temp })
     try { sessionStorage.setItem('sp_rec_pick', JSON.stringify(payload)) } catch { /* 세션이 막혀 있으면 그냥 빈손으로 간다 */ }
     navigate('/home/build')
   }
@@ -175,15 +233,25 @@ export default function ColorCatalog() {
         {SITU.map(s => <button key={s.id} onClick={() => setParams({ situ: s.id })} className={chip(situ === s.id)}>{t('outfit.situ.' + s.id)}</button>)}
       </div>
 
-      {/* 자물쇠 줄 — 자리마다 색 하나를 못 박는다 */}
-      <div className="grid grid-cols-4 gap-1.5">
+      {/* 기온 — 옷 모양이 여기를 따른다. 날씨가 있으면 [지금 t°] 가 기본 */}
+      <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mb-2">
+        {now != null && (
+          <button onClick={() => { setParams({ temp: null }); trackEvent('catalog_temp', { t: now, src: 'weather' }) }} className={chip(selTemp === 'now')}>{t('catalog.tempNow', { t: now })}</button>
+        )}
+        {TEMP_STEPS.map(x => (
+          <button key={x} onClick={() => { setParams({ temp: x }); trackEvent('catalog_temp', { t: x, src: 'chip' }) }} className={chip(selTemp === x)}>{t('catalog.tempStep', { t: x })}</button>
+        ))}
+      </div>
+
+      {/* 자물쇠 줄 — 자리마다 색 하나를 못 박는다 (모자·머플러는 잠가야 입는다) */}
+      <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5">
         {LOCK_SLOTS.map(s => (
-          <button key={s} onClick={() => { setSheet(s); setTab(COLOR_TABS[0].id) }} className={`rounded-2xl border p-2 flex flex-col items-center gap-1 active:scale-[0.97] transition-all ${locks[s] ? 'border-warm-900 dark:border-warm-100 bg-white dark:bg-warm-800' : 'border-warm-300 dark:border-warm-600 bg-warm-50 dark:bg-warm-800/50'}`}>
+          <button key={s} onClick={() => { setSheet(s); setTab(COLOR_TABS[0].id) }} className={`flex-none w-[72px] rounded-2xl border p-2 flex flex-col items-center gap-1 active:scale-[0.97] transition-all ${locks[s] ? 'border-warm-900 dark:border-warm-100 bg-white dark:bg-warm-800' : 'border-warm-300 dark:border-warm-600 bg-warm-50 dark:bg-warm-800/50'}`}>
             <span className="relative w-7 h-7 rounded-full border-2 border-white flex items-center justify-center" style={{ background: locks[s] ? COLORS_60[locks[s]!]?.hex : 'repeating-linear-gradient(45deg, #E7E5E4 0 4px, #FAFAF9 4px 8px)', boxShadow: '0 0 0 1px rgba(28,25,23,.15)' }}>
               {locks[s] && <Pin size={11} className={COLORS_60[locks[s]!]?.hcl[2] > 60 ? 'text-warm-900' : 'text-white'} />}
             </span>
             <span className="text-[10.5px] font-bold text-warm-900 dark:text-warm-100 leading-none">{t('builder.slot.' + s)}</span>
-            <span className="text-[9.5px] text-warm-500 leading-none truncate max-w-full">{locks[s] ? getColorName(locks[s]!) : t('catalog.any')}</span>
+            <span className="text-[9.5px] text-warm-500 leading-none truncate max-w-full">{locks[s] ? getColorName(locks[s]!) : t(ACC_SLOTS.includes(s as typeof ACC_SLOTS[number]) ? 'catalog.none' : 'catalog.any')}</span>
           </button>
         ))}
       </div>
@@ -194,6 +262,14 @@ export default function ColorCatalog() {
         </span>
         {!!lockedSlots.length && <button onClick={() => setParams({ lock: {} })} className="ml-auto text-[11.5px] font-semibold text-warm-500 underline underline-offset-2">{t('catalog.unlockAll')}</button>}
       </div>
+
+      {!!locks.scarf && temp >= WARM && <div className="mb-2 text-[11.5px] text-warm-500 leading-snug">{t('catalog.scarfWarm')}</div>}
+
+      {!cards.length && (
+        <div className="rounded-2xl border border-warm-300 dark:border-warm-600 bg-warm-50 dark:bg-warm-800/50 p-4 text-[12.5px] text-warm-600 dark:text-warm-400 leading-snug">
+          {t(locks.outer ? 'catalog.noOuterWarm' : 'catalog.noneFound')}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-2">
         {cards.map((x, i) => (
@@ -209,7 +285,7 @@ export default function ColorCatalog() {
         ))}
       </div>
 
-      <div className="mt-3 text-[11px] text-warm-500 leading-snug">{t('catalog.weatherNote')}</div>
+      <div className="mt-3 text-[11px] text-warm-500 leading-snug">{t('catalog.weatherNote', { t: temp })}</div>
 
       {/* 색 고르기 시트 */}
       {sheet && (
@@ -253,8 +329,9 @@ export default function ColorCatalog() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-1.5 mt-3">
-              {LOCK_SLOTS.filter(s => open.full[s]).map(s => (
-                <button key={s} onClick={() => lock(s, open.full[s]!)} disabled={locks[s] === open.full[s]} className="h-10 rounded-2xl border border-warm-300 dark:border-warm-600 text-[12px] font-semibold text-warm-700 dark:text-warm-300 flex items-center justify-center gap-1.5 active:scale-[0.98] disabled:opacity-40">
+              {/* 이미 잠근 자리는 뺀다 — 모자·머플러는 잠가야만 있으니 여기 안 뜬다 */}
+              {LOCK_SLOTS.filter(s => open.full[s] && locks[s] !== open.full[s]).map(s => (
+                <button key={s} onClick={() => lock(s, open.full[s]!)} className="h-10 rounded-2xl border border-warm-300 dark:border-warm-600 text-[12px] font-semibold text-warm-700 dark:text-warm-300 flex items-center justify-center gap-1.5 active:scale-[0.98]">
                   <i className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ background: COLORS_60[open.full[s]!]?.hex }} />
                   {t('catalog.lockThis', { slot: t('builder.slot.' + s) })}
                 </button>
