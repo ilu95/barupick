@@ -1920,9 +1920,9 @@
     "female": "여",
     "takeOff": "벗기",
     "none": "없음",
-    "tieNeedsShirt": "셔츠 위에만",
-    "topNeedsUpper": "아우터나 이너를 먼저 입으면 상의를 뺄 수 있어요",
-    "noRec": "지금 조합에서 크게 좋아지는 색이 없어요",
+    "tieNeedsShirt": "셔츠를 입어야 맬 수 있어요",
+    "topNeedsUpper": "아우터나 이너가 있어야 상의를 벗을 수 있어요",
+    "noRec": "지금 조합은 이미 잘 맞아요. 바꿔서 더 나아지는 색이 없어요",
     "pt": "점",
     "done": "완성",
     "slot": {
@@ -1940,25 +1940,25 @@
     },
     "guidedTitle": "하나씩 골라보기",
     "guided": {
-      "next": "다음: {{slot}}",
-      "skip": "{{slot}} 없이 다음"
+      "next": "다음은 {{slot}}",
+      "skip": "{{slot}} 건너뛰기"
     },
     "basis": "<b>{{colors}}</b>에 어울리는 {{slot}} 색이에요",
-    "basisNone": "색을 하나 고르면, 다른 자리는 그 색에 맞춰 나눠 드려요",
+    "basisNone": "먼저 색을 하나 골라 보세요. 나머지 자리는 그 색에 어울리는 순서로 보여 드려요",
     "sec": {
       "match": "찰떡 궁합",
       "safe": "무난한 조합",
       "point": "고수의 영역",
-      "avoid": "피하는 게 좋아요"
+      "avoid": "잘 안 어울리는 색"
     },
     "group": {
       "pc": "나에게 맞는 색",
       "safe": "무난",
-      "match": "어울려요",
+      "match": "잘 어울려요",
       "point": "포인트",
       "mine": "내 옷"
     },
-    "pcHint": "퍼스널컬러를 정하면 나에게 맞는 색부터 보여 드려요",
+    "pcHint": "퍼스널컬러를 설정하면 나에게 맞는 색을 먼저 보여 드려요",
     "pcHintLink": "퍼스널컬러 정하기",
     "sortRec": "어울리는 순",
     "sortBright": "밝기순",
@@ -1967,7 +1967,7 @@
     "moveChip": "{{slot}} → {{color}} · {{score}}점",
     "combos": {
       "title": "이렇게 입어 보세요",
-      "fixed": "고른 색은 그대로 두었어요",
+      "fixed": "고른 색은 그대로예요",
       "kind": {
         "safe": "무난",
         "point": "포인트",
@@ -1977,7 +1977,7 @@
       }
     },
     "preview": {
-      "title": "이 자리 후보"
+      "title": "이 자리에 어울리는 색"
     }
   },
   "reminder": {

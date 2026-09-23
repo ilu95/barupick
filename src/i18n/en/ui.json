@@ -1920,9 +1920,9 @@
     "female": "W",
     "takeOff": "Take off",
     "none": "None",
-    "tieNeedsShirt": "Shirt only",
-    "topNeedsUpper": "Add an outer or inner layer first to remove the top",
-    "noRec": "No color makes this much better right now",
+    "tieNeedsShirt": "Needs a shirt",
+    "topNeedsUpper": "You need an outer or inner layer before removing the top",
+    "noRec": "This combo already works. No color change makes it better",
     "pt": "pts",
     "done": "Done",
     "slot": {
@@ -1941,15 +1941,15 @@
     "guidedTitle": "One piece at a time",
     "guided": {
       "next": "Next: {{slot}}",
-      "skip": "Skip to {{slot}}"
+      "skip": "Skip {{slot}}"
     },
     "basis": "{{slot}} colors that go with <b>{{colors}}</b>",
-    "basisNone": "Pick one color. The other pieces will be sorted to match it",
+    "basisNone": "Pick one color first. The other pieces will be sorted by how well they match it",
     "sec": {
       "match": "Perfect match",
       "safe": "Safe bet",
       "point": "Bold move",
-      "avoid": "Better to avoid"
+      "avoid": "Doesn't go well"
     },
     "group": {
       "pc": "Your colors",
@@ -1977,7 +1977,7 @@
       }
     },
     "preview": {
-      "title": "Try for this spot"
+      "title": "Colors for this piece"
     }
   },
   "reminder": {

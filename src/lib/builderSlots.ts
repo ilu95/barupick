@@ -64,16 +64,16 @@ export const HAIR_COLORS: { hex: string; ko: string; en: string }[] = [
 
 /** 칸별 한 줄 힌트 — 어디에 보이는 색인지 */
 export const HINTS: Record<string, { ko: string; en: string }> = {
-  outer: { ko: '제일 넓게 보여요. 차분한 색이 편해요', en: 'Largest area — calm colors work as the base' },
-  middleware: { ko: '상의와 밝기가 달라야 겹쳐 입은 게 보여요', en: 'Separate its lightness from the top so the layer shows' },
-  top: { ko: '얼굴 바로 아래라 밝은 색이 잘 받아요', en: 'Near the face — light colors flatter' },
-  inner: { ko: '목선에만 살짝 보여요. 포인트 색도 괜찮아요', en: 'Only shows at the neckline — use as an accent' },
-  bottom: { ko: '아래가 어두우면 안정감이 있어요', en: 'Darker below feels grounded' },
-  shoes: { ko: '하의 색이나 무채색으로 맞추면 깔끔해요', en: 'Match the bottom or go neutral' },
-  scarf: { ko: '얼굴 옆이라 퍼스널컬러가 제일 잘 드러나요', en: 'Next to the face — personal color shows most' },
+  outer: { ko: '가장 넓게 보이는 자리예요. 차분한 색이 무난해요', en: 'Largest area — calm colors work as the base' },
+  middleware: { ko: '상의와 밝기를 다르게 하면 겹쳐 입은 느낌이 살아요', en: 'Separate its lightness from the top so the layer shows' },
+  top: { ko: '얼굴과 가까워서 밝은 색이 잘 어울려요', en: 'Near the face — light colors flatter' },
+  inner: { ko: '목 부분만 살짝 보여요. 포인트 색을 써도 좋아요', en: 'Only shows at the neckline — use as an accent' },
+  bottom: { ko: '아래쪽이 어두우면 안정감이 생겨요', en: 'Darker below feels grounded' },
+  shoes: { ko: '하의와 같은 색이나 무채색이면 깔끔해요', en: 'Match the bottom or go neutral' },
+  scarf: { ko: '얼굴 옆이라 퍼스널컬러가 가장 잘 드러나요', en: 'Next to the face — personal color shows most' },
   hat: { ko: '신발이나 하의와 같은 계열이면 잘 어울려요', en: 'One dot on top — tie it to shoes or bottom' },
-  hair: { ko: '상의보다 어둡거나 밝아야 얼굴이 살아요', en: 'Hair color reads best against the top' },
-  tie: { ko: '셔츠 위에만 보여요. 상의·하의 중 한 색과 이으면 정돈돼요', en: 'Only shows over a shirt — echo the top or bottom color to tie it together' },
+  hair: { ko: '상의와 밝기가 다르면 얼굴이 또렷해 보여요', en: 'Hair color reads best against the top' },
+  tie: { ko: '셔츠 위에만 보여요. 상의나 하의 색과 맞추면 단정해요', en: 'Only shows over a shirt — echo the top or bottom color to tie it together' },
 }
 
 /** 기본 색 (칸을 처음 채울 때) */
