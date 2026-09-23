@@ -2016,25 +2016,25 @@
   },
   "catalog": {
     "title": "Look catalog",
-    "hint": "The more colors you pin, the shorter the list. Unpinned slots are filled with colors that match",
-    "any": "Any color",
-    "unlock": "Unpin — any color",
-    "unlockAll": "Unpin all",
-    "count": "{{n}} outfits in this color",
-    "hard": "△ This color is a hard one to match",
+    "hint": "Lock the colors you want. We fill the other pieces with colors that match. The more you set, the shorter the list",
+    "any": "Not set",
+    "unlock": "Unlock",
+    "unlockAll": "Unlock all",
+    "count": "{{n}} looks with your colors",
+    "hard": "△ Few combos work with this color",
     "lockThis": "Pin this {{slot}}",
-    "make": "Make this one",
-    "none": "None",
+    "make": "Build this look",
+    "none": "Not set",
     "noneFound": "No looks match these pins. Try unpinning one",
     "base": "Your combo",
-    "changeBase": "Change",
-    "countBase": "{{n}} looks for this combo",
-    "more": "Show more · {{n}} left",
-    "end": "That's all. Change a lock for more"
+    "changeBase": "Change combo",
+    "countBase": "{{n}} looks from this combo",
+    "more": "Show {{n}} more looks",
+    "end": "That's every look. Change a locked color for new ones"
   },
   "pick": {
     "choose": "What next with this combo?",
     "gotoCatalog": "Browse finished looks",
-    "gotoBuilder": "Pick each piece myself"
+    "gotoBuilder": "Pick colors piece by piece"
   }
 }
