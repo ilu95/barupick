@@ -199,8 +199,12 @@ export function combosFor(input: EngineInput, opts: { fixed?: Set<string>; n?: n
   return [...rest.slice(0, opts.n || 6), ...(tasteCard ? [tasteCard] : [])]
 }
 
-/** 자물쇠(locked) 밖의 자리 색을 후보 풀에서 조합해 매긴다. combosFor 보다 넓게(≤ n), 무작위 없음 */
-export function catalogFor(input: EngineInput, locked: Set<string>, n = 12): ComboCard[] {
+/**
+ * 자물쇠(locked) 밖의 자리 색을 후보 풀에서 조합해 매긴다. combosFor 보다 넓게(≤ n), 무작위 없음.
+ * depth 는 후보를 몇 겹으로 펼칠지 — 1 은 예전 그대로(바탕 코디 여럿을 합칠 때),
+ * 2 는 바탕이 한 벌뿐인 카탈로그용으로 통을 더 돌고 자리 쌍·세 색까지 낸다.
+ */
+export function catalogFor(input: EngineInput, locked: Set<string>, n = 12, depth = 1): ComboCard[] {
   const slots = Object.keys(input.outfit).filter(s => input.outfit[s] && !locked.has(s))
   if (!slots.length) return []
   const chromaOf = (k: string) => COLORS_60[k]?.hcl[1] ?? 0
@@ -228,10 +232,18 @@ export function catalogFor(input: EngineInput, locked: Set<string>, n = 12): Com
   const base = (i: number) => { const key: Record<string, string> = {}; slots.forEach(s => { key[s] = pick(s, 'neu', i) }); return key }
   const patterns: { key: Record<string, string>; kind: ComboCard['kind'] }[] = []
   // 전부 무채 → 한 자리만 연유채 → 한 자리만 유채 → 두 색 → 톤온톤 순으로 후보를 늘어놓는다
-  for (let i = 0; i < 4; i++) patterns.push({ key: base(i), kind: 'safe' })
-  for (const s of slots) for (let i = 0; i < 2; i++) patterns.push({ key: { ...base(i), [s]: pick(s, 'soft', i) }, kind: 'point' })
-  for (const s of slots) for (let i = 0; i < 2; i++) patterns.push({ key: { ...base(i), [s]: pick(s, 'vivid', i) }, kind: 'point' })
-  for (const s of slots.filter(x => x !== main).slice(0, 3)) patterns.push({ key: { ...base(0), [main]: pick(main, 'vivid', 0), [s]: pick(s, 'soft', 0) }, kind: 'two' })
+  for (let i = 0; i < 4 * depth; i++) patterns.push({ key: base(i), kind: 'safe' })
+  for (const s of slots) for (let i = 0; i < 2 * depth; i++) patterns.push({ key: { ...base(i), [s]: pick(s, 'soft', i) }, kind: 'point' })
+  for (const s of slots) for (let i = 0; i < 2 * depth; i++) patterns.push({ key: { ...base(i), [s]: pick(s, 'vivid', i) }, kind: 'point' })
+  if (depth > 1) {
+    // 두 색 — 자리 쌍마다 쨍함+연유채, 연유채+연유채 (주 자리에 매이지 않는다)
+    for (let a = 0; a < slots.length; a++) for (let b = a + 1; b < slots.length; b++) {
+      patterns.push({ key: { ...base(0), [slots[a]]: pick(slots[a], 'vivid', 0), [slots[b]]: pick(slots[b], 'soft', 0) }, kind: 'two' })
+      patterns.push({ key: { ...base(0), [slots[a]]: pick(slots[a], 'soft', 0), [slots[b]]: pick(slots[b], 'soft', 1) }, kind: 'two' })
+    }
+  } else {
+    for (const s of slots.filter(x => x !== main).slice(0, 3)) patterns.push({ key: { ...base(0), [main]: pick(main, 'vivid', 0), [s]: pick(s, 'soft', 0) }, kind: 'two' })
+  }
   // 톤온톤 — 잠근 색(없으면 주 자리 색)과 같은 계열에서 밝기만 달리한다
   const anchor = input.outfit[Object.keys(TO_V7).find(s => locked.has(s) && input.outfit[s]) || main]
   if (anchor && COLORS_60[anchor]) {
@@ -241,7 +253,12 @@ export function catalogFor(input: EngineInput, locked: Set<string>, n = 12): Com
       const lit = fam.filter(k => Math.abs(lumOf(k) - lumOf(anchor)) >= 8)
       tone[s] = lit.length ? lit : fam
     }
-    for (let i = 0; i < 2; i++) patterns.push({ key: Object.fromEntries(slots.map(s => [s, tone[s].length ? tone[s][i % tone[s].length] : pick(s, 'neu', i)])), kind: 'tone' })
+    for (let i = 0; i < 2 * depth; i++) patterns.push({ key: Object.fromEntries(slots.map(s => [s, tone[s].length ? tone[s][i % tone[s].length] : pick(s, 'neu', i)])), kind: 'tone' })
+  }
+  // 세 색 — 주 자리는 쨍하게, 나머지 두 자리는 연하게 (자유 자리가 셋 이상일 때만)
+  if (depth > 1 && slots.length >= 3) {
+    const rest = slots.filter(s => s !== main).slice(0, 2)
+    for (let i = 0; i < 2; i++) patterns.push({ key: { ...base(0), [main]: pick(main, 'vivid', i), [rest[0]]: pick(rest[0], 'soft', i), [rest[1]]: pick(rest[1], 'soft', i + 1) }, kind: 'two' })
   }
   const seen = new Set<string>(); const cards: ComboCard[] = []
   for (const { key, kind } of patterns) {

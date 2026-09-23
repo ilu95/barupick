@@ -214,17 +214,13 @@
     },
     "needs": {
       "title": "What can we help with?",
-      "catalog": {
-        "title": "Outfits in this color",
-        "sub": "Pin a color to a slot — navy top, say — and only outfits that work with it remain"
-      },
       "guided": {
         "title": "Pick one piece at a time",
         "sub": "Top first, one slot at a time, with matching colors for each"
       },
       "layered": {
         "title": "Layered combos",
-        "sub": "Only layered outfits, for today’s temperature"
+        "sub": "Pick a layered combo, then choose colors or browse finished looks"
       },
       "items": {
         "title": "Items worth adding",
@@ -2025,16 +2021,20 @@
     "unlock": "Unpin — any color",
     "unlockAll": "Unpin all",
     "count": "{{n}} outfits in this color",
-    "countAll": "{{n}} outfits for today",
     "hard": "△ This color is a hard one to match",
     "lockThis": "Pin this {{slot}}",
     "make": "Make this one",
     "none": "None",
-    "tempNow": "Now {{t}}°",
-    "tempStep": "{{t}}°",
-    "noOuterWarm": "No outerwear looks at this temperature. Try a cooler one",
     "noneFound": "No looks match these pins. Try unpinning one",
-    "scarfWarm": "A scarf on a warm day — just for the color",
-    "weatherNote": "Pieces are for {{t}}°. Focus on the colors"
+    "base": "Your combo",
+    "changeBase": "Change",
+    "countBase": "{{n}} looks for this combo",
+    "more": "Show more · {{n}} left",
+    "end": "That's all. Change a lock for more"
+  },
+  "pick": {
+    "choose": "What next with this combo?",
+    "gotoCatalog": "Browse finished looks",
+    "gotoBuilder": "Pick each piece myself"
   }
 }
