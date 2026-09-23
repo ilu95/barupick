@@ -388,6 +388,30 @@ function delta(items, ctx, slot, hex, name) {
   return { d: r.total - base.total, total: r.total, warn: r.reasons.filter(x => x.w < 0 && x.slots.includes(slot)), reasons: r.reasons };
 }
 const SMALL_SLOTS = ['shoes', 'scarf', 'hat', 'inner', 'tie', 'socks'];
+/* 구역 판정 규칙 — guide() 의 세 묶음(safe/match/point)과 zonesOf() 가 같은 것을 쓴다. 채점 수치는 여기 없다 */
+const zoneRules = (slot, opts) => ({
+  fn: x => fashionNeutral(lch(x.hex), (opts && opts.idFor) || slot),   /* 패션 무채 — 네이비·카멜도 바탕으로 센다 */
+  hardWarn: x => x.warn.some(w => w.w <= -1),
+  small: SMALL_SLOTS.includes(slot),
+});
+/**
+ * 팔레트 전부를 네 구역으로. guide() 의 pred·tol 을 그대로 쓰되 상위 N·계열 겹침 제한만 뺀다.
+ * 우선순위: marks 의 warn → avoid, 그 다음 point > match > safe(나머지 전부).
+ * point 를 match 앞에 두는 이유: guide() 의 두 묶음은 배타가 아니라, 작은 자리의 쨍한 색은
+ * 양쪽에 다 든다. 구역은 하나만 줄 수 있고 쨍한 게 그 색의 성질이니 "고수의 영역"으로 보낸다.
+ * (match 를 앞에 두면 고수 구역이 사실상 비어 버린다 — guide-check: 423건 vs 64건)
+ */
+function zonesOf(list, top, slot, opts) {
+  const R = zoneRules(slot, opts), out = {};
+  for (const x of list) {
+    out[x.key] = (x.warn.length && x.d <= -4) ? 'avoid'            /* marks 의 warn 과 같은 식 */
+      : R.hardWarn(x) ? 'safe'                                     /* 감점 규칙에 걸리면 세 묶음 어디에도 안 들어간다 */
+      : (R.small && x.vv >= .4) ? 'point'                          /* guide 의 point 묶음 조건 */
+      : (R.fn(x) < .5 && x.total >= top - 8) ? 'match'             /* guide 의 match 묶음 조건 */
+      : 'safe';
+  }
+  return out;
+}
 function guide(items, ctx, slot, palette, opts) {
   opts = opts || {};
   const base = evaluate(items, ctx);
@@ -409,12 +433,13 @@ function guide(items, ctx, slot, palette, opts) {
   /* 추천 세 묶음: 무난(무채·연유채) 최대 4 + 어울려요(유채 상위) 최대 5 + 포인트(작은 자리에서만 쨍한 색) 최대 3. 감점 규칙 없는 것만, 계열 겹침 3개까지 */
   const byAdj = [...list].sort((a, b) => b.adj - a.adj || a.key.localeCompare(b.key));
   const famOf = hex => { const c = lch(hex); return c.C <= NEUTRAL_C ? 'n' + (c.L > 60 ? 'L' : 'D') : 'h' + Math.round(c.h / 30); };
-  const pickN = (pred, nMax, tol) => { const out = [], hues = []; for (const x of byAdj) { if (out.length >= nMax) break; if (!pred(x) || x.warn.some(w => w.w <= -1) || x.total < top - tol) continue; const fam = famOf(x.hex); if (hues.filter(h => h === fam).length >= 3) continue; hues.push(fam); out.push(x); } return out; };
+  const R = zoneRules(slot, opts);
+  const pickN = (pred, nMax, tol) => { const out = [], hues = []; for (const x of byAdj) { if (out.length >= nMax) break; if (!pred(x) || R.hardWarn(x) || x.total < top - tol) continue; const fam = famOf(x.hex); if (hues.filter(h => h === fam).length >= 3) continue; hues.push(fam); out.push(x); } return out; };
   /* 무난 묶음은 계산 채도가 아니라 패션 무채(네이비·카멜·브라운도 바탕으로 센다) 기준으로 가른다 */
-  const fnOf = x => fashionNeutral(lch(x.hex), opts.idFor || slot);
+  const fnOf = R.fn;
   const safe = pickN(x => fnOf(x) >= .5, 4, 10), match = pickN(x => fnOf(x) < .5, 5, 8);
-  const point = SMALL_SLOTS.includes(slot)
-    ? list.filter(x => x.vv >= .4 && !x.warn.some(w => w.w <= -1)).sort((a, b) => b.total - a.total || a.key.localeCompare(b.key)).slice(0, 3)
+  const point = R.small
+    ? list.filter(x => x.vv >= .4 && !R.hardWarn(x)).sort((a, b) => b.total - a.total || a.key.localeCompare(b.key)).slice(0, 3)
     : [];
   /* 내 퍼스널컬러 핵심색 중 다른 감점 규칙에 안 걸린 것 최대 4 */
   const mine = pcFace && pcFace.size
@@ -424,7 +449,7 @@ function guide(items, ctx, slot, palette, opts) {
   const seen = new Set(); const rec = [];
   for (const x of [...mine, ...safe, ...match, ...point]) if (!seen.has(x.key)) { seen.add(x.key); rec.push(x); }
   const marks = {}; list.forEach(x => { marks[x.key] = seen.has(x.key) ? 'rec' : (x.warn.length && x.d <= -4) ? 'warn' : ''; });
-  return { base, list, rec, groups, marks };
+  return { base, list, rec, groups, marks, zones: zonesOf(list, top, slot, opts) };
 }
 function bestMoves(items, ctx, palette, k) {
   const base = evaluate(items, ctx); const out = [];
@@ -437,4 +462,4 @@ function bestMoves(items, ctx, palette, k) {
   out.sort((a, b) => b.adj - a.adj);
   return { base, moves: out.slice(0, k || 3) };
 }
-export { lch, evaluate, delta, guide, bestMoves, visibleAreas, toneFail, chromaWeight, fashionNeutral, vivid, NEUTRAL_C, SOFT_C, AREA };
+export { lch, evaluate, delta, guide, zonesOf, bestMoves, visibleAreas, toneFail, chromaWeight, fashionNeutral, vivid, NEUTRAL_C, SOFT_C, AREA };
