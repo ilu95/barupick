@@ -28,6 +28,8 @@ export interface EngineInput {
   situ?: string | null
   month?: number
 }
+/** 색 칩 구역 — 찰떡 궁합 / 무난한 조합 / 고수의 영역 / 피하는 게 좋아요 */
+export type Zone = 'match' | 'safe' | 'point' | 'avoid'
 export interface EnginePart { key: string; label: string; value: number; max: number }
 export interface EngineReason { id: string; txt: string; w: number; slots: string[] }
 export interface EngineResult { total: number; parts: EnginePart[]; reasons: EngineReason[]; raw: any }
@@ -139,7 +141,7 @@ export function guideFor(input: EngineInput, slot: string, recN = 12) {
   for (const [k, m] of Object.entries(g.marks as Record<string, string>)) if (m === 'rec' || m === 'warn') marks[k] = m
   const delta: Record<string, number> = {}; const why: Record<string, string> = {}
   for (const x of g.list) { delta[x.key] = x.d; why[x.key] = x.why }
-  return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[]; mine: string[] } }
+  return { rec: g.rec.map((x: any) => x.key as string), marks, delta, why, groups: g.groups as { safe: string[]; match: string[]; point: string[]; mine: string[] }, zones: g.zones as Record<string, Zone> }
 }
 
 /** rawTotal = 보정(calibrate) 전 v7 총점. 92점 천장에서 동점이 쏟아질 때 순위를 가르는 데만 쓴다 — 화면 점수는 total */

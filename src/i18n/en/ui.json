@@ -1944,6 +1944,14 @@
       "next": "Next: {{slot}}",
       "skip": "Skip to {{slot}}"
     },
+    "basis": "{{slot}} colors that go with <b>{{colors}}</b>",
+    "basisNone": "Pick one color. The other pieces will be sorted to match it",
+    "sec": {
+      "match": "Perfect match",
+      "safe": "Safe bet",
+      "point": "Bold move",
+      "avoid": "Better to avoid"
+    },
     "group": {
       "pc": "Your colors",
       "safe": "Safe",

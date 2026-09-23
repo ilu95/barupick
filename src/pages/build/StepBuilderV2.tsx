@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, RotateCcw, X, Check } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
@@ -69,6 +69,17 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     const k = slot === 'bottom' ? s.bottomColor : s.shoesColor
     return k ? COLORS_60[k]?.hex || null : null
   }
+  // 옷 자리의 색 키. 상체는 getFilledOutfit 의 outer/middleware/top/inner 와 달리 레일 칸 그대로 본다
+  // (니트 한 장은 outfit 에선 middleware 지만 유저에겐 '상의' 다)
+  const keyOf = (slot: string): string | null => {
+    const r = slot as RailSlot
+    if (isUpper(r)) return layerOf(s.upper, r)?.colorKey || null
+    return slot === 'bottom' ? s.bottomColor : slot === 'shoes' ? s.shoesColor
+      : slot === 'scarf' ? s.scarfColor : slot === 'hat' ? s.hatColor : slot === 'tie' ? s.tieColor : null
+  }
+  // 색을 고른 자리는 곧 고정 — 레일에 📌. 다시 고르면 그 색으로 바뀌고 계속 고정, 옷을 벗으면 풀린다.
+  // 하의·신발의 기본색은 유저가 고른 게 아니라 touched 에 없다 — 📌 도 기준 문장도 없다
+  const pinned = (slot: RailSlot): boolean => slot === 'acc' ? ['scarf', 'hat', 'tie'].some(a => touched.has(a)) : touched.has(slot)
   // 이웃 자리의 메인색 (칩 반원 오른쪽 40%): 상의↔하의, 신발→하의, 목도리·모자→아우터(입었으면)/상의, 레이어드·이너·넥타이→상의
   const neighborKeyFor = (slot: string): string | null => {
     if (slot === 'top') return colorOf('bottom')
@@ -77,12 +88,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     if (slot === 'scarf' || slot === 'hat') return colorOf('outer') || colorOf('top')
     return colorOf('top')
   }
-  const currentKey = (): string | null => {
-    if (focus === 'hair') return null
-    if (focus === 'acc') return acc === 'scarf' ? s.scarfColor : acc === 'hat' ? s.hatColor : s.tieColor
-    if (isUpper(focus)) return layerOf(s.upper, focus)?.colorKey || null
-    return focus === 'bottom' ? s.bottomColor : s.shoesColor
-  }
+  const currentKey = (): string | null => keyOf(colorSlot)
   const currentPlate = (): string | null => {
     if (focus === 'hair') return s.hair || null
     if (focus === 'acc') return acc === 'scarf' ? (s.scarfColor ? s.scarfItem || TYPES.scarf[0] : null) : acc === 'hat' ? (s.hatColor ? s.hatItem || TYPES.hat[0] : null) : (s.tieColor ? s.tieItem || TYPES.tie[0] : null)
@@ -110,13 +116,14 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     build.setSlotGarment(focus, plate, currentKey() || DEFAULT_COLOR[focus])
   }
   const takeOff = () => {
+    setTouched(prev => { if (!prev.has(colorSlot)) return prev; const n = new Set(prev); n.delete(colorSlot); return n })
     if (focus === 'acc') { build.setAccItem(acc, null, null); return }
     if (isUpper(focus)) build.setSlotGarment(focus, null)
   }
-  const pickColor = (key: string, src: 'grid' | 'rec' | 'mine', pos: number, group?: string) => {
+  const pickColor = (key: string, src: 'grid' | 'rec' | 'mine', pos: number) => {
     if (focus === 'hair') { build.setHair(s.hair || HAIR[sex][0].id, key); return }
     const delta = build.calcScoreDelta(colorSlot, key)
-    trackColorPick('build', { slot: colorSlot, color: key, src, tab, pos, delta, group })
+    trackColorPick('build', { slot: colorSlot, color: key, src, tab, pos, delta, group: guide?.zones[key] })
     trackColorConfirm({ slot: colorSlot, item: currentPlate(), color: key, action: 'v2' as any, score_before: score })
     setTouched(prev => prev.has(colorSlot) ? prev : new Set(prev).add(colorSlot))
     if (focus === 'acc') { build.setAccItem(acc, currentPlate() || TYPES[acc][0], key); return }
@@ -190,11 +197,11 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   // 칩: 왼쪽 후보색, 오른쪽 40% 이웃 자리 메인색(반원). 내 옷 👕 · 취향 ♥ 배지
   const neighborHex = focus === 'hair' ? null : neighborKeyFor(colorSlot)
   const chipBg = (hex: string) => neighborHex && neighborHex !== hex ? `linear-gradient(to right, ${hex} 0 60%, ${neighborHex} 60% 100%)` : hex
-  const renderChip = (k: string, src: 'grid' | 'rec' | 'mine', pos: number, group?: string) => {
+  const renderChip = (k: string, src: 'grid' | 'rec' | 'mine', pos: number, group?: string, dim?: boolean) => {
     const c = COLORS_60[k]; if (!c) return null
     const on = cur === k; const mark = src === 'grid' ? guide?.marks[k] : undefined
     return (
-      <button key={(group || src) + '-' + k} onClick={() => pickColor(k, src, pos, group)} className="w-[54px] flex-none flex flex-col items-center gap-1 active:scale-95 transition-transform">
+      <button key={(group || src) + '-' + k} onClick={() => pickColor(k, src, pos)} className={`w-[54px] flex-none flex flex-col items-center gap-1 active:scale-95 transition-transform ${dim && !on ? 'opacity-60' : ''}`}>
         <span className="relative w-9 h-9 rounded-full border-2 border-white flex items-center justify-center" style={{ background: chipBg(c.hex), boxShadow: on ? '0 0 0 2px #1C1917' : '0 0 0 1px rgba(28,25,23,.15)' }}>
           {on && <Check size={14} className={c.hcl[2] > 60 ? 'text-warm-900' : 'text-white'} />}
           {mark === 'rec' && !on && <i className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-terra-500 border border-white" />}
@@ -206,22 +213,33 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
       </button>
     )
   }
+  // 네 구역 — 색 하나라도 고르면(touched) 탭 안의 색을 찰떡 궁합 / 무난한 조합 / 고수의 영역 / 피하는 게 좋아요 로 나눈다.
+  // 기준이 없으면(touched 없음) 나누지 않는다 — 기준 없이 나누면 거짓말이다.
+  const ZONES = ['match', 'safe', 'point', 'avoid'] as const
+  const zoned = touched.size > 0 && !!guide
+  const zoneRows = (keys: string[], take = 0) => ZONES
+    .map(z => { const ks = keys.filter(k => guide?.zones[k] === z); return { id: z, label: t('builder.sec.' + z), keys: take ? ks.slice(0, take) : ks, dim: z === 'avoid' } })
+    .filter(g => g.keys.length)
+
   // 퍼스널컬러 핵심색 추천 (guide.groups.mine = 엔진의 pcFace 그룹 — 옷장 "내 옷" 그룹과 이름이 겹쳐 UI id 는 'pc' 로 구분)
   const pcKeys = guide?.groups.mine || []
   const hasPersonalColor = !!profile.getPersonalColor()
-  const groupRows: { id: string; label: string; keys: string[] }[] = guide ? [
+  // 추천 탭도 같은 네 구역으로 — 계열 가리지 않고 어울리는 순 상위 8개씩
+  const recRows = useMemo(() => guide
+    ? zoneRows(Object.keys(COLORS_60).sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999)), 8)
+    : [], [guide])
+  const groupRows: { id: string; label: string; keys: string[]; dim?: boolean }[] = guide ? [
     ...(pcKeys.length ? [{ id: 'pc', label: t('builder.group.pc'), keys: pcKeys }] : []),
     ...(mineKeys.length ? [{ id: 'mine', label: t('builder.group.mine'), keys: mineKeys }] : []),
-    { id: 'safe', label: t('builder.group.safe'), keys: guide.groups.safe },
-    { id: 'match', label: t('builder.group.match'), keys: guide.groups.match },
-    ...(guide.groups.point.length ? [{ id: 'point', label: t('builder.group.point'), keys: guide.groups.point }] : []),
+    ...recRows,
   ].filter(g => g.keys.length) : []
   const mineAllGroups = useMemo(() => {
     if (tab !== 'mine-all') return []
+    if (zoned) return zoneRows(Array.from(new Set(wardrobe.items.map(i => i.color))))
     return (['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat'] as const)
-      .map(cat => ({ id: cat, label: t('builder.slot.' + cat), keys: Array.from(new Set(wardrobe.getItems(cat).map(i => i.color))) }))
+      .map(cat => ({ id: cat as string, label: t('builder.slot.' + cat), keys: Array.from(new Set(wardrobe.getItems(cat).map(i => i.color))), dim: false }))
       .filter(g => g.keys.length)
-  }, [tab, wardrobe.items])
+  }, [tab, wardrobe.items, zoned, guide])
 
   // 조합 카드: 지금 입은 옷은 그대로, 고르지 않은 자리만 6가지 패턴으로 색을 채운다
   const wardrobeBySlot = useMemo(() => Object.fromEntries(
@@ -230,6 +248,8 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const combos = useMemo(() => guided ? [] : build.getCombos({ fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) }), [guided, s, touched, wardrobeBySlot])
   useEffect(() => { if (combos.length) trackEvent('combo_view', { n: combos.length }) }, [combos.length])
   const filled = getFilledOutfit(s)
+  // 기준 문장에 들어갈 "색 자리" 목록. 지금 보고 있는 자리는 뺀다 — 그 자리가 기준일 수는 없다
+  const basisColors = Array.from(touched).filter(sl => sl !== colorSlot && keyOf(sl)).map(sl => getColorName(keyOf(sl)!) + ' ' + t('builder.slot.' + sl)).join(' · ')
   const comboActive = (c: ComboCard) => Object.entries(c.outfit).every(([slot, key]) => filled[slot] === key)
   const activeCombo = combos.find(comboActive)
   const comboScene = (c: ComboCard) => charSceneFromState({
@@ -269,7 +289,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     return charSceneFromState({ ...s, bottomColor: focus === 'bottom' ? key : s.bottomColor, shoesColor: focus === 'shoes' ? key : s.shoesColor }, sex)
   }
   const pickPreview = (c: { key: string; kind: string }, idx: number) => {
-    pickColor(c.key, 'rec', idx, c.kind)
+    pickColor(c.key, 'rec', idx)
     trackEvent('guided_preview_pick', { slot: colorSlot, idx })
     nextGuide()
   }
@@ -294,13 +314,14 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
         </div>
         <div className="grid grid-cols-2 gap-1.5 px-1.5 pb-2 content-end">
           {RAIL.map(r => {
-            const on = focus === r.id, w = worn(r.id), sw = colorOf(r.id)
+            const on = focus === r.id, w = worn(r.id), sw = colorOf(r.id), pin = pinned(r.id)
             return (
               <button key={r.id} onClick={() => { setFocus(r.id); setTab('rec'); const k = GUIDE.indexOf(r.id); if (k >= 0) setGi(k) }}
                 className={`relative rounded-2xl flex flex-col items-center justify-center gap-0.5 py-1 border transition-all ${on ? 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 shadow-warm-sm text-warm-900 dark:text-warm-100' : 'border-transparent text-warm-500'}`} style={{ height: 66 }}>
                 <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-[20px] ${w ? (on ? 'bg-terra-100 dark:bg-terra-900/30' : 'bg-warm-200 dark:bg-warm-700') : 'border border-dashed border-warm-400 text-warm-400 text-[18px]'}`}>{w ? r.icon : '＋'}</span>
                 <span className="text-[10.5px] font-semibold leading-none">{t('builder.slot.' + r.id)}</span>
                 <span className="w-5 h-1 rounded-full" style={{ background: sw || 'transparent' }} />
+                {pin && <i className="absolute -top-1 -right-1 text-[10px] leading-none not-italic">📌</i>}
               </button>
             )
           })}
@@ -321,7 +342,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
                       <CharacterCanvas {...previewScene(c.key)} width={72} style={{ contentVisibility: 'auto' } as React.CSSProperties} />
                     </span>
                     <span className="text-[11px] font-bold text-warm-900 dark:text-warm-100 truncate max-w-full">{getColorName(c.key)}</span>
-                    <span className="text-[9.5px] text-warm-500 truncate max-w-full">{t('builder.group.' + c.kind)}</span>
+                    <span className="text-[9.5px] text-warm-500 truncate max-w-full">{t('builder.sec.' + c.kind)}</span>
                   </button>
                 )
               })}
@@ -396,7 +417,13 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
           </div>
         ) : (
           <>
-            <div className="mt-3 px-4 flex items-center gap-3.5 overflow-x-auto [scrollbar-width:none]">
+            {/* 기준 문장 — 무엇에 맞춰 나눴는지 한 줄 */}
+            <div className="mt-2.5 px-4 text-[11.5px] text-warm-500">
+              {basisColors
+                ? <Trans i18nKey="builder.basis" values={{ colors: basisColors, slot: t('builder.slot.' + colorSlot) }} components={{ b: <b className="font-bold text-warm-800 dark:text-warm-200" /> }} />
+                : t('builder.basisNone')}
+            </div>
+            <div className="mt-2 px-4 flex items-center gap-3.5 overflow-x-auto [scrollbar-width:none]">
               {tabs.map(x => <button key={x.id} onClick={() => setTab(x.id)} className={`flex-none text-[12px] font-semibold pb-0.5 border-b-2 whitespace-nowrap ${tab === x.id ? 'text-warm-900 dark:text-warm-100 border-warm-900 dark:border-warm-100' : 'text-warm-500 border-transparent'}`}>{x.id === 'rec' ? <span className="text-terra-600">{x.label}</span> : x.label}</button>)}
               {tab !== 'rec' && tab !== 'mine-all' && (
                 <button onClick={() => { const next = !sortBright; setSortBright(next); trackEvent('color_sort', { slot: colorSlot, bright: next }) }} className="flex-none ml-auto text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 whitespace-nowrap">{sortBright ? t('builder.sortRec') : t('builder.sortBright')}</button>
@@ -411,7 +438,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
                 ) : groupRows.map(g => (
                   <div key={g.id}>
                     <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
-                    <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, g.id === 'mine' ? 'mine' : 'rec', i, g.id))}</div>
+                    <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, g.id === 'mine' ? 'mine' : 'rec', i, g.id, g.dim))}</div>
                   </div>
                 ))}
                 {!hasPersonalColor && (
@@ -427,7 +454,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
                 ) : mineAllGroups.map(g => (
                   <div key={g.id}>
                     <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
-                    <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, 'mine', i, g.id))}</div>
+                    <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, 'mine', i, g.id, g.dim))}</div>
                   </div>
                 ))}
               </div>
@@ -435,6 +462,16 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
               <div className="mt-2 px-3 overflow-x-auto [scrollbar-width:none]">
                 {chipKeys.length === 0 ? (
                   <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
+                ) : zoned ? (
+                  // 격자를 접지 않고 격자 안에 구역을 새겨 넣는다 — 피하는 색도 흐리게 두되 고를 수는 있다
+                  <div className="flex flex-col gap-2.5">
+                    {zoneRows(chipKeys).map(g => (
+                      <div key={g.id}>
+                        <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
+                        <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, 'grid', i, g.id, g.dim))}</div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <div className="grid grid-flow-col gap-1.5" style={{ gridTemplateRows: 'repeat(2, 56px)', gridAutoColumns: '54px' }}>
                     {chipKeys.map((k, i) => renderChip(k, 'grid', i))}
