@@ -11,6 +11,8 @@ import { useAutoSync, useLastSyncTime, useSyncStatus } from '@/hooks/useAutoSync
 import { useModal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import { useTranslation } from 'react-i18next'
+import SexToggle from '@/components/ui/SexToggle'
+import { useCharSex } from '@/hooks/useCharSex'
 
 import { SUPPORTED_LANGUAGES } from '@/i18n'
 
@@ -28,6 +30,7 @@ export default function Settings() {
   const [hideCounts, setHideCounts] = useState(localStorage.getItem('sp_hide_counts') === '1')
   const [reminder, setReminder] = useState(reminderOn())
   const [easy, setEasy] = useState(isEasy())
+  const [sex, setSex] = useCharSex()
   const toggleMode = () => { const next = !easy; setMode(next ? 'easy' : 'pro'); setEasy(next) }
   const toggleReminder = async () => {
     const next = !reminder
@@ -142,8 +145,11 @@ export default function Settings() {
         desc={t('settings.reminderDesc')}
         value={reminder}
         onChange={toggleReminder}
-        last
       />
+      <div className="flex items-center justify-between py-3.5">
+        <span className="text-[15px] text-warm-900 dark:text-warm-100">{t('settings.charSex')}</span>
+        <SexToggle sex={sex} onChange={setSex} screen="settings" />
+      </div>
 
       {/* 데이터 */}
       {user && (

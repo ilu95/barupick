@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, RotateCcw, X, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import SexToggle from '@/components/ui/SexToggle'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { MOOD_GROUPS, STYLE_ICONS } from '@/lib/styles'
-import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT, type CharScene } from '@/lib/char/map'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, DEFAULT_BOTTOM, DEFAULT_SHOE, DEFAULT_SCARF, DEFAULT_HAT, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { typesFor, HAT_NAMES } from '@/lib/builderSlots'
 import { PLATE_TO_ITEM, plateName as plateNameOf, TEMPLATES, STYLE_KEY, PARTS } from '@/lib/outfits'
 import { useRecommend, type ComboResult } from '@/hooks/useRecommend'
@@ -81,12 +83,12 @@ const chipCls = (on: boolean) => `h-8 px-3 rounded-full text-[12.5px] font-semib
 function StepMood({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const sex = charSex()
+  const [sex, setSex] = useCharSex()
   const mood = rec.state.mood
   const group = mood ? MOOD_GROUPS[mood] : null
   return (
     <div className="pb-8">
-      <Head title={t('recommend.v2Title')} onBack={() => navigate('/home')} />
+      <Head title={t('recommend.v2Title')} onBack={() => navigate('/home')} right={<SexToggle sex={sex} onChange={setSex} screen="recommend" />} />
       <div className="px-4 text-[11.5px] text-warm-500 dark:text-warm-400">{t('recommend.v2Hint')}</div>
 
       <div className="px-4 mt-3 grid grid-cols-3 gap-2">
@@ -144,7 +146,7 @@ function StepMood({ rec }: { rec: RecHook }) {
 // ═══════════════════════════════════════
 function StepPick({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
-  const sex = charSex()
+  const [sex] = useCharSex()
   const plates = rec.state.plates
   const shown = (slot: Slot) => plates[slot] || (slot === 'top' ? DEFAULT_TOP : slot === 'bottom' ? DEFAULT_BOTTOM : slot === 'shoes' ? DEFAULT_SHOE : null)
   const scene = useMemo(() => {
@@ -206,7 +208,7 @@ function StepPick({ rec }: { rec: RecHook }) {
 function StepResults({ rec }: { rec: RecHook }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const sex = charSex()
+  const [sex] = useCharSex()
   const s = rec.state
   const results = s.results
   const [all, setAll] = useState(false)

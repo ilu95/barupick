@@ -6,7 +6,7 @@ import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { COLORS_60, getColorName } from '@/lib/colors'
-import { charSex } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { loadTaste, buildFall } from '@/lib/taste'
 import { fetchTasteShare, fetchCompares, recordCompare, compareTastes, sceneFromLook, profileOf, lookOf, isMyShare, myTasteShare, tasteUrl, gwa, type TasteShare, type TasteProfile, type TasteCompareRow, type Compare } from '@/lib/tasteShare'
 import { drawCompareCard } from '@/lib/tasteCard'
@@ -27,7 +27,7 @@ export default function TasteComparePage() {
   const navigate = useNavigate()
   const toast = useToast()
   const { user, profile: authProfile } = useAuth() as any
-  const sex = charSex()
+  const [sex] = useCharSex()
   const mine = useMemo(loadTaste, [])
   const [share, setShare] = useState<TasteShare | null>(null)
   const [state, setState] = useState<'loading' | 'intro' | 'compare' | 'owner' | 'error'>('loading')

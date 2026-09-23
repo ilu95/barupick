@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
-import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { useWeather, weatherEmoji } from '@/hooks/useWeather'
 import { PARTS, NEU, PLATE_TO_ITEM, STYLE_KEY, ranked, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Part } from '@/lib/outfits'
 import { trackEvent } from '@/lib/analytics'
@@ -34,7 +35,7 @@ export default function TodayPick() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { weather } = useWeather()
-  const sex = charSex()
+  const [sex] = useCharSex()
   const evening = new Date().getHours() >= 17 && !!weather?.tomorrow
   const temp = evening ? weather!.tomorrow!.feels : (weather?.feels ?? 21)
   const situ = defaultSitu()

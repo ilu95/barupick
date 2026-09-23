@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, RotateCcw, X, Check } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
-import { charSceneFromState, charSex, setCharSex, canWearTie } from '@/lib/char/map'
+import { charSceneFromState, canWearTie } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { PLATE_NAMES, PLATE_TO_ITEM } from '@/lib/outfits'
 import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, UI_OUTERNESS, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import { getFilledOutfit, type BuildHook } from '@/hooks/useBuild'
@@ -32,7 +33,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const ko = (i18n.language || 'ko').startsWith('ko')
-  const [sex, setSex] = useState<'m' | 'w'>(charSex)
+  const [sex, setSex] = useCharSex()
   const [focus, setFocus] = useState<RailSlot>(GUIDE[0])
   const [gi, setGi] = useState(0)                        // guided: 지금 몇 번째 자리인지
   const [acc, setAcc] = useState<AccSlot>('scarf')
@@ -184,7 +185,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const nextSlot = guided && gi < GUIDE.length - 1 ? GUIDE[gi + 1] : null
   const nextGuide = () => { if (!nextSlot) return; setGi(gi + 1); setFocus(nextSlot); setTab('rec'); trackEvent('guided_next', { from: focus, to: nextSlot }) }
 
-  const changeSex = (x: 'm' | 'w') => { setSex(x); setCharSex(x); const h = HAIR[x][0].id; build.setHair(h, s.hairColor || HAIR_COLORS[0].hex) }
+  const changeSex = (x: 'm' | 'w') => { setSex(x); const h = HAIR[x][0].id; build.setHair(h, s.hairColor || HAIR_COLORS[0].hex) }
 
   // 칩: 왼쪽 후보색, 오른쪽 40% 이웃 자리 메인색(반원). 내 옷 👕 · 취향 ♥ 배지
   const neighborHex = focus === 'hair' ? null : neighborKeyFor(colorSlot)
