@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, RefreshCw, Thermometer, ChevronRight } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import SexToggle from '@/components/ui/SexToggle'
 import { COLORS_60, getColorName } from '@/lib/colors'
-import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { useWeather, weatherEmoji, feelsAt, codeAt, dayRange, isGood, permissionState } from '@/hooks/useWeather'
 import { tempOf, nextTemp } from '@/hooks/useTemp'
 import { SITU, PARTS, ranked, alternatives, reasons, plateName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
@@ -36,7 +38,7 @@ export default function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { weather, status, denied, refresh } = useWeather({ auto: false })
-  const sex = charSex()
+  const [sex, setSex] = useCharSex()
   const easy = isEasy()
   const taste = useMemo(loadTaste, [])
   const lastVote = useMemo(() => myVotes()[0] || null, [])
@@ -158,8 +160,9 @@ export default function Home() {
         {timeChips.map(c => <button key={c.key} onClick={() => selectHour(c.hour)} className={chip(hour === c.hour)}>{t(`home.when.${c.key}`)}</button>)}
       </div>
       {range && range.hi - range.lo >= 5 && <div className="text-[11px] text-warm-500 mb-1.5">{t('home.when.range', { lo: range.lo, hi: range.hi })}</div>}
-      <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mb-2">
+      <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] -mx-5 px-5 mb-2">
         {SITU.map(s => <button key={s.id} onClick={() => setSitu(s.id)} className={chip(situ === s.id)}>{t('outfit.situ.' + s.id)}</button>)}
+        <div className="ml-auto flex-none"><SexToggle sex={sex} onChange={setSex} screen="home" /></div>
       </div>
       {!weather && denied && <button onClick={() => refresh()} className="text-[11px] text-warm-500 underline mb-1">{t('home.easy.allowLocation')}</button>}
 

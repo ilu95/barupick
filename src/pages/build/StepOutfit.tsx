@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ThumbsUp, ThumbsDown, ArrowRight, RotateCcw, ChevronDown, ChevronUp, X, Thermometer } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
-import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { useWeather } from '@/hooks/useWeather'
 import type { BuildHook } from '@/hooks/useBuild'
 import { useToast } from '@/components/ui/Toast'
@@ -34,7 +35,7 @@ export default function StepOutfit({ build }: { build: BuildHook }) {
   const toast = useToast()
   const navigate = useNavigate()
   const { weather } = useWeather()
-  const sex = charSex()
+  const [sex] = useCharSex()
   const taste = useMemo(loadTaste, [])
 
   const [situ, setSitu] = useState<Situ>(defaultSitu)

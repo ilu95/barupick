@@ -329,7 +329,8 @@
     "reminderDesc": "Only on days the weather changes (5°+ or rain): tomorrow's outfit",
     "reminderDenied": "Notifications are not allowed. Enable them in device settings",
     "modeEasy": "Pick-for-me mode",
-    "modeEasyDesc": "On: home is one outfit. Off: the full workbench"
+    "modeEasyDesc": "On: home is one outfit. Off: the full workbench",
+    "charSex": "Character"
   },
   "feedbackModal": {
     "title": "Send Feedback",

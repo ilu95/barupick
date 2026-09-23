@@ -329,7 +329,8 @@
     "reminderDesc": "날씨가 바뀌는 날(기온 5° 이상·비)에만 내일의 한 벌을 알려요",
     "reminderDenied": "알림 권한이 없어요. 기기 설정에서 허용해 주세요",
     "modeEasy": "골라 주는 모드",
-    "modeEasyDesc": "켜면 홈이 곧 한 벌. 끄면 작업대(옷 84종·색 167개)가 열려요"
+    "modeEasyDesc": "켜면 홈이 곧 한 벌. 끄면 작업대(옷 84종·색 167개)가 열려요",
+    "charSex": "캐릭터 성별"
   },
   "feedbackModal": {
     "title": "피드백 보내기",

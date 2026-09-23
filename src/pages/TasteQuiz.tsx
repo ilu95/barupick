@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, Share, RotateCcw, ChevronDown, X, Users, Link2 } from 'lucide-react'
 import CharacterCanvas, { bootCharacter } from '@/components/mannequin/CharacterCanvas'
 import * as R from '@/lib/char/render3'
-import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { COLORS_60, getColorName } from '@/lib/colors'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
@@ -30,7 +31,7 @@ export default function TasteQuiz() {
   const [sp] = useSearchParams()
   const withCode = sp.get('with')           // 친구 링크(/t/코드)에서 온 사람 — 끝나면 비교로
   const { user, profile: authProfile } = useAuth() as any
-  const sex = charSex()
+  const [sex] = useCharSex()
   const ko = isKo(i18n.language)
 
   const [i, setI] = useState(0)

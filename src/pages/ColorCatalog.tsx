@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Pin, X } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import SexToggle from '@/components/ui/SexToggle'
 import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
-import { charSex, charSceneFromState } from '@/lib/char/map'
+import { charSceneFromState } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { uiSlotOf, typesFor } from '@/lib/builderSlots'
 import { PARTS, SITU, TEMPLATES, partsOf, plateName, scoreOf, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { pickPayload } from '@/lib/pickPayload'
@@ -63,7 +65,7 @@ interface Card { c: ComboCard; full: Record<string, string>; hard: boolean }
 export default function ColorCatalog() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const sex = charSex()
+  const [sex, setSex] = useCharSex()
   const [sp, setSp] = useSearchParams()
   const [sheet, setSheet] = useState<LockSlot | null>(null)
   const [open, setOpen] = useState<Card | null>(null)
@@ -203,6 +205,7 @@ export default function ColorCatalog() {
           <div className="text-[10.5px] font-semibold text-warm-500 leading-none">{t('catalog.base')}</div>
           <div className="text-[13px] font-bold text-warm-900 dark:text-warm-100 leading-tight mt-1 truncate">{baseName}</div>
         </div>
+        <SexToggle sex={sex} onChange={setSex} screen="catalog" />
         <button onClick={() => navigate(-1)} className="flex-none text-[11.5px] font-semibold text-warm-500 underline underline-offset-2">{t('catalog.changeBase')}</button>
       </div>
 

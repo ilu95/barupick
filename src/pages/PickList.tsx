@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Thermometer, X } from 'lucide-react'
 import CharacterCanvas from '@/components/mannequin/CharacterCanvas'
+import SexToggle from '@/components/ui/SexToggle'
 import { COLORS_60, getColorName } from '@/lib/colors'
-import { charSex, DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { DEFAULT_HAIR, DEFAULT_HAIR_COLOR, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { useWeather } from '@/hooks/useWeather'
 import { SITU, PARTS, STYLE_KEY, ranked, reasons, plateName, styleName, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { STYLE_GUIDE, MOOD_GROUPS } from '@/lib/styles'
@@ -33,7 +35,7 @@ export default function PickList() {
   const style = rawStyle && STYLE_GUIDE[rawStyle] ? rawStyle : null
   const kind = style ? 'style' : (rawKind && KINDS[rawKind] ? rawKind : 'layered')
   const { weather } = useWeather()
-  const sex = charSex()
+  const [sex, setSex] = useCharSex()
   const [situ, setSitu] = useState<Situ>(defaultSitu)
   const [tempOverride, setTempOverride] = useState<number | null>(null)
   /** 고른 조합 — 시트를 띄우고 두 갈래 중 하나를 기다린다 */
@@ -107,6 +109,7 @@ export default function PickList() {
       <div className="flex items-center gap-2 mb-1">
         <button onClick={() => navigate(-1)} aria-label={t('common.back')} className="w-9 h-9 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 flex items-center justify-center active:scale-90"><ArrowLeft size={16} /></button>
         <h1 className="font-display text-[20px] font-bold tracking-tight text-warm-900 dark:text-warm-100 flex-1">{title}</h1>
+        <SexToggle sex={sex} onChange={setSex} screen="picks" />
         <button onClick={cycleTemp} className="h-8 px-2.5 rounded-full bg-white dark:bg-warm-800 border border-warm-300 dark:border-warm-600 text-[12px] font-bold text-warm-800 dark:text-warm-200 flex items-center gap-1 active:scale-95"><Thermometer size={13} />{temp}°</button>
       </div>
       <p className="text-[12.5px] text-warm-600 dark:text-warm-400 mb-2">{subtitle}</p>

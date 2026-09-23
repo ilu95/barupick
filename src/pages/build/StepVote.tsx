@@ -7,7 +7,8 @@ import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useWeather } from '@/hooks/useWeather'
 import { COLORS_60, getColorName } from '@/lib/colors'
-import { charSceneFromState, charSex, DEFAULT_SCARF, type CharScene } from '@/lib/char/map'
+import { charSceneFromState, DEFAULT_SCARF, type CharScene } from '@/lib/char/map'
+import { useCharSex } from '@/hooks/useCharSex'
 import { uiSlotOf, layerOf, HAT_NAMES, type UpperSlot } from '@/lib/builderSlots'
 import { PARTS, ranked, alternatives, loadPrefs, loadRecent, plateName, type Part, type Situ, type Ctx } from '@/lib/outfits'
 import { ITEMS_CATALOG } from '@/lib/styles'
@@ -57,7 +58,7 @@ export default function StepVote({ build }: { build: BuildHook }) {
   const { user } = useAuth() as any
   const { weather } = useWeather()
   const s = build.state
-  const sex = charSex()
+  const [sex] = useCharSex()
   const score = build.getScore()
   const hasNow = s.upper.length > 0   // 1단계 도구 줄에서 바로 오면 지금 코디가 없다
   const [sel, setSel] = useState<string[]>(hasNow ? ['now'] : [])
