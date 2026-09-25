@@ -8,7 +8,7 @@
 // ================================================================
 import { getSlotKey, sortUpper, type UpperLayer, type SlotKey } from '@/hooks/useBuild'
 import { profile } from '@/lib/profile'
-import { PLATE_SLOT } from '@/lib/outfits'
+import { PLATE_SLOT, TIE_TOPS } from '@/lib/outfits'
 import { COLORS_60 } from '@/lib/colors'
 
 export type CharSlot = 'inner' | 'mid1' | 'mid2' | 'outer'
@@ -63,16 +63,13 @@ export const DEFAULT_TIE = '59_tie'
 export const DEFAULT_HAIR: Record<'m' | 'w', string> = { m: 'h1_twoblock', w: 'hf5_bob' }
 export const DEFAULT_HAIR_COLOR = '#2B2320'
 
-/** mid1 칸에서 넥타이와 짝지을 수 있는 셔츠 판 (10_shirt_open 은 mid2 라 제외) */
-const SHIRT_MID1 = new Set(['08_shirt_closed', '09_shirt_short'])
-
-/** 상체 레이어 중 mid1 칸에 셔츠가 있어야 넥타이를 그릴 수 있다 */
+/** 상체 레이어 중 mid1 칸에 셔츠가 있어야 넥타이를 그릴 수 있다 (TIE_TOPS: src/lib/outfits.ts) */
 export function canWearTie(state: { upper: UpperLayer[] }): boolean {
   const sorted = sortUpper(state.upper)
   return sorted.some((l, i) => {
     const appSlot = getSlotKey(i, sorted.length, l)
     const plate = l.plate || defaultPlateFor(l.itemId, appSlot === 'hidden' ? 'top' : appSlot)
-    return !!plate && PLATE_SLOT[plate] === 'mid1' && SHIRT_MID1.has(plate)
+    return !!plate && PLATE_SLOT[plate] === 'mid1' && TIE_TOPS.has(plate)
   })
 }
 
