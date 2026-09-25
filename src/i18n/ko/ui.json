@@ -1964,6 +1964,7 @@
     "sortRec": "어울리는 순",
     "sortBright": "밝기순",
     "legend": "● 추천 · △ 주의",
+    "legendAcc": "△ 주의",
     "mineTab": "내 옷장",
     "moveChip": "{{slot}} → {{color}} · {{score}}점",
     "combos": {

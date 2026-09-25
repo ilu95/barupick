@@ -8,7 +8,7 @@ import { COLORS_60, COLOR_TABS, getColorName } from '@/lib/colors'
 import { charSceneFromState } from '@/lib/char/map'
 import { useCharSex } from '@/hooks/useCharSex'
 import { uiSlotOf, typesFor } from '@/lib/builderSlots'
-import { PARTS, SITU, TEMPLATES, partsOf, plateName, scoreOf, loadPrefs, loadRecent, defaultSitu, type Ctx, type Entry, type Situ } from '@/lib/outfits'
+import { PARTS, SITU, TEMPLATES, partsOf, plateName, scoreOf, loadPrefs, loadRecent, defaultSitu, canTie, type Ctx, type Entry, type Situ } from '@/lib/outfits'
 import { pickPayload } from '@/lib/pickPayload'
 import { initialState, outfitToState, engineInputOf, type BuildState } from '@/hooks/useBuild'
 import { catalogFor, scoreOutfit, type ComboCard, type EngineInput } from '@/lib/engine'
@@ -25,8 +25,8 @@ import { trackEvent } from '@/lib/analytics'
 
 /** 자물쇠를 걸 수 있는 조합 자리 — 그 조합에 실제로 있는 것만 칩으로 뜬다 */
 const COMBO_SLOTS = ['outer', 'middleware', 'top', 'bottom', 'shoes'] as const
-/** 잠가야만 생기는 자리 — 자물쇠를 풀면 코디에서 사라진다 */
-const ACC_SLOTS = ['hat', 'scarf'] as const
+/** 잠가야만 생기는 자리 — 자물쇠를 풀면 코디에서 사라진다. 넥타이는 셔츠 조합에서만 뜨고, 조합에 원래 있으면 색만 바뀐다 */
+const ACC_SLOTS = ['hat', 'scarf', 'tie'] as const
 const LOCK_SLOTS = [...COMBO_SLOTS, ...ACC_SLOTS]
 type LockSlot = typeof LOCK_SLOTS[number]
 
@@ -78,24 +78,29 @@ export default function ColorCatalog() {
   const lockRaw = sp.get('lock')
   const asked = useMemo(() => parseLocks(lockRaw), [lockRaw])
 
-  // 잠근 모자·머플러는 조합에 얹어서 입힌다 (안 잠갔으면 null — 조합에 원래 없다)
+  const parts = useMemo(() => tpl ? partsOf(tpl, sex) : null, [tpl, sex])
+  const tieOk = !!parts && canTie(parts)
+
+  // 잠근 모자·머플러는 조합에 얹어서 입힌다 (안 잠갔으면 null — 조합에 원래 없다).
+  // 넥타이는 잠갔을 때만 키를 넣는다 — 안 잠근 셔츠 조합의 원래 넥타이를 null 로 덮지 않게
   const accs = useMemo(() => ({
     hat: asked.hat ? { plate: typesFor('hat', sex)[0], colorKey: asked.hat } : null,
     scarf: asked.scarf ? { plate: typesFor('scarf', sex)[0], colorKey: asked.scarf } : null,
-  }), [asked.hat, asked.scarf, sex])
+    ...(asked.tie && tieOk ? { tie: { plate: parts!.tie || typesFor('tie', sex)[0], colorKey: asked.tie } } : {}),
+  }), [asked.hat, asked.scarf, asked.tie, tieOk, parts, sex])
 
   // ── 바탕은 유저가 고른 조합 한 벌. 카탈로그는 그 한 벌의 색만 펼친다 ──
   const base = useMemo<Base | null>(() => {
-    if (!tpl) return null
-    const p = partsOf(tpl, sex)
+    if (!tpl || !parts) return null
+    const p = parts
     const ctx: Ctx = { sex, situ, temp: CTX_TEMP, prefs: loadPrefs(), recent: loadRecent() }
     const e: Entry = { c: tpl, p, s: scoreOf(tpl, p, ctx) }
     const state = outfitToState(initialState('coord'), { ...pickPayload(e, situ, 'result'), ...accs })
     return { e, state, input: engineInputOf(state) }
-  }, [tpl, sex, situ, accs])
+  }, [tpl, parts, sex, situ, accs])
 
-  // 자물쇠 줄 = 이 조합에 있는 자리 + 모자·머플러. 조합에 없는 자리의 자물쇠는 버린다
-  const lockSlots = useMemo(() => [...COMBO_SLOTS.filter(s => base?.input.outfit[s]), ...ACC_SLOTS] as LockSlot[], [base])
+  // 자물쇠 줄 = 이 조합에 있는 자리 + 모자·머플러 (+ 셔츠면 넥타이). 조합에 없는 자리의 자물쇠는 버린다
+  const lockSlots = useMemo(() => [...COMBO_SLOTS.filter(s => base?.input.outfit[s]), ...ACC_SLOTS.filter(s => s !== 'tie' || tieOk)] as LockSlot[], [base, tieOk])
   const locks = useMemo(() => Object.fromEntries(lockSlots.filter(s => asked[s]).map(s => [s, asked[s]!])) as Locks, [lockSlots, asked])
   const lockedSlots = useMemo(() => lockSlots.filter(s => locks[s]), [lockSlots, locks])
   const lockKey = useMemo(() => formatLocks(locks), [locks])
@@ -219,7 +224,7 @@ export default function ColorCatalog() {
               {locks[s] && <Pin size={11} className={COLORS_60[locks[s]!]?.hcl[2] > 60 ? 'text-warm-900' : 'text-white'} />}
             </span>
             <span className="text-[10.5px] font-bold text-warm-900 dark:text-warm-100 leading-none">{t('builder.slot.' + s)}</span>
-            <span className="text-[9.5px] text-warm-500 leading-none truncate max-w-full">{locks[s] ? getColorName(locks[s]!) : t(ACC_SLOTS.includes(s as typeof ACC_SLOTS[number]) ? 'catalog.none' : 'catalog.any')}</span>
+            <span className="text-[9.5px] text-warm-500 leading-none truncate max-w-full">{locks[s] ? getColorName(locks[s]!) : t(base.input.outfit[s] ? 'catalog.any' : 'catalog.none')}</span>
           </button>
         ))}
       </div>

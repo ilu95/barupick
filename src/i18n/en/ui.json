@@ -1964,6 +1964,7 @@
     "sortRec": "Best match",
     "sortBright": "By brightness",
     "legend": "● recommended · △ caution",
+    "legendAcc": "△ caution",
     "mineTab": "My closet",
     "moveChip": "{{slot}} → {{color}} · {{score}}pt",
     "combos": {
