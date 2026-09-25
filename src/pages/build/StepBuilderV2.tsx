@@ -10,7 +10,7 @@ import { PLATE_NAMES, PLATE_TO_ITEM } from '@/lib/outfits'
 import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, UI_OUTERNESS, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import { getFilledOutfit, engineInputOf, type BuildHook } from '@/hooks/useBuild'
 import { basisOf, colorGuide, ACC_SLOTS } from '@/lib/guide'
-import type { ComboCard } from '@/lib/engine'
+import { combosFor, type ComboCard } from '@/lib/engine'
 import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuide } from '@/lib/analytics'
 import { useWardrobe } from '@/hooks/useWardrobe'
 import { loadTaste } from '@/lib/taste'
@@ -39,14 +39,9 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const [gi, setGi] = useState(0)                        // guided: 지금 몇 번째 자리인지
   const [acc, setAcc] = useState<AccSlot>('scarf')
   const [tab, setTab] = useState<string>('rec')
-  const [touched, setTouched] = useState<Set<string>>(new Set())
+  // 고른 자리만 입힌다 — 마운트 시점에 이미 색이 있는 자리(1단계 조합 등)는 고른 것으로 친다
+  const [touched, setTouched] = useState<Set<string>>(() => new Set(Object.keys(engineInputOf(build.state).outfit)))
   const s = build.state
-
-  // 하의·신발은 항상 입고 시작한다 (판은 1단계 것, 없으면 기본)
-  useEffect(() => {
-    if (!s.bottomColor) build.setSlotColor('bottom', DEFAULT_COLOR.bottom)
-    if (!s.shoesColor) build.setSlotColor('shoes', DEFAULT_COLOR.shoes)
-  }, [])
 
   const scene = useMemo(() => charSceneFromState(s, sex), [s, sex])
   const score = build.getScore()
@@ -172,7 +167,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const tag = score > 0 ? (head && head.length <= 14 ? head : t('build.scoreGrade.' + gradeKey)) : ''
   const reasonRaw = (bad || good)?.txt || ''
   const reason = reasonRaw && reasonRaw !== tag ? reasonRaw : ''
-  const complete = s.upper.length >= 1 && !!s.bottomColor && !!s.shoesColor
+  const complete = touched.size >= 2
 
   // 발: 한 수 (점수 72 미만 + 이득 4 이상일 때만)
   const toast = useToast()
@@ -253,7 +248,15 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const wardrobeBySlot = useMemo(() => Object.fromEntries(
     (['outer', 'middleware', 'top', 'bottom', 'shoes', 'scarf', 'hat'] as const).map(cat => [cat, Array.from(new Set(wardrobe.getItems(cat).map(i => i.color)))])
   ), [wardrobe.items])
-  const combos = useMemo(() => guided ? [] : build.getCombos({ fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) }), [guided, s, touched, wardrobeBySlot])
+  // 카드용 입력만 하의·신발을 숨은 기본색으로 채운다(고른 자리는 아니다) — 상의를 하나도 안 골랐으면 카드를 안 띄운다
+  const combos = useMemo(() => {
+    if (guided || s.upper.length === 0) return []
+    const ei = engineInputOf(s)
+    const outfit = { ...ei.outfit }
+    if (!outfit.bottom) outfit.bottom = DEFAULT_COLOR.bottom
+    if (!outfit.shoes) outfit.shoes = DEFAULT_COLOR.shoes
+    return combosFor({ ...ei, outfit }, { fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) })
+  }, [guided, s, touched, wardrobeBySlot])
   useEffect(() => { if (combos.length) trackEvent('combo_view', { n: combos.length }) }, [combos.length])
   const filled = getFilledOutfit(s)
   // 기준 문장에 들어갈 "색 자리" 목록 — 구역 계산에 넣은 basisInput 과 같은 자리. 지금 보고 있는 자리는 뺀다
@@ -271,6 +274,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   }, sex)
   const applyCombo = (c: ComboCard) => {
     build.applyColors(c.outfit)
+    setTouched(prev => { const n = new Set(prev); for (const slot of Object.keys(c.outfit)) n.add(slot); return n })
     trackEvent('combo_pick', { idx: combos.indexOf(c), kind: c.kind, total: c.total, mine: c.mine })
   }
 
@@ -329,12 +333,14 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
         <div className="grid grid-cols-2 gap-1.5 px-1.5 pb-2 content-end">
           {RAIL.map(r => {
             const on = focus === r.id, w = worn(r.id), sw = colorOf(r.id), pin = pinned(r.id)
+            // 필수 자리(상의·하의·신발)인데 아직 안 고르면 — 아이콘은 그대로 두되 흐리게 + "미선택"
+            const unset = !r.optional && !w
             return (
               <button key={r.id} onClick={() => { setFocus(r.id); setTab('rec'); const k = GUIDE.indexOf(r.id); if (k >= 0) setGi(k) }}
                 className={`relative rounded-2xl flex flex-col items-center justify-center gap-0.5 py-1 border transition-all ${on ? 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 shadow-warm-sm text-warm-900 dark:text-warm-100' : 'border-transparent text-warm-500'}`} style={{ height: 66 }}>
-                <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-[20px] ${w ? (on ? 'bg-terra-100 dark:bg-terra-900/30' : 'bg-warm-200 dark:bg-warm-700') : 'border border-dashed border-warm-400 text-warm-400 text-[18px]'}`}>{w ? r.icon : '＋'}</span>
+                <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-[20px] ${w ? (on ? 'bg-terra-100 dark:bg-terra-900/30' : 'bg-warm-200 dark:bg-warm-700') : unset ? 'bg-warm-200 dark:bg-warm-700 opacity-50' : 'border border-dashed border-warm-400 text-warm-400 text-[18px]'}`}>{w || unset ? r.icon : '＋'}</span>
                 <span className="text-[10.5px] font-semibold leading-none">{t('builder.slot.' + r.id)}</span>
-                <span className="w-5 h-1 rounded-full" style={{ background: sw || 'transparent' }} />
+                {unset ? <span className="text-[8.5px] leading-none text-warm-400">{t('builder.unset')}</span> : <span className="w-5 h-1 rounded-full" style={{ background: sw || 'transparent' }} />}
                 {pin && <i className="absolute -top-1 -right-1 text-[10px] leading-none not-italic">📌</i>}
               </button>
             )
@@ -506,7 +512,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white/95 dark:bg-[#1C1917]/95 backdrop-blur-xl border-t border-warm-300 dark:border-warm-700 px-4 py-2.5 z-50 flex items-center gap-3" style={{ paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))' }}>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-1 text-[12px] text-warm-500">
-            <b className="text-[24px] font-extrabold text-warm-900 dark:text-warm-100 tracking-tight tabular-nums">{score > 0 ? score : '--'}</b>{t('builder.pt')}
+            <b className="text-[24px] font-extrabold text-warm-900 dark:text-warm-100 tracking-tight tabular-nums">{touched.size >= 2 ? score : '—'}</b>{touched.size >= 2 && t('builder.pt')}
             {tag && <span className="ml-1.5 text-[12px] font-semibold text-warm-700 dark:text-warm-300 truncate">{tag}</span>}
             {footerMove && (
               <button onClick={applyFooterMove} className="ml-1.5 flex-none text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-terra-100 text-terra-700 dark:bg-terra-900/30 dark:text-terra-300 truncate">
@@ -514,7 +520,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
               </button>
             )}
           </div>
-          {reason && <div className="text-[11px] text-warm-500 truncate">{reason}</div>}
+          {touched.size < 2 ? <div className="text-[11px] text-warm-500 truncate">{t('builder.scoreNeedsTwo')}</div> : reason && <div className="text-[11px] text-warm-500 truncate">{reason}</div>}
         </div>
         {nextSlot ? (
           <button onClick={nextGuide} disabled={!canTakeOff(focus) && !worn(focus)} className="flex-none h-11 px-4 rounded-full bg-warm-900 dark:bg-warm-100 text-white dark:text-warm-900 font-bold text-[13.5px] disabled:opacity-40 active:scale-[0.98]">{canTakeOff(focus) && !worn(focus) ? t('builder.guided.skip', { slot: t('builder.slot.' + nextSlot) }) : t('builder.guided.next', { slot: t('builder.slot.' + nextSlot) })} →</button>
