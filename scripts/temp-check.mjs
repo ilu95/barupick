@@ -19,7 +19,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = path.join(ROOT, 'node_modules/.cache/temp-check.bundle.mjs')
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
 await build({
-  stdin: { contents: `export { ranked, TEMPLATES, PARTS, partsOf, idealW, plateName, warmth, SITU } from './src/lib/outfits'`, resolveDir: ROOT, loader: 'ts' },
+  stdin: { contents: `export { ranked, TEMPLATES, PARTS, partsOf, idealW, plateName, warmth, SITU, canTie } from './src/lib/outfits'`, resolveDir: ROOT, loader: 'ts' },
   bundle: true, platform: 'node', format: 'esm', outfile: OUT, logLevel: 'error',
 })
 
@@ -33,7 +33,16 @@ globalThis.window = Object.assign(globalThis, { addEventListener: noop, removeEv
 globalThis.document = { documentElement: { lang: 'ko', setAttribute: noop, classList: { add: noop, remove: noop, toggle: noop } }, addEventListener: noop, removeEventListener: noop, createElement: () => ({ style: {}, setAttribute: noop }), body: { appendChild: noop } }
 globalThis.CustomEvent = class { constructor(t, o) { this.type = t; this.detail = o && o.detail } }
 
-const { ranked, TEMPLATES, PARTS, partsOf, idealW, plateName, warmth, SITU } = await import(pathToFileURL(OUT).href)
+const { ranked, TEMPLATES, PARTS, partsOf, idealW, plateName, warmth, SITU, canTie } = await import(pathToFileURL(OUT).href)
+
+/* 넥타이는 셔츠 위에만 — 조합표 자체에 니트+넥타이 같은 조합이 있으면 안 된다 */
+const tieBad = []
+for (const c of TEMPLATES) for (const sex of ['m', 'w']) {
+  const p = partsOf(c, sex)
+  if (p.tie && !canTie(p)) tieBad.push(`${c.id}(${sex}): ${p.top || '상의 없음'} + 넥타이`)
+}
+if (tieBad.length) { console.log(`\n❌ 넥타이 없는 셔츠 위 ${tieBad.length}건:\n${tieBad.map(l => '   ' + l).join('\n')}`); process.exit(1) }
+console.log(`\n✅ 넥타이 없는 셔츠 위 0건`)
 
 /* ── 기준표(나무위키·기상청 통용 기온별 옷차림) ── */
 const HOT = { // 그 구간에 "덥다"고 보는 판

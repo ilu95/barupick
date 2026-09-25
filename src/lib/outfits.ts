@@ -423,6 +423,10 @@ export const PLATE_SLOT: Record<string, string> = {
 
 export const FEMALE_ONLY = new Set<string>(["23_skirt_wrap", "24_skirt_pleat", "25_skirt_denim", "26_dress_shirt", "27_dress_knit", "34_skirt_knit", "46_knit_crop", "47_blouse", "48_skirt_mini", "49_skirt_long", "50_leggings", "51_dress_mini", "52_jumpsuit", "78_flats_ballet", "79_maryjane", "82_boots_long"])
 
+/** 넥타이를 맬 수 있는 상의(top) 판 — src/lib/char/map.ts 의 SHIRT_MID1 과 같은 값, 그쪽이 여기서 가져다 쓴다 */
+export const TIE_TOPS = new Set(['08_shirt_closed', '09_shirt_short'])
+export const canTie = (p: Parts) => !!p.top && TIE_TOPS.has(p.top)
+
 /** 격식도 1~5 */
 const F: Record<string, number> = {
   "19_blazer": 4,
@@ -2366,8 +2370,10 @@ export function neighbors(base: Entry, ctx: Ctx): Entry[] {
     if (k === 'top' && !nid) continue
     if (!nid && !p[k]) continue
     if (ctx.anchor && p[k] === ctx.anchor) continue
+    if (k === 'tie' && nid && !canTie(p)) continue
     const np: Parts = { ...p }; if (nid) np[k] = nid; else delete np[k]
     if (np.top && np.top === np.layer) continue
+    if (k === 'top' && np.tie && !canTie(np)) delete np.tie
     const c: Template = { id: base.c.id + '~' + k + '=' + (nid || 'none'), tag: base.c.tag, st: base.c.st, p: np, w: null, pal: { ...base.c.pal, ...(nid && !base.c.pal[k] ? { [k]: DEFPAL[k] } : {}) } }
     out.push({ c, p: np, s: scoreOf(base.c, np, ctx), chg: k, from: p[k], to: nid || undefined, gen: true })
   }
