@@ -1926,6 +1926,8 @@
     "noRec": "This combo already works. No color change makes it better",
     "pt": "pts",
     "done": "Done",
+    "unset": "Not set",
+    "scoreNeedsTwo": "Pick two pieces to see a score",
     "slot": {
       "hair": "Hair",
       "inner": "Inner",

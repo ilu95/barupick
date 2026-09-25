@@ -151,7 +151,7 @@ export function charSceneFromState(state: { upper: UpperLayer[]; bottomColor: st
     usedSlot.add(cs)
     items.push({ id: plate, color: hex })
   })
-  items.push({ id: state.bottomItem || DEFAULT_BOTTOM, color: (state.bottomColor && COLORS_60[state.bottomColor]?.hex) || '#1C1917' })
+  if (state.bottomColor && COLORS_60[state.bottomColor]) items.push({ id: state.bottomItem || DEFAULT_BOTTOM, color: COLORS_60[state.bottomColor].hex })
   if (state.shoesColor && COLORS_60[state.shoesColor]) items.push({ id: state.shoesItem || DEFAULT_SHOE, color: COLORS_60[state.shoesColor].hex })
   if (state.scarfColor && COLORS_60[state.scarfColor]) items.push({ id: state.scarfItem || DEFAULT_SCARF, color: COLORS_60[state.scarfColor].hex })
   if (state.tieColor && COLORS_60[state.tieColor] && canWearTie(state)) items.push({ id: state.tieItem || DEFAULT_TIE, color: COLORS_60[state.tieColor].hex })
