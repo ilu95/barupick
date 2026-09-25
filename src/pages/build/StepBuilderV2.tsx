@@ -8,7 +8,8 @@ import { charSceneFromState, canWearTie } from '@/lib/char/map'
 import { useCharSex } from '@/hooks/useCharSex'
 import { PLATE_NAMES, PLATE_TO_ITEM } from '@/lib/outfits'
 import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, UI_OUTERNESS, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
-import { getFilledOutfit, type BuildHook } from '@/hooks/useBuild'
+import { getFilledOutfit, engineInputOf, type BuildHook } from '@/hooks/useBuild'
+import { basisOf, colorGuide, ACC_SLOTS } from '@/lib/guide'
 import type { ComboCard } from '@/lib/engine'
 import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuide } from '@/lib/analytics'
 import { useWardrobe } from '@/hooks/useWardrobe'
@@ -131,8 +132,12 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     build.setSlotColor(colorSlot, key)
   }
 
-  // 안내 층: 이 자리의 세 묶음(무난/어울려요/포인트) / ● / △
-  const guide = useMemo(() => focus === 'hair' ? null : build.getGuide(colorSlot), [colorSlot, s])
+  // 안내 층: 구역 / ● / △. 구역·기준 문장·● 는 고른(touched) 자리 + 지금 자리만 보고 계산한다 —
+  // 기본색으로 채워진 자리를 넣으면 "레드 상의에 어울리는" 이라 쓰고 차콜 하의·블랙 신발까지 맞춰 계산하게 된다.
+  // 총점·결과·조합 카드는 그대로 전부(engineInput) 본다. 기준이 없으면 지금처럼 전부로 ● 만.
+  const basisInput = useMemo(() => focus === 'hair' ? null : basisOf(engineInputOf(s), touched, colorSlot), [colorSlot, s, touched])
+  const guide = useMemo(() => focus === 'hair' ? null : basisInput ? colorGuide(basisInput, colorSlot) : build.getGuide(colorSlot), [colorSlot, s, basisInput])
+  const isAcc = ACC_SLOTS.has(colorSlot)
   useEffect(() => { if (focus !== 'hair') trackColorTab('build', tab, tab === 'rec' ? (guide?.rec.length || 0) : (COLOR_TABS.find(x => x.id === tab)?.keys.length || 0)) }, [tab, focus])
 
   // 내 옷 색 (sp_wardrobe): 지금 자리 카테고리 색 + 취향 팔레트
@@ -199,7 +204,8 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const chipBg = (hex: string) => neighborHex && neighborHex !== hex ? `linear-gradient(to right, ${hex} 0 60%, ${neighborHex} 60% 100%)` : hex
   const renderChip = (k: string, src: 'grid' | 'rec' | 'mine', pos: number, group?: string, dim?: boolean) => {
     const c = COLORS_60[k]; if (!c) return null
-    const on = cur === k; const mark = src === 'grid' ? guide?.marks[k] : undefined
+    const on = cur === k; const m = src === 'grid' || group === 'flat' ? guide?.marks[k] : undefined
+    const mark = isAcc && m === 'rec' ? undefined : m   // 액세서리는 △ 만
     return (
       <button key={(group || src) + '-' + k} onClick={() => pickColor(k, src, pos)} className={`w-[54px] flex-none flex flex-col items-center gap-1 active:scale-95 transition-transform ${dim && !on ? 'opacity-60' : ''}`}>
         <span className="relative w-9 h-9 rounded-full border-2 border-white flex items-center justify-center" style={{ background: chipBg(c.hex), boxShadow: on ? '0 0 0 2px #1C1917' : '0 0 0 1px rgba(28,25,23,.15)' }}>
@@ -213,21 +219,23 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
       </button>
     )
   }
-  // 네 구역 — 색 하나라도 고르면(touched) 탭 안의 색을 찰떡 궁합 / 무난한 조합 / 고수의 영역 / 피하는 게 좋아요 로 나눈다.
-  // 기준이 없으면(touched 없음) 나누지 않는다 — 기준 없이 나누면 거짓말이다.
+  // 네 구역 — 지금 자리 말고 고른 자리가 있으면 탭 안의 색을 찰떡 궁합 / 무난한 조합 / 고수의 영역 / 피하는 게 좋아요 로 나눈다.
+  // 기준이 없으면 나누지 않는다 — 기준 없이 나누면 거짓말이다.
+  // 액세서리는 면적이 작아 총점이 안 움직인다. 액센트 규칙(v8.6, 실제 룩 검증)이 들어오면 구역을 켠다.
   const ZONES = ['match', 'safe', 'point', 'avoid'] as const
-  const zoned = touched.size > 0 && !!guide
-  const zoneRows = (keys: string[], take = 0) => ZONES
-    .map(z => { const ks = keys.filter(k => guide?.zones[k] === z); return { id: z, label: t('builder.sec.' + z), keys: take ? ks.slice(0, take) : ks, dim: z === 'avoid' } })
+  const zoned = !!basisInput && !!guide && !isAcc
+  const zoneRows = (keys: string[], take?: Partial<Record<typeof ZONES[number], number>>) => ZONES
+    .map(z => { const ks = keys.filter(k => guide?.zones[k] === z); return { id: z, label: t('builder.sec.' + z), keys: take ? ks.slice(0, take[z] || 0) : ks, dim: z === 'avoid' } })
     .filter(g => g.keys.length)
 
   // 퍼스널컬러 핵심색 추천 (guide.groups.mine = 엔진의 pcFace 그룹 — 옷장 "내 옷" 그룹과 이름이 겹쳐 UI id 는 'pc' 로 구분)
   const pcKeys = guide?.groups.mine || []
   const hasPersonalColor = !!profile.getPersonalColor()
-  // 추천 탭도 같은 네 구역으로 — 계열 가리지 않고 어울리는 순 상위 8개씩
-  const recRows = useMemo(() => guide
-    ? zoneRows(Object.keys(COLORS_60).sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999)), 8)
-    : [], [guide])
+  // 추천 탭도 같은 구역으로 — 계열 가리지 않고 어울리는 순 상위 찰떡 6 · 무난 6 · 고수 4 (피하는 색은 안 띄운다).
+  // 구역이 없으면(기준 없음·액세서리) 제목 없는 한 줄: 기준 없음은 ● 추천, 액세서리는 팔레트 그대로에 △ 만
+  const recRows = useMemo(() => !guide ? []
+    : zoned ? zoneRows(Object.keys(COLORS_60).sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999)), { match: 6, safe: 6, point: 4 })
+    : [{ id: 'flat', label: '', keys: isAcc ? Object.keys(COLORS_60) : guide.rec, dim: false }], [guide, zoned, isAcc])
   const groupRows: { id: string; label: string; keys: string[]; dim?: boolean }[] = guide ? [
     ...(pcKeys.length ? [{ id: 'pc', label: t('builder.group.pc'), keys: pcKeys }] : []),
     ...(mineKeys.length ? [{ id: 'mine', label: t('builder.group.mine'), keys: mineKeys }] : []),
@@ -248,8 +256,8 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const combos = useMemo(() => guided ? [] : build.getCombos({ fixed: touched, n: 6, wardrobe: wardrobeBySlot, taste: Array.from(tastePal) }), [guided, s, touched, wardrobeBySlot])
   useEffect(() => { if (combos.length) trackEvent('combo_view', { n: combos.length }) }, [combos.length])
   const filled = getFilledOutfit(s)
-  // 기준 문장에 들어갈 "색 자리" 목록. 지금 보고 있는 자리는 뺀다 — 그 자리가 기준일 수는 없다
-  const basisColors = Array.from(touched).filter(sl => sl !== colorSlot && keyOf(sl)).map(sl => getColorName(keyOf(sl)!) + ' ' + t('builder.slot.' + sl)).join(' · ')
+  // 기준 문장에 들어갈 "색 자리" 목록 — 구역 계산에 넣은 basisInput 과 같은 자리. 지금 보고 있는 자리는 뺀다
+  const basisColors = basisInput ? Object.keys(basisInput.outfit).filter(sl => sl !== colorSlot && keyOf(sl)).map(sl => getColorName(keyOf(sl)!) + ' ' + t('builder.slot.' + sl)).join(' · ') : ''
   const comboActive = (c: ComboCard) => Object.entries(c.outfit).every(([slot, key]) => filled[slot] === key)
   const activeCombo = combos.find(comboActive)
   const comboScene = (c: ComboCard) => charSceneFromState({
@@ -270,13 +278,19 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const previewCards = useMemo(() => {
     if (!guided || !guide) return []
     const cands: { key: string; kind: 'safe' | 'match' | 'point' }[] = []
+    if (zoned) {
+      // 카드 이름이 칩 구역과 같도록 구역마다 1위
+      const byDelta = Object.keys(COLORS_60).sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999))
+      for (const kind of ['safe', 'match', 'point'] as const) { const key = byDelta.find(k => guide.zones[k] === kind); if (key) cands.push({ key, kind }) }
+      return cands
+    }
     if (guide.groups.safe[0]) cands.push({ key: guide.groups.safe[0], kind: 'safe' })
     if (guide.groups.match[0]) cands.push({ key: guide.groups.match[0], kind: 'match' })
     const pointKey = guide.groups.point[0] || guide.groups.match[1]
     if (pointKey) cands.push({ key: pointKey, kind: 'point' })
     const seen = new Set<string>()
     return cands.filter(c => !seen.has(c.key) && seen.add(c.key))
-  }, [guided, guide])
+  }, [guided, guide, zoned])
   const previewScene = (key: string) => {
     if (focus === 'acc') return charSceneFromState({ ...s, scarfColor: acc === 'scarf' ? key : s.scarfColor, hatColor: acc === 'hat' ? key : s.hatColor, tieColor: acc === 'tie' ? key : s.tieColor }, sex)
     if (isUpper(focus)) {
@@ -342,7 +356,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
                       <CharacterCanvas {...previewScene(c.key)} width={72} style={{ contentVisibility: 'auto' } as React.CSSProperties} />
                     </span>
                     <span className="text-[11px] font-bold text-warm-900 dark:text-warm-100 truncate max-w-full">{getColorName(c.key)}</span>
-                    <span className="text-[9.5px] text-warm-500 truncate max-w-full">{t('builder.sec.' + c.kind)}</span>
+                    {!isAcc && <span className="text-[9.5px] text-warm-500 truncate max-w-full">{t('builder.sec.' + c.kind)}</span>}
                   </button>
                 )
               })}
@@ -428,14 +442,18 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
               {tab !== 'rec' && tab !== 'mine-all' && (
                 <button onClick={() => { const next = !sortBright; setSortBright(next); trackEvent('color_sort', { slot: colorSlot, bright: next }) }} className="flex-none ml-auto text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 whitespace-nowrap">{sortBright ? t('builder.sortRec') : t('builder.sortBright')}</button>
               )}
-              {tab !== 'rec' && tab !== 'mine-all' && <span className="flex-none text-[10px] text-warm-400 whitespace-nowrap">{t('builder.legend')}</span>}
+              {tab !== 'rec' && tab !== 'mine-all' && <span className="flex-none text-[10px] text-warm-400 whitespace-nowrap">{t(isAcc ? 'builder.legendAcc' : 'builder.legend')}</span>}
             </div>
 
             {tab === 'rec' ? (
               <div className="mt-2 px-3 flex flex-col gap-2.5">
                 {groupRows.length === 0 ? (
                   <div className="text-[11px] text-warm-500 px-1 py-3">{t('builder.noRec')}</div>
-                ) : groupRows.map(g => (
+                ) : groupRows.map(g => g.id === 'flat' ? (
+                  <div key={g.id} className="grid grid-flow-col gap-1.5 overflow-x-auto [scrollbar-width:none]" style={{ gridTemplateRows: g.keys.length > 8 ? 'repeat(2, 56px)' : '56px', gridAutoColumns: '54px' }}>
+                    {g.keys.map((k, i) => renderChip(k, 'rec', i, g.id))}
+                  </div>
+                ) : (
                   <div key={g.id}>
                     <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
                     <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, g.id === 'mine' ? 'mine' : 'rec', i, g.id, g.dim))}</div>
