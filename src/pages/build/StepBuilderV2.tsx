@@ -39,6 +39,13 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   const [gi, setGi] = useState(0)                        // guided: 지금 몇 번째 자리인지
   const [acc, setAcc] = useState<AccSlot>('scarf')
   const [tab, setTab] = useState<string>('rec')
+  // 무대 sticky: 스크롤 40px 넘으면 줄이고, 10px 아래로 돌아와야 다시 키운다 (덜컥임 방지)
+  const [compact, setCompact] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setCompact(c => window.scrollY > (c ? 10 : 40))
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   // 고른 자리만 입힌다 — 마운트 시점에 이미 색이 있는 자리(1단계 조합 등)는 고른 것으로 친다
   const [touched, setTouched] = useState<Set<string>>(() => new Set(Object.keys(engineInputOf(build.state).outfit)))
   const s = build.state
@@ -324,11 +331,12 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
         </div>
       </div>
 
-      {/* 무대: 캐릭터 + 레일 (높이 고정) */}
-      <div className="grid grid-cols-[1fr_128px]" style={{ height: 300 }}>
+      {/* 무대: 캐릭터 + 레일. 화면 위에 붙어 스크롤해도 칩 선택 결과가 바로 보인다.
+          top 은 AppHeader(sticky, z-100, 높이 60px + 안전영역) 바로 아래 — 겹치면 안 보인다 */}
+      <div className="sticky z-30 grid grid-cols-[1fr_128px] bg-[#F7F5F2] border-b border-warm-300 dark:border-warm-700" style={{ top: 'calc(60px + env(safe-area-inset-top, 0px))', height: compact ? 190 : 300, transition: 'height .2s' }}>
         <div className="relative flex items-end justify-center pb-2 overflow-hidden">
           <div className="absolute left-1/2 bottom-3 -translate-x-1/2 w-28 h-3 rounded-full" style={{ background: 'radial-gradient(ellipse at center, rgba(28,25,23,.16), rgba(28,25,23,0) 70%)' }} />
-          <CharacterCanvas {...scene} width={208} />
+          <CharacterCanvas {...scene} width={compact ? 130 : 208} />
         </div>
         <div className="grid grid-cols-2 gap-1.5 px-1.5 pb-2 content-end">
           {RAIL.map(r => {
@@ -337,10 +345,10 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
             const unset = !r.optional && !w
             return (
               <button key={r.id} onClick={() => { setFocus(r.id); setTab('rec'); const k = GUIDE.indexOf(r.id); if (k >= 0) setGi(k) }}
-                className={`relative rounded-2xl flex flex-col items-center justify-center gap-0.5 py-1 border transition-all ${on ? 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 shadow-warm-sm text-warm-900 dark:text-warm-100' : 'border-transparent text-warm-500'}`} style={{ height: 66 }}>
-                <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-[20px] ${w ? (on ? 'bg-terra-100 dark:bg-terra-900/30' : 'bg-warm-200 dark:bg-warm-700') : unset ? 'bg-warm-200 dark:bg-warm-700 opacity-50' : 'border border-dashed border-warm-400 text-warm-400 text-[18px]'}`}>{w || unset ? r.icon : '＋'}</span>
-                <span className="text-[10.5px] font-semibold leading-none">{t('builder.slot.' + r.id)}</span>
-                {unset ? <span className="text-[8.5px] leading-none text-warm-400">{t('builder.unset')}</span> : <span className="w-5 h-1 rounded-full" style={{ background: sw || 'transparent' }} />}
+                className={`relative rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition-all ${compact ? 'py-0.5' : 'py-1'} ${on ? 'bg-white dark:bg-warm-800 border-warm-300 dark:border-warm-600 shadow-warm-sm text-warm-900 dark:text-warm-100' : 'border-transparent text-warm-500'}`} style={{ height: compact ? 40 : 66, transition: 'height .2s' }}>
+                <span className={`rounded-xl flex items-center justify-center ${compact ? 'w-6 h-6 text-[13px]' : 'w-10 h-10 text-[20px]'} ${w ? (on ? 'bg-terra-100 dark:bg-terra-900/30' : 'bg-warm-200 dark:bg-warm-700') : unset ? 'bg-warm-200 dark:bg-warm-700 opacity-50' : `border border-dashed border-warm-400 text-warm-400 ${compact ? 'text-[11px]' : 'text-[18px]'}`}`}>{w || unset ? r.icon : '＋'}</span>
+                <span className={`font-semibold leading-none ${compact ? 'text-[9px]' : 'text-[10.5px]'}`}>{t('builder.slot.' + r.id)}</span>
+                {!compact && (unset ? <span className="text-[8.5px] leading-none text-warm-400">{t('builder.unset')}</span> : <span className="w-5 h-1 rounded-full" style={{ background: sw || 'transparent' }} />)}
                 {pin && <i className="absolute -top-1 -right-1 text-[10px] leading-none not-italic">📌</i>}
               </button>
             )
