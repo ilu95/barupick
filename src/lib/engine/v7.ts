@@ -169,6 +169,11 @@ function evaluate(items, ctx) {
     const upC = upperItems.reduce((s, p) => s + p.c.C * p.area, 0) / upArea, upH = upperMain.c.h;
     const dL = sep(upperMain.c, bot.c) + ((isDenim(bot) || isDenim(upperMain)) && !(isDenim(bot) && isDenim(upperMain)) ? 6 : 0);
     const oneTone = dLmain < 10 && sameHue(upperMain, bot) && Math.abs(upperMain.c.C - bot.c.C) < 20;
+    /* 어두운 근접 톤 — 네이비×차콜·네이비×다크브라운처럼 위아래가 둘 다 어둡고(L<32·C<25) 명도 차가 15 안쪽이면
+       원톤도 대비도 아닌 틈(dL-low)에 빠지지 않게 원톤·올블랙과 같이 본다. 경계에서 점수가 튀지 않게 dL 12~18 램프 */
+    const darkNear = (1 - ramp(Math.max(upperMain.c.L, bot.c.L), 30, 34)) * (1 - ramp(Math.max(upperMain.c.C, bot.c.C), 23, 27)) * (1 - ramp(dLmain, 12, 18));
+    /* 올블랙만큼 올려 주는 건 틈(dL 10~15)에서만 — 진짜 원톤(네이비×미드나잇)은 기존 원톤 판정 그대로 둔다 */
+    const darkGap = darkNear * ramp(dLmain, 7, 10);
     let fit = band(dL, TARGET[0], TARGET[1], TARGET[2], TARGET[3]);
     /* 실무 예외 4종 — v7 의 "뭉개짐" 판정이 실무에서 정상인 착장(어두운 톤온톤·올화이트·흑백)을 깎던 자리.
        모자란 만큼을 비율로 되돌린다. 원톤 전용이던 "갈라 주는 자리" 판정을 모든 경우로 일반화하고 양말도 후보에 넣는다. */
@@ -178,7 +183,8 @@ function evaluate(items, ctx) {
     const brkOf = p => ramp(Math.abs(p.c.L - upperMain.c.L), 18, 32) * ramp(Math.abs(p.c.L - bot.c.L), 12, 24);
     const brkP = breakers.reduce((m, p) => (!m || brkOf(p) > brkOf(m)) ? p : m, null);
     const brk = brkP ? brkOf(brkP) : 0;
-    if (oneTone) fit = Math.max(fit, .45 + .55 * ramp(breakers.reduce((m, p) => Math.max(m, Math.abs(p.c.L - upperMain.c.L)), 0), 18, 45));
+    const toneFloor = .45 + .55 * ramp(breakers.reduce((m, p) => Math.max(m, Math.abs(p.c.L - upperMain.c.L)), 0), 18, 45);
+    fit = Math.max(fit, (oneTone ? 1 : darkNear) * toneFloor);
     const hueCarry = ramp(Math.max(upperMain.c.C, bot.c.C), 30, 45) * ramp(dH(upperMain.c.h, bot.c.h), 40, 70) * (1 - brk);
     const lightTonal = ramp(Math.min(upperMain.c.L, bot.c.L), FIX.C ? 58 : 66, FIX.C ? 66 : 74) * Math.max(ramp(Math.max(upperMain.c.C, bot.c.C), 10, 16), ramp(Math.min(upperMain.c.L, bot.c.L), 78, 84)) * (1 - brk);
     /* H. 크림·오프화이트도 무채다 — 계산 채도가 아니라 패션 무채로 본다 */
@@ -202,11 +208,11 @@ function evaluate(items, ctx) {
     /* E'. "올블랙"은 채도도 본다 — 네이비(C 18)·미드나잇(C 20)은 어두워도 블랙이 아니다 */
     const isK = p => p && p.c.L < 18 && p.c.C <= NEUTRAL_C;
     const allBlack = FIX.E && isK(upperMain) && isK(bot) && isK(shE);
-    if (allBlack) fit = fit + (1 - fit) * .5;
+    fit = fit + (1 - fit) * .5 * Math.max(allBlack ? 1 : 0, darkGap);
     /* 갈라 주는 자리는 밝을 수도 어두울 수도 있다(brkOf 는 절대값) — 말을 방향에 맞춰야 한다 */
     const brkUp = brkP && brkP.c.L > (upperMain.c.L + bot.c.L) / 2;
     if (brk > .35) add('tonal-breaker', `위아래 색이 비슷한데 ${nmG(brkP)} ${brkUp ? '밝아서 답답해 보이지 않아요' : '어두워서 밋밋하지 않아요'}`, 1, [brkP.slot, 'top', 'bottom']);
-    else if (oneTone) add('onetone-flat', '위아래가 온통 같은 색이라 밋밋해요. 이너나 신발만 밝은 걸로 바꿔도 확 살아나요', -1, ['top', 'shoes', 'inner']);
+    else if (oneTone || darkNear > .5) add('onetone-flat', oneTone ? '위아래가 온통 같은 색이라 밋밋해요. 이너나 신발만 밝은 걸로 바꿔도 확 살아나요' : '위아래가 둘 다 어두워서 가라앉아 보여요. 이너나 신발만 밝은 걸로 바꿔도 확 살아나요', -1, ['top', 'shoes', 'inner']);
     else if (dL < TARGET[1] * .6) {
       if (hueCarry > .35) add('hue-carries', `${nmW(upperMain)} ${nmN(bot)} 비슷하게 밝지만 색이 달라서 따로따로 잘 보여요`, 1, ['top', 'bottom']);
       else if (lightTonal > .35) add('light-tonal', '밝은 색으로만 맞춰 입어서 가볍고 산뜻해요', 1, ['top', 'bottom']);
@@ -220,7 +226,9 @@ function evaluate(items, ctx) {
     if (o && t) { const d2 = Math.abs(o.c.L - t.c.L); const oi = ramp(d2, 6, 22); mScore += 5 * (allBlack ? .5 + .5 * oi : oi); if (d2 < 8) add('outer-inner', `${nmW(o)} ${nmN(t)} 밝기가 비슷해서 겹쳐 입은 티가 안 나요`, -1, ['outer', 'top']); }
     else mScore += 5;
     const wantLightBottom = ctx.body && ctx.body.bottom === 'light';
-    mScore += 3 * (wantLightBottom ? ramp(bot.c.L - upperL, -8, 4) : ramp(upperL - bot.c.L, -8, 4));
+    /* 어두운 근접 톤은 위아래 순서가 눈에 안 띈다 — 같은 밝기(올블랙)처럼 본다 */
+    const dirOf = d => ramp(wantLightBottom ? -d : d, -8, 4);
+    mScore += 3 * Math.max(dirOf(upperL - bot.c.L), darkGap * dirOf(0));
     fitL = mScore / 30;
   } else { mScore = 18; fitL = .6; }
   parts['명도 구조'] = [Math.round(mScore), 30];

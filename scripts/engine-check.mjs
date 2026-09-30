@@ -126,6 +126,11 @@ console.log('코트 있음', withCoat.cal, '|', withCoat.reasons.filter(x => x.w
 console.log('코트 없음', noCoat.cal, '|', noCoat.reasons.filter(x => x.w < 0).map(x => x.txt).join(' / '))
 gate('대표님 사례 (코트 있음)', withCoat.cal <= 70, withCoat.cal, '≤ 70')
 gate('대표님 사례 (코트 없음)', noCoat.cal <= 50, noCoat.cal, '≤ 50')
+/* 어두운 근접 톤 — 네이비 니트 · 차콜 슬랙스는 기본 조합이다. dL-low 틈에 빠져 40점 나던 것 */
+const navyChar = ev({ top: 'navy', bottom: 'charcoal', shoes: 'black' }), navyCharW = ev({ top: 'navy', bottom: 'charcoal', shoes: 'white' })
+console.log('네이비·차콜·블랙', navyChar.cal, '| 네이비·차콜·화이트', navyCharW.cal)
+gate('대표님 사례 (네이비 니트·차콜·블랙)', navyChar.cal >= 70, navyChar.cal, '≥ 70')
+gate('대표님 사례 (네이비 니트·차콜·화이트)', navyCharW.cal >= 80, navyCharW.cal, '≥ 80')
 
 /* 6) 실제 룩 495 — 대표님이 핀터레스트에서 고른 착장의 자리→색 키(이미지 없음).
    좋은/나쁜을 가르는 세트가 아니라 "정상 코디"만 모은 것이라, 평균이 떨어지거나 60 미만이 늘면 규칙이 과하게 깎는다는 뜻이다.
