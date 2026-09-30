@@ -18,12 +18,24 @@ export type Move = EngineMove
  * 구역 상수 — 점수는 보정(calibrate) 전 v7 원점수 단위.
  * T_MATCH/T_AVOID: 그 자리 최고점과의 차이. C_VIVID: LCh 채도. L_CONTRAST: 기준 자리들과의 명도 차.
  * 값은 scripts/guide-check.mjs 의 분포·기준 세트 검사로 정했다.
- *   T_MATCH 0: 차이가 정수라 1만 줘도 찰떡이 27%로 상한(30%)에 붙는다 — 최고점과 같은 색만.
+ *   T_MATCH 6 · MATCH_CAP 12: 기준이 하나면 후보 대부분이 같은 점수라 0 으로는 계절 +1 받은 색만 찰떡이 됐다(네이비 상의 → 카라멜 44, 그레이 38).
+ *   6점 안쪽을 찰떡 후보로 두고, 12개를 넘으면 채도 낮은 순 → delta → 키 순 앞 12 만 찰떡, 나머지는 무난.
+ *   delta 를 먼저 보면 1점 앞선 카라멜·로즈핑크·라일락이 12칸을 다 먹고 그레이·화이트가 또 빠진다.
  *   C_VIVID 50: 35면 고수가 50%. 좋은 룩 실제 색 85%가 채도 30 이하라 50에서 좋은 룩을 거의 안 건드린다.
  *   L_CONTRAST 101: 명도 차 최대가 ~100(흑백)이라 사실상 끔. 좋은 룩 절반이 명도 차 61 이상(흑백·네이비·아이보리 대비)이라
  *   40~90 어디에 둬도 좋은 룩이 고수로 빠진다(85% 미달). 규칙은 남겨 두고 값만 막았다.
  */
-export const ZONE = { T_MATCH: 0, T_AVOID: 20, C_VIVID: 50, L_CONTRAST: 101 }
+export const ZONE = { T_MATCH: 6, MATCH_CAP: 12, T_AVOID: 20, C_VIVID: 50, L_CONTRAST: 101 }
+
+const chromaOf = (k: string) => lch(COLORS_60[k].hex).C
+
+/** 칸 안 순서 — 찰떡·무난은 무채·저채도 먼저(같으면 delta), 고수·피하는 색은 delta 순. 점수·구역은 안 바꾼다 */
+export function sortInZone(zone: Zone, keys: string[], delta: Record<string, number>): string[] {
+  const d = (k: string) => delta[k] ?? -999
+  return zone === 'match' || zone === 'safe'
+    ? [...keys].sort((a, b) => chromaOf(a) - chromaOf(b) || d(b) - d(a))
+    : [...keys].sort((a, b) => d(b) - d(a))
+}
 
 /** 액세서리는 면적이 작아 총점이 안 움직인다 — 구역을 끄고 △ 만. 액센트 규칙(v8.6, 실제 룩 검증)이 들어오면 구역을 켠다. */
 export const ACC_SLOTS = new Set(['hat', 'scarf', 'tie'])
@@ -49,13 +61,17 @@ function zonesFrom(g: ReturnType<typeof guideFor>, input: EngineInput, slot: str
     .filter(([s, k]) => s !== slot && k && COLORS_60[k])
     .map(([, k]) => lch(COLORS_60[k!].hex).L)
   const out: Record<string, Zone> = {}
+  const near: string[] = []
   for (const [k, d] of Object.entries(g.delta)) {
     const gap = best - d
     if (g.marks[k] === 'warn' || gap > ZONE.T_AVOID) { out[k] = 'avoid'; continue }
     const c = lch(COLORS_60[k].hex)
     const bold = c.C >= ZONE.C_VIVID || basisL.some(L => Math.abs(c.L - L) >= ZONE.L_CONTRAST)
-    out[k] = bold ? 'point' : gap <= ZONE.T_MATCH ? 'match' : 'safe'
+    out[k] = bold ? 'point' : 'safe'
+    if (!bold && gap <= ZONE.T_MATCH) near.push(k)
   }
+  near.sort((a, b) => chromaOf(a) - chromaOf(b) || g.delta[b] - g.delta[a] || a.localeCompare(b))
+  for (const k of near.slice(0, ZONE.MATCH_CAP)) out[k] = 'match'
   return out
 }
 
@@ -66,7 +82,7 @@ export function colorGuide(input: EngineInput, slot: string, recN = 12): Guide {
 
 /**
  * 색 키들을 네 구역으로. 순서: △(marks warn) 또는 최고점보다 T_AVOID 넘게 낮으면 avoid →
- * 쨍하거나(채도) 기준 자리와 명도가 크게 벌어지면 point(과감한 선택) → 최고점과 T_MATCH 이내면 match → 나머지 safe.
+ * 쨍하거나(채도) 기준 자리와 명도가 크게 벌어지면 point(과감한 선택) → 최고점과 T_MATCH 이내 앞 MATCH_CAP 개면 match → 나머지 safe.
  * 액세서리 자리는 빈 객체.
  */
 export function zoneOf(input: EngineInput, slot: string, keys: string[]): Record<string, Zone> {

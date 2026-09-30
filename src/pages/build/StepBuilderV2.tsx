@@ -9,7 +9,7 @@ import { useCharSex } from '@/hooks/useCharSex'
 import { PLATE_NAMES, PLATE_TO_ITEM } from '@/lib/outfits'
 import { RAIL, TYPES, typesFor, HAIR, HAIR_COLORS, HINTS, HAT_NAMES, DEFAULT_COLOR, UI_OUTERNESS, layerOf, uiSlotOf, type RailSlot, type UpperSlot, type AccSlot } from '@/lib/builderSlots'
 import { getFilledOutfit, engineInputOf, type BuildHook } from '@/hooks/useBuild'
-import { basisOf, colorGuide, ACC_SLOTS } from '@/lib/guide'
+import { basisOf, colorGuide, sortInZone, ACC_SLOTS } from '@/lib/guide'
 import { combosFor, type ComboCard } from '@/lib/engine'
 import { trackColorPick, trackColorConfirm, trackColorTab, trackEvent, trackGuide } from '@/lib/analytics'
 import { useWardrobe } from '@/hooks/useWardrobe'
@@ -226,8 +226,9 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   // 액세서리는 면적이 작아 총점이 안 움직인다. 액센트 규칙(v8.6, 실제 룩 검증)이 들어오면 구역을 켠다.
   const ZONES = ['match', 'safe', 'point', 'avoid'] as const
   const zoned = !!basisInput && !!guide && !isAcc
-  const zoneRows = (keys: string[], take?: Partial<Record<typeof ZONES[number], number>>) => ZONES
-    .map(z => { const ks = keys.filter(k => guide?.zones[k] === z); return { id: z, label: t('builder.sec.' + z), keys: take ? ks.slice(0, take[z] || 0) : ks, dim: z === 'avoid' } })
+  // 칸 안은 sortInZone(찰떡·무난은 무채 먼저) — 격자에서 밝기순을 켰으면 그 순서 그대로
+  const zoneRows = (keys: string[], take?: Partial<Record<typeof ZONES[number], number>>, keepOrder = false) => ZONES
+    .map(z => { const f = keys.filter(k => guide?.zones[k] === z); const ks = keepOrder || !guide ? f : sortInZone(z, f, guide.delta); return { id: z, label: t('builder.sec.' + z), keys: take ? ks.slice(0, take[z] || 0) : ks, dim: z === 'avoid' } })
     .filter(g => g.keys.length)
 
   // 퍼스널컬러 핵심색 추천 (guide.groups.mine = 엔진의 pcFace 그룹 — 옷장 "내 옷" 그룹과 이름이 겹쳐 UI id 는 'pc' 로 구분)
@@ -236,7 +237,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
   // 추천 탭도 같은 구역으로 — 계열 가리지 않고 어울리는 순 상위 찰떡 6 · 무난 6 · 고수 4 (피하는 색은 안 띄운다).
   // 구역이 없으면(기준 없음·액세서리) 제목 없는 한 줄: 기준 없음은 ● 추천, 액세서리는 팔레트 그대로에 △ 만
   const recRows = useMemo(() => !guide ? []
-    : zoned ? zoneRows(Object.keys(COLORS_60).sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999)), { match: 6, safe: 6, point: 4 })
+    : zoned ? zoneRows(Object.keys(COLORS_60), { match: 6, safe: 6, point: 4 })
     : [{ id: 'flat', label: '', keys: isAcc ? Object.keys(COLORS_60) : guide.rec, dim: false }], [guide, zoned, isAcc])
   const groupRows: { id: string; label: string; keys: string[]; dim?: boolean }[] = guide ? [
     ...(pcKeys.length ? [{ id: 'pc', label: t('builder.group.pc'), keys: pcKeys }] : []),
@@ -291,8 +292,8 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
     const cands: { key: string; kind: 'safe' | 'match' | 'point' }[] = []
     if (zoned) {
       // 카드 이름이 칩 구역과 같도록 구역마다 1위
-      const byDelta = Object.keys(COLORS_60).sort((a, b) => (guide.delta[b] ?? -999) - (guide.delta[a] ?? -999))
-      for (const kind of ['safe', 'match', 'point'] as const) { const key = byDelta.find(k => guide.zones[k] === kind); if (key) cands.push({ key, kind }) }
+      const rows = zoneRows(Object.keys(COLORS_60))
+      for (const kind of ['safe', 'match', 'point'] as const) { const key = rows.find(r => r.id === kind)?.keys[0]; if (key) cands.push({ key, kind }) }
       return cands
     }
     if (guide.groups.safe[0]) cands.push({ key: guide.groups.safe[0], kind: 'safe' })
@@ -497,7 +498,7 @@ export default function StepBuilderV2({ build, guided = false, onBack, onDone, d
                 ) : zoned ? (
                   // 격자를 접지 않고 격자 안에 구역을 새겨 넣는다 — 피하는 색도 흐리게 두되 고를 수는 있다
                   <div className="flex flex-col gap-2.5">
-                    {zoneRows(chipKeys).map(g => (
+                    {zoneRows(chipKeys, undefined, sortBright).map(g => (
                       <div key={g.id}>
                         <div className="px-1 mb-1 text-[10.5px] font-bold text-warm-500">{g.label}</div>
                         <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{g.keys.map((k, i) => renderChip(k, 'grid', i, g.id, g.dim))}</div>
