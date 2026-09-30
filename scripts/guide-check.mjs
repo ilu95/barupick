@@ -116,9 +116,30 @@ for (const situ of SITUS) for (const o of OUTFITS) for (const slot of BIG) {
 }
 const tot = Object.values(seen).reduce((a, b) => a + b, 0)
 const P = Object.fromEntries(Object.entries(seen).map(([k, v]) => [k, pct(v, tot)]))
-const distOk = P.match >= 10 && P.match <= 30 && P.safe >= 30 && P.safe <= 60 && P.point >= 5 && P.point <= 20 && P.avoid <= 40
+/* 찰떡은 MATCH_CAP(12/167 ≈ 7%)으로 묶여서 아래 끝은 "있다"만 본다 — 위 끝 30% 는 그대로 */
+const distOk = P.match > 0 && P.match <= 30 && P.safe >= 30 && P.safe <= 60 && P.point >= 5 && P.point <= 20 && P.avoid <= 40
 line(distOk, `b) 분포 (${cases}경우)`, `찰떡 ${P.match}% · 무난 ${P.safe}% · 고수 ${P.point}% · 피하는 ${P.avoid}%`)
 for (const [s, v] of Object.entries(bySlot)) { const t = Object.values(v).reduce((a, b) => a + b, 0); console.log(`     ${s.padEnd(11)} 찰떡 ${pct(v.match, t)} · 무난 ${pct(v.safe, t)} · 고수 ${pct(v.point, t)} · 피하는 ${pct(v.avoid, t)}`) }
+/* b') 기준 개수별 — 기준이 하나면 점수가 평평해서 찰떡이 상한(12)에 붙고, 늘수록 점수가 갈려 줄어야 한다 */
+{
+  const byN = {}
+  for (const situ of SITUS) for (const o of OUTFITS) for (const slot of BIG) {
+    const full = { outfit: { ...o }, situ, month: 4 }
+    if (!full.outfit[slot]) full.outfit[slot] = 'white'
+    const others = Object.keys(full.outfit).filter(s => s !== slot)
+    for (let n = 1; n <= others.length; n++) {
+      const z = zoneOf(basisOf(full, others.slice(0, n), slot), slot, KEYS)
+      const b = byN[Math.min(n, 3)] = byN[Math.min(n, 3)] || { match: 0, safe: 0, point: 0, avoid: 0, cases: 0, matchN: [] }
+      b.cases++; let m = 0
+      for (const k of KEYS) { b[z[k]]++; if (z[k] === 'match') m++ }
+      b.matchN.push(m)
+    }
+  }
+  for (const [n, v] of Object.entries(byN)) {
+    const t = v.match + v.safe + v.point + v.avoid, avgM = +(v.matchN.reduce((a, b) => a + b, 0) / v.matchN.length).toFixed(1)
+    line(pct(v.match, t) <= 30, `b) 기준 ${n === '3' ? '3개 이상' : n + '개'} (${v.cases}경우)`, `찰떡 ${pct(v.match, t)}% (평균 ${avgM}색) · 무난 ${pct(v.safe, t)}% · 고수 ${pct(v.point, t)}% · 피하는 ${pct(v.avoid, t)}%`)
+  }
+}
 line(neutralMatch > 0, 'd) 무채색 찰떡', `${neutralMatch}건`)
 
 /* ── c) 기준 세트 ── */
