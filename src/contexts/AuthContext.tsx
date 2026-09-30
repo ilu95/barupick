@@ -9,6 +9,9 @@ import { removeKeys } from '@/lib/storage'
 // iOS 번들 ID — Apple 네이티브 로그인 시 id_token의 aud 클레임에 사용됨
 const IOS_BUNDLE_ID = 'kr.co.barusa.barupick'
 
+// 메일 링크·OAuth 가 앱(커스텀 스킴)으로 돌아오는 웹 콜백
+const AUTH_CALLBACK = 'https://barupick.vercel.app/auth/callback.html'
+
 // 커스텀 네이티브 Apple Sign In 플러그인 (ios/App/App/AppleSignInPlugin.swift)
 interface AppleSignInPlugin {
   authorize(): Promise<{ identityToken: string; user: string; email?: string; fullName?: string }>
@@ -30,7 +33,9 @@ interface AuthState {
   profile: Profile | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  signup: (email: string, password: string, nickname: string) => Promise<void>
+  signup: (email: string, password: string, nickname: string) => Promise<boolean>
+  resendConfirm: (email: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   socialLogin: (provider: 'kakao' | 'google' | 'apple') => Promise<void>
   logout: () => Promise<void>
   fetchProfile: () => Promise<void>
@@ -129,13 +134,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signup = async (email: string, password: string, nickname: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { nickname } }
+      options: { data: { nickname }, emailRedirectTo: AUTH_CALLBACK }
     })
     if (error) throw error
+    // 이미 있는 이메일이면 수파베이스가 가짜 성공(identities 빈 배열)을 돌려준다
+    if (data.user && data.user.identities?.length === 0) throw new Error('User already registered')
     trackSignup()
+    return !!data.session // false = 이메일 확인 대기
+  }
+
+  const resendConfirm = async (email: string) => {
+    const { error } = await supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: AUTH_CALLBACK } })
+    if (error) throw error
+  }
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: AUTH_CALLBACK })
+    if (error) throw error
   }
 
   const socialLogin = async (provider: 'kakao' | 'google' | 'apple') => {
@@ -208,7 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: 'https://barupick.vercel.app/auth/callback.html',
+          redirectTo: AUTH_CALLBACK,
           skipBrowserRedirect: true,
         }
       })
@@ -254,7 +272,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, signup, socialLogin, logout, fetchProfile, updateProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, signup, resendConfirm, resetPassword, socialLogin, logout, fetchProfile, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

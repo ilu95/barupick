@@ -127,6 +127,31 @@ workflows:
       - name: Sync Capacitor
         script: npx cap sync android
 
+      - name: Patch AndroidManifest (deep link)
+        script: |
+          python3 - <<'PY'
+          import re,io
+          p='android/app/src/main/AndroidManifest.xml'; s=io.open(p,encoding='utf-8').read()
+          if 'kr.co.barusa.barupick' not in s:
+              filt='''
+                      <intent-filter>
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data android:scheme="kr.co.barusa.barupick" />
+                      </intent-filter>
+          '''
+              # MainActivity 의 <activity> 블록 안, 첫 </intent-filter> 뒤에 넣는다
+              s=re.sub(r'(<activity[^>]*MainActivity[\s\S]*?</intent-filter>)', lambda m: m.group(1)+filt, s, count=1)
+              assert 'kr.co.barusa.barupick' in s, 'patch failed'
+              # 콜백이 새 액티비티를 띄우지 않게 singleTask 보장
+              if 'launchMode' not in s:
+                  s=s.replace('<activity', '<activity android:launchMode="singleTask"', 1)
+              io.open(p,'w',encoding='utf-8').write(s); print('patched')
+          else: print('already')
+          PY
+          grep -n "kr.co.barusa.barupick" android/app/src/main/AndroidManifest.xml
+
 
       - name: Increment version code
         script: |
