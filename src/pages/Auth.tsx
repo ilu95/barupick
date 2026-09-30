@@ -3,6 +3,20 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Shirt, UserPlus, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { Capacitor } from '@capacitor/core'
+
+// 안드로이드엔 네이티브 Apple 로그인이 없다 — OAuth 로 빠지면 같은 딥링크 문제를 타서 숨긴다
+const HIDE_APPLE = Capacitor.getPlatform() === 'android'
+
+// 수파베이스 영문 오류 → 번역 키 (못 맞추면 원문 대신 일반 실패 문구)
+const AUTH_ERR: [string, string][] = [
+  ['Invalid login credentials', 'auth.err.invalid'],
+  ['Email not confirmed', 'auth.err.unconfirmed'],
+  ['User already registered', 'auth.err.exists'],
+]
+function authErrKey(e: any, fallback: string) {
+  return AUTH_ERR.find(([m]) => e?.message?.includes(m))?.[1] ?? fallback
+}
 
 export default function Auth() {
   const location = useLocation()
@@ -27,11 +41,23 @@ export default function Auth() {
 function Login() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { login, socialLogin } = useAuth()
+  const { login, socialLogin, resendConfirm, resetPassword } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const handleResend = async () => {
+    try { await resendConfirm(email); setError(''); setNotice(t('auth.resendDone')) }
+    catch (e: any) { setError(e.message || t('auth.loginFailed')) }
+  }
+
+  const handleReset = async () => {
+    if (!email) { setError(t('auth.emailRequired')); return }
+    try { await resetPassword(email); setError(''); setNotice(t('auth.resetSent')) }
+    catch (e: any) { setError(e.message || t('auth.loginFailed')) }
+  }
 
   const handleLogin = async () => {
     if (!email || !password) { setError(t('auth.emailRequired')); return }
@@ -41,7 +67,7 @@ function Login() {
       await login(email, password)
       navigate('/home', { replace: true })
     } catch (e: any) {
-      setError(e.message || t('auth.loginFailed'))
+      setError(t(authErrKey(e, 'auth.loginFailed')))
     } finally {
       setLoading(false)
     }
@@ -83,6 +109,7 @@ function Login() {
 
         {/* 소셜 로그인 */}
         <div className="flex flex-col gap-2.5 mb-5">
+          {!HIDE_APPLE && (
           <button
             onClick={() => handleSocial('apple')}
             disabled={!!socialLoading}
@@ -91,6 +118,7 @@ function Login() {
             {socialLoading === 'apple' ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>}
             {t('auth.appleLogin')}
           </button>
+          )}
           <button
             onClick={() => handleSocial('kakao')}
             disabled={!!socialLoading}
@@ -126,8 +154,14 @@ function Login() {
         {error && (
           <div className="text-sm text-red-500 text-center mb-3 bg-red-50 dark:bg-red-900/20 rounded-xl px-4 py-3 leading-relaxed">
             {error}
+            {error === t('auth.err.unconfirmed') && (
+              <button onClick={handleResend} className="block mx-auto mt-2 text-terra-600 font-semibold underline">
+                {t('auth.resendConfirm')}
+              </button>
+            )}
           </div>
         )}
+        {notice && <div className="text-sm text-warm-700 text-center mb-3 bg-warm-100 rounded-xl px-4 py-3 leading-relaxed">{notice}</div>}
 
         {/* 이메일 로그인 */}
         <div className="mb-4">
@@ -160,6 +194,10 @@ function Login() {
           {loading ? t('common.loading') : t('auth.loginButton')}
         </button>
 
+        <div className="text-center mb-3">
+          <button onClick={handleReset} className="text-xs text-warm-600 underline">{t('auth.forgotPassword')}</button>
+        </div>
+
         <div className="text-center text-sm text-warm-600">
           {t('auth.switchToSignup').split('?')[0]}?{' '}
           <button onClick={() => navigate('/auth/signup')} className="text-terra-600 font-semibold">
@@ -181,6 +219,7 @@ function Signup() {
   const [nickname, setNickname] = useState('')
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSignup = async () => {
@@ -195,10 +234,11 @@ function Signup() {
     setLoading(true)
     setError('')
     try {
-      await signup(email, password, nickname)
-      navigate('/home', { replace: true })
+      const hasSession = await signup(email, password, nickname)
+      if (hasSession) navigate('/home', { replace: true })
+      else setNotice(t('auth.signupCheckMail'))
     } catch (e: any) {
-      setError(e.message || t('auth.signupFailed'))
+      setError(t(authErrKey(e, 'auth.signupFailed')))
     } finally {
       setLoading(false)
     }
@@ -240,6 +280,7 @@ function Signup() {
 
         {/* 소셜 가입 */}
         <div className="flex flex-col gap-2.5 mb-4">
+          {!HIDE_APPLE && (
           <button
             onClick={() => handleSocial('apple')}
             className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-semibold text-sm bg-black text-white active:scale-[0.98] transition-all"
@@ -247,6 +288,7 @@ function Signup() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
             {t('auth.appleLogin')}
           </button>
+          )}
           <button
             onClick={() => handleSocial('kakao')}
             className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all"
@@ -278,6 +320,7 @@ function Signup() {
 
         {/* 에러 */}
         {error && <div className="text-sm text-red-500 text-center mb-3">{error}</div>}
+        {notice && <div className="text-sm text-warm-700 text-center mb-3 bg-warm-100 rounded-xl px-4 py-3 leading-relaxed">{notice}</div>}
 
         {/* 닉네임 */}
         <div className="mb-4">
