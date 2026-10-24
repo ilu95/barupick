@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { FeedbackModal } from '@/pages/Settings'
 import { profile } from '@/lib/profile'
+import { trackEvent } from '@/lib/analytics'
 import { useTranslation } from 'react-i18next'
 
 // ─── 날씨 코디 ───
@@ -926,6 +927,8 @@ export function EventDetail() {
 export function PcSelect() {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const toast = useToast()
+  const [, rerender] = useState(0)
   const current = profile.getPersonalColor()
   const currentData = current ? (PERSONAL_COLOR_12 as any)[current] : null
   const [mode, setMode] = useState<'menu' | 'quiz' | 'result' | 'select'>('menu')
@@ -969,6 +972,14 @@ export function PcSelect() {
     navigate('/profile', { replace: true })
   }
 
+  // fitMode 는 체형 맞춤과 공용 스위치라 건드리지 않는다
+  const clearPC = () => {
+    profile.setPersonalColor(null)
+    trackEvent('set_personal_color', { type: null })
+    toast.success(t('pcSelect.cleared'))
+    rerender(n => n + 1)
+  }
+
   // 메인 메뉴
   if (mode === 'menu') {
     return (
@@ -986,6 +997,13 @@ export function PcSelect() {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {currentData && (
+          <div className="mb-5 -mt-2">
+            <button onClick={clearPC} className="w-full py-3 border border-warm-400 dark:border-warm-600 rounded-2xl text-sm font-semibold text-warm-700 dark:text-warm-300 active:scale-[0.98] transition-all">{t('pcSelect.clear')}</button>
+            <p className="text-[11px] text-warm-500 dark:text-warm-400 mt-1.5 text-center">{t('pcSelect.clearDesc')}</p>
           </div>
         )}
 
